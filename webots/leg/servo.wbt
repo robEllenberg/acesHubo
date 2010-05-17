@@ -1,0 +1,26 @@
+#VRML_SIM V6.0 utf8
+WorldInfo {
+  info [
+    "Description"
+    "Author: first name last name <e-mail>"
+    "Date: DD MMM YYYY"
+  ]
+}
+Viewpoint {
+  orientation 0.929135 0.364829 0.0600597 5.53658
+  position -0.226849 0.496808 0.677873
+}
+Background {
+  skyColor [
+    0.4 0.7 1
+  ]
+}
+PointLight {
+  location 0 0.3 0
+}
+Robot {
+  children [
+    Servo {
+    }
+  ]
+}

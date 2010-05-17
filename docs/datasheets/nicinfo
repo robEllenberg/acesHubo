@@ -1,0 +1,36 @@
+
+Windows IP Configuration
+
+        Host Name . . . . . . . . . . . . : tyr
+        Primary Dns Suffix  . . . . . . . : 
+        Node Type . . . . . . . . . . . . : Hybrid
+        IP Routing Enabled. . . . . . . . : No
+        WINS Proxy Enabled. . . . . . . . : No
+        DNS Suffix Search List. . . . . . : dhcp.drexel.edu
+
+Ethernet adapter Wireless Network Connection:
+
+        Media State . . . . . . . . . . . : Media disconnected
+        Description . . . . . . . . . . . : Atheros AR5007EG Wireless Network Adapter
+        Physical Address. . . . . . . . . : 00-23-4E-10-53-C4
+
+Ethernet adapter Local Area Connection:
+
+        Connection-specific DNS Suffix  . : dhcp.drexel.edu
+        Description . . . . . . . . . . . : Realtek RTL8102E Family PCI-E Fast Ethernet NIC
+        Physical Address. . . . . . . . . : 00-23-8B-12-8B-C7
+        Dhcp Enabled. . . . . . . . . . . : Yes
+        Autoconfiguration Enabled . . . . : Yes
+        IP Address. . . . . . . . . . . . : 129.25.31.179
+        Subnet Mask . . . . . . . . . . . : 255.255.128.0
+        Default Gateway . . . . . . . . . : 129.25.1.253
+        DHCP Server . . . . . . . . . . . : 144.118.24.10
+        DNS Servers . . . . . . . . . . . : 144.118.24.20
+                                            144.118.24.10
+        Primary WINS Server . . . . . . . : 144.118.25.118
+        Secondary WINS Server . . . . . . : 144.118.25.31
+        Lease Obtained. . . . . . . . . . : Monday, March 08, 2010 11:40:47 AM
+        Lease Expires . . . . . . . . . . : Monday, March 29, 2010 11:40:47 AM
+
+
+Liscence is tied to wireless interface.

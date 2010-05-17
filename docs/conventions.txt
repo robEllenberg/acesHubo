@@ -1,0 +1,45 @@
+Joint Naming Convention
+Joint names are capitalized 3-character codes
+in the following order:
+
+Sides
+(From the robot's perspective)
+R - Right
+L - Left
+_ - (Blank) Center/On axis of symmetry
+
+Body Part
+H - Hip
+N - Neck
+S - Shoulder
+L - Leg
+E - Elbow
+K - Knee
+A - Ankle
+F - Foot
+W - Waist
+
+Rotational Coordinate
+R - Roll        (in the way one roll's their ankle)
+P - Pitch       (as to punt a football, or nod one's head 'yes')
+Y - Yaw         (as from 'Twist & Shout', or shake one's head 'no')
+
+2009 Atlas Script File Definition
+Space delimited floating point numbers, 0-indexed
+
+q[0] = HIP_TORSO_YAW
+q[1] = L_HIP_YAW
+q[2] = L_HIP_ROLL
+q[3] = L_HIP_PITCH
+q[4] = L_KNEE_UPPER
+q[5] = L_KNEE_LOWER
+q[6] = L_ANKLE_PITCH
+q[7] = L_ANKLE_ROLL
+q[8] = R_HIP_YAW
+q[9] = R_HIP_ROLL
+q[10] = R_HIP_PITCH
+q[11] = R_KNEE_UPPER
+q[12] = R_KNEE_LOWER
+q[13] = R_ANKLE_PITCH
+q[14] = R_ANKLE_ROLL
+
