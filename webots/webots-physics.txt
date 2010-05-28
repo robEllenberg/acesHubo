@@ -1,0 +1,35 @@
+'Bounding Object' added as a member of a Servo Node
+-------------------------------------------------------
+boundingObject DEF BODY_BO Group {
+    children [
+      Transform {
+        translation 0 0.056 -0.021
+        children [
+          Shape {
+            geometry Box {
+              size 0.134 0.135 0.1
+            }
+          }
+        ]
+      }
+    ]
+  }
+
+boundingObject DEF FAKE_BOX Box {
+    size 0.001 0.001 0.001
+}
+
+
+'Physics' added as a member of a Servo Node
+----------------------------------------------------
+physics DEF LLEG_JOINT2_PHYSICS Physics {
+     density -1
+     mass 0.172696
+     inertiaMatrix [
+        0, 0, 0, 6.30681e-05, 5.5582e-05, 4.51248e-05, -2.93348e-07, -1.01227e-06, 3.50678e-07
+     ]
+     coulombFriction 0.995
+     forceDependentSlip 0.005
+     centerOfMass -0.00328965 -0.000632384 0.0034717
+     orientation 0 0 1 1.5708
+}
