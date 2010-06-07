@@ -12,7 +12,7 @@ all: robotisFlex.o pvalue.o dispatcher.o hardware.o credentials.o parameter.o me
 webots: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o miniHubo
 #	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o miniHubo
-	$(CP) miniHubo /home/bob/thesis/webots/webots-proj/controllers/miniHubo/
+	$(CP) miniHubo /home/bob/thesis/aces/webots/webots-proj/controllers/miniHubo/
 
 test: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o test.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o test

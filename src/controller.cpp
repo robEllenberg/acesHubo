@@ -8,6 +8,7 @@ namespace ACES{
       : RTT::TaskContext(n),
         walkScript(scriptFile, std::ifstream::in)
     {
+        assert(walkScript.is_open());
         plist = pl;
         std::vector<ACES::Parameter*>::iterator it;
         //Create a mapping of names->parameters
@@ -41,8 +42,7 @@ namespace ACES{
 
     void WbController::cleanupHook(){}
 
-    std::map<std::string, ACES::PValue*>* 
-      WbController::getStateVector(){
+    std::map<std::string, ACES::PValue*>* WbController::getStateVector(){
 
         std::map<std::string, ACES::PValue*> *sv =
             new std::map<std::string, ACES::PValue*>;
@@ -51,7 +51,7 @@ namespace ACES{
         //Fill w/the script info if we have data left, 
         //otherwise zero fill the vector
         if(not walkScript.eof()){
-            for(int i = 0; i<15; i++){
+            for(int i = 0; i<13; i++){
                 //offset = it+i;
                 float value;
                 walkScript >> value;
@@ -59,7 +59,7 @@ namespace ACES{
                RTT::Logger::log() << value << ", ";
             }
         }else{
-            for(int i=0; i< 15; i++){
+            for(int i=0; i< 13; i++){
                 angles.push_back(0.0);
                 RTT::Logger::log() << "EOF" << ", ";
             }
@@ -71,6 +71,7 @@ namespace ACES{
         walkScript.getline(a, 1000);
 
         //Populate the state vector
+        /*
         (*sv)["HY"] = new ACES::PValue(angles[0]);
         (*sv)["LHY"] = new ACES::PValue(angles[1]);
         (*sv)["LHR"] = new ACES::PValue(angles[2]);
@@ -86,6 +87,21 @@ namespace ACES{
                                  + angles[12]);
         (*sv)["RAP"] = new ACES::PValue(angles[13]);
         (*sv)["RAR"] = new ACES::PValue(angles[14]);
+        */
+        (*sv)["HY"] = new ACES::PValue(angles[0]);
+        (*sv)["LHY"] = new ACES::PValue(angles[1]);
+        (*sv)["LHR"] = new ACES::PValue(angles[2]);
+        (*sv)["LHP"] = new ACES::PValue(angles[3]);
+        (*sv)["LKP"] = new ACES::PValue(angles[4]);
+        (*sv)["LAP"] = new ACES::PValue(angles[5]);
+        (*sv)["LAR"] = new ACES::PValue(angles[6]);
+        (*sv)["RHY"] = new ACES::PValue(angles[7]);
+        (*sv)["RHR"] = new ACES::PValue(angles[8]);
+        (*sv)["RHP"] = new ACES::PValue(angles[9]);
+        (*sv)["RKP"] = new ACES::PValue(angles[10]);
+        (*sv)["RAP"] = new ACES::PValue(angles[11]);
+        (*sv)["RAR"] = new ACES::PValue(angles[12]);
+ 
         return sv;
     }
 

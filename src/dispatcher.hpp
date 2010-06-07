@@ -7,6 +7,7 @@
 #include <rtt/Activity.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/Event.hpp>
+#include <rtt/Buffer.hpp>
 #include "parameter.hpp"
 #include "protocol.hpp"
 

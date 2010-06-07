@@ -63,8 +63,7 @@ namespace ACES {
         }
     }
 
-    std::list<Credentials*>*
-      Protocol::getNewRequests(){
+    std::list<Credentials*>* Protocol::getNewRequests(){
         std::list<Credentials*>* cred = new std::list<Credentials*>();
         while( this->request_stack->size() ){
             Credentials* c; 

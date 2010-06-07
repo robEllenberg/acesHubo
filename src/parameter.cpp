@@ -62,6 +62,7 @@ namespace ACES {
         //original approach 
         //Credentials* c = new Credentials(credentials, val);
         Credentials* c = credentials->credCopy(val);
+        //if( this->outport->full() ){}
         this->outport->Push(c);
         return true;
     }

@@ -65,6 +65,7 @@ namespace ACES {
             void issueMessage();
             
             bool theresStillTime();
+            //virtual bool registerParam(ACES::Parameter*) = 0;
     };
 
     class charDevProtocol : public Protocol {

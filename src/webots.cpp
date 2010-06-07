@@ -12,8 +12,8 @@ namespace Webots {
     }
     
     void Hardware::updateHook(){
-        wb_robot_step(32);
         ACES::Hardware::updateHook();
+        wb_robot_step(32);
     }
 
     bool Hardware::transmit(ACES::Message* m){
@@ -31,7 +31,8 @@ namespace Webots {
 
             WbDeviceTag joint =
                     wb_robot_get_device(jid.c_str());
-            wb_servo_set_position(joint, 3.14159/180.*angle);
+            //wb_servo_set_position(joint, 3.14159/180.*angle);
+            wb_servo_set_position(joint, angle);
         }
         //m->printme();
     }
@@ -104,7 +105,14 @@ namespace Webots {
             reqs.pop_front();
             pending_stack->push_back(m);
         }
+        //
+        //joints[name] = 
+
     }
+
+//    bool registerParam(ACES::Parameter*){
+//        joints.push_back()
+//    }
 
     ACES::Credentials* Protocol::parseHWInput(
                        ACES::Message* c) {}

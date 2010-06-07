@@ -69,6 +69,9 @@ namespace Webots{
                                ACES::Message* c) ;
             void aggregateRequests(
                 std::list<ACES::Credentials*> &reqs);
+
+            //bool registerParam(ACES::Parameter*);
+            //std::map<std::string, bool> joints;
     };
 }    
 

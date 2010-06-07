@@ -21,7 +21,7 @@ int ORO_main(int a, char** b){
     );
 
     ACES::Hardware* hw = (ACES::Hardware*) new 
-        Webots::Hardware((std::string)"HW", 5, 31);
+        Webots::Hardware((std::string)"HW", 10, 15);
 
     ACES::Protocol* webot =
              (ACES::Protocol*) new Webots::Protocol(
@@ -31,11 +31,11 @@ int ORO_main(int a, char** b){
 
     ACES::Parameter* xx = (ACES::Parameter*) new
         Webots::Parameter("xx", "Chest_1",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* HY = (ACES::Parameter*) new
         Webots::Parameter("HY", "Waist_1",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* LSP = (ACES::Parameter*) new
         Webots::Parameter("LSP", "Shoulder_Elbow_2",
@@ -59,19 +59,19 @@ int ORO_main(int a, char** b){
 
     ACES::Parameter* LHR = (ACES::Parameter*) new
         Webots::Parameter("LHR", "Hip_Ankle_pitch_roll_2",
-        dispatch, 5, 31, 0.0, -1.0 );
+        dispatch, 5, 31, 0.0, 1.0 );
 
     ACES::Parameter* LHP = (ACES::Parameter*) new
         Webots::Parameter("LHP", "Thigh_2",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* LKP = (ACES::Parameter*) new
         Webots::Parameter("LKP", "Shin_2",
-        dispatch, 5, 31, 0.0, -1.0 );
+        dispatch, 5, 31, 0.0, 1.0 );
 
     ACES::Parameter* LAP = (ACES::Parameter*) new
         Webots::Parameter("LAP", "Hip_Ankle_pitch_roll_4",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* LAR = (ACES::Parameter*) new
         Webots::Parameter("LAR", "Foot_2",
@@ -87,15 +87,15 @@ int ORO_main(int a, char** b){
 
     ACES::Parameter* RHP = (ACES::Parameter*) new
         Webots::Parameter("RHP", "Thigh_1",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* RKP = (ACES::Parameter*) new
         Webots::Parameter("RKP", "Shin_1",
-        dispatch, 5, 31, 0.0, -1.0 );
+        dispatch, 5, 31, 0.0, 1.0 );
 
     ACES::Parameter* RAP = (ACES::Parameter*) new
         Webots::Parameter("RAP", "Hip_Ankle_pitch_roll_3",
-        dispatch, 5, 31, 0.0, 1.0 );
+        dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* RAR = (ACES::Parameter*) new
         Webots::Parameter("RAR", "Foot_1",
@@ -141,7 +141,8 @@ int ORO_main(int a, char** b){
     pvect.push_back(RAR);
 
     ACES::WbController wbctrl("ctrl", pvect,
-        "testTools/zmpwalkfast2.txt", 5, 10);
+        //"testTools/zmpwalkfast2.txt", 5, 10);
+        "IKscript1.txt", 5, 10);
     for(int i = 10000; i > 0; i--){
     }
 

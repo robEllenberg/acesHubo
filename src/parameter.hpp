@@ -32,6 +32,10 @@ namespace ACES {
             */
             RTT::WriteBufferPort<Credentials*>* outport;
             RTT::ReadDataPort<Credentials*>* inport;
+            //RTT::Buffer<Credentials*, RTT::NonBlockingPolicy,
+            //            RTT::BlockingPolicy>* outport;
+            //RTT::Buffer<Credentials*>* inport;
+
             //RTT::Method<void(float)> setMethod;
 
             Parameter(std::string n, Credentials* c,

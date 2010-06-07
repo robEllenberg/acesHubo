@@ -81,6 +81,11 @@ namespace ACES{
         RTT::WriteBufferPort<Credentials*>* param_tx =
             new RTT::WriteBufferPort<Credentials*>(n1, 15);
 
+        //RTT::Buffer<Credentials*, RTT::NonBlockingPolicy, RTT::BlockingPolicy>* param_tx = new RTT::Buffer<Credentials*, RTT::NonBlockingPolicy, RTT::BlockingPolicy>(1);
+        //RTT::PortInterface* param_tx = (RTT::PortInterface*)new RTT::Buffer<Credentials*, RTT::NonBlockingPolicy, RTT::BlockingPolicy>(1);
+//        RTT::PortInterface* param_tx = new RTT::PortInterface(n1);
+ //       param_tx->createConnection(buf_param_tx);
+
         RTT::ReadDataPort<Credentials*>* param_rx =
             new RTT::ReadDataPort<Credentials*>(n4);
 
@@ -88,12 +93,14 @@ namespace ACES{
 
         pram->ports()->addPort(param_tx, n1);
         pram->ports()->addEventPort(param_rx, n4);
+        //pram->outport = (RTT::Buffer*)param_tx;
         pram->outport = param_tx;
         pram->inport = param_rx;
 
         param_tx->connectTo(pcol->request_stack);
         pcol_tx->connectTo(param_rx);
         pcol->connectPeers(pram);
+        //pcol->registerParam(pram);
        
         return true;
     }

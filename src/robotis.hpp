@@ -67,7 +67,7 @@ namespace Robotis {
 
             std::deque<char>* scanInput();
 
-            void addRequest(ACES::Credentials c);
+            void addRequest(ACES::Credentials* c);
 
             ACES::Message* buildMessage(
                  ACES::Credentials* cred);
