@@ -6,13 +6,16 @@ LIBS = -L/home/bob/thesis/support/lib -L/usr/local/webots/lib/
 CXXFLAGS = $(INCLUDES) $(LIBS)
 DEBUG = -g
 
-all: robotisFlex.o pvalue.o dispatcher.o hardware.o credentials.o parameter.o message.o  protocol.o robotis.o 
+hubo: robotisFlex.o pvalue.o dispatcher.o hardware.o credentials.o parameter.o message.o  protocol.o robotis.o 
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o controller
 
-webots: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
+webots-mini: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o minihubo
-#	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o minihubo
-	$(CP) minihubo /home/bob/thesis/aces/webots/webots-proj/controllers/minihubo/
+	$(CP) minihubo ../webots/controllers/minihubo/
+
+webots-hubo:
+	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o hubo
+	$(CP) hubo ../webots/controllers/hubo/
 
 test: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o test.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o test
@@ -22,7 +25,9 @@ robotisFlex.o: robotis.l
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) -c -lfl robotis.yy.c -o robotisFlex.o
 
 clean:
-	@-rm test atlasleg controller miniHubo
+	@-rm test atlasleg controller miniHubo hubo
+	@../webots/controllers/minihubo/minihubo
+	@../webots/controllers/hubo/hubo
 	@-rm *.o
 	@-rm robotis.yy.c robotis.yy.h
 	@-rm orocos.log .tb_history test.io
