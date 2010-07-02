@@ -3,19 +3,32 @@
 namespace ACES {
     Protocol::Protocol(std::string n, Hardware* hw,
                        int pri, int UpdateFreq)
-      :RTT::TaskContext(n){
+      : RTT::TaskContext(n),
+        issueMessage("issueMessage")
+        {
 
         priority = pri;
         frequency = UpdateFreq;
         name = n;
         hardware = hw;
+        
+        this->events()->addEvent(&issueMessage, "issueMessage", "msg", "The message to be transmitted");
+
+        RTT::Handle h = this->events()->setupConnection("issueMessage")
+            .callback( hw, &Hardware::transmit
+           //            hw->engine()->events() ).handle();
+            ).handle();
+        assert( h.ready() );
+        h.connect();
+        assert( h.connected() );
 
         this->pending_stack = new std::deque<Message*>;
-        request_stack = new
-            RTT::ReadBufferPort<Credentials*>("Request Stack");
+
+        //request_stack = new
+        //    RTT::ReadBufferPort<Credentials*>("Request Stack");
         
-        this->ports()->addPort(request_stack,
-                               (std::string) "Request Stack");
+        //this->ports()->addPort(request_stack,
+        //                       (std::string) "Request Stack");
 
         hwInBuffer = new
            RTT::ReadBufferPort<Message*>("FromLine");
@@ -51,18 +64,20 @@ namespace ACES {
 
     //void Protocol::updateHook(const std::vector<RTT::PortInterface*>& updatedPorts)
     void Protocol::updateHook(){
-        std::list<ACES::Credentials*>* c = getNewRequests();
-        aggregateRequests(*c);
-        delete c;
+        //std::list<ACES::Credentials*>* c = getNewRequests();
+        //aggregateRequests(*c);
+        //delete c;
+
         //while(   (not this->hardware->isBusyMethod())
         //      && this->pending_stack->size()
         //      && this->theresStillTime() ){
         while( this->pending_stack->size() ){
             //pop next message off pending  
-            this->issueMessage();
+           issueMessage( this->prepareMessage() );
         }
     }
 
+/*
     std::list<Credentials*>* Protocol::getNewRequests(){
         std::list<Credentials*>* cred = new std::list<Credentials*>();
         while( this->request_stack->size() ){
@@ -72,6 +87,11 @@ namespace ACES {
         }
         return cred;
     }
+*/
+    void Protocol::addRequest(Credentials* c){
+        ACES::Message *m = new ACES::Message( c );
+        pending_stack->push_back(m);
+    }
 
     void Protocol::stopHook(){
         this->hardware->stop();
@@ -80,11 +100,12 @@ namespace ACES {
     void Protocol::cleanupHook(){
     }
 
-    void Protocol::issueMessage(){
+    Message* Protocol::prepareMessage(){
         Message* m = this->pending_stack->front();
         this->pending_stack->pop_front();
-        hwOutBuffer->Push(m);	
+        return m;
         //m->printme();
     }
+
 }
 

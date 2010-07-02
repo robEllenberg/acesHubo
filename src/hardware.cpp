@@ -4,15 +4,15 @@ namespace ACES {
     Hardware::Hardware(std::string name, int pri,
                      int UpdateFreq) :
 	    RTT::TaskContext(name),
-	    NewData("NewData"),
+	    //NewData("NewData"),
 	    outBuffer((std::string)"ToProtocol", 500),
         inBuffer((std::string)"FromProtocol")
         {
             priority = pri;
             frequency = UpdateFreq;
-            this->events()->addEvent( &NewData,
-                "Notify of new data arrival", "data",
-                "The recieved data.");
+            //this->events()->addEvent( &NewData,
+            //    "Notify of new data arrival", "data",
+            //    "The recieved data.");
             this->ports()->addPort( &outBuffer,
                 "Ouput buffer to the supporting protocol");
             this->ports()->addPort( &inBuffer,
@@ -47,15 +47,16 @@ namespace ACES {
         //std::cout << "Update" << std::endl;
         //RTT::Logger::log(RTT::Logger::Debug) << "Update"
         //  << RTT::endlog();
+/*
         while( inBuffer.size() ){
-        //RTT::Logger::log(RTT::Logger::Debug) << "Sizeof buffer:"
-        // <<  inBuffer.size() << RTT::endlog();
             Message* m;
             inBuffer.Pop(m);
             transmit(m);
+
             //delete m;
             //TODO - add logic for managing responses from hw
         }
+*/
         recieve();
     }
 

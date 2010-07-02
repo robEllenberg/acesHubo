@@ -89,17 +89,31 @@ namespace ACES{
         RTT::ReadDataPort<Credentials*>* param_rx =
             new RTT::ReadDataPort<Credentials*>(n4);
 
+        //new
         pcol->ports()->addPort(pcol_tx, n3);
 
+        //new
         pram->ports()->addPort(param_tx, n1);
         pram->ports()->addEventPort(param_rx, n4);
+
         //pram->outport = (RTT::Buffer*)param_tx;
+
+        //new
         pram->outport = param_tx;
         pram->inport = param_rx;
 
-        param_tx->connectTo(pcol->request_stack);
+        //new
+        //param_tx->connectTo(pcol->request_stack);
         pcol_tx->connectTo(param_rx);
         pcol->connectPeers(pram);
+
+        RTT::Handle h = pram->events()->setupConnection("sendGoal")
+            .callback( pcol, &Protocol::addRequest,
+                       pcol->engine()->events() ).handle();
+        assert( h.ready() );
+        h.connect();
+        assert( h.connected() );
+
         //pcol->registerParam(pram);
        
         return true;

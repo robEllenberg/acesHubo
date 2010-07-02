@@ -3,19 +3,36 @@ namespace ACES{
 
     WbController::WbController(
       std::string n, std::vector<ACES::Parameter*> pl,
-      const char* scriptFile, 
+      const char* scriptFile, ACES::Hardware* hw_one,
+      ACES::Dispatcher* dispatch,
       int pri, int UpdateFreq)
       : RTT::TaskContext(n),
-        walkScript(scriptFile, std::ifstream::in)
+        walkScript(scriptFile, std::ifstream::in),
+        applyStateVector("applyStateVector")
+        //stepMethod("Step", &WbController::step, this)
     {
+        RTT::Method<void(void)>* stepMethod = new RTT::Method<void(void)>
+            ("step", &WbController::step, this);
+        this->methods()->addMethod(stepMethod, "Advance the simulation one time step.");
+
+        this->events()->addEvent(&applyStateVector, "applyStateVector", "SVmap", "map of state vect info");
+
         assert(walkScript.is_open());
         plist = pl;
         std::vector<ACES::Parameter*>::iterator it;
+
         //Create a mapping of names->parameters
         for(it = plist.begin(); it != plist.end(); it++){
-            pmap[(*it)->name] = (*it);
+           pmap[(*it)->name] = (*it);
+           RTT::Handle h = this->events()->setupConnection("applyStateVector")
+                .callback( (*it), &Parameter::setGoal,
+                           (*it)->engine()->events() ).handle();
+           assert( h.ready() );
+           h.connect();
         }
         name = n;
+        hwlist.push_back(hw_one);
+        dispatcher = dispatch;
         frequency = UpdateFreq;
         priority = pri;
         this->setActivity(
@@ -24,10 +41,7 @@ namespace ACES{
     }
 
     void WbController::updateHook(){
-        std::map<std::string, ACES::PValue*>* sv =
-            getStateVector();
-        applyStateVector(*sv);
-        delete sv;
+        step();
     }
 
     bool WbController::configureHook(){
@@ -35,12 +49,39 @@ namespace ACES{
     }
 
     bool WbController::startHook(){
+        for(std::list<ACES::Hardware*>::iterator it = hwlist.begin();
+            it != hwlist.end(); it++){
+                (*it)->start();
+        }
+        dispatcher->start();
         return true;
     }
 
-    void WbController::stopHook(){}
+    void WbController::stopHook(){
+        dispatcher->stop();
+        for(std::list<ACES::Hardware*>::iterator it = hwlist.begin();
+            it != hwlist.end(); it++){
+                (*it)->stop();
+        }
+    }
 
     void WbController::cleanupHook(){}
+
+    void WbController::step(){
+        //delete stateVect;
+        for(std::list<ACES::Hardware*>::iterator it = hwlist.begin();
+            it != hwlist.end(); it++){
+                RTT::Method<void(int)> stepper = 
+                        (*it)->methods()->getMethod<void(int)>("step");
+                //for(int i = 0; i< 10000; i++){
+                //    int a = 2;
+                //}
+                stepper(32);
+        }
+        stateVect = getStateVector();
+        applyStateVector(stateVect);
+        //delete sv;
+    }
 
     std::map<std::string, ACES::PValue*>* WbController::getStateVector(){
 
@@ -105,6 +146,7 @@ namespace ACES{
         return sv;
     }
 
+/*
     void WbController::applyStateVector
       (std::map<std::string, ACES::PValue*>& sv){
         //p = parameter, 
@@ -117,10 +159,11 @@ namespace ACES{
                 ACES::PValue* goal = (*state).second;
                 RTT::Command<bool(ACES::PValue*)> *pUpdate =
                     param->setPoint;
-                while( not pUpdate->ready() ){}
+                //while( not pUpdate->ready() ){}
                 (*pUpdate)(goal);
             }
         }
     }
+*/
 
 }

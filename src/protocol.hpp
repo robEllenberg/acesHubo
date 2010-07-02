@@ -51,9 +51,10 @@ namespace ACES {
              */
             std::deque<Message*>* pending_stack;
             //! The requests made to protocol by parameters
-            RTT::ReadBufferPort<Credentials*>* request_stack;
+            //RTT::ReadBufferPort<Credentials*>* request_stack;
 
-            std::list<Credentials*>* getNewRequests();
+            //std::list<Credentials*>* getNewRequests();
+            void addRequest(Credentials*);
             virtual void aggregateRequests(
                 std::list<Credentials*> &reqs) = 0;
 
@@ -62,7 +63,9 @@ namespace ACES {
 
             virtual Credentials* parseHWInput(
                                Message* c) = 0 ;
-            void issueMessage();
+            //void issueMessage();
+            Message* prepareMessage();
+            RTT::Event<void(Message*)> issueMessage;
             
             bool theresStillTime();
             //virtual bool registerParam(ACES::Parameter*) = 0;

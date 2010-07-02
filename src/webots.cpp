@@ -4,7 +4,13 @@ namespace Webots {
     
     Hardware::Hardware(std::string name, int pri,
                      int UpdateFreq) 
-      : ACES::Hardware(name, pri, UpdateFreq){ }
+      :ACES::Hardware(name, pri, UpdateFreq){
+        
+        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
+            ("step", &Hardware::step, this);
+        this->methods()->addMethod(stepMethod);
+            //"Time to advance (ms)");
+    }
        
     bool Hardware::startHook(){
         wb_robot_init();
@@ -12,14 +18,18 @@ namespace Webots {
     }
     
     void Hardware::updateHook(){
+    }
+
+    void Hardware::step(int time){
         ACES::Hardware::updateHook();
-        wb_robot_step(32);
+        wb_robot_step(time);
     }
 
     bool Hardware::transmit(ACES::Message* m){
         //Pull the first element out of the abstrated
         //credentials list and cast it to a webots
         //credentials.
+        
         Credentials* c = (Credentials*)(m->credList.front());
         std::string jid = (*c).wb_device_id;
 
@@ -29,8 +39,7 @@ namespace Webots {
             float angle = (*c).rotation
                            * (target - (*c).zero);
 
-            WbDeviceTag joint =
-                    wb_robot_get_device(jid.c_str());
+            WbDeviceTag joint = wb_robot_get_device(jid.c_str());
             //wb_servo_set_position(joint, 3.14159/180.*angle);
             wb_servo_set_position(joint, angle);
         }
@@ -133,4 +142,5 @@ namespace Webots {
         //Credentials cred(cname, z, rot);
         //this->credentials = cred;
     }
+
 }

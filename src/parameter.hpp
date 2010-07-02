@@ -50,9 +50,12 @@ namespace ACES {
             bool triggerCycle();
             void printme();
 
-            virtual bool setGoal(ACES::PValue*) ;
-            virtual bool goalSet() ;
+            void setGoal(std::map<std::string, ACES::PValue*>*);
+            RTT::Event<void(ACES::Credentials*)> sendGoal;
+
+            //virtual bool goalSet() ;
             RTT::Command<bool(ACES::PValue*)>* setPoint;
+            int pileup;
     };
 }
     

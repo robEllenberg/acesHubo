@@ -36,7 +36,7 @@ namespace ACES {
             virtual bool transmit(Message* m) = 0;
             virtual bool recieve() = 0;
 
-            RTT::Event<void(std::string)> NewData;
+            //RTT::Event<void(std::string)> NewData;
             RTT::Method<bool(void)> isBusyMethod;
     };
 

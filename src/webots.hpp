@@ -32,6 +32,7 @@ namespace Webots{
             bool transmit(ACES::Message* m);
             bool recieve();
             void setGoal();
+            void step(int time=32);
     };
 
     class Parameter : public ACES::Parameter {
@@ -42,6 +43,7 @@ namespace Webots{
             Parameter(std::string pname, std::string cname,
               ACES::Dispatcher* d, int pri, int UpdateFreq,
               float z=150.0, float rot=1.0);
+            void setGoal(std::map<std::string, ACES::PValue*>*);
     };
    
     class Credentials : public ACES::Credentials {

@@ -21,17 +21,16 @@ int ORO_main(int a, char** b){
     );
 
     ACES::Hardware* hw = (ACES::Hardware*) new 
-        Webots::Hardware((std::string)"HW", 10, 15);
+        Webots::Hardware((std::string)"HW", 10, 50);
 
     ACES::Protocol* webot =
              (ACES::Protocol*) new Webots::Protocol(
-             (std::string)"wbpcol", (Webots::Hardware*)hw, 3, 100);
+             (std::string)"wbpcol", (Webots::Hardware*)hw, 3, 50);
 
     connectPeers( dispatch, webot);
-
-    ACES::Parameter* xx = (ACES::Parameter*) new
-        Webots::Parameter("xx", "Chest_1",
-        dispatch, 5, 31, 0.0, -1.0 );
+    //ACES::Parameter* xx = (ACES::Parameter*) new
+    //    Webots::Parameter("xx", "Chest_1",
+    //    dispatch, 5, 31, 0.0, -1.0 );
 
     ACES::Parameter* HY = (ACES::Parameter*) new
         //Webots::Parameter("HY", "Waist_1",
@@ -118,7 +117,7 @@ int ORO_main(int a, char** b){
         Webots::Parameter("RAR", "RAR",
         dispatch, 5, 31, 0.0, 1.0 );
 
-    dispatch->registerParameter(xx, webot);
+    //dispatch->registerParameter(xx, webot);
     dispatch->registerParameter(HY, webot);
     dispatch->registerParameter(LSP, webot);
     dispatch->registerParameter(LSR, webot);
@@ -138,7 +137,7 @@ int ORO_main(int a, char** b){
     dispatch->registerParameter(RAR, webot);
 
     std::vector<ACES::Parameter*> pvect;
-    pvect.push_back(xx);
+    //pvect.push_back(xx);
     pvect.push_back(HY);
     pvect.push_back(LSP);
     pvect.push_back(LSR);
@@ -157,17 +156,17 @@ int ORO_main(int a, char** b){
     pvect.push_back(RAP);
     pvect.push_back(RAR);
 
-    ACES::WbController wbctrl("ctrl", pvect,
-        //"testTools/zmpwalkfast2.txt", 5, 10);
-        "IKscript1.txt", 5, 10);
-    for(int i = 10000; i > 0; i--){
-    }
+    ACES::WbController* wbctrl = new ACES::WbController("ctrl", pvect,
+        "IKscript1.txt", hw, dispatch, 5, 50);
 
-    hw->start();
-    dispatch->start();
-    wbctrl.start();
+    wbctrl->connectPeers( (RTT::TaskContext*) hw);
+    wbctrl->connectPeers( (RTT::TaskContext*) dispatch);
 
-    Orocos::TaskBrowser tbrowser(hw);
+    //hw->start();
+    //dispatch->start();
+    //wbctrl.start();
+
+    Orocos::TaskBrowser tbrowser(wbctrl);
     tbrowser.loop();
     return 0;
 }

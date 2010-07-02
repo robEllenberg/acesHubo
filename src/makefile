@@ -13,7 +13,7 @@ webots-mini: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o minihubo
 	$(CP) minihubo ../webots/controllers/minihubo/
 
-webots-hubo:
+webots-hubo: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o hubo
 	$(CP) hubo ../webots/controllers/hubo/
 
@@ -26,8 +26,8 @@ robotisFlex.o: robotis.l
 
 clean:
 	@-rm test atlasleg controller miniHubo hubo
-	@../webots/controllers/minihubo/minihubo
-	@../webots/controllers/hubo/hubo
+	@-rm ../webots/controllers/minihubo/minihubo
+	@-rm ../webots/controllers/hubo/hubo
 	@-rm *.o
 	@-rm robotis.yy.c robotis.yy.h
 	@-rm orocos.log .tb_history test.io
