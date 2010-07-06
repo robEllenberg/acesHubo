@@ -19,27 +19,8 @@ namespace ACES {
     class Dispatcher;
     class Parameter : public RTT::TaskContext {
         public:
-            std::string name;
-            int frequency;
-            int priority;
-
-            Credentials* credentials;
-            Dispatcher* dispatcher;
-            /*!
-                The outport is created and linked to the 
-                paramter by the dispatcher as part of the
-                connection process.
-            */
-            RTT::WriteBufferPort<Credentials*>* outport;
-            RTT::ReadDataPort<Credentials*>* inport;
-            //RTT::Buffer<Credentials*, RTT::NonBlockingPolicy,
-            //            RTT::BlockingPolicy>* outport;
-            //RTT::Buffer<Credentials*>* inport;
-
-            //RTT::Method<void(float)> setMethod;
-
             Parameter(std::string n, Credentials* c,
-                      Dispatcher* d, int pri, int UpdateFreq);
+                      int pri, int UpdateFreq);
 
             bool configureHook();
             bool startHook();
@@ -47,15 +28,15 @@ namespace ACES {
             void stopHook();
             void cleanupHook();
 
-            bool triggerCycle();
             void printme();
+
+            std::string name;
+            int frequency;
+            int priority;
+            Credentials* credentials;
 
             void setGoal(std::map<std::string, ACES::PValue*>*);
             RTT::Event<void(ACES::Credentials*)> sendGoal;
-
-            //virtual bool goalSet() ;
-            RTT::Command<bool(ACES::PValue*)>* setPoint;
-            int pileup;
     };
 }
     

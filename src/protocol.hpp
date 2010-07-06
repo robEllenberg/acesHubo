@@ -21,6 +21,7 @@
 namespace ACES {
     class Dispatcher;
     class Credentials;
+    class Parameter;
 //! Abstract class for describing a data protocol
 /*!
  * The Protocol virtual class 
@@ -69,6 +70,8 @@ namespace ACES {
             
             bool theresStillTime();
             //virtual bool registerParam(ACES::Parameter*) = 0;
+            bool registerParameter(Parameter* p);
+            std::list<Parameter*> pramlist;
     };
 
     class charDevProtocol : public Protocol {

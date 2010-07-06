@@ -4,12 +4,15 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <string>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
 
 #include "parameter.hpp"
 #include "pvalue.hpp"
+
+enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
 namespace ACES{
 
@@ -18,21 +21,8 @@ namespace ACES{
             WbController(std::string n,
               std::vector<ACES::Parameter*> pl, 
               const char* scriptFile, ACES::Hardware* hw_one,
-              ACES::Dispatcher* dispatch,
+              ACES::Protocol* pcol,
               int pri, int UpdateFreq);
-
-            std::vector<ACES::Parameter*> plist;
-            std::map<std::string,
-                     ACES::Parameter*> pmap;
-
-            //    RTT::Command<bool(ACES::PValue*)> > pmap;
-            //    RTT::DispatchInterface* > pmap;
-            std::ifstream walkScript;
-            std::map<std::string, ACES::PValue*>*
-                getStateVector();
-            //void applyStateVector(std::map<std::string,
-            //    ACES::PValue*>& sv);
-            std::map<std::string, ACES::PValue*>* stateVect;
 
             void updateHook();
             bool configureHook();
@@ -40,16 +30,36 @@ namespace ACES{
             void stopHook();
             void cleanupHook();
 
-            //RTT::Method<void(void)> stepMethod;
             void step();
+            void run();
+            void halt();
+            std::map<std::string, ACES::PValue*>*
+                getStateVector(bool echo=0);
+
+            std::vector<ACES::Parameter*> plist;
+
+            std::map<std::string, ACES::Parameter*> pmap;
+
+            std::ifstream walkScript;
+
+            std::map<std::string, ACES::PValue*>* stateVect;
+
             RTT::Event<void(std::map<std::string, ACES::PValue*>*)>
                 applyStateVector;
+            RTT::Method<void(void)> stepMethod;
+            RTT::Method<void(void)> runMethod;
+            RTT::Method<void(void)> haltMethod;
+            RTT::Method<bool(std::string)> openScriptMethod;
+
+            bool openScript(std::string scriptPath);
 
             std::string name;
             int frequency;
             int priority;
             std::list<ACES::Hardware*> hwlist;
+            std::list<Protocol*> pcollist;
             ACES::Dispatcher* dispatcher;
+            int simState;
     };
 }
 

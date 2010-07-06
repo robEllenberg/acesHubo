@@ -114,33 +114,22 @@ namespace Webots {
             reqs.pop_front();
             pending_stack->push_back(m);
         }
-        //
-        //joints[name] = 
-
     }
-
-//    bool registerParam(ACES::Parameter*){
-//        joints.push_back()
-//    }
 
     ACES::Credentials* Protocol::parseHWInput(
                        ACES::Message* c) {}
 
     Parameter::Parameter(std::string n,
-      ACES::Credentials* c, ACES::Dispatcher* d,
+      ACES::Credentials* c,
       int pri, int UpdateFreq)
-      : ACES::Parameter(n, c, d, pri, UpdateFreq)
+      : ACES::Parameter(n, c, pri, UpdateFreq)
     {}
 
     Parameter::Parameter(std::string pname, std::string cname,
-      ACES::Dispatcher* d, int pri, int UpdateFreq,
+      int pri, int UpdateFreq,
       float z, float rot)
         : ACES::Parameter(pname,
                           new Credentials(cname,z,rot),
-                          d, pri, UpdateFreq)
-    {
-        //Credentials cred(cname, z, rot);
-        //this->credentials = cred;
-    }
-
+                          pri, UpdateFreq)
+    {}
 }

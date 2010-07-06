@@ -9,7 +9,7 @@ namespace ACES{
         frequency = UpdateFreq;
         priority = pri;
         this->setActivity(
-             new RTT::Activity( priority, 1.0/frequency ) );
+             new RTT::Activity( priority, 1.0/frequency, 0, n ) );
     }
 
     bool Dispatcher::startHook(){

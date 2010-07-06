@@ -18,7 +18,7 @@ namespace ACES {
             this->ports()->addPort( &inBuffer,
                 "Input buffer from the supporting protocol");
             this->setActivity(
-                new RTT::Activity(priority, 1.0/UpdateFreq));
+                new RTT::Activity(priority, 1.0/UpdateFreq, 0, name));
             //this->methods()->addMethod( &isBusyMethod,
             //    "Check if the hardware is busy");
         }

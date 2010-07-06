@@ -38,10 +38,10 @@ namespace Webots{
     class Parameter : public ACES::Parameter {
         public:
             Parameter(std::string n,
-              ACES::Credentials* c, ACES::Dispatcher* d,
+              ACES::Credentials* c,
               int pri, int UpdateFreq);
             Parameter(std::string pname, std::string cname,
-              ACES::Dispatcher* d, int pri, int UpdateFreq,
+              int pri, int UpdateFreq,
               float z=150.0, float rot=1.0);
             void setGoal(std::map<std::string, ACES::PValue*>*);
     };

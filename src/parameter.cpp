@@ -1,36 +1,23 @@
 #include "parameter.hpp"
 namespace ACES {
     Parameter::Parameter(std::string n, Credentials* c,
-      Dispatcher* d, int pri, int UpdateFreq)
+      int pri, int UpdateFreq)
       : RTT::TaskContext(n),
         sendGoal("sendGoal")
     {
         name = n;
         credentials = c;
-        dispatcher = d;
         frequency = UpdateFreq;
         priority = pri;
-        pileup = 0;
-
-        //setPoint = new RTT::Command<bool(ACES::PValue*)>
-        //    ("setpoint", &Parameter::setGoal,
-        //    &Parameter::goalSet, this);
-        //this->commands()->addCommand(
-        //    setPoint, "ah", "sp", "The set point"
-        //);
 
         this->events()->addEvent(&sendGoal, "sendGoal", "credentials",
             "credentials associated w/the goal");
 
         this->setActivity(
-            new RTT::Activity( priority, 1.0/UpdateFreq )
+            new RTT::Activity( priority, 1.0/UpdateFreq, 0, n )
         );
     }
-    
-    bool Parameter::triggerCycle(){
-        return true;
-    }
-    
+   
     void Parameter::printme(){
         RTT::Logger::log() << "Parameter: " << this->name
         << ", (F:" << this->frequency << ", P:"
@@ -48,11 +35,7 @@ namespace ACES {
     }
     
     void Parameter::updateHook(){
-
-        //if (triggerCycle()){ 
-        //    this->outport->Push(this->credentials);
-        //}
-
+        sendGoal(this->credentials);
         //RTT::Logger::log() << "Update Parameter "
         //<< this->name << RTT::Logger::endl;
 
@@ -63,18 +46,6 @@ namespace ACES {
     
     void Parameter::cleanupHook(){
     }
-
-/*
-    bool Parameter::setGoal(PValue* val){
-        //TODO - See if this can be  removed in favor of
-        //original approach 
-        //Credentials* c = new Credentials(credentials, val);
-        Credentials* c = credentials->credCopy(val);
-        //if( this->outport->full() ){}
-        this->outport->Push(c);
-        return true;
-    }
-*/
 
     void Parameter::setGoal(std::map<std::string, ACES::PValue*>* p){
         std::map<std::string, ACES::PValue* >::iterator mypair;
@@ -87,9 +58,4 @@ namespace ACES {
             sendGoal(c);
         }
     }
-
-    //bool Parameter::goalSet(){
-    //    return true;
-    //}
-
 }

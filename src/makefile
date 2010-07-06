@@ -9,7 +9,7 @@ DEBUG = -g
 hubo: robotisFlex.o pvalue.o dispatcher.o hardware.o credentials.o parameter.o message.o  protocol.o robotis.o 
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o controller
 
-webots-mini: controller.o testsuite.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
+webots-mini: controller.o hardware.o protocol.o parameter.o pvalue.o message.o credentials.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o minihubo
 	$(CP) minihubo ../webots/controllers/minihubo/
 

@@ -43,7 +43,7 @@ namespace ACES {
         
 
         this->setActivity(
-            new RTT::Activity( priority, 1.0/frequency )
+            new RTT::Activity( priority, 1.0/frequency, 0, n )
         );
     }
     
@@ -52,8 +52,13 @@ namespace ACES {
     }
     
     bool Protocol::startHook(){
-        RTT::Logger::log() << "Protocol Startup"
-                           << std::endl;
+        //RTT::Logger::log() << "Protocol Startup"
+        //                   << std::endl;
+        for(std::list<Parameter*>::iterator it = pramlist.begin();
+            it !=pramlist.end(); it++){
+                (*it)->start();
+        }
+
         this->hardware->start();
         return true;
     }
@@ -94,6 +99,10 @@ namespace ACES {
     }
 
     void Protocol::stopHook(){
+        for(std::list<Parameter*>::iterator it = pramlist.begin();
+            it !=pramlist.end(); it++){
+                (*it)->stop();
+        }
         this->hardware->stop();
     }
     
@@ -105,6 +114,19 @@ namespace ACES {
         this->pending_stack->pop_front();
         return m;
         //m->printme();
+    }
+    
+    bool Protocol::registerParameter(Parameter* p){
+        this->connectPeers(p);
+        pramlist.push_back(p);
+
+        RTT::Handle h = p->events()->setupConnection("sendGoal")
+            .callback( this, &Protocol::addRequest,
+                       this->engine()->events() ).handle();
+        assert( h.ready() );
+        h.connect();
+        assert( h.connected() );
+        return true;
     }
 
 }
