@@ -29,19 +29,30 @@ namespace Webots {
         //Pull the first element out of the abstrated
         //credentials list and cast it to a webots
         //credentials.
-        
-        Credentials* c = (Credentials*)(m->credList.front());
-        std::string jid = (*c).wb_device_id;
+        ACES::ProtoCredential *p =
+            (ACES::ProtoCredential*)(m->credList.front());
 
-        //Pull the seek value out of the PValue object
-        if( (*c).val ){
-            float target = (*c).val->val;
-            float angle = (*c).rotation
-                           * (target - (*c).zero);
+        switch( p->credType ){
+            case CRED_WB_JOINT:
+                {
+                Credentials<float>* c =
+                        (Credentials<float>*)(m->credList.front());
+                std::string jid = (*c).wb_device_id;
 
-            WbDeviceTag joint = wb_robot_get_device(jid.c_str());
-            //wb_servo_set_position(joint, 3.14159/180.*angle);
-            wb_servo_set_position(joint, angle);
+                //Pull the seek value out of the SValue object
+                if( (*c).val ){
+                    float target = (*c).val;
+                    float angle = (*c).rotation
+                                   * (target - (*c).zero);
+
+                    WbDeviceTag joint = wb_robot_get_device(jid.c_str());
+                    //wb_servo_set_position(joint, 3.14159/180.*angle);
+                    wb_servo_set_position(joint, angle);
+                }
+                }
+                break;
+            default:
+                break;
         }
         //m->printme();
     }
@@ -54,39 +65,45 @@ namespace Webots {
         return false;
     }
 
-    Credentials::Credentials() : ACES::Credentials(){
+    template <class T>
+    Credentials<T>::Credentials() : ACES::Credentials<T>(){
         wb_device_id = "";
         zero = 0.0;
         rotation = 1.0;
-        val = 0;
     }
     
-    Credentials::Credentials(std::string id_str, float z,
+    template <class T>
+    Credentials<T>::Credentials(std::string id_str, float z,
         float rot)
-      : ACES::Credentials(){
+      : ACES::Credentials<T>(){
         wb_device_id = id_str;
         zero = z;
         rotation = rot;
     }  
 
-    Credentials::Credentials(char* id_str, float z, 
+    template <class T>
+    Credentials<T>::Credentials(char* id_str, float z, 
                 float rot){
         Credentials( (std::string)id_str, z, rot );
     }
 
-    Credentials::Credentials(Credentials& c, ACES::PValue* p)
-      : ACES::Credentials(0, p){ 
+    template <class T>
+    Credentials<T>::Credentials(Credentials<T>& c, ACES::SValue* p)
+      : ACES::Credentials<T>(0, p){ 
         wb_device_id = c.wb_device_id;
         zero = c.zero;
         rotation = c.rotation;
     }
 
-    void Credentials::printme(){
-        int* p = (int*)val;
+    template <class T>
+    void Credentials<T>::printme(){
+        //int* p = (int*)val;
         RTT::Logger::log() << "Credential w/id= " << this->wb_device_id
             << " and value= ";
-        if(p){
-            this->val->printme();
+        //if(p){
+        if(this->val){
+            //this->val->printme();
+            RTT::Logger::log() << this->val;
         }
         else{
             RTT::Logger::log()  << "NULL";
@@ -94,7 +111,8 @@ namespace Webots {
         RTT::Logger::log() << RTT::endlog();
     }
 
-    ACES::Credentials* Credentials::credCopy(ACES::PValue* p){
+/*
+    ACES::Credentials* Credentials::credCopy(void* p){
         Credentials* c = new Credentials();
         c->wb_device_id = wb_device_id;
         c->zero = zero;
@@ -102,10 +120,12 @@ namespace Webots {
         c->val = p;
         return (ACES::Credentials*) c;
     }
-
+*/
     Protocol::Protocol(std::string name, Hardware* hw,
                      int pri, int UpdateFreq)
       : ACES::Protocol(name, hw, pri, UpdateFreq){}
+
+/*
 
     void Protocol::aggregateRequests(
       std::list<ACES::Credentials*> &reqs){
@@ -115,21 +135,25 @@ namespace Webots {
             pending_stack->push_back(m);
         }
     }
-
-    ACES::Credentials* Protocol::parseHWInput(
+*/
+/*
+    template <class T>
+    ACES::Credentials<T>* Protocol::parseHWInput(
                        ACES::Message* c) {}
-
-    State::State(std::string n,
-      ACES::Credentials* c,
+*/
+    template <class T>
+    State<T>::State(std::string n,
+      ACES::Credentials<T>* c,
       int pri, int UpdateFreq)
-      : ACES::State(n, c, pri, UpdateFreq)
+      : ACES::State<T>(n, c, pri, UpdateFreq)
     {}
 
-    State::State(std::string pname, std::string cname,
+    template <class T>
+    State<T>::State(std::string pname, std::string cname,
       int pri, int UpdateFreq,
       float z, float rot)
-        : ACES::State(pname,
-                          new Credentials(cname,z,rot),
+        : ACES::State<T>(pname,
+                          new Credentials<T>(cname,z,rot),
                           pri, UpdateFreq)
     {}
 }

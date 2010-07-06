@@ -11,7 +11,7 @@
 #include <rtt/Activity.hpp>
 
 #include "message.hpp"
-#include "pvalue.hpp"
+#include "svalue.hpp"
 
 namespace ACES {
       

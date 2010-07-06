@@ -96,7 +96,7 @@ namespace ACES {
         while( this->hardpoint_in->readsome((char*)&c, 1) ){
             //RTT::Logger::log() << "on-line: "
             //<<std::hex << (int)c << std::dec << std::endl;
-            charDevPValue* cpv = new charDevPValue(c);
+            charDevSValue* cpv = new charDevSValue(c);
             outBuffer.buffer()->Push((Message*)cpv);	
 	    }
     }

@@ -10,7 +10,7 @@
 #include <rtt/Event.hpp>
 
 #include "state.hpp"
-#include "pvalue.hpp"
+#include "svalue.hpp"
 
 enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
@@ -33,7 +33,7 @@ namespace ACES{
             void step();
             void run();
             void halt();
-            std::map<std::string, PValue*>*
+            std::map<std::string, SValue*>*
                 getStateVector(bool echo=0);
 
             std::vector<State*> plist;
@@ -42,9 +42,9 @@ namespace ACES{
 
             std::ifstream walkScript;
 
-            std::map<std::string, PValue*>* stateVect;
+            std::map<std::string, SValue*>* stateVect;
 
-            RTT::Event<void(std::map<std::string, PValue*>*)>
+            RTT::Event<void(std::map<std::string, SValue*>*)>
                 applyStateVector;
             RTT::Method<void(void)> stepMethod;
             RTT::Method<void(void)> runMethod;

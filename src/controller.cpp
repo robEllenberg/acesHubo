@@ -144,11 +144,11 @@ namespace ACES{
             return false;
     }
 
-    std::map<std::string, ACES::PValue*>*
+    std::map<std::string, ACES::SValue*>*
       WbController::getStateVector(bool echo){
         //The state vector is a lookup table by the name of the joint
-        std::map<std::string, ACES::PValue*> *sv =
-            new std::map<std::string, ACES::PValue*>;
+        std::map<std::string, ACES::SValue*> *sv =
+            new std::map<std::string, ACES::SValue*>;
 
         std::vector<float> angles;      //Temp container
         //Fill w/the script info if we have data left, 
@@ -182,19 +182,19 @@ namespace ACES{
         walkScript.getline(a, 1000);
 
         //Populate the state vector
-        (*sv)["HY"] = new ACES::PValue(angles[0]);
-        (*sv)["LHY"] = new ACES::PValue(angles[1]);
-        (*sv)["LHR"] = new ACES::PValue(angles[2]);
-        (*sv)["LHP"] = new ACES::PValue(angles[3]);
-        (*sv)["LKP"] = new ACES::PValue(angles[4]);
-        (*sv)["LAP"] = new ACES::PValue(angles[5]);
-        (*sv)["LAR"] = new ACES::PValue(angles[6]);
-        (*sv)["RHY"] = new ACES::PValue(angles[7]);
-        (*sv)["RHR"] = new ACES::PValue(angles[8]);
-        (*sv)["RHP"] = new ACES::PValue(angles[9]);
-        (*sv)["RKP"] = new ACES::PValue(angles[10]);
-        (*sv)["RAP"] = new ACES::PValue(angles[11]);
-        (*sv)["RAR"] = new ACES::PValue(angles[12]);
+        (*sv)["HY"] = new ACES::SValue(angles[0]);
+        (*sv)["LHY"] = new ACES::SValue(angles[1]);
+        (*sv)["LHR"] = new ACES::SValue(angles[2]);
+        (*sv)["LHP"] = new ACES::SValue(angles[3]);
+        (*sv)["LKP"] = new ACES::SValue(angles[4]);
+        (*sv)["LAP"] = new ACES::SValue(angles[5]);
+        (*sv)["LAR"] = new ACES::SValue(angles[6]);
+        (*sv)["RHY"] = new ACES::SValue(angles[7]);
+        (*sv)["RHR"] = new ACES::SValue(angles[8]);
+        (*sv)["RHP"] = new ACES::SValue(angles[9]);
+        (*sv)["RKP"] = new ACES::SValue(angles[10]);
+        (*sv)["RAP"] = new ACES::SValue(angles[11]);
+        (*sv)["RAR"] = new ACES::SValue(angles[12]);
  
         return sv;
     }

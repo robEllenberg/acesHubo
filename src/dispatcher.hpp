@@ -12,7 +12,7 @@
 #include "protocol.hpp"
 
 namespace ACES {
-    class State;
+    template <class T> class State;
     class Protocol;
     class Dispatcher : public RTT::TaskContext {
         public:

@@ -5,18 +5,18 @@
 
 namespace ACES {
     //!Abstract container for the value of a parameter
-    class PValue {
+    class SValue {
         public:
-            PValue(float v);
+            SValue(float v);
             //std::ostream &operator<<(std::ostream &out);
             virtual void printme() ;
             float val;
     };
 
-    class charDevPValue : public PValue {
+    class charDevSValue : public SValue {
         public:
             unsigned char cval;
-            charDevPValue(unsigned char c);
+            charDevSValue(unsigned char c);
             void printme();
     };
 } 

@@ -15,7 +15,9 @@
 
 namespace ACES {
     class Dispatcher;
+    template <class T>
     class Credentials;
+    template <class T>
     class State;
 //! Abstract class for describing a data protocol
 /*!
@@ -50,23 +52,27 @@ namespace ACES {
             //RTT::ReadBufferPort<Credentials*>* request_stack;
 
             //std::list<Credentials*>* getNewRequests();
-            void addRequest(Credentials*);
-            virtual void aggregateRequests(
-                std::list<Credentials*> &reqs) = 0;
+            template <class T>
+            void addRequest(Credentials<T>*);
+
+            //virtual void aggregateRequests(
+            //    std::list<Credentials*> &reqs) = 0;
 
             //virtual Message* buildMessage(
             //                   Credentials* cred) = 0;
 
-            virtual Credentials* parseHWInput(
-                               Message* c) = 0 ;
+            //virtual Credentials<T>* parseHWInput(
+            //                   Message* c) = 0 ;
             //void issueMessage();
+
             Message* prepareMessage();
             RTT::Event<void(Message*)> issueMessage;
             
             bool theresStillTime();
             //virtual bool registerParam(ACES::State*) = 0;
-            bool registerState(State* p);
-            std::list<State*> pramlist;
+            template <class T>
+            bool registerState(State<T>* p);
+            std::list<void*> pramlist;
     };
 
     class charDevProtocol : public Protocol {

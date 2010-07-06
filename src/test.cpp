@@ -22,7 +22,7 @@ int ORO_main(int a, char** b){
         TestSuite::Hardware((std::string)"HW", 5, 100);
     hw->start();
 
-    ACES::PValue p(12.3);
+    ACES::SValue p(12.3);
     ACES::Credentials c(12);
     ACES::Credentials e(13); 
 
@@ -52,8 +52,8 @@ int ORO_main(int a, char** b){
     }
     wbctrl.start();
 
-    //RTT::Command<bool(ACES::PValue*)> pUpdate =
-    // p2->commands()->getCommand<bool(ACES::PValue*)>("setpoint");
+    //RTT::Command<bool(ACES::SValue*)> pUpdate =
+    // p2->commands()->getCommand<bool(ACES::SValue*)>("setpoint");
     //assert( pUpdate.ready() );
     //pUpdate(&p);
 

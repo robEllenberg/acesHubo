@@ -15,7 +15,7 @@
 #include "protocol.hpp"
 #include "message.hpp"
 #include "state.hpp"
-#include "dispatcher.hpp"
+//#include "dispatcher.hpp"
 
 //Defs for the lexer
 //#define YY_BUFFER_STATE yy_buffer_state*

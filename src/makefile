@@ -6,18 +6,18 @@ LIBS = -L/home/bob/thesis/support/lib -L/usr/local/webots/lib/
 CXXFLAGS = $(INCLUDES) $(LIBS)
 DEBUG = -g
 
-hubo: robotisFlex.o pvalue.o dispatcher.o hardware.o credentials.o state.o message.o  protocol.o robotis.o 
+hubo: robotisFlex.o svalue.o  hardware.o credentials.o state.o message.o  protocol.o robotis.o 
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o controller
 
-webots-mini: controller.o hardware.o protocol.o state.o pvalue.o message.o credentials.o webots.o wbtest.o
+webots-mini: controller.o hardware.o protocol.o state.o svalue.o message.o credentials.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o minihubo
 	$(CP) minihubo ../webots/controllers/minihubo/
 
-webots-hubo: controller.o testsuite.o hardware.o protocol.o state.o pvalue.o message.o credentials.o dispatcher.o webots.o wbtest.o
+webots-hubo: controller.o testsuite.o hardware.o protocol.o state.o svalue.o message.o credentials.o webots.o wbtest.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o hubo
 	$(CP) hubo ../webots/controllers/hubo/
 
-test: controller.o testsuite.o hardware.o protocol.o state.o pvalue.o message.o credentials.o dispatcher.o test.o
+test: controller.o testsuite.o hardware.o protocol.o state.o svalue.o message.o credentials.o test.o
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o test
 
 robotisFlex.o: robotis.l

@@ -10,15 +10,17 @@
 #include <rtt/Ports.hpp>
 #include <rtt/Event.hpp>
 
-#include "pvalue.hpp"
+#include "svalue.hpp"
 #include "protocol.hpp"
 #include "state.hpp"
-#include "dispatcher.hpp"
+//#include "dispatcher.hpp"
 
 extern "C"{
     #include <webots/robot.h>
     #include <webots/servo.h>
 }
+
+enum CREDTYPE { CRED_WB_JOINT=1 };
 
 namespace Webots{
     
@@ -35,26 +37,27 @@ namespace Webots{
             void step(int time=32);
     };
 
-    class State : public ACES::State {
+    template <class T>
+    class State : public ACES::State<T> {
         public:
-            State(std::string n,
-              ACES::Credentials* c,
-              int pri, int UpdateFreq);
+            State(std::string n, ACES::Credentials<T>* c,
+                  int pri, int UpdateFreq);
             State(std::string pname, std::string cname,
-              int pri, int UpdateFreq,
-              float z=150.0, float rot=1.0);
-            void setGoal(std::map<std::string, ACES::PValue*>*);
+                  int pri, int UpdateFreq,
+                  float z=150.0, float rot=1.0);
+            //void setGoal(std::map<std::string, ACES::SValue*>*);
     };
    
-    class Credentials : public ACES::Credentials {
+    template <class T>
+    class Credentials : public ACES::Credentials<T> {
         public:
             Credentials();
             Credentials(std::string id_str, float z=150.0,
                         float rot=1.0);
             Credentials(char* id_str, float z=150.0, 
                         float rot=1.0);
-            Credentials(Credentials& c, ACES::PValue* p); 
-            ACES::Credentials* credCopy(ACES::PValue* p=0);
+            Credentials(Credentials& c, ACES::SValue* p); 
+            //ACES::Credentials<T>* credCopy(void* p=0);
             void printme();
             std::string wb_device_id;
             float zero;
@@ -67,10 +70,10 @@ namespace Webots{
                      int pri, int UpdateFreq);
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
-            ACES::Credentials* parseHWInput(
-                               ACES::Message* c) ;
-            void aggregateRequests(
-                std::list<ACES::Credentials*> &reqs);
+            //ACES::Credentials* parseHWInput(
+            //                   ACES::Message* c) ;
+            //void aggregateRequests(
+            //    std::list<ACES::Credentials*> &reqs);
 
             //bool registerParam(ACES::State*);
             //std::map<std::string, bool> joints;

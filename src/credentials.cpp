@@ -1,41 +1,49 @@
 #include "credentials.hpp"
 namespace ACES {
-
-    //Credentials::Credentials(){
-    //    this->id = 0;
-    //    this->val = 0;
-    //}
-    Credentials::Credentials(int id_num, ACES::PValue* p){
-        this->id = id_num;
-        this->val = p;
+    ProtoCredential::ProtoCredential(int t){
+        credType = t;
     }
 
-    Credentials::Credentials(Credentials *c, ACES::PValue* p)
+    template <class T> 
+    Credentials<T>::Credentials(int id_num, T v, int type)
+        : ProtoCredential(type){
+        this->id = id_num;
+        this->val = v;
+    }
+
+    template <class T> 
+    Credentials<T>::Credentials(Credentials *c, T v)
     {
         this->id = c->id;
-        this->val = p;
+        this->val = v;
+        this->credType = c->credType;
     }
 
+    /*
     Credentials::~Credentials(){
         delete this->val;
     }
+    */
 
+/*
     void Credentials::printme(){
-        int* p = (int*)val;
+        //int* p = (int*)val;
         RTT::Logger::log() << "Credential w/id= " << this->id
             << " and value= ";
+        
         if(p){
             this->val->printme();
         }
         else{
             RTT::Logger::log()  << "NULL";
         }
-        RTT::Logger::log() << RTT::endlog();
+        
+        RTT::Logger::log() << val << RTT::endlog();
     }
-
+*/
 
 /*
-    Credentials* Credentials::credCopy(PValue* p){
+    Credentials* Credentials::credCopy(SValue* p){
         Credentials *c = new Credentials();
         return c;
     }

@@ -54,9 +54,11 @@ namespace ACES {
     bool Protocol::startHook(){
         //RTT::Logger::log() << "Protocol Startup"
         //                   << std::endl;
-        for(std::list<State*>::iterator it = pramlist.begin();
+        for(std::list<void*>::iterator it = pramlist.begin();
             it !=pramlist.end(); it++){
-                (*it)->start();
+                //TODO - Have no idea if this will hold
+                // in all cases, better check that out
+                ((State<int>*)(*it))->start();
         }
 
         this->hardware->start();
@@ -93,15 +95,18 @@ namespace ACES {
         return cred;
     }
 */
-    void Protocol::addRequest(Credentials* c){
+    template <class T>
+    void Protocol::addRequest(Credentials<T>* c){
         ACES::Message *m = new ACES::Message( c );
         pending_stack->push_back(m);
     }
 
     void Protocol::stopHook(){
-        for(std::list<State*>::iterator it = pramlist.begin();
+        for(std::list<void*>::iterator it = pramlist.begin();
             it !=pramlist.end(); it++){
-                (*it)->stop();
+                //TODO - Have no idea if this will hold
+                // in all cases, better check that out
+                ((State<int>*)(*it))->stop();
         }
         this->hardware->stop();
     }
@@ -116,7 +121,8 @@ namespace ACES {
         //m->printme();
     }
     
-    bool Protocol::registerState(State* p){
+    template <class T>
+    bool Protocol::registerState(State<T>* p){
         this->connectPeers(p);
         pramlist.push_back(p);
 

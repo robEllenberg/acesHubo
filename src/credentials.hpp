@@ -2,21 +2,27 @@
 #define ACES_CREDENTIALS_HPP
 
 #include <rtt/Logger.hpp>
-#include "pvalue.hpp"
+#include "svalue.hpp"
 
 namespace ACES {
- 
-    class Credentials{
+    class ProtoCredential{
+        public:
+            ProtoCredential(int t);
+            int credType;
+    };
+
+    template <class T>
+    class Credentials : public ProtoCredential{
         public:
             //Credentials(const Credentials &c);
             //Credentials();
-            Credentials(int id_num=0, PValue* p=0);
-            Credentials(Credentials *c, PValue* p=0);
-            virtual Credentials* credCopy(PValue* p=0) = 0;
-            ~Credentials();
-            virtual void printme();
+            Credentials(int id_num=0, T v=0, int type=0);
+            Credentials(Credentials *c, T v);
+            //virtual Credentials* credCopy(void* p=0) = 0;
+            //~Credentials();
+            virtual void printme() = 0;
             int id;
-            PValue* val;
+            T val;
     };
 
 }

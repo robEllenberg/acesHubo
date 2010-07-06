@@ -9,11 +9,12 @@ namespace ACES{
     
     class Message {
         public:
-            Message(std::list<Credentials*> &cl);
-            Message(Credentials* c);
+            //TODO - All these void* should be too credentials
+            Message(std::list<void*> &cl);
+            Message(void* c);
             ~Message();
-            void printme();
-            std::list<ACES::Credentials*> credList;
+            //void printme();
+            std::list<void*> credList;
     };
 /*
     class charDevMessage : Message {

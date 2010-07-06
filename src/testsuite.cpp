@@ -47,7 +47,7 @@ namespace TestSuite{
       }
 
 /*
-    bool State::setGoal(ACES::PValue* val){
+    bool State::setGoal(ACES::SValue* val){
         return ACES::State::setGoal(val);
     }
 
