@@ -36,23 +36,23 @@ namespace TestSuite{
         }
     }
 
-    Parameter::Parameter(std::string n, ACES::Credentials* c,
+    State::State(std::string n, ACES::Credentials* c,
           ACES::Dispatcher* d, int pri, int UpdateFreq)
-      : ACES::Parameter(n, c, d, pri, UpdateFreq)
+      : ACES::State(n, c, d, pri, UpdateFreq)
       {
          //RTT::Method<void(float)>* setMethod = new RTT::Method<void(float)>
-         //   ("setMethod", &Parameter::set, this);
+         //   ("setMethod", &State::set, this);
          //this->methods()->addMethod(setMethod,
          //   "Set the goal for the parameter", "value", "set point");
       }
 
 /*
-    bool Parameter::setGoal(ACES::PValue* val){
-        return ACES::Parameter::setGoal(val);
+    bool State::setGoal(ACES::PValue* val){
+        return ACES::State::setGoal(val);
     }
 
-    bool Parameter::goalSet(){
-        return ACES::Parameter::goalSet();
+    bool State::goalSet(){
+        return ACES::State::goalSet();
     }
 */
 };

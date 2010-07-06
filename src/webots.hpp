@@ -12,7 +12,7 @@
 
 #include "pvalue.hpp"
 #include "protocol.hpp"
-#include "parameter.hpp"
+#include "state.hpp"
 #include "dispatcher.hpp"
 
 extern "C"{
@@ -35,12 +35,12 @@ namespace Webots{
             void step(int time=32);
     };
 
-    class Parameter : public ACES::Parameter {
+    class State : public ACES::State {
         public:
-            Parameter(std::string n,
+            State(std::string n,
               ACES::Credentials* c,
               int pri, int UpdateFreq);
-            Parameter(std::string pname, std::string cname,
+            State(std::string pname, std::string cname,
               int pri, int UpdateFreq,
               float z=150.0, float rot=1.0);
             void setGoal(std::map<std::string, ACES::PValue*>*);
@@ -72,7 +72,7 @@ namespace Webots{
             void aggregateRequests(
                 std::list<ACES::Credentials*> &reqs);
 
-            //bool registerParam(ACES::Parameter*);
+            //bool registerParam(ACES::State*);
             //std::map<std::string, bool> joints;
     };
 }    

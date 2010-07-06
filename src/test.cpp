@@ -26,24 +26,24 @@ int ORO_main(int a, char** b){
     ACES::Credentials c(12);
     ACES::Credentials e(13); 
 
-    TestSuite::Parameter* p1 =
-    new TestSuite::Parameter((std::string)"RHR",
+    TestSuite::State* p1 =
+    new TestSuite::State((std::string)"RHR",
                            &c, &dispatch, 5, 10);
 
-    TestSuite::Parameter* p2 =
-    new TestSuite::Parameter((std::string)"LHR",
+    TestSuite::State* p2 =
+    new TestSuite::State((std::string)"LHR",
                            &e, &dispatch, 5, 10);
 
     TestSuite::Protocol proto("wbproto", hw, 5, 50);
     connectPeers( &dispatch, &proto );
 
-    std::vector<ACES::Parameter*> pvect;
+    std::vector<ACES::State*> pvect;
     pvect.push_back(p1);
     pvect.push_back(p2);
 
             
-    dispatch.registerParameter(p1, &proto);
-    dispatch.registerParameter(p2, &proto);
+    dispatch.registerState(p1, &proto);
+    dispatch.registerState(p2, &proto);
     dispatch.start();
 
     ACES::WbController wbctrl("ctrl", pvect,

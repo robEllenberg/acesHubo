@@ -13,7 +13,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startHook(){
-        std::map<Parameter*, Protocol*>::iterator it;
+        std::map<State*, Protocol*>::iterator it;
         for(it = this->routeTable.begin();
             it != this->routeTable.end();
             it++)
@@ -38,7 +38,7 @@ namespace ACES{
     }
 
     void Dispatcher::stopHook(){
-        std::map<Parameter*, Protocol*>::iterator it;
+        std::map<State*, Protocol*>::iterator it;
 
         for(it = this->routeTable.begin();
             it != this->routeTable.end();
@@ -58,7 +58,7 @@ namespace ACES{
     void Dispatcher::cleanupHook(){
     }
             
-    bool Dispatcher::registerParameter(Parameter* pram,
+    bool Dispatcher::registerState(State* pram,
                                        Protocol* pcol)
     {
         routeTable[pram] = pcol;

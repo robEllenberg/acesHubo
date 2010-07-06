@@ -28,9 +28,9 @@ namespace TestSuite{
                 std::list<ACES::Credentials*> &reqs);
     };
 
-    class Parameter : public ACES::Parameter{
+    class State : public ACES::State{
         public:
-            Parameter(std::string n, ACES::Credentials* c,
+            State(std::string n, ACES::Credentials* c,
               ACES::Dispatcher* d, int pri, int UpdateFreq);
             //void set(float setPoint);
             //bool setGoal(ACES::PValue* val);

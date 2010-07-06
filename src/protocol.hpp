@@ -11,17 +11,12 @@
 #include <string>
 #include "message.hpp"
 #include "hardware.hpp"
-#include "parameter.hpp"
-//#include "webots.hpp"
-
-//namespace Webots{
-//    class Webots;
-//}
+#include "state.hpp"
 
 namespace ACES {
     class Dispatcher;
     class Credentials;
-    class Parameter;
+    class State;
 //! Abstract class for describing a data protocol
 /*!
  * The Protocol virtual class 
@@ -69,9 +64,9 @@ namespace ACES {
             RTT::Event<void(Message*)> issueMessage;
             
             bool theresStillTime();
-            //virtual bool registerParam(ACES::Parameter*) = 0;
-            bool registerParameter(Parameter* p);
-            std::list<Parameter*> pramlist;
+            //virtual bool registerParam(ACES::State*) = 0;
+            bool registerState(State* p);
+            std::list<State*> pramlist;
     };
 
     class charDevProtocol : public Protocol {

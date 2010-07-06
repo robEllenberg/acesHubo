@@ -54,7 +54,7 @@ namespace ACES {
     bool Protocol::startHook(){
         //RTT::Logger::log() << "Protocol Startup"
         //                   << std::endl;
-        for(std::list<Parameter*>::iterator it = pramlist.begin();
+        for(std::list<State*>::iterator it = pramlist.begin();
             it !=pramlist.end(); it++){
                 (*it)->start();
         }
@@ -99,7 +99,7 @@ namespace ACES {
     }
 
     void Protocol::stopHook(){
-        for(std::list<Parameter*>::iterator it = pramlist.begin();
+        for(std::list<State*>::iterator it = pramlist.begin();
             it !=pramlist.end(); it++){
                 (*it)->stop();
         }
@@ -116,7 +116,7 @@ namespace ACES {
         //m->printme();
     }
     
-    bool Protocol::registerParameter(Parameter* p){
+    bool Protocol::registerState(State* p){
         this->connectPeers(p);
         pramlist.push_back(p);
 

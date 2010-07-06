@@ -119,16 +119,16 @@ namespace Webots {
     ACES::Credentials* Protocol::parseHWInput(
                        ACES::Message* c) {}
 
-    Parameter::Parameter(std::string n,
+    State::State(std::string n,
       ACES::Credentials* c,
       int pri, int UpdateFreq)
-      : ACES::Parameter(n, c, pri, UpdateFreq)
+      : ACES::State(n, c, pri, UpdateFreq)
     {}
 
-    Parameter::Parameter(std::string pname, std::string cname,
+    State::State(std::string pname, std::string cname,
       int pri, int UpdateFreq,
       float z, float rot)
-        : ACES::Parameter(pname,
+        : ACES::State(pname,
                           new Credentials(cname,z,rot),
                           pri, UpdateFreq)
     {}

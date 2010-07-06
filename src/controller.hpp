@@ -9,7 +9,7 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
 
-#include "parameter.hpp"
+#include "state.hpp"
 #include "pvalue.hpp"
 
 enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
@@ -19,9 +19,9 @@ namespace ACES{
     class WbController : public RTT::TaskContext {
         public:
             WbController(std::string n,
-              std::vector<ACES::Parameter*> pl, 
-              const char* scriptFile, ACES::Hardware* hw_one,
-              ACES::Protocol* pcol,
+              std::vector<State*> pl, 
+              const char* scriptFile, Hardware* hw_one,
+              Protocol* pcol,
               int pri, int UpdateFreq);
 
             void updateHook();
@@ -33,18 +33,18 @@ namespace ACES{
             void step();
             void run();
             void halt();
-            std::map<std::string, ACES::PValue*>*
+            std::map<std::string, PValue*>*
                 getStateVector(bool echo=0);
 
-            std::vector<ACES::Parameter*> plist;
+            std::vector<State*> plist;
 
-            std::map<std::string, ACES::Parameter*> pmap;
+            std::map<std::string, State*> pmap;
 
             std::ifstream walkScript;
 
-            std::map<std::string, ACES::PValue*>* stateVect;
+            std::map<std::string, PValue*>* stateVect;
 
-            RTT::Event<void(std::map<std::string, ACES::PValue*>*)>
+            RTT::Event<void(std::map<std::string, PValue*>*)>
                 applyStateVector;
             RTT::Method<void(void)> stepMethod;
             RTT::Method<void(void)> runMethod;
@@ -56,9 +56,8 @@ namespace ACES{
             std::string name;
             int frequency;
             int priority;
-            std::list<ACES::Hardware*> hwlist;
+            std::list<Hardware*> hwlist;
             std::list<Protocol*> pcollist;
-            ACES::Dispatcher* dispatcher;
             int simState;
     };
 }

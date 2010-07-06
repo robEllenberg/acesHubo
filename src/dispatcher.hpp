@@ -8,22 +8,22 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Event.hpp>
 #include <rtt/Buffer.hpp>
-#include "parameter.hpp"
+#include "state.hpp"
 #include "protocol.hpp"
 
 namespace ACES {
-    class Parameter;
+    class State;
     class Protocol;
     class Dispatcher : public RTT::TaskContext {
         public:
-            //Parameter(std::string name, Protocol* pro);
+            //State(std::string name, Protocol* pro);
             Dispatcher(std::string n, int pri, int UpdateFreq );
             bool configureHook();
             bool startHook();
             void updateHook(); 
             void stopHook();
             void cleanupHook();
-            bool registerParameter(Parameter* pram, Protocol* pcol);
+            bool registerState(State* pram, Protocol* pcol);
             //bool activate();
             //bool deactivate();
             std::string name;
@@ -32,7 +32,7 @@ namespace ACES {
             
         private:
             //Protocol *gov;
-            std::map<Parameter*, Protocol*> routeTable;
+            std::map<State*, Protocol*> routeTable;
     };
 }
 

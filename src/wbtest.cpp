@@ -28,115 +28,115 @@ int ORO_main(int a, char** b){
              (std::string)"wbpcol", (Webots::Hardware*)hw, 3, 50);
 
     //connectPeers( dispatch);
-    //ACES::Parameter* xx = (ACES::Parameter*) new
-    //    Webots::Parameter("xx", "Chest_1",
+    //ACES::State* xx = (ACES::State*) new
+    //    Webots::State("xx", "Chest_1",
     //    dispatch, 5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* HY = (ACES::Parameter*) new
-        //Webots::Parameter("HY", "Waist_1",
-        Webots::Parameter("HY", "HY",
+    ACES::State* HY = (ACES::State*) new
+        //Webots::State("HY", "Waist_1",
+        Webots::State("HY", "HY",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* LSP = (ACES::Parameter*) new
-        //Webots::Parameter("LSP", "Shoulder_Elbow_2",
-        Webots::Parameter("LSP", "LSP",
+    ACES::State* LSP = (ACES::State*) new
+        //Webots::State("LSP", "Shoulder_Elbow_2",
+        Webots::State("LSP", "LSP",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* LSR = (ACES::Parameter*) new
-        //Webots::Parameter("LSR", "Bicep_2",
-        Webots::Parameter("LSR", "LSR",
+    ACES::State* LSR = (ACES::State*) new
+        //Webots::State("LSR", "Bicep_2",
+        Webots::State("LSR", "LSR",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* RSP = (ACES::Parameter*) new
-        //Webots::Parameter("RSP", "Shoulder_Elbow_1",
-        Webots::Parameter("RSP", "RSP",
+    ACES::State* RSP = (ACES::State*) new
+        //Webots::State("RSP", "Shoulder_Elbow_1",
+        Webots::State("RSP", "RSP",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* RSR = (ACES::Parameter*) new
-        //Webots::Parameter("RSR", "Bicep_1",
-        Webots::Parameter("RSR", "RSR",
+    ACES::State* RSR = (ACES::State*) new
+        //Webots::State("RSR", "Bicep_1",
+        Webots::State("RSR", "RSR",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* LHY = (ACES::Parameter*) new
-        //Webots::Parameter("LHY", "Hip_yaw_2",
-        Webots::Parameter("LHY", "LHY",
+    ACES::State* LHY = (ACES::State*) new
+        //Webots::State("LHY", "Hip_yaw_2",
+        Webots::State("LHY", "LHY",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* LHR = (ACES::Parameter*) new
-        //Webots::Parameter("LHR", "Hip_Ankle_pitch_roll_2",
-        Webots::Parameter("LHR", "LHR",
+    ACES::State* LHR = (ACES::State*) new
+        //Webots::State("LHR", "Hip_Ankle_pitch_roll_2",
+        Webots::State("LHR", "LHR",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* LHP = (ACES::Parameter*) new
-        //Webots::Parameter("LHP", "Thigh_2",
-        Webots::Parameter("LHP", "LHP",
+    ACES::State* LHP = (ACES::State*) new
+        //Webots::State("LHP", "Thigh_2",
+        Webots::State("LHP", "LHP",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* LKP = (ACES::Parameter*) new
-        //Webots::Parameter("LKP", "Shin_2",
-        Webots::Parameter("LKP", "LKP",
+    ACES::State* LKP = (ACES::State*) new
+        //Webots::State("LKP", "Shin_2",
+        Webots::State("LKP", "LKP",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* LAP = (ACES::Parameter*) new
-        //Webots::Parameter("LAP", "Hip_Ankle_pitch_roll_4",
-        Webots::Parameter("LAP", "LAP",
+    ACES::State* LAP = (ACES::State*) new
+        //Webots::State("LAP", "Hip_Ankle_pitch_roll_4",
+        Webots::State("LAP", "LAP",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* LAR = (ACES::Parameter*) new
-        //Webots::Parameter("LAR", "Foot_2",
-        Webots::Parameter("LAR", "LAR",
+    ACES::State* LAR = (ACES::State*) new
+        //Webots::State("LAR", "Foot_2",
+        Webots::State("LAR", "LAR",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* RHY = (ACES::Parameter*) new
-        //Webots::Parameter("RHY", "Hip_yaw_1",
-        Webots::Parameter("RHY", "RHY",
+    ACES::State* RHY = (ACES::State*) new
+        //Webots::State("RHY", "Hip_yaw_1",
+        Webots::State("RHY", "RHY",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* RHR = (ACES::Parameter*) new
-        //Webots::Parameter("RHR", "Hip_Ankle_pitch_roll_1",
-        Webots::Parameter("RHR", "RHR",
+    ACES::State* RHR = (ACES::State*) new
+        //Webots::State("RHR", "Hip_Ankle_pitch_roll_1",
+        Webots::State("RHR", "RHR",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* RHP = (ACES::Parameter*) new
-        //Webots::Parameter("RHP", "Thigh_1",
-        Webots::Parameter("RHP", "RHP",
+    ACES::State* RHP = (ACES::State*) new
+        //Webots::State("RHP", "Thigh_1",
+        Webots::State("RHP", "RHP",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* RKP = (ACES::Parameter*) new
-        //Webots::Parameter("RKP", "Shin_1",
-        Webots::Parameter("RKP", "RKP",
+    ACES::State* RKP = (ACES::State*) new
+        //Webots::State("RKP", "Shin_1",
+        Webots::State("RKP", "RKP",
         5, 31, 0.0, 1.0 );
 
-    ACES::Parameter* RAP = (ACES::Parameter*) new
-        //Webots::Parameter("RAP", "Hip_Ankle_pitch_roll_3",
-        Webots::Parameter("RAP", "RAP",
+    ACES::State* RAP = (ACES::State*) new
+        //Webots::State("RAP", "Hip_Ankle_pitch_roll_3",
+        Webots::State("RAP", "RAP",
         5, 31, 0.0, -1.0 );
 
-    ACES::Parameter* RAR = (ACES::Parameter*) new
-        //Webots::Parameter("RAR", "Foot_1",
-        Webots::Parameter("RAR", "RAR",
+    ACES::State* RAR = (ACES::State*) new
+        //Webots::State("RAR", "Foot_1",
+        Webots::State("RAR", "RAR",
         5, 31, 0.0, 1.0 );
 
-    //webot->registerParameter(xx);
-    webot->registerParameter(HY);
-    webot->registerParameter(LSP);
-    webot->registerParameter(LSR);
-    webot->registerParameter(RSP);
-    webot->registerParameter(RSR);
-    webot->registerParameter(LHY);
-    webot->registerParameter(LHR);
-    webot->registerParameter(LHP);
-    webot->registerParameter(LKP);
-    webot->registerParameter(LAP);
-    webot->registerParameter(LAR);
-    webot->registerParameter(RHY);
-    webot->registerParameter(RHR);
-    webot->registerParameter(RHP);
-    webot->registerParameter(RKP);
-    webot->registerParameter(RAP);
-    webot->registerParameter(RAR);
+    //webot->registerState(xx);
+    webot->registerState(HY);
+    webot->registerState(LSP);
+    webot->registerState(LSR);
+    webot->registerState(RSP);
+    webot->registerState(RSR);
+    webot->registerState(LHY);
+    webot->registerState(LHR);
+    webot->registerState(LHP);
+    webot->registerState(LKP);
+    webot->registerState(LAP);
+    webot->registerState(LAR);
+    webot->registerState(RHY);
+    webot->registerState(RHR);
+    webot->registerState(RHP);
+    webot->registerState(RKP);
+    webot->registerState(RAP);
+    webot->registerState(RAR);
 
-    std::vector<ACES::Parameter*> pvect;
+    std::vector<ACES::State*> pvect;
     //pvect.push_back(xx);
     pvect.push_back(HY);
     pvect.push_back(LSP);

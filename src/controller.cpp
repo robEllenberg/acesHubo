@@ -2,9 +2,9 @@
 namespace ACES{
 
     WbController::WbController(
-      std::string n, std::vector<ACES::Parameter*> pl,
-      const char* scriptFile, ACES::Hardware* hw_one,
-      ACES::Protocol* pcol,
+      std::string n, std::vector<State*> pl,
+      const char* scriptFile, Hardware* hw_one,
+      Protocol* pcol,
       int pri, int UpdateFreq)
       : RTT::TaskContext(n),
         walkScript(scriptFile, std::ifstream::in),
@@ -46,14 +46,14 @@ namespace ACES{
         this->events()->addEvent(&applyStateVector, "applyStateVector",
             "SVmap", "map of state vect info");
 
-        std::vector<ACES::Parameter*>::iterator it;
+        std::vector<ACES::State*>::iterator it;
         for(it = plist.begin(); it != plist.end(); it++){
-           //Create a mapping of names->parameters
+           //Create a mapping of names->states
            pmap[(*it)->name] = (*it);
-           //Connect and verifyeach of the parameters to the state
+           //Connect and verifyeach of the states to the state
            //application event
            RTT::Handle h = this->events()->setupConnection("applyStateVector")
-                .callback( (*it), &Parameter::setGoal,
+                .callback( (*it), &State::setGoal,
                            (*it)->engine()->events() ).handle();
            assert( h.ready() );
            h.connect();

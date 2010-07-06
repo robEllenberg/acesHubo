@@ -14,7 +14,7 @@
 
 #include "protocol.hpp"
 #include "message.hpp"
-#include "parameter.hpp"
+#include "state.hpp"
 #include "dispatcher.hpp"
 
 //Defs for the lexer
@@ -75,9 +75,9 @@ namespace Robotis {
             ACES::Credentials* parseHWInput(unsigned char* c);
     };
     
-    class Parameter : public ACES::Parameter {
+    class State : public ACES::State {
         public:
-            Parameter(std::string n,
+            State(std::string n,
                 ACES::Credentials* c, ACES::Dispatcher* d,
                 int pri, int UpdateFreq);
     };
