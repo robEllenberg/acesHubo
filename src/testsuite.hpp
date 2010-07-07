@@ -31,7 +31,7 @@ namespace TestSuite{
     class State : public ACES::State{
         public:
             State(std::string n, ACES::Credentials* c,
-              ACES::Dispatcher* d, int pri, int UpdateFreq);
+              int pri, int UpdateFreq);
             //void set(float setPoint);
             //bool setGoal(ACES::SValue* val);
             //bool goalSet();

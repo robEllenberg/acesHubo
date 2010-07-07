@@ -12,8 +12,12 @@
 
 #include "message.hpp"
 #include "svalue.hpp"
+#include "dispatcher.hpp"
 
 namespace ACES {
+    class taskCfg;
+
+    enum HWTYPE { 
       
     class Hardware : public RTT::TaskContext {
         public:
@@ -26,6 +30,7 @@ namespace ACES {
 
             Hardware(std::string name, int priority,
                      int UpdateFreq);
+            Hardware(taskCfg cfg, std::string args);
             bool configureHook();
             bool startHook();
             void stopHook();

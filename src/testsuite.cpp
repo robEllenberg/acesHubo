@@ -37,7 +37,7 @@ namespace TestSuite{
     }
 
     State::State(std::string n, ACES::Credentials* c,
-          ACES::Dispatcher* d, int pri, int UpdateFreq)
+          int pri, int UpdateFreq)
       : ACES::State(n, c, d, pri, UpdateFreq)
       {
          //RTT::Method<void(float)>* setMethod = new RTT::Method<void(float)>

@@ -27,6 +27,7 @@ namespace Webots{
     class Hardware : public ACES::Hardware {
         public:
             Hardware(std::string n, int pri, int UpdateFreq); 
+            Hardware(ACES::taskCfg, std::string args);
             bool startHook();
             void updateHook();
 

@@ -16,7 +16,7 @@ int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
     logger->setLogLevel(RTT::Logger::Debug);
 
-    ACES::Dispatcher dispatch("dispatch", 5, 100);
+    //ACES::Dispatcher dispatch("dispatch", 5, 100);
 
     TestSuite::Hardware* hw = new 
         TestSuite::Hardware((std::string)"HW", 5, 100);

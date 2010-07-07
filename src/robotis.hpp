@@ -77,9 +77,11 @@ namespace Robotis {
     
     class State : public ACES::State {
         public:
+/*
             State(std::string n,
                 ACES::Credentials* c, ACES::Dispatcher* d,
                 int pri, int UpdateFreq);
+*/
     };
     
     class Credentials : public ACES::Credentials {

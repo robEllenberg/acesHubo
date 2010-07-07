@@ -108,11 +108,12 @@ ACES::Credentials* Protocol::parseHWInput(unsigned char* c){
     }
 }
 
+/*
     State::State(std::string n, ACES::Credentials* c,
       ACES::Dispatcher* d, int pri, int UpdateFreq)
       : ACES::State(n, c, d, pri, UpdateFreq){
     }
-
+*/
     Hardware::Hardware(std::string name,
         std::ifstream *in, std::ofstream *out, int priority,
         int UpdateFreq)

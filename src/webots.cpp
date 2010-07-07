@@ -11,6 +11,13 @@ namespace Webots {
         this->methods()->addMethod(stepMethod);
             //"Time to advance (ms)");
     }
+
+    Hardware::Hardware(ACES::taskCfg cfg, int type, std::string args)
+      : ACES::Hardware(cfg, args){
+        switch(CRED_WB_JOINT){
+            case 
+        }
+    }
        
     bool Hardware::startHook(){
         wb_robot_init();

@@ -14,7 +14,6 @@
 #include "state.hpp"
 
 namespace ACES {
-    class Dispatcher;
     template <class T>
     class Credentials;
     template <class T>

@@ -5,23 +5,28 @@ namespace ACES {
                      int UpdateFreq) :
 	    RTT::TaskContext(name),
 	    //NewData("NewData"),
-	    outBuffer((std::string)"ToProtocol", 500),
-        inBuffer((std::string)"FromProtocol")
+	    //outBuffer((std::string)"ToProtocol", 500),
+        //inBuffer((std::string)"FromProtocol")
         {
             priority = pri;
             frequency = UpdateFreq;
             //this->events()->addEvent( &NewData,
             //    "Notify of new data arrival", "data",
             //    "The recieved data.");
-            this->ports()->addPort( &outBuffer,
-                "Ouput buffer to the supporting protocol");
-            this->ports()->addPort( &inBuffer,
-                "Input buffer from the supporting protocol");
             this->setActivity(
                 new RTT::Activity(priority, 1.0/UpdateFreq, 0, name));
             //this->methods()->addMethod( &isBusyMethod,
             //    "Check if the hardware is busy");
         }
+
+    Hardware::Hardware(taskCfg cfg, std::string args) :
+     RTT::TaskContext(cfg.name){
+        priority = cfg.priority;
+        frequency = cfg.freq;
+        this->setActivity( new RTT::Activity( priority, 1.0/frequency,
+                                              name)
+                         );
+    }
     
     bool Hardware::configureHook(){
         return true;
