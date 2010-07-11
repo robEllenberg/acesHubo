@@ -8,19 +8,26 @@
 #include "protocol.hpp"
 #include "controller.hpp"
 #include "state.hpp"
+#include "hardware.hpp"
+#include "webots.hpp"
 
 namespace ACES{
     class Dispatcher : public RTT::TaskContext {
         public:
             Dispatcher();
-            addHardware(std::string cfg, int type, std::string args);
-            addProtocol(std::string cfg, int type, std::string args);
-            addState(std::string cfg, int type, std::string args);
-            addController(std::string cfg, int type, std::string args);
+            bool addHardware(std::string cfg, std::string type,
+                             std::string args);
+            bool addProtocol(std::string cfg, std::string type,
+                             std::string args);
+            bool addState(std::string cfg, std::string type,
+                          std::string args);
+            bool addController(std::string cfg, std::string type,
+                               std::string args);
 
             std::list<void*> stateList;
             std::list<Protocol*> pList;
             std::list<WbController*> cList;
+            std::list<Hardware*> hwList;
             
             bool configureHook();
             bool startHook();

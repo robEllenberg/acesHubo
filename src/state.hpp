@@ -22,6 +22,7 @@ namespace ACES {
         public:
             State(std::string n, Credentials<T>* c,
                       int pri, int UpdateFreq, T val);
+            State(taskCfg cfg, Credentials<T>* c, T ic);
 
             bool configureHook();
             bool startHook();

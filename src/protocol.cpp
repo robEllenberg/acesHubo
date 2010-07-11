@@ -3,49 +3,51 @@
 namespace ACES {
     Protocol::Protocol(std::string n, Hardware* hw,
                        int pri, int UpdateFreq)
-      : RTT::TaskContext(n),
-        issueMessage("issueMessage")
-        {
-
+      : RTT::TaskContext(n), issueMessage("issueMessage")
+    {
         priority = pri;
         frequency = UpdateFreq;
-        name = n;
-        hardware = hw;
-        
-        this->events()->addEvent(&issueMessage, "issueMessage", "msg", "The message to be transmitted");
-
-        RTT::Handle h = this->events()->setupConnection("issueMessage")
-            .callback( hw, &Hardware::transmit
-           //            hw->engine()->events() ).handle();
-            ).handle();
-        assert( h.ready() );
-        h.connect();
-        assert( h.connected() );
 
         this->pending_stack = new std::deque<Message*>;
-
-        //request_stack = new
-        //    RTT::ReadBufferPort<Credentials*>("Request Stack");
         
-        //this->ports()->addPort(request_stack,
-        //                       (std::string) "Request Stack");
-
-        hwInBuffer = new
-           RTT::ReadBufferPort<Message*>("FromLine");
-        hwOutBuffer = new
-           RTT::WriteBufferPort<Message*>("ToLine",500);
-        this->ports()->addPort(hwInBuffer,
-                               (std::string)"FromLine");
-        this->ports()->addPort(hwOutBuffer,
-                               (std::string)"ToLine");
-        (*hw).outBuffer.connectTo(this->hwInBuffer);
-        this->hwOutBuffer->connectTo( &(hw->inBuffer) );
-        
-
+        this->events()->addEvent(&issueMessage, "issueMessage", "msg",
+                                 "The message to be transmitted");
         this->setActivity(
             new RTT::Activity( priority, 1.0/frequency, 0, n )
         );
     }
+
+    Protocol::Protocol(taskCfg cfg, std::string args):
+      RTT::TaskContext(cfg.name),
+      issueMessage("issueMessage"){
+
+        priority = cfg.priority;
+        frequency = cfg.freq;
+ 
+        this->pending_stack = new std::deque<Message*>;
+        
+        this->events()->addEvent(&issueMessage, "issueMessage", "msg",
+                                 "The message to be transmitted");
+        this->setActivity(
+            new RTT::Activity( priority, 1.0/frequency, 0, n )
+        );
+    }
+
+    bool Protocol::addHW(Hardware* hw){
+        RTT::Handle h = this->events()->setupConnection("issueMessage")
+            .callback( hw, &Hardware::transmit
+           //            hw->engine()->events() ).handle();
+            ).handle();
+        if(not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+        return true;
+    }
+
     
     bool Protocol::configureHook(){
         return true;
@@ -54,14 +56,14 @@ namespace ACES {
     bool Protocol::startHook(){
         //RTT::Logger::log() << "Protocol Startup"
         //                   << std::endl;
+        /*
         for(std::list<void*>::iterator it = pramlist.begin();
             it !=pramlist.end(); it++){
                 //TODO - Have no idea if this will hold
                 // in all cases, better check that out
                 ((State<int>*)(*it))->start();
         }
-
-        this->hardware->start();
+        */
         return true;
     }
 
@@ -108,7 +110,6 @@ namespace ACES {
                 // in all cases, better check that out
                 ((State<int>*)(*it))->stop();
         }
-        this->hardware->stop();
     }
     
     void Protocol::cleanupHook(){

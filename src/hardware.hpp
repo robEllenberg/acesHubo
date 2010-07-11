@@ -16,8 +16,6 @@
 
 namespace ACES {
     class taskCfg;
-
-    enum HWTYPE { 
       
     class Hardware : public RTT::TaskContext {
         public:

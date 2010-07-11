@@ -19,6 +19,23 @@ namespace ACES {
             new RTT::Activity( priority, 1.0/UpdateFreq, 0, n )
         );
     }
+
+    template <class T>
+    State<T>::State(taskCfg cfg, Credentials<T>* c, T ic) :
+      RTT::TaskContext(cfg.name), sendGoal("sendGoal"){
+
+        this->events()->addEvent(&sendGoal, "sendGoal", "credentials",
+            "credentials associated w/the goal");
+
+        priority = cfg.pri;
+        frequency = cfg.freq;
+        credentials = c;
+        value = ic;
+
+        this->setActivity(
+            new RTT::Activity( priority, 1.0/frequency, 0, cfg.name )
+        );
+    }
     
     template <class T>
     void State<T>::printme(){

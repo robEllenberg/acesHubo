@@ -26,6 +26,7 @@ namespace ACES {
         public:
             Protocol(std::string name, Hardware* hw,
                      int pri, int UpdateFreq);
+            Protocol(taskCfg cfg, std::string args);
             bool configureHook();
             bool startHook();
             //void updateHook(
@@ -34,10 +35,11 @@ namespace ACES {
             void updateHook();
             void stopHook();
             void cleanupHook();
+            bool addHW(Hardware* hw);
 
             RTT::ReadBufferPort<Message*>* hwInBuffer;
             RTT::WriteBufferPort<Message*>* hwOutBuffer;
-            Hardware* hardware;
+            //Hardware* hardware;
             std::string name;
             int frequency;
             int priority;

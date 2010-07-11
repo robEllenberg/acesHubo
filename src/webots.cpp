@@ -12,11 +12,13 @@ namespace Webots {
             //"Time to advance (ms)");
     }
 
-    Hardware::Hardware(ACES::taskCfg cfg, int type, std::string args)
+    Hardware::Hardware(ACES::taskCfg cfg, std::string args)
       : ACES::Hardware(cfg, args){
-        switch(CRED_WB_JOINT){
-            case 
-        }
+
+        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
+            ("step", &Hardware::step, this);
+        this->methods()->addMethod(stepMethod);
+        
     }
        
     bool Hardware::startHook(){
@@ -132,6 +134,9 @@ namespace Webots {
                      int pri, int UpdateFreq)
       : ACES::Protocol(name, hw, pri, UpdateFreq){}
 
+    Protocol::Protocol(taskCfg cfg, std::string args) 
+      : ACES::Protocl(cfg, args){}
+        
 /*
 
     void Protocol::aggregateRequests(
@@ -163,4 +168,9 @@ namespace Webots {
                           new Credentials<T>(cname,z,rot),
                           pri, UpdateFreq)
     {}
+
+    template <class T>
+    State<T>::State(ACES::taskCfg cfg, std::string args){
+        
+    }
 }

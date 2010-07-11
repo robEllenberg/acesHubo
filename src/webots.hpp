@@ -46,6 +46,7 @@ namespace Webots{
             State(std::string pname, std::string cname,
                   int pri, int UpdateFreq,
                   float z=150.0, float rot=1.0);
+            State(ACES::taskCfg cfg, std::string args);
             //void setGoal(std::map<std::string, ACES::SValue*>*);
     };
    
@@ -69,6 +70,7 @@ namespace Webots{
         public:
             Protocol(std::string name, Hardware* hw,
                      int pri, int UpdateFreq);
+            Protocol(taskCfg cfg, std::string args);
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
             //ACES::Credentials* parseHWInput(
