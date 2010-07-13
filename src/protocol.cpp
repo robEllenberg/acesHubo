@@ -1,7 +1,7 @@
 #include "protocol.hpp"
 
 namespace ACES {
-    Protocol::Protocol(std::string n, Hardware* hw,
+    Protocol::Protocol(std::string n, 
                        int pri, int UpdateFreq)
       : RTT::TaskContext(n), issueMessage("issueMessage")
     {
@@ -29,23 +29,8 @@ namespace ACES {
         this->events()->addEvent(&issueMessage, "issueMessage", "msg",
                                  "The message to be transmitted");
         this->setActivity(
-            new RTT::Activity( priority, 1.0/frequency, 0, n )
+            new RTT::Activity( priority, 1.0/frequency, 0, cfg.name )
         );
-    }
-
-    bool Protocol::addHW(Hardware* hw){
-        RTT::Handle h = this->events()->setupConnection("issueMessage")
-            .callback( hw, &Hardware::transmit
-           //            hw->engine()->events() ).handle();
-            ).handle();
-        if(not h.ready() ){
-            return false;
-        }
-        h.connect();
-        if( not h.connected() ){
-            return false;
-        }
-        return true;
     }
 
     
@@ -56,22 +41,9 @@ namespace ACES {
     bool Protocol::startHook(){
         //RTT::Logger::log() << "Protocol Startup"
         //                   << std::endl;
-        /*
-        for(std::list<void*>::iterator it = pramlist.begin();
-            it !=pramlist.end(); it++){
-                //TODO - Have no idea if this will hold
-                // in all cases, better check that out
-                ((State<int>*)(*it))->start();
-        }
-        */
-        return true;
+       return true;
     }
 
-    bool Protocol::theresStillTime(){
-        return true;
-    }
-
-    //void Protocol::updateHook(const std::vector<RTT::PortInterface*>& updatedPorts)
     void Protocol::updateHook(){
         //std::list<ACES::Credentials*>* c = getNewRequests();
         //aggregateRequests(*c);
@@ -86,17 +58,6 @@ namespace ACES {
         }
     }
 
-/*
-    std::list<Credentials*>* Protocol::getNewRequests(){
-        std::list<Credentials*>* cred = new std::list<Credentials*>();
-        while( this->request_stack->size() ){
-            Credentials* c; 
-            this->request_stack->Pop(c);
-            cred->push_back(c);
-        }
-        return cred;
-    }
-*/
     template <class T>
     void Protocol::addRequest(Credentials<T>* c){
         ACES::Message *m = new ACES::Message( c );
@@ -104,12 +65,6 @@ namespace ACES {
     }
 
     void Protocol::stopHook(){
-        for(std::list<void*>::iterator it = pramlist.begin();
-            it !=pramlist.end(); it++){
-                //TODO - Have no idea if this will hold
-                // in all cases, better check that out
-                ((State<int>*)(*it))->stop();
-        }
     }
     
     void Protocol::cleanupHook(){
@@ -123,11 +78,10 @@ namespace ACES {
     }
     
     template <class T>
-    bool Protocol::registerState(State<T>* p){
-        this->connectPeers(p);
-        pramlist.push_back(p);
+    bool Protocol::subscribeState(State<T>* p){
+        this->connectPeers( (RTT::TaskContext*) p );
 
-        RTT::Handle h = p->events()->setupConnection("sendGoal")
+        RTT::Handle h = p->events()->setupConnection("announceGoal")
             .callback( this, &Protocol::addRequest,
                        this->engine()->events() ).handle();
         assert( h.ready() );

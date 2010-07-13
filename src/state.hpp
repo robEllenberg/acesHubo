@@ -12,11 +12,12 @@
 #include <rtt/Command.hpp>
 
 //#include "protocol.hpp"
-//#include "dispatcher.hpp"
 #include "credentials.hpp"
+#include "controller.hpp"
+#include "taskcfg.hpp"
 
 namespace ACES {
-    //class Dispatcher;
+    class WbController;
     template <class T>
     class State : public RTT::TaskContext {
         public:
@@ -40,7 +41,8 @@ namespace ACES {
 
             void setGoal(std::map<std::string, void*>*);
             //TODO - Not the best method of data passing
-            RTT::Event<void(void*)> sendGoal;
+            RTT::Event<void(void*)> announceGoal;
+            bool subscribeController(WbController* c);
     };
 }
     

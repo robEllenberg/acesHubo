@@ -1,5 +1,5 @@
-#ifndef ACES_CONTROLLER_HPP
-#define ACES_CONTROLLER_HPP
+#ifndef ACES_DISPATCHER_HPP
+#define ACES_DISPATCHER_HPP
 
 #include <string>
 
@@ -10,11 +10,12 @@
 #include "state.hpp"
 #include "hardware.hpp"
 #include "webots.hpp"
+#include "taskcfg.hpp"
 
 namespace ACES{
     class Dispatcher : public RTT::TaskContext {
         public:
-            Dispatcher();
+            Dispatcher(std::string n, int pri, int freq);
             bool addHardware(std::string cfg, std::string type,
                              std::string args);
             bool addProtocol(std::string cfg, std::string type,
@@ -35,14 +36,6 @@ namespace ACES{
             void stopHook();
             void cleanupHook();
             
-    };
-
-    class taskCfg {
-        public:
-            taskCfg(std::sting cfg);
-            std::string name; 
-            double freq;
-            int priority;
     };
 }
 

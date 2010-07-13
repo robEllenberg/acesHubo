@@ -4,7 +4,7 @@ namespace ACES {
     State<T>::State(std::string n, Credentials<T>* c,
       int pri, int UpdateFreq, T val)
       : RTT::TaskContext(n),
-        sendGoal("sendGoal")
+        announceGoal("announceGoal")
     {
         name = n;
         credentials = c;
@@ -12,7 +12,7 @@ namespace ACES {
         priority = pri;
         value = val;
 
-        this->events()->addEvent(&sendGoal, "sendGoal", "credentials",
+        this->events()->addEvent(&announceGoal, "announceGoal", "credentials",
             "credentials associated w/the goal");
 
         this->setActivity(
@@ -22,12 +22,12 @@ namespace ACES {
 
     template <class T>
     State<T>::State(taskCfg cfg, Credentials<T>* c, T ic) :
-      RTT::TaskContext(cfg.name), sendGoal("sendGoal"){
+      RTT::TaskContext(cfg.name), announceGoal("announceGoal"){
 
-        this->events()->addEvent(&sendGoal, "sendGoal", "credentials",
+        this->events()->addEvent(&announceGoal, "announceGoal", "credentials",
             "credentials associated w/the goal");
 
-        priority = cfg.pri;
+        priority = cfg.priority;
         frequency = cfg.freq;
         credentials = c;
         value = ic;
@@ -59,7 +59,7 @@ namespace ACES {
     template <class T>
     void State<T>::updateHook(){
         Credentials<T>* c = new Credentials<T>(credentials);
-        sendGoal(c);
+        announceGoal(c);
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;
 
@@ -85,7 +85,24 @@ namespace ACES {
             
             //this->outport->Push(c);
             //printme();
-            sendGoal((void*)c);
+            announceGoal((void*)c);
         }
     }
+    
+    template <class T>
+    bool State<T>::subscribeController(WbController* c){
+        this->connectPeers( (RTT::TaskContext*) c);
+        RTT::Handle h = c->events()->setupConnection("applyStateVector")
+                .callback( this, &State::setGoal,
+                           this->engine()->events() ).handle();
+        if( not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+        return true;
+    }
+
 }

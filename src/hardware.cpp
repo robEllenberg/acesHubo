@@ -1,15 +1,16 @@
 #include "hardware.hpp"
 
 namespace ACES {
-    Hardware::Hardware(std::string name, int pri,
+    Hardware::Hardware(std::string n, int pri,
                      int UpdateFreq) :
-	    RTT::TaskContext(name),
+	    RTT::TaskContext(n)
 	    //NewData("NewData"),
 	    //outBuffer((std::string)"ToProtocol", 500),
         //inBuffer((std::string)"FromProtocol")
         {
             priority = pri;
             frequency = UpdateFreq;
+            name = n;
             //this->events()->addEvent( &NewData,
             //    "Notify of new data arrival", "data",
             //    "The recieved data.");
@@ -23,7 +24,7 @@ namespace ACES {
      RTT::TaskContext(cfg.name){
         priority = cfg.priority;
         frequency = cfg.freq;
-        this->setActivity( new RTT::Activity( priority, 1.0/frequency,
+        this->setActivity( new RTT::Activity( priority, 1.0/frequency, 0,
                                               name)
                          );
     }
@@ -65,11 +66,29 @@ namespace ACES {
         recieve();
     }
 
+    bool Hardware::subscribeProtocol(Protocol* p){
+        this->connectPeers( (RTT::TaskContext*) p);
+        RTT::Handle h = p->events()->setupConnection("issueMessage")
+            .callback( this, &Hardware::transmit
+           //            hw->engine()->events() ).handle();
+            ).handle();
+        if(not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+        return true;
+    }
+
     charDevHardware::charDevHardware(std::string name,
                        std::ifstream *in,
                        std::ofstream *out, int priority,
                        int UpdateFreq) : 
-            Hardware(name, priority, UpdateFreq)
+            Hardware(name, priority, UpdateFreq),
+            outBuffer("Out", 10),
+            inBuffer("In")
         {
             hardpoint_in = in;
             hardpoint_out = out;
@@ -99,10 +118,9 @@ namespace ACES {
     void charDevHardware::checkForLineData(){
         unsigned char c;
         while( this->hardpoint_in->readsome((char*)&c, 1) ){
-            //RTT::Logger::log() << "on-line: "
-            //<<std::hex << (int)c << std::dec << std::endl;
-            charDevSValue* cpv = new charDevSValue(c);
-            outBuffer.buffer()->Push((Message*)cpv);	
+            //TODO - Reimplement, post removal of SVal's
+            //charDevSValue* cpv = new charDevSValue(c);
+            //outBuffer.buffer()->Push((Message*)cpv);	
 	    }
     }
 }

@@ -11,20 +11,17 @@
 #include <rtt/Activity.hpp>
 
 #include "message.hpp"
-#include "svalue.hpp"
-#include "dispatcher.hpp"
+#include "protocol.hpp"
+#include "taskcfg.hpp"
 
 namespace ACES {
-    class taskCfg;
-      
+    class Protocol;
     class Hardware : public RTT::TaskContext {
         public:
-          //! Ouput from this Hardware to associated Protocol
-            RTT::WriteBufferPort<ACES::Message*> outBuffer; 
-            //! Input to this hardware from Protocol
-            RTT::ReadBufferPort<ACES::Message*> inBuffer; 
+
             int frequency;
             int priority;
+            std::string name;
 
             Hardware(std::string name, int priority,
                      int UpdateFreq);
@@ -40,11 +37,16 @@ namespace ACES {
             virtual bool recieve() = 0;
 
             //RTT::Event<void(std::string)> NewData;
+            bool subscribeProtocol(Protocol* p);
             RTT::Method<bool(void)> isBusyMethod;
     };
 
     class charDevHardware : public Hardware {
         public:
+            //! Ouput from this Hardware to associated Protocol
+            RTT::WriteBufferPort<ACES::Message*> outBuffer; 
+            //! Input to this hardware from Protocol
+            RTT::ReadBufferPort<ACES::Message*> inBuffer; 
             void updateHook();
             void checkForLineData();
             void checkForProtocolData();

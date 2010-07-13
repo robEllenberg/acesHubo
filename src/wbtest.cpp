@@ -10,7 +10,7 @@
 #include "message.hpp"
 #include "hardware.hpp"
 #include "webots.hpp"
-
+#include "dispatcher.hpp"
 
 int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
@@ -20,9 +20,11 @@ int ORO_main(int a, char** b){
 //        "dispatch", 5, 100
 //    );
 
-    ACES::Hardware* hw = (ACES::Hardware*) new 
-        Webots::Hardware((std::string)"HW", 10, 50);
+    ACES::Dispatcher* d = new ACES::Dispatcher("dispatch", 20, 1);
 
+    d->addHardware("wbhw 1 100", "Webots", "");
+
+/*
     ACES::Protocol* webot =
              (ACES::Protocol*) new Webots::Protocol(
              (std::string)"wbpcol", (Webots::Hardware*)hw, 3, 50);
@@ -163,10 +165,9 @@ int ORO_main(int a, char** b){
     //wbctrl->connectPeers( (RTT::TaskContext*) dispatch);
 
     //hw->start();
-    //webot->start();
-    //wbctrl.start();
 
-    Orocos::TaskBrowser tbrowser(wbctrl);
+*/
+    Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();
     return 0;
 }

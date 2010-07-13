@@ -13,7 +13,8 @@
 #include "svalue.hpp"
 #include "protocol.hpp"
 #include "state.hpp"
-//#include "dispatcher.hpp"
+#include "hardware.hpp"
+#include "taskcfg.hpp"
 
 extern "C"{
     #include <webots/robot.h>
@@ -23,7 +24,7 @@ extern "C"{
 enum CREDTYPE { CRED_WB_JOINT=1 };
 
 namespace Webots{
-    
+    template <class T> class Credentials;
     class Hardware : public ACES::Hardware {
         public:
             Hardware(std::string n, int pri, int UpdateFreq); 
@@ -36,6 +37,8 @@ namespace Webots{
             bool recieve();
             void setGoal();
             void step(int time=32);
+            void stepRequest( std::map<std::string, void*>* );
+            bool subscribeController(ACES::WbController* c);
     };
 
     template <class T>
@@ -46,8 +49,9 @@ namespace Webots{
             State(std::string pname, std::string cname,
                   int pri, int UpdateFreq,
                   float z=150.0, float rot=1.0);
-            State(ACES::taskCfg cfg, std::string args);
+            State(ACES::taskCfg cfg, Credentials<T>* c, T ic);
             //void setGoal(std::map<std::string, ACES::SValue*>*);
+            static void* parseDispArgs(std::string type, std::string args);
     };
    
     template <class T>
@@ -65,12 +69,27 @@ namespace Webots{
             float zero;
             float rotation;
     };
+    
+    template <class T>
+    void* State<T>::parseDispArgs(std::string type,
+                                         std::string args)
+    {
+        void *c = 0;
+        if(type == "float"){
+            std::istringstream s1(args);
+            std::string id;
+            float zero, rot;
+            s1 >> id >> zero >> rot;
+            c = (void*)new Credentials<float>(id, zero, rot);
+        }
+        return c;
+    }
 
     class Protocol : public ACES::Protocol {
         public:
-            Protocol(std::string name, Hardware* hw,
+            Protocol(std::string name, 
                      int pri, int UpdateFreq);
-            Protocol(taskCfg cfg, std::string args);
+            Protocol(ACES::taskCfg cfg, std::string args);
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
             //ACES::Credentials* parseHWInput(

@@ -74,6 +74,27 @@ namespace Webots {
         return false;
     }
 
+    bool Hardware::subscribeController(ACES::WbController* c){
+        this->connectPeers( (RTT::TaskContext*) c);
+        RTT::Handle h = c->events()->setupConnection("applyStateVector")
+                .callback( this, &Hardware::stepRequest,
+                           this->engine()->events() ).handle();
+        if( not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+        return true;
+    }
+
+    void Hardware::stepRequest( std::map<std::string, void*>* ){
+        //TODO - This will advance the simulation before the 
+        //new state information is processed
+        step();
+    }
+
     template <class T>
     Credentials<T>::Credentials() : ACES::Credentials<T>(){
         wb_device_id = "";
@@ -130,12 +151,12 @@ namespace Webots {
         return (ACES::Credentials*) c;
     }
 */
-    Protocol::Protocol(std::string name, Hardware* hw,
+    Protocol::Protocol(std::string name, 
                      int pri, int UpdateFreq)
-      : ACES::Protocol(name, hw, pri, UpdateFreq){}
+      : ACES::Protocol(name, pri, UpdateFreq){}
 
-    Protocol::Protocol(taskCfg cfg, std::string args) 
-      : ACES::Protocl(cfg, args){}
+    Protocol::Protocol(ACES::taskCfg cfg, std::string args) 
+      : ACES::Protocol(cfg, args){}
         
 /*
 
@@ -170,7 +191,23 @@ namespace Webots {
     {}
 
     template <class T>
-    State<T>::State(ACES::taskCfg cfg, std::string args){
-        
+    State<T>::State(ACES::taskCfg cfg, Credentials<T>* c, T ic)
+     :ACES::State<T>(cfg, (ACES::Credentials<T>*) c, ic)
+    {}
+/*    
+    template <class T>
+    void* State<T>::parseDispArgs(std::string type,
+                                         std::string args)
+    {
+        void *c = 0;
+        if(type == "float"){
+            std::istringstream s1(args);
+            std::string id;
+            float zero, rot;
+            s1 >> id >> zero >> rot;
+            c = (void*)new Credentials<float>(id, zero, rot);
+        }
+        return c;
     }
+*/
 }
