@@ -30,9 +30,13 @@ namespace ACES{
     {
         taskCfg c(cfg);
         Protocol* p;
-            if ( type == "Webots"){
-                p = (Protocol*) new Webots::Protocol(cfg, args);
-            } 
+        if ( type == "Webots"){
+            p = (Protocol*) new Webots::Protocol(cfg, args);
+        } 
+        if(p){
+            pList.push_back(p);
+            this->connectPeers(p);
+        }
     }
 
     bool Dispatcher::addState(std::string cfg, std::string type,
@@ -46,21 +50,38 @@ namespace ACES{
         std::string t1, t2;
         s1 >> t1 >> t2;
       
-
+        Credentials* cred;
+        void* state;
         if( t1 == "Webots") {
             if (t2 == "float"){
-                void* a = Webots::State<float>::parseDispArgs(t2, args);
-                void* s =
+                cred = Webots::State<float>::parseDispArgs(t2, args);
+                state =
                      (void*) new Webots::State<float>(c,
-                                             (Webots::Credentials<float>*)a,
-                                             (float)0.0);
+                                                      cred,
+                                                      (float)0.0);
             } 
+        }
+        if(state){
+            stateList.push_back(state);
+            connectPeers( (RTT::TaskContext*)state);
         }
     }
 
     bool Dispatcher::addController(std::string cfg, std::string type,
                                    std::string args)
     {}
+
+    bool Dispatcher::linkPS(std::string pcol, std::string state){
+        RTT::TaskContext* p = this->getPeer(pcol);
+        RTT::TaskContext* s = this->getPeer(state);
+        if(p and s){
+            //return ((Protocol*)p)->subscribeState(s);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
     bool Dispatcher::configureHook(){
         return true;
@@ -72,21 +93,28 @@ namespace ACES{
             (*it)->start();
         }
 
+        //RTT::Logger::log() << "Finished HW" << RTT::endlog();
+
         for(std::list<Protocol*>::iterator it = pList.begin();
             it != pList.end(); it++){
             (*it)->start();
         }
 
+        //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
         for(std::list<void*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->start();
         }
 
+        //RTT::Logger::log() << "Finished States" << RTT::endlog();
+
         for(std::list<WbController*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->start();
         }
+
+        //RTT::Logger::log() << "Finished Controllers" << RTT::endlog();
         return true;
     }
     

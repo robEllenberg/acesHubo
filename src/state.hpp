@@ -17,13 +17,13 @@
 #include "taskcfg.hpp"
 
 namespace ACES {
-    class WbController;
+    //class WbController;
     template <class T>
     class State : public RTT::TaskContext {
         public:
-            State(std::string n, Credentials<T>* c,
+            State(std::string n, Credentials* c,
                       int pri, int UpdateFreq, T val);
-            State(taskCfg cfg, Credentials<T>* c, T ic);
+            State(taskCfg cfg, Credentials* c, T ic);
 
             bool configureHook();
             bool startHook();
@@ -36,14 +36,17 @@ namespace ACES {
             std::string name;
             int frequency;
             int priority;
-            Credentials<T>* credentials;
+            Credentials* credentials;
             T value;
 
             void setGoal(std::map<std::string, void*>*);
             //TODO - Not the best method of data passing
             RTT::Event<void(void*)> announceGoal;
             bool subscribeController(WbController* c);
+            //virtual Credentials* parseDispArgs(std::string type,
+            //                                   std::string args) = 0;
     };
+    #include "state.cc"
 }
     
 #endif

@@ -4,19 +4,22 @@ namespace ACES {
         credType = t;
     }
 
-    template <class T> 
-    Credentials<T>::Credentials(int id_num, T v, int type)
-        : ProtoCredential(type){
+    Credentials::Credentials(int type, int id_num)
+        : ProtoCredential(type)
+    {
         this->id = id_num;
-        this->val = v;
     }
 
-    template <class T> 
-    Credentials<T>::Credentials(Credentials *c, T v)
+    Credentials::Credentials(Credentials *c)
+        : ProtoCredential(c->credType)
     {
         this->id = c->id;
-        this->val = v;
-        this->credType = c->credType;
+    }
+
+    void Credentials::printme() {
+        RTT::Logger::log() << "Credential: Type= " << credType
+                           << ", ID= " << id;
+        RTT::Logger::log() << RTT::endlog();
     }
 
     /*

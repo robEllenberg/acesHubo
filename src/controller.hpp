@@ -5,13 +5,16 @@
 #include <map>
 #include <list>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
+#include <rtt/Method.hpp>
+#include <rtt/Activity.hpp>
 
-#include "state.hpp"
-#include "hardware.hpp"
+//#include "state.hpp"
+//#include "hardware.hpp"
 
 enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 

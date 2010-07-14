@@ -58,8 +58,7 @@ namespace ACES {
         }
     }
 
-    template <class T>
-    void Protocol::addRequest(Credentials<T>* c){
+    void Protocol::addRequest(Credentials* c){
         ACES::Message *m = new ACES::Message( c );
         pending_stack->push_back(m);
     }
@@ -77,9 +76,9 @@ namespace ACES {
         //m->printme();
     }
     
-    template <class T>
-    bool Protocol::subscribeState(State<T>* p){
-        this->connectPeers( (RTT::TaskContext*) p );
+    bool Protocol::subscribeState(RTT::TaskContext* p){
+        assert(p->ready());
+        this->connectPeers( p );
 
         RTT::Handle h = p->events()->setupConnection("announceGoal")
             .callback( this, &Protocol::addRequest,

@@ -25,7 +25,7 @@ namespace ACES {
         priority = cfg.priority;
         frequency = cfg.freq;
         this->setActivity( new RTT::Activity( priority, 1.0/frequency, 0,
-                                              name)
+                                              cfg.name)
                          );
     }
     
@@ -34,7 +34,7 @@ namespace ACES {
     }
 
     bool Hardware::startHook(){
-        unsigned char c;
+        //unsigned char c;
         //TODO - Re-add a check to clear a non-empty buffer
         //before starting operation
         //while( this->hardpoint_in->readsome((char*)&c, 1) ){}

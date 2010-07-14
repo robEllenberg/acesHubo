@@ -22,7 +22,26 @@ int ORO_main(int a, char** b){
 
     ACES::Dispatcher* d = new ACES::Dispatcher("dispatch", 20, 1);
 
-    d->addHardware("wbhw 1 100", "Webots", "");
+    d->addHardware("wbHW 1 10", "Webots", "");
+    d->addProtocol("wbPcol 2 10", "Webots", "");
+    d->addState("HY 5 31", "Webots float", "");
+    d->addState("LSP 5 31", "Webots float", "");
+    d->addState("LSR 5 31", "Webots float", "");
+    d->addState("RSP 5 31", "Webots float", "");
+    d->addState("RSR 5 31", "Webots float", "");
+    d->addState("LHY 5 31", "Webots float", "");
+    d->addState("LHR 5 31", "Webots float", "");
+    d->addState("LHP 5 31", "Webots float", "");
+    d->addState("LKP 5 31", "Webots float", "");
+    d->addState("LAP 5 31", "Webots float", "");
+    d->addState("LAR 5 31", "Webots float", "");
+    d->addState("RHY 5 31", "Webots float", "");
+    d->addState("RHR 5 31", "Webots float", "");
+    d->addState("RHP 5 31", "Webots float", "");
+    d->addState("RKP 5 31", "Webots float", "");
+    d->addState("RAP 5 31", "Webots float", "");
+    d->addState("RAR 5 31", "Webots float", "");
+    d->linkPS("wbPcol", "HY");
 
 /*
     ACES::Protocol* webot =

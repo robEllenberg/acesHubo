@@ -16,7 +16,6 @@
 #include "taskcfg.hpp"
 
 namespace ACES {
-    template <class T>
     class Credentials;
     template <class T>
     class State;
@@ -35,7 +34,7 @@ namespace ACES {
             void updateHook();
             void stopHook();
             void cleanupHook();
-            template <class T> bool subscribeState(State<T>* p);
+            bool subscribeState(RTT::TaskContext* p);
 
             std::string name;
             int frequency;
@@ -50,8 +49,7 @@ namespace ACES {
             //RTT::ReadBufferPort<Credentials*>* request_stack;
 
             //std::list<Credentials*>* getNewRequests();
-            template <class T>
-            void addRequest(Credentials<T>*);
+            void addRequest(Credentials*);
 
             //virtual void aggregateRequests(
             //    std::list<Credentials*> &reqs) = 0;
