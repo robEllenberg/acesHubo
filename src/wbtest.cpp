@@ -16,11 +16,19 @@ int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
     logger->setLogLevel(RTT::Logger::Debug);
 
-//    ACES::Dispatcher* dispatch = new ACES::Dispatcher(
-//        "dispatch", 5, 100
-//    );
-
     ACES::Dispatcher* d = new ACES::Dispatcher("dispatch", 20, 1);
+
+/*
+    ACES::State<float>* s1 = new ACES::State<float>("s1", 0, 5, 31, 0.0);
+    ACES::Protocol* p1 = new ACES::Protocol("p1", 3, 50);
+    RTT::Handle h = s1->events()->setupConnection("announceGoal").
+                        callback( p1, &ACES::Protocol::addRequest).handle();
+    assert(h.ready());
+    h.connect();
+    assert(h.connected());
+    p1->subscribeState(s1);
+    ACES::Dispatcher(p1, s1);
+*/
 
     d->addHardware("wbHW 1 10", "Webots", "");
     d->addProtocol("wbPcol 2 10", "Webots", "");
@@ -42,6 +50,22 @@ int ORO_main(int a, char** b){
     d->addState("RAP 5 31", "Webots float", "");
     d->addState("RAR 5 31", "Webots float", "");
     d->linkPS("wbPcol", "HY");
+    d->linkPS("wbPcol", "LSP");
+    d->linkPS("wbPcol", "LSR");
+    d->linkPS("wbPcol", "RSP");
+    d->linkPS("wbPcol", "RSR");
+    d->linkPS("wbPcol", "LHY");
+    d->linkPS("wbPcol", "LHR");
+    d->linkPS("wbPcol", "LHP");
+    d->linkPS("wbPcol", "LKP");
+    d->linkPS("wbPcol", "LAP");
+    d->linkPS("wbPcol", "LAR");
+    d->linkPS("wbPcol", "RHY");
+    d->linkPS("wbPcol", "RHR");
+    d->linkPS("wbPcol", "RHP");
+    d->linkPS("wbPcol", "RKP");
+    d->linkPS("wbPcol", "RAP");
+    d->linkPS("wbPcol", "RAR");
 
 /*
     ACES::Protocol* webot =

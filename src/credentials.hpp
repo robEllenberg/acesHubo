@@ -17,7 +17,10 @@ namespace ACES {
         public:
             Credentials(Credentials* c);
             Credentials(int type, int id_num=0);
+            //MUST IMPLIMENT
+            //virtual Credentials(Credentials* c, void* sp) = 0; 
             virtual void printme() = 0;
+            virtual Credentials* copy(void* setP) = 0;
 
             int id;
             void* setPoint;

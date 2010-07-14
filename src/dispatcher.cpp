@@ -65,6 +65,9 @@ namespace ACES{
             stateList.push_back(state);
             connectPeers( (RTT::TaskContext*)state);
         }
+        else{
+            assert(false);
+        }
     }
 
     bool Dispatcher::addController(std::string cfg, std::string type,
@@ -74,9 +77,33 @@ namespace ACES{
     bool Dispatcher::linkPS(std::string pcol, std::string state){
         RTT::TaskContext* p = this->getPeer(pcol);
         RTT::TaskContext* s = this->getPeer(state);
+
         if(p and s){
-            //return ((Protocol*)p)->subscribeState(s);
-            return true;
+            return ((Protocol*)p)->subscribeState(s);
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool Dispatcher::linkHP(std::string hw, std::string pcol){
+        RTT::TaskContext* h = this->getPeer(hw);
+        RTT::TaskContext* p = this->getPeer(pcol);
+
+        if (h and p){
+            return ((Hardware*)h)->subscribeProtocol((Protocol*)p);
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool Dispatcher::linkSC(std::string state, std::string ctrl){
+        RTT::TaskContext* s = this->getPeer(state);
+        RTT::TaskContext* c = this->getPeer(ctrl);
+
+        if (s and c){
+            return ((State<>*)s)->subscribeController();
         }
         else{
             return false;

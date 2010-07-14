@@ -61,7 +61,7 @@ namespace Webots{
                         float dir=1.0);
             Credentials(char* id_str, float z=150.0, 
                         float dir=1.0);
-            Credentials(Credentials* c, float sp); 
+            Credentials(Credentials* c, void* sp); 
             void printme();
             std::string wb_device_id;
             float zero;

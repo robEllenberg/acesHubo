@@ -18,31 +18,38 @@
 
 namespace ACES {
     //class WbController;
-    template <class T>
-    class State : public RTT::TaskContext {
+    class ProtoState : public RTT::TaskContext {
         public:
-            State(std::string n, Credentials* c,
-                      int pri, int UpdateFreq, T val);
-            State(taskCfg cfg, Credentials* c, T ic);
-
+            ProtoState(std::string n, Credentials* c,
+            int pri, int UpdateFreq);
+            ProtoState(taskCfg cfg, Credentials* c) ;
             bool configureHook();
             bool startHook();
             void updateHook();  
             void stopHook();
             void cleanupHook();
 
-            void printme();
-
             std::string name;
             int frequency;
             int priority;
             Credentials* credentials;
+
+            RTT::Event<void(Credentials*)> announceGoal;
+            bool subscribeController(WbController* c);
+            void setGoal(std::map<std::string, void*>*);
+    };
+
+    template <class T>
+    class State : public ProtoState {
+        public:
+            State(std::string n, Credentials* c,
+                      int pri, int UpdateFreq, T val);
+            State(taskCfg cfg, Credentials* c, T ic);
+
+            void printme();
             T value;
 
-            void setGoal(std::map<std::string, void*>*);
             //TODO - Not the best method of data passing
-            RTT::Event<void(void*)> announceGoal;
-            bool subscribeController(WbController* c);
             //virtual Credentials* parseDispArgs(std::string type,
             //                                   std::string args) = 0;
     };

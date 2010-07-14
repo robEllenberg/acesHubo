@@ -25,6 +25,8 @@ namespace ACES{
             bool addController(std::string cfg, std::string type,
                                std::string args);
             bool linkPS(std::string pcol, std::string state);
+            bool linkHP(std::string hw, std::string pcol);
+            bool linkSC(std::string state, std::string ctrl);
 
             std::list<void*> stateList;
             std::list<Protocol*> pList;

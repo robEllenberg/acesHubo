@@ -131,13 +131,14 @@ namespace Webots {
         direction = dir;
     }
 
-    Credentials::Credentials(Credentials* c, float sp)
+    Credentials::Credentials(Credentials* c, void* sp)
         : ACES::Credentials( (ACES::Credentials*)c )
     {
         wb_device_id = c->wb_device_id;
         zero = c->zero;
         direction = c->direction;
-        setPoint = (void*) new float(sp);
+        //setPoint = (void*) new float(sp);
+        setPoint = sp;
     }
 
     void Credentials::printme(){

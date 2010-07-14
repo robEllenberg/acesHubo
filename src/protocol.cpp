@@ -76,17 +76,17 @@ namespace ACES {
         //m->printme();
     }
     
-    bool Protocol::subscribeState(RTT::TaskContext* p){
-        assert(p->ready());
-        this->connectPeers( p );
-
-        RTT::Handle h = p->events()->setupConnection("announceGoal")
+    bool Protocol::subscribeState(RTT::TaskContext* s){
+        RTT::Handle h = s->events()->setupConnection("announceGoal")
             .callback( this, &Protocol::addRequest,
-                       this->engine()->events() ).handle();
-        assert( h.ready() );
+                       this->engine()->events()).handle();
+        if( not h.ready()){
+            return false;
+        }
         h.connect();
-        assert( h.connected() );
-        return true;
+        if( not h.connected() ){
+            return false;
+        }
     }
 
 }
