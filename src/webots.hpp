@@ -39,7 +39,7 @@ namespace Webots{
             void stepRequest( std::map<std::string, void*>* );
             bool subscribeController(ACES::WbController* c);
     };
-
+/*
     template <class T>
     class State : public ACES::State<T> {
         public:
@@ -53,22 +53,25 @@ namespace Webots{
             static ACES::Credentials* parseDispArgs(std::string type,
                                              std::string args);
     };
-   
+    #include "webots.cc"
+*/   
     class Credentials : public ACES::Credentials {
         public:
             Credentials(Credentials* c);
             Credentials(std::string id_str, float z=150.0,
                         float dir=1.0);
             Credentials(char* id_str, float z=150.0, 
-                        float dir=1.0);
+                        float dir=1.2);
             Credentials(Credentials* c, void* sp); 
+            ACES::Credentials* copy(void* setP);
+            static ACES::Credentials* parseDispArgs(std::string type,
+                                             std::string args);
             void printme();
             std::string wb_device_id;
             float zero;
             float direction;
     };
 
-#include "webots.cc"
 
     class Protocol : public ACES::Protocol {
         public:

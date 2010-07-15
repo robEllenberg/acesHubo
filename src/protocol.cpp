@@ -59,7 +59,9 @@ namespace ACES {
     }
 
     void Protocol::addRequest(Credentials* c){
+        //c->printme();
         ACES::Message *m = new ACES::Message( c );
+        //((Credentials*)m->credList.front())->printme();
         pending_stack->push_back(m);
     }
 

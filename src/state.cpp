@@ -24,6 +24,7 @@ namespace ACES {
         this->events()->addEvent(&announceGoal, "announceGoal", "credentials",
             "credentials associated w/the goal");
 
+        name = cfg.name;
         priority = cfg.priority;
         frequency = cfg.freq;
         credentials = c;
@@ -76,9 +77,12 @@ namespace ACES {
             //T* valp = (*mypair).second;
             //T val = *valp;
             void* val = (*mypair).second;
-            Credentials* c = new Credentials(this->credentials, val);
+            Credentials* c = credentials->copy(val);
+            //Credentials* c = new Credentials(this->credentials, val);
             
-            announceGoal((void*)c);
+            //RTT::Logger::log() << this->name << " Announce: "
+            //<< *((float*)val) << RTT::endlog();
+            announceGoal(c);
         }
     }
 

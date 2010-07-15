@@ -53,26 +53,44 @@ namespace ACES{
         Credentials* cred;
         void* state;
         if( t1 == "Webots") {
-            if (t2 == "float"){
-                cred = Webots::State<float>::parseDispArgs(t2, args);
+                cred = Webots::Credentials::parseDispArgs(t2, args);
                 state =
-                     (void*) new Webots::State<float>(c,
-                                                      cred,
-                                                      (float)0.0);
-            } 
+                     (void*) new ACES::State<float>(c,
+                                                    cred,
+                                                    (float)0.0);
         }
         if(state){
             stateList.push_back(state);
             connectPeers( (RTT::TaskContext*)state);
+            return true;
         }
-        else{
-            assert(false);
-        }
+        return false;
     }
 
     bool Dispatcher::addController(std::string cfg, std::string type,
                                    std::string args)
-    {}
+    {
+        taskCfg c(cfg);
+
+        std::istringstream s1(type);
+        //t1 - Major type - Webots, HuboCAN, etc
+        //t2 - Minor/data type - int, float, etc
+        std::string t1, t2;
+        s1 >> t1 >> t2;
+
+        WbController* ctrl;
+        if ( t1 == "Webots"){
+            if (t2 == "Mini"){
+                ctrl = (WbController*) new WbController(c, args);
+            }
+        } 
+        if(ctrl){
+            cList.push_back(ctrl);
+            this->connectPeers(ctrl);
+            return true;
+        }
+        return false;
+    }
 
     bool Dispatcher::linkPS(std::string pcol, std::string state){
         RTT::TaskContext* p = this->getPeer(pcol);
@@ -103,7 +121,18 @@ namespace ACES{
         RTT::TaskContext* c = this->getPeer(ctrl);
 
         if (s and c){
-            return ((State<>*)s)->subscribeController();
+            return ((ProtoState*)s)->subscribeController((WbController*)c);
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool Dispatcher::linkHC(std::string hw, std::string ctrl){
+        Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
+        RTT::TaskContext* c = this->getPeer(ctrl);
+        if (h and c){
+            return h->subscribeController((ACES::WbController*) c);
         }
         else{
             return false;

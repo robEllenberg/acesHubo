@@ -8,7 +8,9 @@ namespace Webots {
         
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
-        this->methods()->addMethod(stepMethod);
+        this->methods()->addMethod(stepMethod,
+                                   "Advance the system time",
+                                   "TStep", "Lenght of step to advance(ms)");
             //"Time to advance (ms)");
     }
 
@@ -17,7 +19,9 @@ namespace Webots {
 
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
-        this->methods()->addMethod(stepMethod);
+        this->methods()->addMethod(stepMethod,
+                                   "Advance the system time",
+                                   "TStep", "Lenght of step to advance(ms)");
         
     }
        
@@ -38,26 +42,30 @@ namespace Webots {
         //Pull the first element out of the abstrated
         //credentials list and cast it to a webots
         //credentials.
-        ACES::ProtoCredential *p =
-            (ACES::ProtoCredential*)(m->credList.front());
+    
+        //((ACES::Credentials*)m->credList.front())->printme();
+
+        Credentials *p =
+            (Credentials*)(m->credList.front());
 
         switch( p->credType ){
-            case ACES::CRED_WB_JOINT:
+            case (ACES::CRED_WB_JOINT):
                 {
-                Credentials* c =
-                        (Credentials*)(m->credList.front());
-                std::string jid = (*c).wb_device_id;
+                    Credentials* c =
+                            (Credentials*)(m->credList.front());
+                    std::string jid = (*c).wb_device_id;
 
-                //Pull the seek value out of the SValue object
-                if( *(float*)((*c).setPoint) ){
-                    float target = *(float*)((*c).setPoint);
-                    float angle = (*c).direction
-                                   * (target - (*c).zero);
+                    //Pull the seek value out of the SValue object
+                    if( c->setPoint ){
+                        float* tp = (float*)(c->setPoint);
+                        float target = *tp;
+                        float angle = (*c).direction
+                                       * (target - (*c).zero);
 
-                    WbDeviceTag joint = wb_robot_get_device(jid.c_str());
-                    //wb_servo_set_position(joint, 3.14159/180.*angle);
-                    wb_servo_set_position(joint, angle);
-                }
+                        WbDeviceTag joint = wb_robot_get_device(jid.c_str());
+                        //wb_servo_set_position(joint, 3.14159/180.*angle);
+                        wb_servo_set_position(joint, angle);
+                    }
                 }
                 break;
             default:
@@ -141,6 +149,13 @@ namespace Webots {
         setPoint = sp;
     }
 
+    ACES::Credentials* Credentials::copy(void* setP){
+        Credentials* c = new Credentials(this);
+        NCcopy((ProtoCredential*)c);
+        c->setPoint = setP;
+        return (ACES::Credentials*)c;
+    }
+
     void Credentials::printme(){
         //int* p = (int*)val;
         ACES::Credentials::printme();
@@ -157,6 +172,20 @@ namespace Webots {
             RTT::Logger::log()  << "NULL";
         }
         RTT::Logger::log() << RTT::endlog();
+    }
+
+    ACES::Credentials* Credentials::parseDispArgs(std::string type,
+                                         std::string args)
+    {
+        ACES::Credentials *c = 0;
+        if(type == "float"){
+            std::istringstream s1(args);
+            std::string id;
+            float zero, rot;
+            s1 >> id >> zero >> rot;
+            c = (ACES::Credentials*)new Credentials(id, zero, rot);
+        }
+        return c;
     }
 
     Protocol::Protocol(std::string name, 

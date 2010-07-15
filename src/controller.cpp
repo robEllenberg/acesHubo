@@ -17,16 +17,8 @@ namespace ACES{
         frequency = UpdateFreq;
         priority = pri;
 
-        //this->connectPeers( (RTT::TaskContext*) hw_one);
-        //this->connectPeers( (RTT::TaskContext*) pcol);
-        
         //Set the current state of the simulation to stopped
         simState = WB_CTRL_HALT;
-
-        //We keep a list of the different hardware components the protocol
-        //is connected to
-        //hwlist.push_back(hw_one);
-        //pcollist.push_back(pcol);
 
         //Make sure we have an existant script file
         assert(walkScript.is_open());
@@ -61,6 +53,42 @@ namespace ACES{
             new RTT::Activity( priority, 1.0/UpdateFreq, 0, n )
         );
     }
+    
+    WbController::WbController(taskCfg cfg, std::string args)
+      : RTT::TaskContext(cfg.name),
+        walkScript((const char*)args.c_str(), std::ifstream::in),
+        applyStateVector("applyStateVector"),
+        stepMethod("step", &WbController::step, this),
+        runMethod("run", &WbController::run, this),
+        haltMethod("halt", &WbController::halt, this),
+        openScriptMethod("openScript", &WbController::openScript, this)
+    {
+        name = cfg.name;
+        priority = cfg.priority;
+        frequency = cfg.freq;
+
+        //Set the current state of the simulation to stopped
+        simState = WB_CTRL_HALT;
+
+        //Make sure we have an existant script file
+        assert(walkScript.is_open());
+
+        this->methods()->addMethod(stepMethod,
+            "Advance the simulation one time step.");
+        this->methods()->addMethod(runMethod,
+            "Start the simulation (free running).");
+        this->methods()->addMethod(haltMethod,
+            "Halt the simulation.");
+        this->methods()->addMethod(openScriptMethod,
+            "Open a new trajectory file", "sfile", "Script file path");
+
+        this->events()->addEvent(&applyStateVector, "applyStateVector",
+            "SVmap", "map of state vect info");
+
+        this->setActivity(
+            new RTT::Activity( priority, 1.0/frequency, 0, cfg.name )
+        );
+    }
 
     void WbController::updateHook(){
         switch(simState){
@@ -70,16 +98,9 @@ namespace ACES{
                 //Fall through here is intentional
             case WB_CTRL_RUN:
                  //delete stateVect;
-                stateVect = getStateVector();
+                stateVect = getStateVector(true);
                 applyStateVector(stateVect);
-                /*
-                for(std::list<Hardware*>::iterator it = hwlist.begin();
-                    it != hwlist.end(); it++){
-                        RTT::Method<void(int)> stepper = 
-                           (*it)->methods()->getMethod<void(int)>("step");
-                        stepper(32);
-                }
-                */
+                
                 //delete sv;       
                 if(simState == WB_CTRL_STEP){
                     simState = WB_CTRL_HALT;

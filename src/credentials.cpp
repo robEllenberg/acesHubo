@@ -4,21 +4,28 @@ namespace ACES {
         credType = t;
     }
 
-    Credentials::Credentials(int type, int id_num)
+    Credentials::Credentials(int type)
         : ProtoCredential(type)
     {
-        this->id = id_num;
+        //this->id = id_num;
+        setPoint = 0;
     }
 
     Credentials::Credentials(Credentials *c)
         : ProtoCredential(c->credType)
     {
-        this->id = c->id;
+        //this->id = c->id;
+        setPoint = c->setPoint;
+    }
+    
+    ProtoCredential* ProtoCredential::NCcopy(ProtoCredential *c){
+        c->credType = this->credType;
+        return c;
     }
 
     void Credentials::printme() {
-        RTT::Logger::log() << "Credential: Type= " << credType
-                           << ", ID= " << id;
+        RTT::Logger::log() << "Credential: Type= " << credType;
+                           //<< ", ID= " << id;
         RTT::Logger::log() << RTT::endlog();
     }
 

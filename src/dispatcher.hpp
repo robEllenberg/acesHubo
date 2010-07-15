@@ -27,6 +27,7 @@ namespace ACES{
             bool linkPS(std::string pcol, std::string state);
             bool linkHP(std::string hw, std::string pcol);
             bool linkSC(std::string state, std::string ctrl);
+            bool linkHC(std::string hw, std::string ctrl);
 
             std::list<void*> stateList;
             std::list<Protocol*> pList;

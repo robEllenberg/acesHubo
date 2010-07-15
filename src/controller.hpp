@@ -15,6 +15,7 @@
 
 //#include "state.hpp"
 //#include "hardware.hpp"
+#include "taskcfg.hpp"
 
 enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
@@ -25,6 +26,7 @@ namespace ACES{
             WbController(std::string n,
               const char* scriptFile, 
               int pri, int UpdateFreq);
+            WbController(taskCfg cfg, std::string args);
 
             void updateHook();
             bool configureHook();
