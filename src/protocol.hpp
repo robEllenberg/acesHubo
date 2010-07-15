@@ -14,6 +14,7 @@
 #include "message.hpp"
 #include "state.hpp"
 #include "taskcfg.hpp"
+#include "goal.hpp"
 
 namespace ACES {
     class Credentials;
@@ -34,7 +35,7 @@ namespace ACES {
             void updateHook();
             void stopHook();
             void cleanupHook();
-            bool subscribeState(RTT::TaskContext* p);
+            bool subscribeDevice(RTT::TaskContext* d);
 
             std::string name;
             int frequency;
@@ -49,7 +50,7 @@ namespace ACES {
             //RTT::ReadBufferPort<Credentials*>* request_stack;
 
             //std::list<Credentials*>* getNewRequests();
-            void addRequest(Credentials*);
+            void addRequest(Goal*);
 
             //virtual void aggregateRequests(
             //    std::list<Credentials*> &reqs) = 0;

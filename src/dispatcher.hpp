@@ -24,7 +24,10 @@ namespace ACES{
                           std::string args);
             bool addController(std::string cfg, std::string type,
                                std::string args);
-            bool linkPS(std::string pcol, std::string state);
+            bool addDevice(std::string cfg, std::string type,
+                           std::string args);
+            bool linkPD(std::string pcol, std::string device);
+            bool linkDS(std::string device, std::string state);
             bool linkHP(std::string hw, std::string pcol);
             bool linkSC(std::string state, std::string ctrl);
             bool linkHC(std::string hw, std::string ctrl);
@@ -32,6 +35,7 @@ namespace ACES{
             std::list<void*> stateList;
             std::list<Protocol*> pList;
             std::list<WbController*> cList;
+            std::list<Device*> dList;
             std::list<Hardware*> hwList;
             
             bool configureHook();

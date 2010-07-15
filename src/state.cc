@@ -1,14 +1,14 @@
     template <class T>
-    State<T>::State(std::string n, Credentials* c,
+    State<T>::State(std::string n, int pid,
       int pri, int UpdateFreq, T val)
-      : ProtoState(n, c, pri, UpdateFreq)
+      : ProtoState(n, pid, pri, UpdateFreq)
     {
         value = val;
     }
 
     template <class T>
-    State<T>::State(taskCfg cfg, Credentials* c, T ic) :
-      ProtoState(cfg, c){
+    State<T>::State(taskCfg cfg, int pid, T ic) :
+      ProtoState(cfg, pid){
         value = ic;
     }
     

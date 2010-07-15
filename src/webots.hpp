@@ -16,6 +16,7 @@
 #include "hardware.hpp"
 #include "taskcfg.hpp"
 #include "credentials.hpp"
+#include "device.hpp"
 
 extern "C"{
     #include <webots/robot.h>
@@ -64,14 +65,20 @@ namespace Webots{
                         float dir=1.2);
             Credentials(Credentials* c, void* sp); 
             ACES::Credentials* copy(void* setP);
-            static ACES::Credentials* parseDispArgs(std::string type,
-                                             std::string args);
+            static ACES::Credentials* parseDispArgs(std::string args);
             void printme();
             std::string wb_device_id;
             float zero;
             float direction;
     };
 
+    //Webots Component Types
+    enum WB_COMP_TYPE { JOINT=1 };
+
+    class Device : public ACES::Device {
+        public:
+            Device(ACES::taskCfg cfg, Credentials* c, std::string type);
+    };
 
     class Protocol : public ACES::Protocol {
         public:

@@ -58,9 +58,9 @@ namespace ACES {
         }
     }
 
-    void Protocol::addRequest(Credentials* c){
+    void Protocol::addRequest(Goal* c){
         //c->printme();
-        ACES::Message *m = new ACES::Message( c );
+        ACES::Message *m = new ACES::Message( c->cred );
         //((Credentials*)m->credList.front())->printme();
         pending_stack->push_back(m);
     }
@@ -78,8 +78,8 @@ namespace ACES {
         //m->printme();
     }
     
-    bool Protocol::subscribeState(RTT::TaskContext* s){
-        RTT::Handle h = s->events()->setupConnection("announceGoal")
+    bool Protocol::subscribeDevice(RTT::TaskContext* d){
+        RTT::Handle h = d->events()->setupConnection("TxRequest")
             .callback( this, &Protocol::addRequest,
                        this->engine()->events()).handle();
         if( not h.ready()){

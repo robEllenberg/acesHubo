@@ -66,6 +66,9 @@ namespace Webots {
                         //wb_servo_set_position(joint, 3.14159/180.*angle);
                         wb_servo_set_position(joint, angle);
                     }
+                    else{
+                        //TODO - Implement logic for measurement request
+                    }
                 }
                 break;
             default:
@@ -174,17 +177,14 @@ namespace Webots {
         RTT::Logger::log() << RTT::endlog();
     }
 
-    ACES::Credentials* Credentials::parseDispArgs(std::string type,
-                                         std::string args)
+    ACES::Credentials* Credentials::parseDispArgs( std::string args)
     {
         ACES::Credentials *c = 0;
-        if(type == "float"){
-            std::istringstream s1(args);
-            std::string id;
-            float zero, rot;
-            s1 >> id >> zero >> rot;
-            c = (ACES::Credentials*)new Credentials(id, zero, rot);
-        }
+        std::istringstream s1(args);
+        std::string id;
+        float zero, rot;
+        s1 >> id >> zero >> rot;
+        c = (ACES::Credentials*)new Credentials(id, zero, rot);
         return c;
     }
 

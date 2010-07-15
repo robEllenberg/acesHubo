@@ -39,6 +39,25 @@ namespace ACES{
         }
     }
 
+    bool Dispatcher::addDevice(std::string cfg, std::string type,
+                               std::string args)
+    {
+        taskCfg c(cfg);
+        std::istringstream s(type);
+        std::string t1, t2;
+        s >> t1 >> t2;
+
+        Device *d;
+        if (type == "Webots"){
+            Credentials *cred = (Credentials*) Webots::Credentials::parseDispArgs(args);
+            d = (Device*) new Webots::Device(c, cred, t2);
+        }
+        if(d){
+            dList.push_back(d);
+            this->connectPeers(d);
+        }
+    }
+
     bool Dispatcher::addState(std::string cfg, std::string type,
                               std::string args)
     {
@@ -50,14 +69,12 @@ namespace ACES{
         std::string t1, t2;
         s1 >> t1 >> t2;
       
-        Credentials* cred;
         void* state;
         if( t1 == "Webots") {
-                cred = Webots::Credentials::parseDispArgs(t2, args);
-                state =
-                     (void*) new ACES::State<float>(c,
-                                                    cred,
-                                                    (float)0.0);
+                if( t2 == "joint"){ 
+                    state =
+                         (void*) new ACES::State<float>(c, JOINT, (float)0.0);
+                }
         }
         if(state){
             stateList.push_back(state);
@@ -92,12 +109,12 @@ namespace ACES{
         return false;
     }
 
-    bool Dispatcher::linkPS(std::string pcol, std::string state){
+    bool Dispatcher::linkPD(std::string pcol, std::string device){
         RTT::TaskContext* p = this->getPeer(pcol);
-        RTT::TaskContext* s = this->getPeer(state);
+        RTT::TaskContext* d = this->getPeer(device);
 
-        if(p and s){
-            return ((Protocol*)p)->subscribeState(s);
+        if(p and d){
+            return ((Protocol*)p)->subscribeDevice(s);
         }
         else{
             return false;

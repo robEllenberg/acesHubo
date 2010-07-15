@@ -1,12 +1,12 @@
 #include "state.hpp"
 namespace ACES {
-    ProtoState::ProtoState(std::string n, Credentials* c,
+    ProtoState::ProtoState(std::string n, int pid,
       int pri, int UpdateFreq)
       : RTT::TaskContext(n),
         announceGoal("announceGoal")
     {
         name = n;
-        credentials = c;
+        propID = pid;
         frequency = UpdateFreq;
         priority = pri;
 
@@ -18,7 +18,7 @@ namespace ACES {
         );
     }
 
-    ProtoState::ProtoState(taskCfg cfg, Credentials* c) :
+    ProtoState::ProtoState(taskCfg cfg, int pid) :
       RTT::TaskContext(cfg.name), announceGoal("announceGoal"){
 
         this->events()->addEvent(&announceGoal, "announceGoal", "credentials",
@@ -27,7 +27,7 @@ namespace ACES {
         name = cfg.name;
         priority = cfg.priority;
         frequency = cfg.freq;
-        credentials = c;
+        propID = pid;
 
         this->setActivity(
             new RTT::Activity( priority, 1.0/frequency, 0, cfg.name )
@@ -43,7 +43,8 @@ namespace ACES {
     }
     
     void ProtoState::updateHook(){
-        announceGoal(credentials);
+        Goal* g = new Goal(this->propID, REFRESH, 0);
+        announceGoal(g);
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;
 
@@ -77,12 +78,13 @@ namespace ACES {
             //T* valp = (*mypair).second;
             //T val = *valp;
             void* val = (*mypair).second;
-            Credentials* c = credentials->copy(val);
+            Goal* g = new Goal(propID, SET, val);
+            //Credentials* c = credentials->copy(val);
             //Credentials* c = new Credentials(this->credentials, val);
             
             //RTT::Logger::log() << this->name << " Announce: "
             //<< *((float*)val) << RTT::endlog();
-            announceGoal(c);
+            announceGoal(g);
         }
     }
 
