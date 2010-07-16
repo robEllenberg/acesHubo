@@ -43,7 +43,8 @@ namespace ACES {
     }
     
     void ProtoState::updateHook(){
-        Goal* g = new Goal(this->propID, REFRESH, 0);
+        Goal* g = new Goal(this->propID, REFRESH);
+        //g->printme();
         announceGoal(g);
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;

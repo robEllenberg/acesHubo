@@ -11,6 +11,7 @@
 #include "hardware.hpp"
 #include "webots.hpp"
 #include "taskcfg.hpp"
+#include "device.hpp"
 
 namespace ACES{
     class Dispatcher : public RTT::TaskContext {

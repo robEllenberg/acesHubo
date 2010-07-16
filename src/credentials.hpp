@@ -23,9 +23,9 @@ namespace ACES {
             //MUST IMPLIMENT
             //virtual Credentials(Credentials* c, void* sp) = 0; 
             virtual void printme() = 0;
-            virtual Credentials* copy(void* setP) = 0;
+            //virtual Credentials* copy(void* setP) = 0;
 
-            void* setPoint;
+            //void* setPoint;
             //int id;
     };
 }

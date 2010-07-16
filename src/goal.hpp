@@ -7,11 +7,14 @@ namespace ACES{
     enum MODES { REFRESH=1, SET};
     class Goal {
         public:
-            Goal(int id, int mode, void* d);
+            Goal(int id, int mode, void* d=0);
+            void printme();
+
             int propID;
             int mode;
             void* data;
             Credentials* cred;
+            
     };
 }
 #endif

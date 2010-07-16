@@ -15,6 +15,7 @@
 #include "state.hpp"
 #include "taskcfg.hpp"
 #include "goal.hpp"
+#include "device.hpp"
 
 namespace ACES {
     class Credentials;
@@ -35,7 +36,7 @@ namespace ACES {
             void updateHook();
             void stopHook();
             void cleanupHook();
-            bool subscribeDevice(RTT::TaskContext* d);
+            bool subscribeDevice(Device* d);
 
             std::string name;
             int frequency;

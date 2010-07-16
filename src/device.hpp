@@ -7,16 +7,23 @@
 #include "goal.hpp"
 #include "taskcfg.hpp"
 #include "credentials.hpp"
+#include "state.hpp"
 
 namespace ACES{
     class Device : public RTT::TaskContext {
         public:
             Device(taskCfg cfg, Credentials* c);
             void RxGoal(Goal* g);
-            bool subscribeState(RTT::TaskContext* s);
+            bool subscribeState(ProtoState* s);
 
             RTT::Event<void(Goal*)> TxRequest;
             Credentials* credentials;
+            
+            bool configureHook();
+            bool startHook();
+            void updateHook();
+            void stopHook();
+            void cleanupHook();
     };
 }
 

@@ -5,6 +5,8 @@ namespace ACES{
       RTT::TaskContext(cfg.name),
       TxRequest("TxRequest")
     {
+        this->events()->addEvent(&TxRequest, "TxRequest", "goal",
+                                 "The Goal/SP Data");
         credentials = c;
     }
 
@@ -13,10 +15,11 @@ namespace ACES{
         TxRequest(g);
     }
 
-    bool Device::subscribeState(RTT::TaskContext* s){
+    bool Device::subscribeState(ProtoState* s){
+        this->connectPeers( (RTT::TaskContext*) s);
         RTT::Handle h = s->events()->setupConnection("announceGoal")
-            .callback( this, &Device::RxGoal//,
-                       //this->engine()->events()
+            .callback( this, &Device::RxGoal
+                     //,  this->engine()->events()
                      ).handle();
         if( not h.ready() ){
             return false;
@@ -26,5 +29,18 @@ namespace ACES{
             return false;
         }
     }
+
+    bool Device::configureHook(){
+        return true;
+    }
+
+    bool Device::startHook(){
+        return true;
+    }
+
+    void Device::updateHook(){}
+
+    void Device::stopHook(){}
+    void Device::cleanupHook(){}
 
 }

@@ -77,7 +77,7 @@ namespace Webots{
 
     class Device : public ACES::Device {
         public:
-            Device(ACES::taskCfg cfg, Credentials* c, std::string type);
+            Device(ACES::taskCfg cfg, ACES::Credentials* c);
     };
 
     class Protocol : public ACES::Protocol {

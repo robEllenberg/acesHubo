@@ -4,17 +4,18 @@
 #include <list>
 #include <rtt/Logger.hpp>
 #include "credentials.hpp"
+#include "goal.hpp"
 
 namespace ACES{
     
     class Message {
         public:
             //TODO - All these void* should be too credentials
-            Message(std::list<void*> &cl);
-            Message(void* c);
+            //Message(std::list<Goal*> &gl);
+            Message(Goal* g);
             ~Message();
             //void printme();
-            std::list<void*> credList;
+            std::list<Goal*> goalList;
     };
 /*
     class charDevMessage : Message {

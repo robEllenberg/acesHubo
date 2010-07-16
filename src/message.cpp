@@ -2,24 +2,25 @@
 
 namespace ACES {
     
-    Message::Message(std::list<void*> &cl){
-        this->credList = cl; 
+/*
+    Message::Message(std::list<Goal*> &gl){
+        this->goalList = gl; 
     }
-
-    Message::Message(void* c) : credList(1, c){
+*/
+    Message::Message(Goal* g) : goalList(1, g){
         
     }
 
     Message::~Message(){
-        while( credList.size() ){
+        while( goalList.size() ){
             //If the credential has a PVal it is a copy 
             //and needs to be deleted.
 
             //if( credList.back()->val ){
             if(true){
-                delete credList.back();
+                delete goalList.back();
             }
-            credList.pop_back();
+           goalList.pop_back();
         }
     }
 

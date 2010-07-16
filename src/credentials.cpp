@@ -8,14 +8,14 @@ namespace ACES {
         : ProtoCredential(type)
     {
         //this->id = id_num;
-        setPoint = 0;
+        //setPoint = 0;
     }
 
     Credentials::Credentials(Credentials *c)
         : ProtoCredential(c->credType)
     {
         //this->id = c->id;
-        setPoint = c->setPoint;
+        //setPoint = c->setPoint;
     }
     
     ProtoCredential* ProtoCredential::NCcopy(ProtoCredential *c){

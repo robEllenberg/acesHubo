@@ -52,17 +52,21 @@ namespace ACES {
         //while(   (not this->hardware->isBusyMethod())
         //      && this->pending_stack->size()
         //      && this->theresStillTime() ){
-        while( this->pending_stack->size() ){
+        while( this->pending_stack->size() > 0){
             //pop next message off pending  
-           issueMessage( this->prepareMessage() );
+            Message* m = this->prepareMessage();
+            //RTT::Logger::log() << m->goalList.size() << RTT::endlog();
+            //m->goalList.front()->printme();
+           issueMessage( m );
         }
     }
 
-    void Protocol::addRequest(Goal* c){
-        //c->printme();
-        ACES::Message *m = new ACES::Message( c->cred );
-        //((Credentials*)m->credList.front())->printme();
+    void Protocol::addRequest(Goal* g){
+        ACES::Message *m = new ACES::Message( g );
         pending_stack->push_back(m);
+        //g->printme();       //segfault, takes longer
+        //m->goalList.front()->printme();     //Core dump
+        //pending_stack->back()->goalList.front()->printme();   //segfault
     }
 
     void Protocol::stopHook(){
@@ -74,14 +78,16 @@ namespace ACES {
     Message* Protocol::prepareMessage(){
         Message* m = this->pending_stack->front();
         this->pending_stack->pop_front();
+        //m->goalList.front()->printme();
         return m;
-        //m->printme();
     }
     
-    bool Protocol::subscribeDevice(RTT::TaskContext* d){
+    bool Protocol::subscribeDevice(Device* d){
+        this->connectPeers( (RTT::TaskContext*) d );
         RTT::Handle h = d->events()->setupConnection("TxRequest")
             .callback( this, &Protocol::addRequest,
-                       this->engine()->events()).handle();
+                       this->engine()->events()
+                     ).handle();
         if( not h.ready()){
             return false;
         }

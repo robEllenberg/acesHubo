@@ -44,13 +44,13 @@ namespace ACES{
     {
         taskCfg c(cfg);
         std::istringstream s(type);
-        std::string t1, t2;
-        s >> t1 >> t2;
+        std::string t1;
+        s >> t1 ;
 
         Device *d;
         if (type == "Webots"){
-            Credentials *cred = (Credentials*) Webots::Credentials::parseDispArgs(args);
-            d = (Device*) new Webots::Device(c, cred, t2);
+            Credentials *cred = Webots::Credentials::parseDispArgs(args);
+            d = (Device*) new Webots::Device(c, cred);
         }
         if(d){
             dList.push_back(d);
@@ -73,7 +73,8 @@ namespace ACES{
         if( t1 == "Webots") {
                 if( t2 == "joint"){ 
                     state =
-                         (void*) new ACES::State<float>(c, JOINT, (float)0.0);
+                         (void*) new ACES::State<float>(c, Webots::JOINT,
+                                                        (float)0.0);
                 }
         }
         if(state){
@@ -114,7 +115,19 @@ namespace ACES{
         RTT::TaskContext* d = this->getPeer(device);
 
         if(p and d){
-            return ((Protocol*)p)->subscribeDevice(s);
+            return ((Protocol*)p)->subscribeDevice((Device*)d);
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool Dispatcher::linkDS(std::string dev, std::string state){
+        RTT::TaskContext* d = getPeer(dev);
+        RTT::TaskContext* s = getPeer(state);
+        
+        if(s and d){
+            return ((Device*)d)->subscribeState((ProtoState*)s);
         }
         else{
             return false;
@@ -173,6 +186,11 @@ namespace ACES{
             (*it)->start();
         }
 
+        for(std::list<Device*>::iterator it = dList.begin();
+            it != dList.end(); it++){
+            (*it)->start();
+        }
+
         //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
         for(std::list<void*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
@@ -195,13 +213,8 @@ namespace ACES{
     }
 
     void Dispatcher::stopHook(){
-        for(std::list<Hardware*>::iterator it = hwList.begin();
-            it != hwList.end(); it++){
-            (*it)->stop();
-        }
-
-        for(std::list<Protocol*>::iterator it = pList.begin();
-            it != pList.end(); it++){
+        for(std::list<WbController*>::iterator it = cList.begin();
+            it != cList.end(); it++){
             (*it)->stop();
         }
 
@@ -211,8 +224,18 @@ namespace ACES{
             p->stop();
         }
 
-        for(std::list<WbController*>::iterator it = cList.begin();
-            it != cList.end(); it++){
+        for(std::list<Device*>::iterator it = dList.begin();
+            it != dList.end(); it++){
+            (*it)->stop();
+        }
+
+        for(std::list<Protocol*>::iterator it = pList.begin();
+            it != pList.end(); it++){
+            (*it)->stop();
+        }
+
+        for(std::list<Hardware*>::iterator it = hwList.begin();
+            it != hwList.end(); it++){
             (*it)->stop();
         }
     }

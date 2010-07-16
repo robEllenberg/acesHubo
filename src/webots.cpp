@@ -43,32 +43,28 @@ namespace Webots {
         //credentials list and cast it to a webots
         //credentials.
     
-        //((ACES::Credentials*)m->credList.front())->printme();
+        ACES::Goal *g = m->goalList.front();
+        //g->printme();
 
-        Credentials *p =
-            (Credentials*)(m->credList.front());
-
-        switch( p->credType ){
-            case (ACES::CRED_WB_JOINT):
+        switch( g->mode ){
+            case (ACES::REFRESH):
+                break;
+            case (ACES::SET):
                 {
+                    g->printme();
                     Credentials* c =
-                            (Credentials*)(m->credList.front());
+                            (Credentials*)(g->cred);
                     std::string jid = (*c).wb_device_id;
 
                     //Pull the seek value out of the SValue object
-                    if( c->setPoint ){
-                        float* tp = (float*)(c->setPoint);
-                        float target = *tp;
-                        float angle = (*c).direction
-                                       * (target - (*c).zero);
+                    float* tp = (float*)(g->data);
+                    float target = *tp;
+                    float angle = (*c).direction
+                                   * (target - (*c).zero);
 
-                        WbDeviceTag joint = wb_robot_get_device(jid.c_str());
-                        //wb_servo_set_position(joint, 3.14159/180.*angle);
-                        wb_servo_set_position(joint, angle);
-                    }
-                    else{
-                        //TODO - Implement logic for measurement request
-                    }
+                    WbDeviceTag joint = wb_robot_get_device(jid.c_str());
+                    //wb_servo_set_position(joint, 3.14159/180.*angle);
+                    wb_servo_set_position(joint, angle);
                 }
                 break;
             default:
@@ -149,23 +145,24 @@ namespace Webots {
         zero = c->zero;
         direction = c->direction;
         //setPoint = (void*) new float(sp);
-        setPoint = sp;
+        //setPoint = sp;
     }
-
+/*
     ACES::Credentials* Credentials::copy(void* setP){
         Credentials* c = new Credentials(this);
         NCcopy((ProtoCredential*)c);
         c->setPoint = setP;
         return (ACES::Credentials*)c;
     }
-
+*/
     void Credentials::printme(){
         //int* p = (int*)val;
         ACES::Credentials::printme();
         
-        RTT::Logger::log() << "Webots ID= " << this->wb_device_id
-            << " and SetPoint= ";
+        RTT::Logger::log() << "Webots ID= " << this->wb_device_id;
+        //    << " and SetPoint= ";
         //if(p){
+        /*
         if(this->setPoint){
             //this->val->printme();
             float* v = (float*)setPoint;
@@ -174,6 +171,7 @@ namespace Webots {
         else{
             RTT::Logger::log()  << "NULL";
         }
+        */
         RTT::Logger::log() << RTT::endlog();
     }
 
@@ -186,6 +184,12 @@ namespace Webots {
         s1 >> id >> zero >> rot;
         c = (ACES::Credentials*)new Credentials(id, zero, rot);
         return c;
+    }
+
+    Device::Device(ACES::taskCfg cfg, ACES::Credentials* c)
+        : ACES::Device(cfg, c)
+    {
+        
     }
 
     Protocol::Protocol(std::string name, 
