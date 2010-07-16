@@ -10,7 +10,6 @@
 #include <rtt/Ports.hpp>
 #include <rtt/Event.hpp>
 
-#include "svalue.hpp"
 #include "protocol.hpp"
 #include "state.hpp"
 #include "hardware.hpp"
@@ -24,10 +23,9 @@ extern "C"{
 }
 
 namespace Webots{
-    class Credentials;
+    //class Credentials;
     class Hardware : public ACES::Hardware {
         public:
-            Hardware(std::string n, int pri, int UpdateFreq); 
             Hardware(ACES::taskCfg, std::string args);
             bool startHook();
             void updateHook();
@@ -72,12 +70,9 @@ namespace Webots{
             float direction;
     };
 
-    //Webots Component Types
-    enum WB_COMP_TYPE { JOINT=1 };
-
     class Device : public ACES::Device {
         public:
-            Device(ACES::taskCfg cfg, ACES::Credentials* c);
+            Device(std::string config, std::string args);
     };
 
     class Protocol : public ACES::Protocol {

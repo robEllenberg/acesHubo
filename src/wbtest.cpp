@@ -16,19 +16,7 @@ int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
     logger->setLogLevel(RTT::Logger::Debug);
 
-    ACES::Dispatcher* d = new ACES::Dispatcher("dispatch", 20, 1);
-
-/*
-    ACES::State<float>* s1 = new ACES::State<float>("s1", 0, 5, 31, 0.0);
-    ACES::Protocol* p1 = new ACES::Protocol("p1", 3, 50);
-    RTT::Handle h = s1->events()->setupConnection("announceGoal").
-                        callback( p1, &ACES::Protocol::addRequest).handle();
-    assert(h.ready());
-    h.connect();
-    assert(h.connected());
-    p1->subscribeState(s1);
-    ACES::Dispatcher(p1, s1);
-*/
+    ACES::Dispatcher* d = new ACES::Dispatcher("dispatch");
 
     RTT::Logger::log() << "Begin Creation" << RTT::endlog();
 
@@ -54,23 +42,23 @@ int ORO_main(int a, char** b){
     d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
     d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
 
-    d->addState("HY 5 31",  "Webots joint", "");
-    d->addState("LSP 5 31", "Webots joint", "");
-    d->addState("LSR 5 31", "Webots joint", "");
-    d->addState("RSP 5 31", "Webots joint", "");
-    d->addState("RSR 5 31", "Webots joint", "");
-    d->addState("LHY 5 31", "Webots joint", "");
-    d->addState("LHR 5 31", "Webots joint", "");
-    d->addState("LHP 5 31", "Webots joint", "");
-    d->addState("LKP 5 31", "Webots joint", "");
-    d->addState("LAP 5 31", "Webots joint", "");
-    d->addState("LAR 5 31", "Webots joint", "");
-    d->addState("RHY 5 31", "Webots joint", "");
-    d->addState("RHR 5 31", "Webots joint", "");
-    d->addState("RHP 5 31", "Webots joint", "");
-    d->addState("RKP 5 31", "Webots joint", "");
-    d->addState("RAP 5 31", "Webots joint", "");
-    d->addState("RAR 5 31", "Webots joint", "");
+    d->addState("HY 5 31",  "Webots", "Joint");
+    d->addState("LSP 5 31", "Webots", "Joint");
+    d->addState("LSR 5 31", "Webots", "Joint");
+    d->addState("RSP 5 31", "Webots", "Joint");
+    d->addState("RSR 5 31", "Webots", "Joint");
+    d->addState("LHY 5 31", "Webots", "Joint");
+    d->addState("LHR 5 31", "Webots", "Joint");
+    d->addState("LHP 5 31", "Webots", "Joint");
+    d->addState("LKP 5 31", "Webots", "Joint");
+    d->addState("LAP 5 31", "Webots", "Joint");
+    d->addState("LAR 5 31", "Webots", "Joint");
+    d->addState("RHY 5 31", "Webots", "Joint");
+    d->addState("RHR 5 31", "Webots", "Joint");
+    d->addState("RHP 5 31", "Webots", "Joint");
+    d->addState("RKP 5 31", "Webots", "Joint");
+    d->addState("RAP 5 31", "Webots", "Joint");
+    d->addState("RAR 5 31", "Webots", "Joint");
 
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
     d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
@@ -110,29 +98,6 @@ int ORO_main(int a, char** b){
 
     d->linkHC("wbHW", "wbctrl");
     d->linkHP("wbHW", "wbPcol");
-
-/*
-    std::vector<ACES::State*> pvect;
-    //pvect.push_back(xx);
-    pvect.push_back(HY);
-    pvect.push_back(LSP);
-    pvect.push_back(LSR);
-    pvect.push_back(RSP);
-    pvect.push_back(RSR);
-    pvect.push_back(LHY);
-    pvect.push_back(LHR);
-    pvect.push_back(LHP);
-    pvect.push_back(LKP);
-    pvect.push_back(LAP);
-    pvect.push_back(LAR);
-    pvect.push_back(RHY);
-    pvect.push_back(RHR);
-    pvect.push_back(RHP);
-    pvect.push_back(RKP);
-    pvect.push_back(RAP);
-    pvect.push_back(RAR);
-
-*/
 
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
     Orocos::TaskBrowser tbrowser(d);

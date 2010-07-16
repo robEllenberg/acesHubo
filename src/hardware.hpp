@@ -16,15 +16,9 @@
 
 namespace ACES {
     class Protocol;
-    class Hardware : public RTT::TaskContext {
+    class Hardware : protected taskCfg,
+                     public RTT::TaskContext {
         public:
-
-            int frequency;
-            int priority;
-            std::string name;
-
-            Hardware(std::string name, int priority,
-                     int UpdateFreq);
             Hardware(taskCfg cfg, std::string args);
             bool configureHook();
             bool startHook();
@@ -36,11 +30,11 @@ namespace ACES {
             virtual bool transmit(Message* m) = 0;
             virtual bool recieve() = 0;
 
-            //RTT::Event<void(std::string)> NewData;
             bool subscribeProtocol(Protocol* p);
-            RTT::Method<bool(void)> isBusyMethod;
+            //RTT::Method<bool(void)> isBusyMethod;
     };
 
+/*
     class charDevHardware : public Hardware {
         public:
             //! Ouput from this Hardware to associated Protocol
@@ -57,6 +51,7 @@ namespace ACES {
                      std::ofstream *out, int priority,
                      int UpdateFreq);
     };
+*/
 
 }    
 #endif

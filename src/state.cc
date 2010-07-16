@@ -1,15 +1,7 @@
     template <class T>
-    State<T>::State(std::string n, int pid,
-      int pri, int UpdateFreq, T val)
-      : ProtoState(n, pid, pri, UpdateFreq)
-    {
-        value = val;
-    }
-
-    template <class T>
-    State<T>::State(taskCfg cfg, int pid, T ic) :
-      ProtoState(cfg, pid){
-        value = ic;
+    State<T>::State(std::string cfg, std::string args) :
+      ProtoState(cfg, args){
+        value = 0;
     }
     
     template <class T>
@@ -21,6 +13,4 @@
 
         this->credentials->printme();
     }
-
-    
 

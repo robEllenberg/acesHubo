@@ -34,20 +34,7 @@ namespace ACES{
 
         this->events()->addEvent(&applyStateVector, "applyStateVector",
             "SVmap", "map of state vect info");
-/*
-        std::vector<ACES::State*>::iterator it;
-        for(it = plist.begin(); it != plist.end(); it++){
-           //Create a mapping of names->states
-           pmap[(*it)->name] = (*it);
-           //Connect and verifyeach of the states to the state
-           //application event
-           RTT::Handle h = this->events()->setupConnection("applyStateVector")
-                .callback( (*it), &State::setGoal,
-                           (*it)->engine()->events() ).handle();
-           assert( h.ready() );
-           h.connect();
-        }
-*/
+
         //Create the governing activity
         this->setActivity(
             new RTT::Activity( priority, 1.0/UpdateFreq, 0, n )

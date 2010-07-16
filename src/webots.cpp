@@ -1,28 +1,14 @@
 #include "webots.hpp"
 
 namespace Webots {
-    
-    Hardware::Hardware(std::string name, int pri,
-                     int UpdateFreq) 
-      :ACES::Hardware(name, pri, UpdateFreq){
-        
-        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
-            ("step", &Hardware::step, this);
-        this->methods()->addMethod(stepMethod,
-                                   "Advance the system time",
-                                   "TStep", "Lenght of step to advance(ms)");
-            //"Time to advance (ms)");
-    }
-
     Hardware::Hardware(ACES::taskCfg cfg, std::string args)
-      : ACES::Hardware(cfg, args){
-
+      : ACES::Hardware(cfg, args)
+    {
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
         this->methods()->addMethod(stepMethod,
                                    "Advance the system time",
                                    "TStep", "Lenght of step to advance(ms)");
-        
     }
        
     bool Hardware::startHook(){
@@ -39,10 +25,6 @@ namespace Webots {
     }
 
     bool Hardware::transmit(ACES::Message* m){
-        //Pull the first element out of the abstrated
-        //credentials list and cast it to a webots
-        //credentials.
-    
         ACES::Goal *g = m->goalList.front();
         //g->printme();
 
@@ -102,18 +84,6 @@ namespace Webots {
         step();
     }
 
-
-/*
-    ACES::Credentials* Credentials::credCopy(void* p){
-        Credentials* c = new Credentials();
-        c->wb_device_id = wb_device_id;
-        c->zero = zero;
-        c->rotation = rotation;
-        c->val = p;
-        return (ACES::Credentials*) c;
-    }
-*/
- 
     Credentials::Credentials(Credentials* c)
         : ACES::Credentials( (ACES::Credentials*)c )
     {
@@ -175,7 +145,7 @@ namespace Webots {
         RTT::Logger::log() << RTT::endlog();
     }
 
-    ACES::Credentials* Credentials::parseDispArgs( std::string args)
+    ACES::Credentials* Credentials::parseDispArgs(std::string args)
     {
         ACES::Credentials *c = 0;
         std::istringstream s1(args);
@@ -186,10 +156,11 @@ namespace Webots {
         return c;
     }
 
-    Device::Device(ACES::taskCfg cfg, ACES::Credentials* c)
-        : ACES::Device(cfg, c)
+    Device::Device(std::string config, std::string args)
+        : ACES::Device(config)
     {
-        
+        ACES::Credentials *cred = Webots::Credentials::parseDispArgs(args);
+        credentials = cred;
     }
 
     Protocol::Protocol(std::string name, 
@@ -198,37 +169,5 @@ namespace Webots {
 
     Protocol::Protocol(ACES::taskCfg cfg, std::string args) 
       : ACES::Protocol(cfg, args){}
-        
-/*
 
-    void Protocol::aggregateRequests(
-      std::list<ACES::Credentials*> &reqs){
-        while( not reqs.empty() ){
-            ACES::Message *m = new ACES::Message( reqs.front() );
-            reqs.pop_front();
-            pending_stack->push_back(m);
-        }
-    }
-*/
-/*
-    ACES::Credentials* Protocol::parseHWInput(
-                       ACES::Message* c) {}
-*/
-
-/*    
-    template <class T>
-    void* State<T>::parseDispArgs(std::string type,
-                                         std::string args)
-    {
-        void *c = 0;
-        if(type == "float"){
-            std::istringstream s1(args);
-            std::string id;
-            float zero, rot;
-            s1 >> id >> zero >> rot;
-            c = (void*)new Credentials<float>(id, zero, rot);
-        }
-        return c;
-    }
-*/
 }

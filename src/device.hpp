@@ -10,20 +10,22 @@
 #include "state.hpp"
 
 namespace ACES{
-    class Device : public RTT::TaskContext {
+    class Device :  protected taskCfg,
+                    public RTT::TaskContext
+    {
         public:
-            Device(taskCfg cfg, Credentials* c);
+            Device(std::string config);
             void RxGoal(Goal* g);
             bool subscribeState(ProtoState* s);
 
-            RTT::Event<void(Goal*)> TxRequest;
-            Credentials* credentials;
-            
             bool configureHook();
             bool startHook();
             void updateHook();
             void stopHook();
             void cleanupHook();
+
+            RTT::Event<void(Goal*)> TxRequest;
+            Credentials* credentials;
     };
 }
 

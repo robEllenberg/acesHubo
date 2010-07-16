@@ -1,10 +1,10 @@
 #include "dispatcher.hpp"
 
 namespace ACES{
-    Dispatcher::Dispatcher(std::string n, int pri, int freq)
-        : RTT::TaskContext(n)
+    Dispatcher::Dispatcher(std::string name)
+        : RTT::TaskContext(name)
     {
-        this->setActivity( new RTT::Activity(pri, 1.0/freq, 0, n) );
+        //this->setActivity( new RTT::Activity(pri, 1.0/freq, 0, n) );
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,
@@ -22,9 +22,6 @@ namespace ACES{
         this->connectPeers(h);
     }
 
-    /*  Protocol Args consist of:
-     *  the backended hardware
-     */ 
     bool Dispatcher::addProtocol(std::string cfg, std::string type,
                                  std::string args)
     {
@@ -42,15 +39,9 @@ namespace ACES{
     bool Dispatcher::addDevice(std::string cfg, std::string type,
                                std::string args)
     {
-        taskCfg c(cfg);
-        std::istringstream s(type);
-        std::string t1;
-        s >> t1 ;
-
         Device *d;
         if (type == "Webots"){
-            Credentials *cred = Webots::Credentials::parseDispArgs(args);
-            d = (Device*) new Webots::Device(c, cred);
+            d = (Device*) new Webots::Device(cfg, args);
         }
         if(d){
             dList.push_back(d);
@@ -61,28 +52,20 @@ namespace ACES{
     bool Dispatcher::addState(std::string cfg, std::string type,
                               std::string args)
     {
-        taskCfg c(cfg);
-        void* s;
-        std::istringstream s1(type);
-        //t1 - Major type - Webots, HuboCAN, etc
-        //t2 - Minor/data type - int, float, etc
-        std::string t1, t2;
-        s1 >> t1 >> t2;
-      
-        void* state;
-        if( t1 == "Webots") {
-                if( t2 == "joint"){ 
-                    state =
-                         (void*) new ACES::State<float>(c, Webots::JOINT,
-                                                        (float)0.0);
-                }
+        //taskCfg c(cfg);
+        ProtoState* s;
+
+        if( type == "Webots") {
+            s = (ProtoState*) new ACES::State<float>(cfg, args);
         }
-        if(state){
-            stateList.push_back(state);
-            connectPeers( (RTT::TaskContext*)state);
+        if(s){
+            stateList.push_back(s);
+            connectPeers(s);
             return true;
         }
-        return false;
+        else{
+            return false;
+        }
     }
 
     bool Dispatcher::addController(std::string cfg, std::string type,
@@ -192,7 +175,7 @@ namespace ACES{
         }
 
         //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
-        for(std::list<void*>::iterator it = stateList.begin();
+        for(std::list<ProtoState*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->start();
@@ -218,7 +201,7 @@ namespace ACES{
             (*it)->stop();
         }
 
-        for(std::list<void*>::iterator it = stateList.begin();
+        for(std::list<ProtoState*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->stop();

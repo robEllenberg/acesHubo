@@ -16,7 +16,7 @@
 namespace ACES{
     class Dispatcher : public RTT::TaskContext {
         public:
-            Dispatcher(std::string n, int pri, int freq);
+            Dispatcher(std::string name);
             bool addHardware(std::string cfg, std::string type,
                              std::string args);
             bool addProtocol(std::string cfg, std::string type,
@@ -33,7 +33,7 @@ namespace ACES{
             bool linkSC(std::string state, std::string ctrl);
             bool linkHC(std::string hw, std::string ctrl);
 
-            std::list<void*> stateList;
+            std::list<ProtoState*> stateList;
             std::list<Protocol*> pList;
             std::list<WbController*> cList;
             std::list<Device*> dList;
@@ -44,7 +44,6 @@ namespace ACES{
             void updateHook();
             void stopHook();
             void cleanupHook();
-            
     };
 }
 

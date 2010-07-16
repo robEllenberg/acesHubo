@@ -1,32 +1,12 @@
 #include "hardware.hpp"
 
 namespace ACES {
-    Hardware::Hardware(std::string n, int pri,
-                     int UpdateFreq) :
-	    RTT::TaskContext(n)
-	    //NewData("NewData"),
-	    //outBuffer((std::string)"ToProtocol", 500),
-        //inBuffer((std::string)"FromProtocol")
-        {
-            priority = pri;
-            frequency = UpdateFreq;
-            name = n;
-            //this->events()->addEvent( &NewData,
-            //    "Notify of new data arrival", "data",
-            //    "The recieved data.");
-            this->setActivity(
-                new RTT::Activity(priority, 1.0/UpdateFreq, 0, name));
-            //this->methods()->addMethod( &isBusyMethod,
-            //    "Check if the hardware is busy");
-        }
-
     Hardware::Hardware(taskCfg cfg, std::string args) :
-     RTT::TaskContext(cfg.name){
-        priority = cfg.priority;
-        frequency = cfg.freq;
-        this->setActivity( new RTT::Activity( priority, 1.0/frequency, 0,
-                                              cfg.name)
-                         );
+        taskCfg(cfg),
+        RTT::TaskContext(name)
+    {
+        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
+                                              name));
     }
     
     bool Hardware::configureHook(){
@@ -34,7 +14,6 @@ namespace ACES {
     }
 
     bool Hardware::startHook(){
-        //unsigned char c;
         //TODO - Re-add a check to clear a non-empty buffer
         //before starting operation
         //while( this->hardpoint_in->readsome((char*)&c, 1) ){}
@@ -63,7 +42,7 @@ namespace ACES {
             //TODO - add logic for managing responses from hw
         }
 */
-        recieve();
+//        recieve();
     }
 
     bool Hardware::subscribeProtocol(Protocol* p){
@@ -82,6 +61,7 @@ namespace ACES {
         return true;
     }
 
+/*
     charDevHardware::charDevHardware(std::string name,
                        std::ifstream *in,
                        std::ofstream *out, int priority,
@@ -123,4 +103,5 @@ namespace ACES {
             //outBuffer.buffer()->Push((Message*)cpv);	
 	    }
     }
+*/
 }

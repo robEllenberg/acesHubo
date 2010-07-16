@@ -1,13 +1,14 @@
 #include "device.hpp"
 
 namespace ACES{
-    Device::Device(taskCfg cfg, Credentials* c) :
-      RTT::TaskContext(cfg.name),
-      TxRequest("TxRequest")
+
+    Device::Device(std::string config) :
+      taskCfg(config),
+      TxRequest("TxRequest"),
+      RTT::TaskContext(name)
     {
         this->events()->addEvent(&TxRequest, "TxRequest", "goal",
                                  "The Goal/SP Data");
-        credentials = c;
     }
 
     void Device::RxGoal(Goal* g){
@@ -39,7 +40,6 @@ namespace ACES{
     }
 
     void Device::updateHook(){}
-
     void Device::stopHook(){}
     void Device::cleanupHook(){}
 
