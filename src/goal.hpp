@@ -14,7 +14,6 @@ namespace ACES{
             int mode;
             void* data;
             Credentials* cred;
-            
     };
 }
 #endif

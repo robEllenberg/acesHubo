@@ -35,7 +35,7 @@ namespace ACES {
             int propID;
 
             RTT::Event<void(Goal*)> announceGoal;
-            bool subscribeController(WbController* c);
+            bool subscribeController(Controller* c);
             void setGoal(std::map<std::string, void*>*);
     };
 

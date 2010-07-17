@@ -13,56 +13,48 @@
 #include <rtt/Method.hpp>
 #include <rtt/Activity.hpp>
 
-//#include "state.hpp"
-//#include "hardware.hpp"
 #include "taskcfg.hpp"
 
-enum WB_ENUM { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
+enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
 namespace ACES{
-    //class Hardware;
-    class WbController : public RTT::TaskContext {
+    class Controller : protected taskCfg,
+                       public RTT::TaskContext
+    {
         public:
-            WbController(std::string n,
-              const char* scriptFile, 
-              int pri, int UpdateFreq);
-            WbController(taskCfg cfg, std::string args);
-
-            void updateHook();
+            Controller(std::string cfg, std::string args);
             bool configureHook();
             bool startHook();
             void stopHook();
             void cleanupHook();
+    };
+
+    class ScriptCtrl : public Controller
+    {
+        public:
+            ScriptCtrl(std::string cfg, std::string args);
+            void updateHook();
 
             void step();
             void run();
             void halt();
-            std::map<std::string, void*>*
-                getStateVector(bool echo=0);
-
-            //std::map<std::string, State*> pmap;
+            bool openScript(std::string scriptPath);
+            virtual std::map<std::string, void*>* 
+                    getStateVector(bool echo=0) = 0;
 
             std::ifstream walkScript;
-
             std::map<std::string, void*>* stateVect;
-
-            RTT::Event<void(std::map<std::string, void*>*)>
-                applyStateVector;
+            int simState;
 
             RTT::Method<void(void)> stepMethod;
             RTT::Method<void(void)> runMethod;
             RTT::Method<void(void)> haltMethod;
             RTT::Method<bool(std::string)> openScriptMethod;
 
-            bool openScript(std::string scriptPath);
-
-            std::string name;
-            int frequency;
-            int priority;
-            //std::list<Hardware*> hwlist;
-            //std::list<Protocol*> pcollist;
-            int simState;
+            RTT::Event<void(std::map<std::string, void*>*)>
+                applyStateVector;
     };
+
 }
 
 #endif

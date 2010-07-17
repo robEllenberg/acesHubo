@@ -25,7 +25,6 @@ namespace ACES{
     bool Dispatcher::addProtocol(std::string cfg, std::string type,
                                  std::string args)
     {
-        taskCfg c(cfg);
         Protocol* p;
         if ( type == "Webots"){
             p = (Protocol*) new Webots::Protocol(cfg, args);
@@ -71,18 +70,16 @@ namespace ACES{
     bool Dispatcher::addController(std::string cfg, std::string type,
                                    std::string args)
     {
-        taskCfg c(cfg);
-
         std::istringstream s1(type);
         //t1 - Major type - Webots, HuboCAN, etc
         //t2 - Minor/data type - int, float, etc
         std::string t1, t2;
         s1 >> t1 >> t2;
 
-        WbController* ctrl;
+        Controller* ctrl;
         if ( t1 == "Webots"){
             if (t2 == "Mini"){
-                ctrl = (WbController*) new WbController(c, args);
+                ctrl = (Controller*) new Webots::ScriptCtrl(cfg, args);
             }
         } 
         if(ctrl){
@@ -134,7 +131,7 @@ namespace ACES{
         RTT::TaskContext* c = this->getPeer(ctrl);
 
         if (s and c){
-            return ((ProtoState*)s)->subscribeController((WbController*)c);
+            return ((ProtoState*)s)->subscribeController((Controller*)c);
         }
         else{
             return false;
@@ -145,7 +142,7 @@ namespace ACES{
         Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
         RTT::TaskContext* c = this->getPeer(ctrl);
         if (h and c){
-            return h->subscribeController((ACES::WbController*) c);
+            return h->subscribeController((Controller*) c);
         }
         else{
             return false;
@@ -183,7 +180,7 @@ namespace ACES{
 
         //RTT::Logger::log() << "Finished States" << RTT::endlog();
 
-        for(std::list<WbController*>::iterator it = cList.begin();
+        for(std::list<Controller*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->start();
         }
@@ -196,7 +193,7 @@ namespace ACES{
     }
 
     void Dispatcher::stopHook(){
-        for(std::list<WbController*>::iterator it = cList.begin();
+        for(std::list<Controller*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->stop();
         }

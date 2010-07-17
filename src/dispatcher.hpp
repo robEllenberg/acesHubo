@@ -35,7 +35,7 @@ namespace ACES{
 
             std::list<ProtoState*> stateList;
             std::list<Protocol*> pList;
-            std::list<WbController*> cList;
+            std::list<Controller*> cList;
             std::list<Device*> dList;
             std::list<Hardware*> hwList;
             

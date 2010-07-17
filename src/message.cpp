@@ -10,7 +10,7 @@ namespace ACES {
     Message::Message(Goal* g) : goalList(1, g){
         
     }
-
+/*
     Message::~Message(){
         while( goalList.size() ){
             //If the credential has a PVal it is a copy 
@@ -23,6 +23,7 @@ namespace ACES {
            goalList.pop_back();
         }
     }
+*/
 
 /*
     void Message::printme(){

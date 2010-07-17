@@ -10,10 +10,9 @@ namespace ACES{
     
     class Message {
         public:
-            //TODO - All these void* should be too credentials
             //Message(std::list<Goal*> &gl);
             Message(Goal* g);
-            ~Message();
+            //~Message();
             //void printme();
             std::list<Goal*> goalList;
     };

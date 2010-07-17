@@ -10,9 +10,6 @@ namespace ACES {
     class ProtoCredential{
         public:
             ProtoCredential(int t);
-            //Non-Create Copy, to be called by a child class who
-            //is implementing a copy of itself
-            ProtoCredential* NCcopy(ProtoCredential* c);
             int credType;
     };
 
@@ -23,10 +20,6 @@ namespace ACES {
             //MUST IMPLIMENT
             //virtual Credentials(Credentials* c, void* sp) = 0; 
             virtual void printme() = 0;
-            //virtual Credentials* copy(void* setP) = 0;
-
-            //void* setPoint;
-            //int id;
     };
 }
 #endif

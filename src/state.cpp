@@ -40,7 +40,7 @@ namespace ACES {
     void ProtoState::cleanupHook(){
     }
 
-    bool ProtoState::subscribeController(WbController* c){
+    bool ProtoState::subscribeController(Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &ProtoState::setGoal,

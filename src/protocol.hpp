@@ -26,11 +26,11 @@ namespace ACES {
 /*!
  * The Protocol virtual class 
  */
-    class Protocol : public RTT::TaskContext {
+    class Protocol : protected taskCfg,
+                     public RTT::TaskContext
+    {
         public:
-            Protocol(std::string name,
-                     int pri, int UpdateFreq);
-            Protocol(taskCfg cfg, std::string args);
+            Protocol(std::string cfg, std::string args);
             bool configureHook();
             bool startHook();
             void updateHook();
@@ -38,9 +38,6 @@ namespace ACES {
             void cleanupHook();
             bool subscribeDevice(Device* d);
 
-            std::string name;
-            int frequency;
-            int priority;
             //! Processed, waiting for transmission. 
             /*! The set of messages already processed by the
              protocol waiting to be

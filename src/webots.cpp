@@ -63,7 +63,7 @@ namespace Webots {
         return false;
     }
 
-    bool Hardware::subscribeController(ACES::WbController* c){
+    bool Hardware::subscribeController(ACES::Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &Hardware::stepRequest,
@@ -108,52 +108,22 @@ namespace Webots {
         direction = dir;
     }
 
-    Credentials::Credentials(Credentials* c, void* sp)
-        : ACES::Credentials( (ACES::Credentials*)c )
-    {
-        wb_device_id = c->wb_device_id;
-        zero = c->zero;
-        direction = c->direction;
-        //setPoint = (void*) new float(sp);
-        //setPoint = sp;
-    }
-/*
-    ACES::Credentials* Credentials::copy(void* setP){
-        Credentials* c = new Credentials(this);
-        NCcopy((ProtoCredential*)c);
-        c->setPoint = setP;
-        return (ACES::Credentials*)c;
-    }
-*/
     void Credentials::printme(){
-        //int* p = (int*)val;
         ACES::Credentials::printme();
         
-        RTT::Logger::log() << "Webots ID= " << this->wb_device_id;
-        //    << " and SetPoint= ";
-        //if(p){
-        /*
-        if(this->setPoint){
-            //this->val->printme();
-            float* v = (float*)setPoint;
-            RTT::Logger::log() << *v;
-        }
-        else{
-            RTT::Logger::log()  << "NULL";
-        }
-        */
+        RTT::Logger::log() << "Webots: ID= " << wb_device_id;
+        RTT::Logger::log() << " Zero= " << zero;
+        RTT::Logger::log() << " Direction= " << direction;
         RTT::Logger::log() << RTT::endlog();
     }
 
     ACES::Credentials* Credentials::parseDispArgs(std::string args)
     {
-        ACES::Credentials *c = 0;
         std::istringstream s1(args);
         std::string id;
         float zero, rot;
         s1 >> id >> zero >> rot;
-        c = (ACES::Credentials*)new Credentials(id, zero, rot);
-        return c;
+        return (ACES::Credentials*)new Credentials(id, zero, rot);
     }
 
     Device::Device(std::string config, std::string args)
@@ -163,11 +133,66 @@ namespace Webots {
         credentials = cred;
     }
 
-    Protocol::Protocol(std::string name, 
-                     int pri, int UpdateFreq)
-      : ACES::Protocol(name, pri, UpdateFreq){}
-
-    Protocol::Protocol(ACES::taskCfg cfg, std::string args) 
+    Protocol::Protocol(std::string cfg, std::string args) 
       : ACES::Protocol(cfg, args){}
 
+    ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
+      : ACES::ScriptCtrl(cfg, args)
+    {}
+
+    std::map<std::string, void*>*
+      ScriptCtrl::getStateVector(bool echo)
+    {
+        //The state vector is a lookup table by the name of the joint
+        std::map<std::string, void*> *sv =
+            new std::map<std::string, void*>;
+
+        std::vector<float> angles;      //Temp container
+        //Fill w/the script info if we have data left, 
+        //otherwise zero fill the vector
+        if(not walkScript.eof()){
+            //For the moment, 13 is magic, based on the #of joints and
+            //the length of the script-file format.
+            for(int i = 0; i<13; i++){  
+                //offset = it+i;
+                float value;
+                walkScript >> value;
+                angles.push_back(value);
+               if(echo){
+                    RTT::Logger::log() << value << ", ";
+               }
+            }
+        }else{
+            for(int i=0; i< 13; i++){
+                angles.push_back(0.0);
+                if(echo){
+                    RTT::Logger::log() << "EOF" << ", ";
+                }
+            }
+        }
+        if(echo){
+            RTT::Logger::log() << RTT::endlog();
+        }
+
+        //Eat the remainder of the line
+        char a[1000];
+        walkScript.getline(a, 1000);
+
+        //Populate the state vector
+        (*sv)["HY"] = new float(angles[0]);
+        (*sv)["LHY"] = new float(angles[1]);
+        (*sv)["LHR"] = new float(angles[2]);
+        (*sv)["LHP"] = new float(angles[3]);
+        (*sv)["LKP"] = new float(angles[4]);
+        (*sv)["LAP"] = new float(angles[5]);
+        (*sv)["LAR"] = new float(angles[6]);
+        (*sv)["RHY"] = new float(angles[7]);
+        (*sv)["RHR"] = new float(angles[8]);
+        (*sv)["RHP"] = new float(angles[9]);
+        (*sv)["RKP"] = new float(angles[10]);
+        (*sv)["RAP"] = new float(angles[11]);
+        (*sv)["RAR"] = new float(angles[12]);
+ 
+        return sv;
+    }
 }
