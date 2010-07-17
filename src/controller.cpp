@@ -60,7 +60,7 @@ namespace ACES{
                 //Fall through here is intentional
             case WB_CTRL_RUN:
                  //delete stateVect;
-                stateVect = getStateVector(true);
+                stateVect = getStateVector();
                 applyStateVector(stateVect);
                 
                 //delete sv;       

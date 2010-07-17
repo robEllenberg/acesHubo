@@ -9,6 +9,10 @@ namespace ACES{
     {
         this->events()->addEvent(&TxRequest, "TxRequest", "goal",
                                  "The Goal/SP Data");
+        this->setActivity(
+            new RTT::Activity( /*priority*/1, 0, 0, name )
+        );
+            
     }
 
     void Device::RxGoal(Goal* g){
@@ -20,7 +24,7 @@ namespace ACES{
         this->connectPeers( (RTT::TaskContext*) s);
         RTT::Handle h = s->events()->setupConnection("announceGoal")
             .callback( this, &Device::RxGoal
-                     //,  this->engine()->events()
+                     ,  this->engine()->events()
                      ).handle();
         if( not h.ready() ){
             return false;

@@ -33,7 +33,7 @@ namespace Webots {
                 break;
             case (ACES::SET):
                 {
-                    g->printme();
+                    //g->printme();
                     Credentials* c =
                             (Credentials*)(g->cred);
                     std::string jid = (*c).wb_device_id;
@@ -192,6 +192,7 @@ namespace Webots {
         (*sv)["RKP"] = new float(angles[10]);
         (*sv)["RAP"] = new float(angles[11]);
         (*sv)["RAR"] = new float(angles[12]);
+        //(*sv)["RSP"] = new float(1.2);
  
         return sv;
     }

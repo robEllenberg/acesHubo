@@ -45,7 +45,10 @@ namespace ACES {
             State(std::string config, std::string args);
 
             void printme();
+            void go(T sp);
+
             T value;
+            RTT::Method<void(T)> goMethod;
     };
 
     #include "state.cc"

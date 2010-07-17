@@ -56,6 +56,7 @@ namespace ACES{
 
         if( type == "Webots") {
             s = (ProtoState*) new ACES::State<float>(cfg, args);
+            ((State<float>*)s)->printme();
         }
         if(s){
             stateList.push_back(s);
