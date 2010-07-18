@@ -3,8 +3,15 @@ namespace ACES{
 
     Controller::Controller(std::string cfg, std::string args)
       : taskCfg(cfg),
-        RTT::TaskContext(name)
+        RTT::TaskContext(name),
+        applyStateVector("applyStateVector")
     {
+        this->events()->addEvent(&applyStateVector, "applyStateVector",
+            "SVmap", "map of state vect info");
+
+        this->setActivity(
+            new RTT::Activity( priority, 1.0/freq, 0, name )
+        );
     }
 
     bool Controller::configureHook(){
@@ -23,7 +30,6 @@ namespace ACES{
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
         walkScript((const char*)args.c_str(), std::ifstream::in),
-        applyStateVector("applyStateVector"),
         stepMethod("step", &ScriptCtrl::step, this),
         runMethod("run", &ScriptCtrl::run, this),
         haltMethod("halt", &ScriptCtrl::halt, this),
@@ -43,13 +49,6 @@ namespace ACES{
             "Halt the simulation.");
         this->methods()->addMethod(openScriptMethod,
             "Open a new trajectory file", "sfile", "Script file path");
-
-        this->events()->addEvent(&applyStateVector, "applyStateVector",
-            "SVmap", "map of state vect info");
-
-        this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name )
-        );
     }
     
     void ScriptCtrl::updateHook(){
@@ -94,5 +93,23 @@ namespace ACES{
             return true;
         else
             return false;
+    }
+
+    NullCtrl::NullCtrl(std::string cfg, std::string args)
+      : Controller(cfg, args)
+    {}
+
+    void NullCtrl::updateHook()
+    {
+        stateVect = getStateVector();
+        applyStateVector(stateVect);
+    }
+
+    std::map<std::string, void*>*
+      NullCtrl::getStateVector(bool echo)
+    {
+        std::map<std::string, void*> *sv =
+            new std::map<std::string, void*>;
+        return sv; 
     }
 }

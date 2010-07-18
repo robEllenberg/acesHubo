@@ -10,6 +10,7 @@ namespace ACES {
     Message::Message(Goal* g) : goalList(1, g){
         
     }
+    Message::Message(){}
 /*
     Message::~Message(){
         while( goalList.size() ){

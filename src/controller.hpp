@@ -27,6 +27,11 @@ namespace ACES{
             bool startHook();
             void stopHook();
             void cleanupHook();
+            virtual std::map<std::string, void*>* 
+                    getStateVector(bool echo=0) = 0;
+
+            RTT::Event<void(std::map<std::string, void*>*)>
+                applyStateVector;
     };
 
     class ScriptCtrl : public Controller
@@ -39,8 +44,6 @@ namespace ACES{
             void run();
             void halt();
             bool openScript(std::string scriptPath);
-            virtual std::map<std::string, void*>* 
-                    getStateVector(bool echo=0) = 0;
 
             std::ifstream walkScript;
             std::map<std::string, void*>* stateVect;
@@ -50,9 +53,18 @@ namespace ACES{
             RTT::Method<void(void)> runMethod;
             RTT::Method<void(void)> haltMethod;
             RTT::Method<bool(std::string)> openScriptMethod;
+    };
 
-            RTT::Event<void(std::map<std::string, void*>*)>
-                applyStateVector;
+    class NullCtrl : public Controller 
+    {
+        public:
+            NullCtrl(std::string config, std::string args);
+            void updateHook();
+            std::map<std::string, void*>* stateVect;
+
+            std::map<std::string, void*>* 
+                    getStateVector(bool echo=0);
+
     };
 
 }

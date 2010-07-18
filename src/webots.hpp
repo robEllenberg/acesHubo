@@ -81,6 +81,7 @@ namespace Webots{
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);
     };
+
 }    
 
 #endif

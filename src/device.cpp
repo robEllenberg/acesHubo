@@ -10,7 +10,8 @@ namespace ACES{
         this->events()->addEvent(&TxRequest, "TxRequest", "goal",
                                  "The Goal/SP Data");
         this->setActivity(
-            new RTT::Activity( /*priority*/1, 0, 0, name )
+            //TODO - allow user to set priority
+            new RTT::Activity( 5, 0, 0, name )
         );
             
     }

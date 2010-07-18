@@ -169,6 +169,9 @@ namespace Webots {
                     RTT::Logger::log() << "EOF" << ", ";
                 }
             }
+            //Issue an empty vector if we don't want to do anything
+            //(picked up by HW to advance timestep in sim)
+            return sv;
         }
         if(echo){
             RTT::Logger::log() << RTT::endlog();
@@ -196,4 +199,5 @@ namespace Webots {
  
         return sv;
     }
+
 }

@@ -10,6 +10,7 @@
 #include <rtt/PortInterface.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/Activity.hpp>
+#include <rtt/Buffer.hpp>
 
 #include "message.hpp"
 #include "state.hpp"
@@ -43,7 +44,8 @@ namespace ACES {
              protocol waiting to be
              submitted to the hardware for transmission.
              */
-            std::deque<Message*>* pending_stack;
+            //std::deque<Message*>* pending_stack;
+            RTT::Buffer<Message*>* pending_stack;
             //! The requests made to protocol by parameters
             //RTT::ReadBufferPort<Credentials*>* request_stack;
 

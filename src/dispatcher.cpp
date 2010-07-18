@@ -82,6 +82,9 @@ namespace ACES{
             if (t2 == "Mini"){
                 ctrl = (Controller*) new Webots::ScriptCtrl(cfg, args);
             }
+            if (t2 == "Null"){
+                ctrl = (Controller*) new NullCtrl(cfg, args);
+            }
         } 
         if(ctrl){
             cList.push_back(ctrl);

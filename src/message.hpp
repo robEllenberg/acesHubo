@@ -11,6 +11,7 @@ namespace ACES{
     class Message {
         public:
             //Message(std::list<Goal*> &gl);
+            Message();
             Message(Goal* g);
             //~Message();
             //void printme();

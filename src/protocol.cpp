@@ -6,8 +6,11 @@ namespace ACES {
       RTT::TaskContext(name),
       issueMessage("issueMessage")
     {
-        this->pending_stack = new std::deque<Message*>;
-        
+//        pending_stack = new std::deque<Message*>;
+
+        //TODO - Figure out why this flips out when we attempt to declare
+        // it as a member instead of a pointer 
+        pending_stack = new RTT::Buffer<Message*>(1000);
         this->events()->addEvent(&issueMessage, "issueMessage", "msg",
                                  "The message to be transmitted");
         this->setActivity(
@@ -34,16 +37,19 @@ namespace ACES {
         //while(   (not this->hardware->isBusyMethod())
         //      && this->pending_stack->size()
         //      && this->theresStillTime() ){
-        while( this->pending_stack->size() > 0){
+        //while( pending_stack.size() > 0){
+        while( not pending_stack->empty() ){
             //pop next message off pending  
-            Message* m = this->prepareMessage();
+
+            Message* m = prepareMessage();
             issueMessage( m );
         }
     }
 
     void Protocol::addRequest(Goal* g){
         ACES::Message *m = new ACES::Message( g );
-        pending_stack->push_back(m);
+//        pending_stack->push_back(m);
+        pending_stack->Push(m);
     }
 
     void Protocol::stopHook(){
@@ -53,8 +59,10 @@ namespace ACES {
     }
 
     Message* Protocol::prepareMessage(){
-        Message* m = this->pending_stack->front();
-        this->pending_stack->pop_front();
+        //Message* m = pending_stack->front();
+        //pending_stack->pop_front();
+        Message* m;
+        pending_stack->Pop(m);
         return m;
     }
     
@@ -62,7 +70,7 @@ namespace ACES {
         this->connectPeers( (RTT::TaskContext*) d );
         RTT::Handle h = d->events()->setupConnection("TxRequest")
             .callback( this, &Protocol::addRequest,
-                       this->engine()->events()
+                       d->engine()->events()
                      ).handle();
         if( not h.ready()){
             return false;

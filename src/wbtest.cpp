@@ -20,9 +20,10 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Creation" << RTT::endlog();
 
-    d->addHardware("wbHW 1 40", "Webots", "");
-    d->addProtocol("wbPcol 2 40", "Webots", "");
-    d->addController("wbctrl 3 15", "Webots Mini", "IKscript1.txt");
+    d->addHardware("wbHW 1 100", "Webots", "");
+    d->addProtocol("wbPcol 2 100", "Webots", "");
+    //d->addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
+    d->addController("wbctrl 10 15", "Webots Null", "");
 
     d->addDevice("dHY", "Webots",  "HY  0.0 -1.0");
     d->addDevice("dLSP", "Webots", "LSP 0.0  1.0");
@@ -42,23 +43,23 @@ int ORO_main(int a, char** b){
     d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
     d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
 
-    d->addState("HY 5 3",  "Webots", "Joint");
-    d->addState("LSP 5 3", "Webots", "Joint");
-    d->addState("LSR 5 3", "Webots", "Joint");
-    d->addState("RSP 5 3", "Webots", "Joint");
-    d->addState("RSR 5 3", "Webots", "Joint");
-    d->addState("LHY 5 3", "Webots", "Joint");
-    d->addState("LHR 5 3", "Webots", "Joint");
-    d->addState("LHP 5 3", "Webots", "Joint");
-    d->addState("LKP 5 3", "Webots", "Joint");
-    d->addState("LAP 5 3", "Webots", "Joint");
-    d->addState("LAR 5 3", "Webots", "Joint");
-    d->addState("RHY 5 3", "Webots", "Joint");
-    d->addState("RHR 5 3", "Webots", "Joint");
-    d->addState("RHP 5 3", "Webots", "Joint");
-    d->addState("RKP 5 3", "Webots", "Joint");
-    d->addState("RAP 5 3", "Webots", "Joint");
-    d->addState("RAR 5 3", "Webots", "Joint");
+    d->addState("HY 5 31",  "Webots", "Joint");
+    d->addState("LSP 5 31", "Webots", "Joint");
+    d->addState("LSR 5 31", "Webots", "Joint");
+    d->addState("RSP 5 31", "Webots", "Joint");
+    d->addState("RSR 5 31", "Webots", "Joint");
+    d->addState("LHY 5 31", "Webots", "Joint");
+    d->addState("LHR 5 31", "Webots", "Joint");
+    d->addState("LHP 5 31", "Webots", "Joint");
+    d->addState("LKP 5 31", "Webots", "Joint");
+    d->addState("LAP 5 31", "Webots", "Joint");
+    d->addState("LAR 5 31", "Webots", "Joint");
+    d->addState("RHY 5 31", "Webots", "Joint");
+    d->addState("RHR 5 31", "Webots", "Joint");
+    d->addState("RHP 5 31", "Webots", "Joint");
+    d->addState("RKP 5 31", "Webots", "Joint");
+    d->addState("RAP 5 31", "Webots", "Joint");
+    d->addState("RAR 5 31", "Webots", "Joint");
 
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
     d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
