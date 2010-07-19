@@ -14,8 +14,9 @@ namespace ACES {
         }
 
         this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name )
+                new RTT::Activity( priority, 1.0/freq, 0, name)
         );
+        
     }
     
     bool ProtoState::configureHook(){
@@ -66,6 +67,10 @@ namespace ACES {
             //<< *((float*)val) << RTT::endlog();
             announceGoal(g);
         }
+    }
+
+    void ProtoState::RxData(Goal* g){
+        asgnfunct(g->data);
     }
 
 }

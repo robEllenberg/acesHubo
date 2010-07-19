@@ -4,7 +4,8 @@ namespace ACES {
     Protocol::Protocol(std::string cfg, std::string args):
       taskCfg(cfg),
       RTT::TaskContext(name),
-      issueMessage("issueMessage")
+      issueMessage("issueMessage"),
+      announceResult("announceResult")
     {
 //        pending_stack = new std::deque<Message*>;
 
@@ -13,6 +14,8 @@ namespace ACES {
         pending_stack = new RTT::Buffer<Message*>(1000);
         this->events()->addEvent(&issueMessage, "issueMessage", "msg",
                                  "The message to be transmitted");
+        this->events()->addEvent(&announceResult, "announceResult", "result",
+                                 "Data struct containing processed result");
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
@@ -79,7 +82,19 @@ namespace ACES {
         if( not h.connected() ){
             return false;
         }
-    }
 
+        h = this->events()->setupConnection("announceResult")
+            .callback( d, &Device::interpretResult,
+                        d->engine()->events()
+                     ).handle();
+        if( not h.ready()){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+        return true;
+    }
 }
 

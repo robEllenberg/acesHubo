@@ -17,6 +17,7 @@
 #include "taskcfg.hpp"
 #include "goal.hpp"
 #include "device.hpp"
+#include "word.hpp"
 
 namespace ACES {
     class Credentials;
@@ -51,6 +52,7 @@ namespace ACES {
 
             //std::list<Credentials*>* getNewRequests();
             void addRequest(Goal*);
+            virtual void interpretRx(ProtoWord*) = 0;
 
             //virtual void aggregateRequests(
             //    std::list<Credentials*> &reqs) = 0;
@@ -64,6 +66,7 @@ namespace ACES {
 
             Message* prepareMessage();
             RTT::Event<void(Message*)> issueMessage;
+            RTT::Event<void(ProtoResult*)> announceResult;
             
             //virtual bool registerParam(ACES::State*) = 0;
     };

@@ -4,21 +4,15 @@
 #include <rtt/Logger.hpp>
 
 namespace ACES {
-
-    enum CREDTYPE { CRED_WB_JOINT=1 };
-
+/*
     class ProtoCredential{
         public:
             ProtoCredential(int t);
             int credType;
     };
-
-    class Credentials : public ProtoCredential{
+*/
+    class Credentials {
         public:
-            Credentials(Credentials* c);
-            Credentials(int type);
-            //MUST IMPLIMENT
-            //virtual Credentials(Credentials* c, void* sp) = 0; 
             virtual void printme() = 0;
     };
 }

@@ -43,6 +43,7 @@ int ORO_main(int a, char** b){
     d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
     d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
 
+/*
     d->addState("HY 5 31",  "Webots", "Joint");
     d->addState("LSP 5 31", "Webots", "Joint");
     d->addState("LSR 5 31", "Webots", "Joint");
@@ -60,7 +61,8 @@ int ORO_main(int a, char** b){
     d->addState("RKP 5 31", "Webots", "Joint");
     d->addState("RAP 5 31", "Webots", "Joint");
     d->addState("RAR 5 31", "Webots", "Joint");
-
+*/
+/*
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
     d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
     d->linkPD("wbPcol", "dLSP"); d->linkDS("dLSP", "LSP");
@@ -99,7 +101,7 @@ int ORO_main(int a, char** b){
 
     d->linkHC("wbHW", "wbctrl");
     d->linkHP("wbHW", "wbPcol");
-
+*/
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
     Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();

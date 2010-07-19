@@ -16,6 +16,7 @@
 #include "taskcfg.hpp"
 #include "credentials.hpp"
 #include "device.hpp"
+#include "word.hpp"
 
 extern "C"{
     #include <webots/robot.h>
@@ -39,29 +40,35 @@ namespace Webots{
     };
    
     class Credentials : public ACES::Credentials {
+        private:
+            void assign(std::string id_str, std::string devname, float z,
+                        float dir);
         public:
             Credentials(Credentials* c);
-            Credentials(std::string id_str, float z=150.0,
-                        float dir=1.0);
-            Credentials(char* id_str, float z=150.0, 
-                        float dir=1.0);
+            Credentials(std::string args);
+            Credentials(std::string id_str, std::string devname,
+                        float z, float dir);
 
-            static ACES::Credentials* parseDispArgs(std::string args);
             void printme();
 
             std::string wb_device_id;
             float zero;
             float direction;
+            std::string devName;
     };
 
     class Device : public ACES::Device {
         public:
             Device(std::string config, std::string args);
+            void interpretResult(ACES::ProtoResult* rx);
+            bool startHook();
+            void stopHook();
     };
 
     class Protocol : public ACES::Protocol {
         public:
             Protocol(std::string cfg, std::string args);
+            void interpretRx(ACES::ProtoWord* rx) = 0;
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
             //ACES::Credentials* parseHWInput(

@@ -34,9 +34,12 @@ namespace ACES {
 
             int propID;
 
+            void (*asgnfunct)(void*);
+
             RTT::Event<void(Goal*)> announceGoal;
             bool subscribeController(Controller* c);
             void setGoal(std::map<std::string, void*>*);
+            void RxData(Goal* d);
     };
 
     template <class T>
@@ -46,6 +49,7 @@ namespace ACES {
 
             void printme();
             void go(T sp);
+            void assign(void* meas);
 
             T value;
             RTT::Method<void(T)> goMethod;

@@ -3,8 +3,12 @@
 namespace ACES {
     Hardware::Hardware(taskCfg cfg, std::string args) :
         taskCfg(cfg),
-        RTT::TaskContext(name)
+        RTT::TaskContext(name),
+        announceRx("announceRx")
     {
+        this->events()->addEvent(&announceRx, "announceRx", "word",
+                                 "Recieved Data");
+
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
                                               name));
     }
@@ -58,6 +62,19 @@ namespace ACES {
         if( not h.connected() ){
             return false;
         }
+
+        h = this->events()->setupConnection("announceRx")
+            .callback( p, &Protocol::interpretRx,
+                       p->engine()->events() ).handle();
+
+        if(not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+ 
         return true;
     }
 

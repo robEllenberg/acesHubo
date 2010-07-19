@@ -8,6 +8,7 @@
 #include "taskcfg.hpp"
 #include "credentials.hpp"
 #include "state.hpp"
+#include "word.hpp"
 
 namespace ACES{
     class Device :  protected taskCfg,
@@ -19,12 +20,13 @@ namespace ACES{
             bool subscribeState(ProtoState* s);
 
             bool configureHook();
-            bool startHook();
             void updateHook();
-            void stopHook();
             void cleanupHook();
 
+            virtual void interpretResult(ProtoResult* rx) = 0 ;
+
             RTT::Event<void(Goal*)> TxRequest;
+            RTT::Event<void(Goal*)> announceData;
             Credentials* credentials;
     };
 }

@@ -7,6 +7,7 @@
         bool one = this->methods()->addMethod(goMethod, "go",
                                    "SP",
                                    "Set Point");
+        asgnfunct = assign;
     }
     
     template <class T>
@@ -22,5 +23,10 @@
         T* p = new T(sp);
         Goal* g = new Goal(propID, SET, p);
         announceGoal(g);
+    }
+
+    template <class T>
+    void State<T>::assign(void* meas){
+        value = *((T*)meas);
     }
 

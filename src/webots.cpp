@@ -29,28 +29,57 @@ namespace Webots {
         //g->printme();
 
         switch( g->mode ){
-            case (ACES::REFRESH):
-                break;
-            case (ACES::SET):
-                {
-                    //g->printme();
-                    Credentials* c =
-                            (Credentials*)(g->cred);
-                    std::string jid = (*c).wb_device_id;
+            case (ACES::REFRESH):{
+                //Vessel for returning the information we find
+                float* result = new float;
 
-                    //Pull the seek value out of the SValue object
-                    float* tp = (float*)(g->data);
-                    float target = *tp;
-                    float angle = (*c).direction
-                                   * (target - (*c).zero);
+                //Lookup the identifier for the component of interest
+                Credentials* c = (Credentials*)(g->cred);
+                WbDeviceTag tag =
+                    wb_robot_get_device( (c->wb_device_id).c_str() );
 
-                    WbDeviceTag joint = wb_robot_get_device(jid.c_str());
-                    //wb_servo_set_position(joint, 3.14159/180.*angle);
-                    wb_servo_set_position(joint, angle);
+                //Different commands are needed depending on the
+                //type of device we're looking up. Find the appropriate
+                //result for this propID
+                switch (g->propID){
+                    case (ACES::JOINT):{
+                        *result = wb_servo_get_position(tag);
+                     }
+                     break;
+                    default:
+                        *result = 0;
+                     break;
                 }
-                break;
+
+                //Place the result on the container & send it back
+                //TODO - This kind of bypasses the physical HW Rx
+                //structure, perhaps we should change that somehow
+                g->data = (void*)result;
+                ACES::ProtoWord* w =
+                    (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
+                announceRx(w);
+             }
+             break;
+
+            case (ACES::SET):{
+                Credentials* c =
+                        (Credentials*)(g->cred);
+                std::string jid = (*c).wb_device_id;
+
+                //Pull the seek value out of the SValue object
+                float* tp = (float*)(g->data);
+                float target = *tp;
+                float angle = (*c).direction
+                               * (target - (*c).zero);
+
+                WbDeviceTag joint = wb_robot_get_device(jid.c_str());
+                //wb_servo_set_position(joint, 3.14159/180.*angle);
+                wb_servo_set_position(joint, angle);
+             }
+             break;
+
             default:
-                break;
+             break;
         }
         //m->printme();
     }
@@ -85,56 +114,88 @@ namespace Webots {
     }
 
     Credentials::Credentials(Credentials* c)
-        : ACES::Credentials( (ACES::Credentials*)c )
     {
-        wb_device_id = c->wb_device_id;
-        zero = c->zero;
-        direction = c->direction;
+        assign(c->wb_device_id, c->devName, c->zero, c->direction);
     }
 
-    Credentials::Credentials(std::string id_str, float z,
-        float dir)
-      : ACES::Credentials(ACES::CRED_WB_JOINT){
+    void Credentials::assign(std::string id_str, std::string devname,
+                           float z, float dir)
+    {
         wb_device_id = id_str;
         zero = z;
         direction = dir;
+        devName = devname;
     }  
 
-    Credentials::Credentials(char* id_str, float z, 
-                float dir)  
-      : ACES::Credentials(ACES::CRED_WB_JOINT){
-        wb_device_id = (std::string)id_str;
-        zero = z;
-        direction = dir;
-    }
+    Credentials::Credentials(std::string id_str, std::string devname,
+     float z, float dir)
+    {
+        assign(id_str, devname, z, dir);
+    }  
 
     void Credentials::printme(){
-        ACES::Credentials::printme();
-        
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
+        RTT::Logger::log() << " Device Name= " << devName;
         RTT::Logger::log() << RTT::endlog();
     }
 
-    ACES::Credentials* Credentials::parseDispArgs(std::string args)
+    Credentials::Credentials(std::string args)
     {
         std::istringstream s1(args);
-        std::string id;
-        float zero, rot;
-        s1 >> id >> zero >> rot;
-        return (ACES::Credentials*)new Credentials(id, zero, rot);
+        float z, d;
+        std::string id, dname;
+        s1 >> id >> z >> d;
+        assign(id, dname, z, d);
     }
 
     Device::Device(std::string config, std::string args)
         : ACES::Device(config)
     {
-        ACES::Credentials *cred = Webots::Credentials::parseDispArgs(args);
+        ACES::Credentials *cred = new
+                Credentials(args + (std::string)" " + name);
         credentials = cred;
+    }
+    
+    bool Device::startHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        //TODO - Magic Number removal (Samples every 8 ms)
+        wb_servo_enable_position(tag, 8); 
+        return true;
+    }
+    
+    void Device::stopHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        wb_servo_disable_position(tag); 
+    }
+
+    void Device::interpretResult(ACES::ProtoResult* rx){
+        ACES::Result<ACES::Goal*>* r = (ACES::Result<ACES::Goal*>*)rx;
+        ACES::Goal* g = r->result;
+        Credentials* c = (Credentials*) g->cred;
+        //If our name matches the name on the packet, this one's for us,
+        //pass it along to the States - let them sort it out
+        if(c->devName == name){
+            announceData(g);
+        }
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 
       : ACES::Protocol(cfg, args){}
+
+    void Protocol::interpretRx(ACES::ProtoWord* rx){
+        //Since webots isn't doing any real interpretation, we grab the
+        //Goal off the word and simply put it into the new container
+        ACES::Word<ACES::Goal*>* w = (ACES::Word<ACES::Goal*>*)rx;
+        ACES::Goal* g = w->data;
+        ACES::Result<ACES::Goal*>* r = new ACES::Result<ACES::Goal*>(g);
+        
+        //Broadcast the reponse
+        announceResult((ACES::ProtoResult*)r);
+    }
 
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : ACES::ScriptCtrl(cfg, args)

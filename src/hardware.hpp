@@ -13,6 +13,7 @@
 #include "message.hpp"
 #include "protocol.hpp"
 #include "taskcfg.hpp"
+#include "word.hpp"
 
 namespace ACES {
     class Protocol;
@@ -32,6 +33,7 @@ namespace ACES {
 
             bool subscribeProtocol(Protocol* p);
             //RTT::Method<bool(void)> isBusyMethod;
+            RTT::Event<void(ProtoWord*)> announceRx;
     };
 
 /*

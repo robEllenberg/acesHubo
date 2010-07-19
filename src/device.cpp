@@ -4,11 +4,14 @@ namespace ACES{
 
     Device::Device(std::string config) :
       taskCfg(config),
+      RTT::TaskContext(name),
       TxRequest("TxRequest"),
-      RTT::TaskContext(name)
+      announceData("announceData")
     {
         this->events()->addEvent(&TxRequest, "TxRequest", "goal",
                                  "The Goal/SP Data");
+        this->events()->addEvent(&announceData, "announceData", "data",
+                                 "Interperted data going to states");
         this->setActivity(
             //TODO - allow user to set priority
             new RTT::Activity( 5, 0, 0, name )
@@ -34,18 +37,32 @@ namespace ACES{
         if( not h.connected() ){
             return false;
         }
+
+        h = this->events()->setupConnection("announceData")
+            .callback( s, &ProtoState::RxData
+                     ,  s->engine()->events()
+                     ).handle();
+        if( not h.ready() ){
+            return false;
+        }
+        h.connect();
+        if( not h.connected() ){
+            return false;
+        }
+
+        return true;
     }
 
     bool Device::configureHook(){
         return true;
     }
-
+/*
     bool Device::startHook(){
         return true;
     }
-
+*/
     void Device::updateHook(){}
-    void Device::stopHook(){}
+//    void Device::stopHook(){}
     void Device::cleanupHook(){}
 
 }
