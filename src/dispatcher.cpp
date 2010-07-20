@@ -56,7 +56,7 @@ namespace ACES{
 
         if( type == "Webots") {
             s = (ProtoState*) new ACES::State<float>(cfg, args);
-            ((State<float>*)s)->printme();
+            //((State<float>*)s)->printme();
         }
         if(s){
             stateList.push_back(s);
@@ -84,6 +84,9 @@ namespace ACES{
             }
             if (t2 == "Null"){
                 ctrl = (Controller*) new NullCtrl(cfg, args);
+            }
+            if (t2 == "Arm"){
+                ctrl = (Controller*) new Webots::ArmCtrl(cfg, args);
             }
         } 
         if(ctrl){

@@ -146,15 +146,17 @@ namespace Webots {
         std::istringstream s1(args);
         float z, d;
         std::string id, dname;
-        s1 >> id >> z >> d;
+        s1 >> id >> z >> d >> dname;
         assign(id, dname, z, d);
     }
 
     Device::Device(std::string config, std::string args)
         : ACES::Device(config)
     {
+        std::string rargs = args + (std::string)" " + name;
+        //RTT::Logger::log() << rargs << RTT::endlog();
         ACES::Credentials *cred = new
-                Credentials(args + (std::string)" " + name);
+                Credentials(rargs);
         credentials = cred;
     }
     
@@ -176,8 +178,11 @@ namespace Webots {
         ACES::Result<ACES::Goal*>* r = (ACES::Result<ACES::Goal*>*)rx;
         ACES::Goal* g = r->result;
         Credentials* c = (Credentials*) g->cred;
+        //RTT::Logger::log() << c->devName << ", " << name
+        //<< *((float*)g->data) << RTT::endlog();
         //If our name matches the name on the packet, this one's for us,
         //pass it along to the States - let them sort it out
+        //c->printme();
         if(c->devName == name){
             announceData(g);
         }
@@ -191,6 +196,7 @@ namespace Webots {
         //Goal off the word and simply put it into the new container
         ACES::Word<ACES::Goal*>* w = (ACES::Word<ACES::Goal*>*)rx;
         ACES::Goal* g = w->data;
+        //RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
         ACES::Result<ACES::Goal*>* r = new ACES::Result<ACES::Goal*>(g);
         
         //Broadcast the reponse
@@ -258,6 +264,50 @@ namespace Webots {
         (*sv)["RAR"] = new float(angles[12]);
         //(*sv)["RSP"] = new float(1.2);
  
+        return sv;
+    }
+
+    ArmCtrl::ArmCtrl(std::string cfg, std::string args)
+      : ACES::ScriptCtrl(cfg, args)
+    {}
+
+    std::map<std::string, void*>*
+      ArmCtrl::getStateVector(bool echo)
+    {
+        //The state vector is a lookup table by the name of the joint
+        std::map<std::string, void*> *sv =
+            new std::map<std::string, void*>;
+
+        std::vector<float> angles;      //Temp container
+        //Fill w/the script info if we have data left, 
+        //otherwise zero fill the vector
+        if(not walkScript.eof()){
+            //For the moment, 13 is magic, based on the #of joints and
+            //the length of the script-file format.
+            for(int i = 0; i<2; i++){  
+                //offset = it+i;
+                float value;
+                walkScript >> value;
+                angles.push_back(value);
+               if(echo){
+                    RTT::Logger::log() << value << ", ";
+               }
+            }
+        }else{
+           return sv;
+        }
+        if(echo){
+            RTT::Logger::log() << RTT::endlog();
+        }
+
+        //Eat the remainder of the line
+        char a[1000];
+        walkScript.getline(a, 1000);
+
+        //Populate the state vector
+        (*sv)["RSP"] = new float(angles[0]);
+        (*sv)["LSP"] = new float(angles[1]);
+
         return sv;
     }
 

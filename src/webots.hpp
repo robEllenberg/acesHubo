@@ -68,7 +68,7 @@ namespace Webots{
     class Protocol : public ACES::Protocol {
         public:
             Protocol(std::string cfg, std::string args);
-            void interpretRx(ACES::ProtoWord* rx) = 0;
+            void interpretRx(ACES::ProtoWord* rx);
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
             //ACES::Credentials* parseHWInput(
@@ -89,6 +89,13 @@ namespace Webots{
                     getStateVector(bool echo=0);
     };
 
+    class ArmCtrl : public ACES::ScriptCtrl
+    {
+        public:
+            ArmCtrl(std::string config, std::string args);
+            std::map<std::string, void*>* 
+                    getStateVector(bool echo=0);
+    };
 }    
 
 #endif

@@ -1,8 +1,12 @@
 #ifndef ACES_WORD_HPP
 #define ACES_WORD_HPP
 
+#include <rtt/Logger.hpp>
+
 namespace ACES{
     class ProtoWord {
+        public:
+            virtual void printme() = 0;
     };
     
     template <class T>
@@ -10,6 +14,7 @@ namespace ACES{
         public:
             Word(T d);
             T data;
+            void printme();
     };
 
     class ProtoResult{
@@ -32,6 +37,11 @@ namespace ACES{
     template <class T>
     Result<T>::Result(T r){
         result = r;
+    }
+    
+    template <class T>
+    void Word<T>::printme(){
+        RTT::Logger::log() << "Word: " << data << RTT::endlog();
     }
 }
 

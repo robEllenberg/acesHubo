@@ -22,8 +22,10 @@ int ORO_main(int a, char** b){
 
     d->addHardware("wbHW 1 100", "Webots", "");
     d->addProtocol("wbPcol 2 100", "Webots", "");
-    //d->addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
-    d->addController("wbctrl 10 15", "Webots Null", "");
+
+    d->addController("wbNull 10 15", "Webots Null", "");
+    d->addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
+    d->addController("wbArm 10 15", "Webots Arm", "sins.txt");
 
     d->addDevice("dHY", "Webots",  "HY  0.0 -1.0");
     d->addDevice("dLSP", "Webots", "LSP 0.0  1.0");
@@ -43,7 +45,6 @@ int ORO_main(int a, char** b){
     d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
     d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
 
-/*
     d->addState("HY 5 31",  "Webots", "Joint");
     d->addState("LSP 5 31", "Webots", "Joint");
     d->addState("LSR 5 31", "Webots", "Joint");
@@ -61,8 +62,7 @@ int ORO_main(int a, char** b){
     d->addState("RKP 5 31", "Webots", "Joint");
     d->addState("RAP 5 31", "Webots", "Joint");
     d->addState("RAR 5 31", "Webots", "Joint");
-*/
-/*
+
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
     d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
     d->linkPD("wbPcol", "dLSP"); d->linkDS("dLSP", "LSP");
@@ -82,10 +82,11 @@ int ORO_main(int a, char** b){
     d->linkPD("wbPcol", "dRAP"); d->linkDS("dRAP", "RAP");
     d->linkPD("wbPcol", "dRAR"); d->linkDS("dRAR", "RAR");
 
-    d->linkSC("HY", "wbctrl");
-    d->linkSC("LSP", "wbctrl");
-    d->linkSC("LSR", "wbctrl");
-    d->linkSC("RSP", "wbctrl");
+    d->linkSC("LSP", "wbArm");
+    d->linkSC("LSR", "wbArm");
+    d->linkSC("RSP", "wbArm");
+    d->linkSC("RSR", "wbArm");
+    d->linkSC("HY",  "wbctrl");
     d->linkSC("LHY", "wbctrl");
     d->linkSC("LHR", "wbctrl");
     d->linkSC("LHP", "wbctrl");
@@ -99,9 +100,10 @@ int ORO_main(int a, char** b){
     d->linkSC("RAP", "wbctrl");
     d->linkSC("RAR", "wbctrl");
 
-    d->linkHC("wbHW", "wbctrl");
+    //d->linkHC("wbHW", "wbctrl");
+    d->linkHC("wbHW", "wbNull");
     d->linkHP("wbHW", "wbPcol");
-*/
+
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
     Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();

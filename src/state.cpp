@@ -70,7 +70,8 @@ namespace ACES {
     }
 
     void ProtoState::RxData(Goal* g){
-        asgnfunct(g->data);
+        //RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
+        asgnfunct(g->data, this);
     }
 
 }

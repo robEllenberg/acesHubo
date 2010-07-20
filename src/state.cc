@@ -1,12 +1,14 @@
     template <class T>
     State<T>::State(std::string cfg, std::string args) :
       ProtoState(cfg, args),
-      goMethod("go", &State<T>::go, this)
+      goMethod("go", &State<T>::go, this),
+      value("value")
     {
-        value = 0;
+        //value = 0;
         bool one = this->methods()->addMethod(goMethod, "go",
                                    "SP",
                                    "Set Point");
+        this->attributes()->addAttribute(&value);
         asgnfunct = assign;
     }
     
@@ -15,7 +17,7 @@
         RTT::Logger::log() << "State: " << name
         << ", (F:" << freq << ", P:"
         << priority << "),"
-        << "(Val = " << value << ")" << std::endl;
+        << "(Val = " << value.get() << ")" << std::endl;
     }
 
     template <class T>
@@ -26,7 +28,9 @@
     }
 
     template <class T>
-    void State<T>::assign(void* meas){
-        value = *((T*)meas);
+    void State<T>::assign(void* meas, void* me){
+        State<T>* t = (State<T>*)me;
+        //t->value = *((T*)meas);
+        t->value.set(  *((T*)meas)  );
     }
 
