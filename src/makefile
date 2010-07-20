@@ -1,8 +1,8 @@
 CXX = g++
 CP = cp
 OCLFLAGS = -DOROCOS_TARGET=gnulinux
-INCLUDES = -I/home/bob/thesis/support/include -I/usr/local/webots/include/controller/c/
-LIBS = -L/home/bob/thesis/support/lib -L/usr/local/webots/lib/
+INCLUDES = -I../../support/include -I/usr/local/webots/include/controller/c/
+LIBS = -L../../support/lib -L/usr/local/webots/lib/
 CXXFLAGS = $(INCLUDES) $(LIBS)
 DEBUG = -g
 
