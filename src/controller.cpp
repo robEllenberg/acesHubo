@@ -59,8 +59,9 @@ namespace ACES{
                 //Fall through here is intentional
             case WB_CTRL_RUN:
                  //delete stateVect;
-                stateVect = getStateVector();
-                applyStateVector(stateVect);
+                std::map<std::string, void*>* sv;
+                sv = getStateVector();
+                applyStateVector(sv);
                 
                 //delete sv;       
                 if(simState == WB_CTRL_STEP){
@@ -101,8 +102,9 @@ namespace ACES{
 
     void NullCtrl::updateHook()
     {
-        stateVect = getStateVector();
-        applyStateVector(stateVect);
+        std::map<std::string, void*>* sv;
+        sv = getStateVector();
+        applyStateVector(sv);
     }
 
     std::map<std::string, void*>*

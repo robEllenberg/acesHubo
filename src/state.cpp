@@ -13,6 +13,9 @@ namespace ACES {
             propID = JOINT;
         }
 
+      //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
+      set_stack = new RTT::Buffer< Goal* >(50);
+
         this->setActivity(
                 new RTT::Activity( priority, 1.0/freq, 0, name)
         );
@@ -29,10 +32,15 @@ namespace ACES {
     
     void ProtoState::updateHook(){
         Goal* g = new Goal(this->propID, REFRESH);
-        announceGoal(g);
+        set_stack->Push(g);
+        //g->printme();
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;
-
+        while ( not set_stack->empty() ){
+            Goal* h;
+            set_stack->Pop(h);
+            announceGoal(h);
+        }
     }
     
     void ProtoState::stopHook(){
@@ -45,7 +53,7 @@ namespace ACES {
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &ProtoState::setGoal,
-                           this->engine()->events() ).handle();
+                           c->engine()->events() ).handle();
         if( not h.ready() ){
             return false;
         }
@@ -57,7 +65,8 @@ namespace ACES {
     }
 
     void ProtoState::setGoal(std::map<std::string, void*>* p){
-        std::map<std::string, void* >::iterator mypair;
+       //RTT::Logger::log() << "trigger" << RTT::endlog();
+       std::map<std::string, void* >::iterator mypair;
         mypair = p->find( name );
         if(mypair != p->end() ){
             void* val = (*mypair).second;
@@ -65,12 +74,18 @@ namespace ACES {
            
             //RTT::Logger::log() << this->name << " Announce: "
             //<< *((float*)val) << RTT::endlog();
-            announceGoal(g);
+            //announceGoal(g);
+            set_stack->Push(g);
         }
     }
 
     void ProtoState::RxData(Goal* g){
-        //RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
+        //if(name == "RSP"){
+        //    RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
+        //}
+            if(name == "RKP"){
+                g->printme();
+            }
         asgnfunct(g->data, this);
     }
 

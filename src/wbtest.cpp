@@ -27,6 +27,7 @@ int ORO_main(int a, char** b){
     d->addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
     d->addController("wbArm 10 15", "Webots Arm", "sins.txt");
 
+    //d->addDevice("dRSP", "Webots", "RSP 0.0  1.0");
     d->addDevice("dHY", "Webots",  "HY  0.0 -1.0");
     d->addDevice("dLSP", "Webots", "LSP 0.0  1.0");
     d->addDevice("dLSR", "Webots", "LSR 0.0  1.0");
@@ -45,6 +46,7 @@ int ORO_main(int a, char** b){
     d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
     d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
 
+   //d->addState("RSP 5 31", "Webots", "Joint");
     d->addState("HY 5 31",  "Webots", "Joint");
     d->addState("LSP 5 31", "Webots", "Joint");
     d->addState("LSR 5 31", "Webots", "Joint");
@@ -63,6 +65,8 @@ int ORO_main(int a, char** b){
     d->addState("RAP 5 31", "Webots", "Joint");
     d->addState("RAR 5 31", "Webots", "Joint");
 
+    //d->linkPD("wbPcol", "dRSP"); d->linkDS("dRSP", "RSP");
+    //d->linkSC("RSP", "wbArm");
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
     d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
     d->linkPD("wbPcol", "dLSP"); d->linkDS("dLSP", "LSP");
@@ -100,7 +104,6 @@ int ORO_main(int a, char** b){
     d->linkSC("RAP", "wbctrl");
     d->linkSC("RAR", "wbctrl");
 
-    //d->linkHC("wbHW", "wbctrl");
     d->linkHC("wbHW", "wbNull");
     d->linkHP("wbHW", "wbPcol");
 

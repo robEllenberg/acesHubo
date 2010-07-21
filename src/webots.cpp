@@ -9,6 +9,7 @@ namespace Webots {
         this->methods()->addMethod(stepMethod,
                                    "Advance the system time",
                                    "TStep", "Lenght of step to advance(ms)");
+        cache = new RTT::Buffer<ACES::ProtoWord*>(50);
     }
        
     bool Hardware::startHook(){
@@ -17,6 +18,11 @@ namespace Webots {
     }
     
     void Hardware::updateHook(){
+        while (not cache->empty() ){
+            ACES::ProtoWord* w;
+            cache->Pop(w);
+            announceRx(w);
+        }
     }
 
     void Hardware::step(int time){
@@ -57,7 +63,8 @@ namespace Webots {
                 g->data = (void*)result;
                 ACES::ProtoWord* w =
                     (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
-                announceRx(w);
+                cache->Push(w);
+                //announceRx(w);
              }
              break;
 
@@ -180,10 +187,10 @@ namespace Webots {
         Credentials* c = (Credentials*) g->cred;
         //RTT::Logger::log() << c->devName << ", " << name
         //<< *((float*)g->data) << RTT::endlog();
+
         //If our name matches the name on the packet, this one's for us,
         //pass it along to the States - let them sort it out
-        //c->printme();
-        if(c->devName == name){
+        if( (c->devName) == name){
             announceData(g);
         }
     }

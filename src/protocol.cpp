@@ -45,12 +45,14 @@ namespace ACES {
             //pop next message off pending  
 
             Message* m = prepareMessage();
+            m->printme
             issueMessage( m );
         }
     }
 
     void Protocol::addRequest(Goal* g){
         ACES::Message *m = new ACES::Message( g );
+        //g->printme();
 //        pending_stack->push_back(m);
         pending_stack->Push(m);
     }

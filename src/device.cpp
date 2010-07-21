@@ -21,11 +21,16 @@ namespace ACES{
 
     void Device::RxGoal(Goal* g){
         g->cred = credentials;
+        /*if(g->mode == SET){
+            g->printme();
+        }*/
         TxRequest(g);
     }
 
     bool Device::subscribeState(ProtoState* s){
         this->connectPeers( (RTT::TaskContext*) s);
+        //TODO - Figure out how calling this reception function
+        //in a non-periodic thread affects RT characteristic
         RTT::Handle h = s->events()->setupConnection("announceGoal")
             .callback( this, &Device::RxGoal
                      ,  this->engine()->events()
@@ -40,7 +45,7 @@ namespace ACES{
 
         h = this->events()->setupConnection("announceData")
             .callback( s, &ProtoState::RxData
-                     ,  s->engine()->events()
+                     ,  this->engine()->events()
                      ).handle();
         if( not h.ready() ){
             return false;

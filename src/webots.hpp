@@ -9,6 +9,7 @@
 #include <rtt/Activity.hpp>
 #include <rtt/Ports.hpp>
 #include <rtt/Event.hpp>
+#include <rtt/Buffer.hpp>
 
 #include "protocol.hpp"
 #include "state.hpp"
@@ -37,6 +38,7 @@ namespace Webots{
             void step(int time=32);
             void stepRequest( std::map<std::string, void*>* );
             bool subscribeController(ACES::Controller* c);
+            RTT::Buffer< ACES::ProtoWord* > *cache;
     };
    
     class Credentials : public ACES::Credentials {

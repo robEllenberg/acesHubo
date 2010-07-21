@@ -2,6 +2,7 @@
 #define ACES_PARAMETER_HPP
 
 #include <iostream>
+#include <string>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
@@ -10,6 +11,7 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Method.hpp>
 #include <rtt/Command.hpp>
+#include <rtt/Buffer.hpp>
 
 #include "credentials.hpp"
 #include "controller.hpp"
@@ -37,6 +39,7 @@ namespace ACES {
             void (*asgnfunct)(void*, void*);
 
             RTT::Event<void(Goal*)> announceGoal;
+            RTT::Buffer< Goal* > *set_stack;
             bool subscribeController(Controller* c);
             void setGoal(std::map<std::string, void*>*);
             void RxData(Goal* d);
