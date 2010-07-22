@@ -49,9 +49,8 @@ namespace ACES {
         }
         if( not requestBuf->empty() ){
             //pop next message off pending  
-
+            //m->printme();
             Message* m = prepareMessage();
-            m->printme();
             issueMessage( m );
         }
         if (returnBuf->size() > 200){
@@ -59,6 +58,7 @@ namespace ACES {
             << returnBuf->size() << RTT::endlog();
         }
         if(not returnBuf->empty() ){
+            
             ProtoResult* r;
             returnBuf->Pop(r);
             announceResult(r);
@@ -102,7 +102,7 @@ namespace ACES {
 
         h = this->events()->setupConnection("announceResult")
             .callback( d, &Device::interpretResult,
-                        d->engine()->events()
+                        this->engine()->events()
                      ).handle();
         if( not h.ready()){
             return false;

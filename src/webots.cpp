@@ -9,7 +9,7 @@ namespace Webots {
         this->methods()->addMethod(stepMethod,
                                    "Advance the system time",
                                    "TStep", "Lenght of step to advance(ms)");
-        cache = new RTT::Buffer<ACES::ProtoWord*>(50);
+        cache = new RTT::Buffer<ACES::ProtoWord*>(250);
     }
        
     bool Hardware::startHook(){
@@ -24,6 +24,9 @@ namespace Webots {
         if (not cache->empty() ){
             ACES::ProtoWord* w;
             cache->Pop(w);
+            //ACES::Word<ACES::Goal*>* g = (ACES::Word<ACES::Goal*>*)w;
+            //ACES::Goal* d = g->data;
+            //d->printme();
             announceRx(w);
         }
     }
@@ -144,11 +147,20 @@ namespace Webots {
     }  
 
     void Credentials::printme(){
+        /*
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
         RTT::Logger::log() << " Device Name= " << devName;
         RTT::Logger::log() << RTT::endlog();
+        */
+        if( wb_device_id == "RKP" ){
+            RTT::Logger::log() << "Webots: ID= " << wb_device_id;
+            RTT::Logger::log() << " Zero= " << zero;
+            RTT::Logger::log() << " Direction= " << direction;
+            RTT::Logger::log() << " Device Name= " << devName;
+            RTT::Logger::log() << RTT::endlog();
+        }
     }
 
     Credentials::Credentials(std::string args)
@@ -195,6 +207,10 @@ namespace Webots {
         //pass it along to the States - let them sort it out
         if( (c->devName) == name){
             //announceData(g);
+
+            //if(name == "dRKP"){
+            //    RTT::Logger::log() << "Got One" << RTT::endlog();
+            //}
             returnBuf->Push(g);
         }
     }

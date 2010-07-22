@@ -53,8 +53,8 @@ namespace ACES {
         this->connectPeers( (RTT::TaskContext*) p);
         RTT::Handle h = p->events()->setupConnection("issueMessage")
             .callback( this, &Hardware::transmit
-           //            hw->engine()->events() ).handle();
-            ).handle();
+                       ,p->engine()->events() ).handle();
+            //).handle();
         if(not h.ready() ){
             return false;
         }
@@ -65,7 +65,7 @@ namespace ACES {
 
         h = this->events()->setupConnection("announceRx")
             .callback( p, &Protocol::interpretRx,
-                       p->engine()->events() ).handle();
+                       this->engine()->events() ).handle();
 
         if(not h.ready() ){
             return false;

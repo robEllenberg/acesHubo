@@ -27,13 +27,15 @@ namespace ACES {
 */
 
     void Message::printme(){
+        /*
         RTT::Logger::log() << "Message:"
                            << RTT::Logger::endl;
+        */
         std::list<Goal*>::iterator it;
         for(it = goalList.begin();
             it != goalList.end();
             it++){
-                RTT::Logger::log() << "\t";
+                //RTT::Logger::log() << "\t";
                 (*it)->printme();
         }
     }
