@@ -3,6 +3,7 @@
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
+#include <rtt/Buffer.hpp>
 
 #include "goal.hpp"
 #include "taskcfg.hpp"
@@ -28,6 +29,8 @@ namespace ACES{
             RTT::Event<void(Goal*)> TxRequest;
             RTT::Event<void(Goal*)> announceData;
             Credentials* credentials;
+            RTT::Buffer<Goal*> *requestBuf;
+            RTT::Buffer<Goal*> *returnBuf;
     };
 }
 

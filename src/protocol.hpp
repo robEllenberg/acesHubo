@@ -45,8 +45,9 @@ namespace ACES {
              protocol waiting to be
              submitted to the hardware for transmission.
              */
-            //std::deque<Message*>* pending_stack;
-            RTT::Buffer<Message*>* pending_stack;
+            //std::deque<Message*>* requestBuf;
+            RTT::Buffer<Message*>* requestBuf;
+            RTT::Buffer<ProtoResult*>* returnBuf;
             //! The requests made to protocol by parameters
             //RTT::ReadBufferPort<Credentials*>* request_stack;
 

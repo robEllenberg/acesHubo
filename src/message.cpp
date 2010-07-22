@@ -26,19 +26,17 @@ namespace ACES {
     }
 */
 
-/*
     void Message::printme(){
         RTT::Logger::log() << "Message:"
                            << RTT::Logger::endl;
-        std::list<void*>::iterator it;
-        for(it = credList.begin();
-            it != credList.end();
+        std::list<Goal*>::iterator it;
+        for(it = goalList.begin();
+            it != goalList.end();
             it++){
                 RTT::Logger::log() << "\t";
                 (*it)->printme();
         }
     }
-*/
 
 /*
     charDevMessage::charDevMessage(){

@@ -18,7 +18,10 @@ namespace Webots {
     }
     
     void Hardware::updateHook(){
-        while (not cache->empty() ){
+        if(cache->size() > 200){
+            RTT::Logger::log() << "Cache Size " << cache->size() << RTT::endlog();
+        }
+        if (not cache->empty() ){
             ACES::ProtoWord* w;
             cache->Pop(w);
             announceRx(w);
@@ -191,7 +194,8 @@ namespace Webots {
         //If our name matches the name on the packet, this one's for us,
         //pass it along to the States - let them sort it out
         if( (c->devName) == name){
-            announceData(g);
+            //announceData(g);
+            returnBuf->Push(g);
         }
     }
 
@@ -207,7 +211,7 @@ namespace Webots {
         ACES::Result<ACES::Goal*>* r = new ACES::Result<ACES::Goal*>(g);
         
         //Broadcast the reponse
-        announceResult((ACES::ProtoResult*)r);
+        returnBuf->Push((ACES::ProtoResult*)r);
     }
 
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)

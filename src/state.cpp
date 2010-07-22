@@ -83,9 +83,9 @@ namespace ACES {
         //if(name == "RSP"){
         //    RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
         //}
-            if(name == "RKP"){
-                g->printme();
-            }
+            //if(name == "RKP"){
+            //    g->printme();
+            //}
         asgnfunct(g->data, this);
     }
 

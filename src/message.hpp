@@ -14,7 +14,7 @@ namespace ACES{
             Message();
             Message(Goal* g);
             //~Message();
-            //void printme();
+            void printme();
             std::list<Goal*> goalList;
     };
 /*

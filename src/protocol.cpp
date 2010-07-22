@@ -7,11 +7,13 @@ namespace ACES {
       issueMessage("issueMessage"),
       announceResult("announceResult")
     {
-//        pending_stack = new std::deque<Message*>;
+//        requestBuf = new std::deque<Message*>;
 
         //TODO - Figure out why this flips out when we attempt to declare
         // it as a member instead of a pointer 
-        pending_stack = new RTT::Buffer<Message*>(1000);
+        requestBuf = new RTT::Buffer<Message*>(250);
+        returnBuf = new RTT::Buffer<ProtoResult*>(250);
+        
         this->events()->addEvent(&issueMessage, "issueMessage", "msg",
                                  "The message to be transmitted");
         this->events()->addEvent(&announceResult, "announceResult", "result",
@@ -38,23 +40,36 @@ namespace ACES {
         //delete c;
 
         //while(   (not this->hardware->isBusyMethod())
-        //      && this->pending_stack->size()
+        //      && this->requestBuf->size()
         //      && this->theresStillTime() ){
-        //while( pending_stack.size() > 0){
-        while( not pending_stack->empty() ){
+        //while( requestBuf.size() > 0){
+        if( requestBuf->size() > 200){
+            RTT::Logger::log() << "PCol, RequestBuff size "
+            << requestBuf->size() << RTT::endlog();
+        }
+        if( not requestBuf->empty() ){
             //pop next message off pending  
 
             Message* m = prepareMessage();
-            m->printme
+            m->printme();
             issueMessage( m );
+        }
+        if (returnBuf->size() > 200){
+            RTT::Logger::log() << "PCol, ReturnBuff size "
+            << returnBuf->size() << RTT::endlog();
+        }
+        if(not returnBuf->empty() ){
+            ProtoResult* r;
+            returnBuf->Pop(r);
+            announceResult(r);
         }
     }
 
     void Protocol::addRequest(Goal* g){
         ACES::Message *m = new ACES::Message( g );
         //g->printme();
-//        pending_stack->push_back(m);
-        pending_stack->Push(m);
+//        requestBuf->push_back(m);
+        requestBuf->Push(m);
     }
 
     void Protocol::stopHook(){
@@ -64,10 +79,10 @@ namespace ACES {
     }
 
     Message* Protocol::prepareMessage(){
-        //Message* m = pending_stack->front();
-        //pending_stack->pop_front();
+        //Message* m = requestBuf->front();
+        //requestBuf->pop_front();
         Message* m;
-        pending_stack->Pop(m);
+        requestBuf->Pop(m);
         return m;
     }
     

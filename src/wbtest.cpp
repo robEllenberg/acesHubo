@@ -20,33 +20,33 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Creation" << RTT::endlog();
 
-    d->addHardware("wbHW 1 100", "Webots", "");
-    d->addProtocol("wbPcol 2 100", "Webots", "");
+    d->addHardware("wbHW 1 600", "Webots", "");
+    d->addProtocol("wbPcol 2 600", "Webots", "");
 
     d->addController("wbNull 10 15", "Webots Null", "");
     d->addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
     d->addController("wbArm 10 15", "Webots Arm", "sins.txt");
 
-    //d->addDevice("dRSP", "Webots", "RSP 0.0  1.0");
-    d->addDevice("dHY", "Webots",  "HY  0.0 -1.0");
-    d->addDevice("dLSP", "Webots", "LSP 0.0  1.0");
-    d->addDevice("dLSR", "Webots", "LSR 0.0  1.0");
-    d->addDevice("dRSP", "Webots", "RSP 0.0  1.0");
-    d->addDevice("dRSR", "Webots", "RSR 0.0  1.0");
-    d->addDevice("dLHY", "Webots", "LHY 0.0  1.0");
-    d->addDevice("dLHR", "Webots", "LHR 0.0  1.0");
-    d->addDevice("dLHP", "Webots", "LHP 0.0 -1.0");
-    d->addDevice("dLKP", "Webots", "LKP 0.0  1.0");
-    d->addDevice("dLAP", "Webots", "LAP 0.0 -1.0");
-    d->addDevice("dLAR", "Webots", "LAR 0.0  1.0");
-    d->addDevice("dRHY", "Webots", "RHY 0.0  1.0");
-    d->addDevice("dRHR", "Webots", "RHR 0.0 -1.0");
-    d->addDevice("dRHP", "Webots", "RHP 0.0 -1.0");
-    d->addDevice("dRKP", "Webots", "RKP 0.0  1.0");
-    d->addDevice("dRAP", "Webots", "RAP 0.0 -1.0");
-    d->addDevice("dRAR", "Webots", "RAR 0.0  1.0");
+    //d->addDevice("dRSP 5 31", "Webots", "RSP 0.0  1.0");
+    d->addDevice("dHY 5 31", "Webots",  "HY  0.0 -1.0");
+    d->addDevice("dLSP 5 31", "Webots", "LSP 0.0  1.0");
+    d->addDevice("dLSR 5 31", "Webots", "LSR 0.0  1.0");
+    d->addDevice("dRSP 5 31", "Webots", "RSP 0.0  1.0");
+    d->addDevice("dRSR 5 31", "Webots", "RSR 0.0  1.0");
+    d->addDevice("dLHY 5 31", "Webots", "LHY 0.0  1.0");
+    d->addDevice("dLHR 5 31", "Webots", "LHR 0.0  1.0");
+    d->addDevice("dLHP 5 31", "Webots", "LHP 0.0 -1.0");
+    d->addDevice("dLKP 5 31", "Webots", "LKP 0.0  1.0");
+    d->addDevice("dLAP 5 31", "Webots", "LAP 0.0 -1.0");
+    d->addDevice("dLAR 5 31", "Webots", "LAR 0.0  1.0");
+    d->addDevice("dRHY 5 31", "Webots", "RHY 0.0  1.0");
+    d->addDevice("dRHR 5 31", "Webots", "RHR 0.0 -1.0");
+    d->addDevice("dRHP 5 31", "Webots", "RHP 0.0 -1.0");
+    d->addDevice("dRKP 5 31", "Webots", "RKP 0.0  1.0");
+    d->addDevice("dRAP 5 31", "Webots", "RAP 0.0 -1.0");
+    d->addDevice("dRAR 5 31", "Webots", "RAR 0.0  1.0");
 
-   //d->addState("RSP 5 31", "Webots", "Joint");
+    //d->addState("RSP 5 31", "Webots", "Joint");
     d->addState("HY 5 31",  "Webots", "Joint");
     d->addState("LSP 5 31", "Webots", "Joint");
     d->addState("LSR 5 31", "Webots", "Joint");
@@ -68,7 +68,7 @@ int ORO_main(int a, char** b){
     //d->linkPD("wbPcol", "dRSP"); d->linkDS("dRSP", "RSP");
     //d->linkSC("RSP", "wbArm");
     RTT::Logger::log() << "Begin Link" << RTT::endlog();
-    d->linkPD("wbPcol", "dHY"); d->linkDS("dHY",  "HY");
+    d->linkDS("dHY",  "HY"); d->linkPD("wbPcol", "dHY");
     d->linkPD("wbPcol", "dLSP"); d->linkDS("dLSP", "LSP");
     d->linkPD("wbPcol", "dLSR"); d->linkDS("dLSR", "LSR");
     d->linkPD("wbPcol", "dRSP"); d->linkDS("dRSP", "RSP");
