@@ -2,6 +2,7 @@
 #include <string>
 
 #include <ocl/TaskBrowser.hpp>
+#include <ocl/FileReporting.hpp>
 #include <rtt/os/main.h>
 #include <rtt/Logger.hpp>
 
@@ -107,7 +108,24 @@ int ORO_main(int a, char** b){
     d->linkHC("wbHW", "wbNull");
     d->linkHP("wbHW", "wbPcol");
 
+    d->addLogger("flog 10 5", "File", "tfile.txt");
+    d->linkLS("flog", "RSP");
+
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
+
+    OCL::FileReporting r("Reporter");
+    r.addPeer(d);
+
+    //RTT::TaskContext tc("progRun");
+    //tc.setActivity(new RTT::Activity(5, 0.01, 0, "progRun") );
+    //tc.scripting()->loadPrograms("testprog.ops");
+    //tc.connectPeers(d);
+    //d->start();
+    //d->engine()->programs()->getProgram("TestProgram")->start();
+
+    d->scripting()->loadPrograms("testprog.ops");
+    d->start();
+    //d->engine()->programs()->getProgram("TestProgram")->start();
     Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();
     return 0;

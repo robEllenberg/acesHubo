@@ -1,0 +1,4 @@
+program TestProgram {
+    do flog.start();
+    do wbArm.run();
+}

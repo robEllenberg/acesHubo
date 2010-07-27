@@ -7,4 +7,8 @@ namespace ACES{
         s1 >> priority;
         s1 >> freq;
     }
+
+    std::string taskCfg::Name(){
+        return name;
+    }
 }

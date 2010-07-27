@@ -7,11 +7,13 @@
 namespace ACES{
 
     class taskCfg {
-        public:
-            taskCfg(std::string cfg);
+        protected:
             std::string name; 
             double freq;
             int priority;
+        public:
+            taskCfg(std::string cfg);
+            std::string Name();
     };
 }
 #endif

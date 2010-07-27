@@ -76,8 +76,9 @@ namespace ACES{
         simState = WB_CTRL_STEP;
     }
 
-    void ScriptCtrl::run(){
+    bool ScriptCtrl::run(){
         simState = WB_CTRL_RUN;
+        return true;
     }
 
     void ScriptCtrl::halt(){

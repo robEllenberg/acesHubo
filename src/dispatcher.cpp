@@ -10,8 +10,6 @@ namespace ACES{
     bool Dispatcher::addHardware(std::string cfg, std::string type,
                                  std::string args)
     {
-        taskCfg c(cfg);
-        
         Hardware* h;
 
             if (type == "Webots") {
@@ -96,6 +94,35 @@ namespace ACES{
         }
         return false;
     }
+    
+    bool Dispatcher::addLogger(std::string cfg, std::string type,
+                               std::string args)
+    {
+        OCL::ReportingComponent* log;
+        if (type == "File"){
+            log = (OCL::*ReportingComponent*) new OCL::FileReporting(args);
+        }
+        if(log){
+            logList.push_back(log);
+            this->connectPeers(log);
+            return true;
+        }
+        return false;
+        /*
+        Logger* log;
+        if( type == "File"){
+            log = (Logger*) new FileLog(cfg, args);
+        }
+
+        if(log){
+            logList.push_back(log);
+            log->subscribeDispatcher(this);
+            this->connectPeers(log);
+            return true;
+        }
+        return false;
+        */
+    }
 
     bool Dispatcher::linkPD(std::string pcol, std::string device){
         RTT::TaskContext* p = this->getPeer(pcol);
@@ -153,6 +180,14 @@ namespace ACES{
         }
         else{
             return false;
+        }
+    }
+
+    bool Dispatcher::linkLS(std::string logger, std::string state){
+        Logger* l = (Logger*)this->getPeer(logger);
+        ProtoState* s  = (ProtoState*)this->getPeer(state);
+        if(l and s){
+            return l->addTrack(state);
         }
     }
 

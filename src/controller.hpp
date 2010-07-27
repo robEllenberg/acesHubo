@@ -41,7 +41,7 @@ namespace ACES{
             void updateHook();
 
             void step();
-            void run();
+            bool run();
             void halt();
             bool openScript(std::string scriptPath);
 
@@ -50,7 +50,7 @@ namespace ACES{
             int simState;
 
             RTT::Method<void(void)> stepMethod;
-            RTT::Method<void(void)> runMethod;
+            RTT::Method<bool(void)> runMethod;
             RTT::Method<void(void)> haltMethod;
             RTT::Method<bool(std::string)> openScriptMethod;
     };

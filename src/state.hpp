@@ -21,8 +21,9 @@
 namespace ACES {
     //Webots Component Types
     enum COMP_TYPE { JOINT=1 };
+    //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
 
-    class ProtoState : protected taskCfg,
+    class ProtoState : public taskCfg,
                        public RTT::TaskContext
     {
         public:
@@ -35,6 +36,7 @@ namespace ACES {
             void cleanupHook();
 
             int propID;
+            //DATA_TYPE dtype;
 
             void (*asgnfunct)(void*, void*);
 

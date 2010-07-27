@@ -11,7 +11,13 @@
         this->attributes()->addAttribute(&value);
         asgnfunct = assign;
     }
-    
+
+/*
+    template <class T>
+    State<int>::State(std::string cfg, std::string args){
+        dtype = INT;
+    }
+*/    
     template <class T>
     void State<T>::printme(){
         RTT::Logger::log() << "State: " << name
