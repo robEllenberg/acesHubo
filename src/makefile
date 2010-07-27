@@ -25,7 +25,7 @@ robotisFlex.o: robotis.l
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) -c -lfl robotis.yy.c -o robotisFlex.o
 
 clean:
-	@-rm test atlasleg controller miniHubo hubo
+	@-rm test atlasleg controller minihubo hubo
 	@-rm ../webots/controllers/minihubo/minihubo
 	@-rm ../webots/controllers/hubo/hubo
 	@-rm *.o

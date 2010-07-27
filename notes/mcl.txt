@@ -1,0 +1,79 @@
+Motion Control Language (MCL)
+
+
+Features
+*Borrow heavily from VHDL
+    (cross compile to VHDL?)
+*Integrate units?
+*Built in integrals, deriviatives, transforms
+*Transforms (fourier, laplace)
+
+----------------Procedural------------------------
+C-Like, Python?
+Primarilly needed for hardware interface
+
+----------------Signal Flow-----------------------
+signal y(t) = sin(t);               //Establishes y as a function of t
+signal x(t) = cos(t);
+signal z(t) = tan(t);
+
+y(3);                               //sin(3.0) 
+bundle hip = (x, y, z);
+
+----------------Time------------------------------
+
+Time Instants VS Time Sequences
+
+t_e                     //Absolute system time (since the epoch)
+t_0                     //Time representing start of program 
+
+t                       //time since t_0
+
+t_(name) = t+2          // Sequence - create a time w/offset 2s from  t
+t_(number) = t + 2      // Instant - float which is current t+2s
+
+----------------Phase Space----------------------------
+Multiple representations of equivalent data simultaneously
+Cartesian end points
+Joint space
+time domain
+frequency domain
+
+
+----------------Controller Level-----------------------
+
+
+
+
+----------------Combinations--------------------------
+
+signal y(t) = sin(t);
+t2 = t + 2;
+signal x(t2) = cos(t2);                 
+signal z(t,t2) = sin(t)/cos(t2);        
+
+bundle RWrist = (x, y, z);              //
+RWrist(1);                              //( cos(1+2), sin(1),  sin(1)/cos(1+2) )
+
+
+----------------Balancing Bot--------------------------
+
+Mx = source()       //rate gyro
+My = source()       //rate gyro
+Mz = source()       //rate gyro
+
+Ax = source()       //Linear Accell
+Ay = source()       //Linear Accell
+Az = source()       //Linear Accell
+
+component PID
+    in x, out y
+    unit P ( in x1, out y1)
+    unit I ( in x2, out y2)
+    unit D ( in x3, out y3)
+
+    x1 <- x; x2 <- x; x3 <- x;
+    y <- Kp*y1 + Ki*y2 + Kd*y3;
+end component    
+
+signal ctrl 

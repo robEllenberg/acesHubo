@@ -1,0 +1,741 @@
+<?xml version='1.0'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+[
+<!ENTITY orocos      "<acronym>Orocos</acronym>">
+]
+>
+
+<article>
+  <articleinfo>
+    <title>The Deployment Component</title>
+    <copyright>
+      <year>2006,2007,2008,2009</year>
+      <holder>Peter Soetens, FMTC</holder>
+    </copyright>
+
+    <legalnotice>
+      <para>
+	Permission is granted to copy, distribute and/or modify this document
+	under the terms of the GNU Free Documentation License, Version 1.1 or
+	any later version published by the Free Software Foundation, with no
+	Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+	Texts. A copy of this license can be found at
+	<ulink
+	  url="http://www.fsf.org/copyleft/fdl.html">http://www.fsf.org/copyleft/fdl.html</ulink>.
+      </para>
+    </legalnotice>
+
+  </articleinfo>
+  
+  <section>
+    <title>Introduction</title>
+    <para>
+      This document describes the Orocos
+      <classname>OCL::DeploymentComponent</classname> for loading and
+      configuring other components using an Orocos script or XML
+      file. This component can only load components into the same
+      process.
+    </para>
+    <section>
+      <title>Principle</title>
+      <para>
+	Each Orocos component can be compiled as a shared, dynamic loadable
+	library. Each such library can define a special
+	function which will allow the DeploymentComponent to create new
+	instances of a component type. This principle is analogous
+	to the plugin mechanism found in web browsers or other desktop
+	applications.
+      </para>
+      <para>
+	A common usage scenario of the DeploymentComponent goes as
+	follows. An initial Orocos application is created which contains
+	only the DeploymentComponent and the
+	<classname>OCL::TaskBrowser</classname>. When the application is
+	started, the TaskBrowser prompts for commands which can be given
+	to the DeploymentComponent.
+      </para>
+      <figure id="fig-deployment-overview"><title>Component Deployment Overview</title>
+      <mediaobject>
+	<imageobject role="html">
+	  <imagedata fileref="images/Deployment.png" />
+	</imageobject>
+	<imageobject role="fo">
+	  <imagedata width="8cm" fileref="images/hires/Deployment.png" />
+	</imageobject>
+	<caption><para>Components are located on your disk using the 'import' statement,
+	loaded using 'loadComponents' and configured using 'configureComponents'.
+	These three steps can be described in an XML file format or using the command
+	prompt.
+	</para></caption>
+      </mediaobject>
+      </figure>
+      <para> 
+	<xref linkend="fig-deployment-overview" /> shows the basic
+	steps.  An XML file contains instructions for the
+	DeploymentComponent where to look for components ('import
+	statements'), which component types to create, which name they
+	must be given and how their internal thread is configured
+	(priorities, periods,...). Furthermore this file describes the
+	network interconnections between all components and how data
+	must be relayed from one component to another. The
+	<function>loadComponents("file.xml")</function> method reads
+	this file, looks up the components, creates them and stores
+	the configuration parameters. One can apply the configuration
+	(threads, properties, data connections,...) by calling
+	<function>configureComponents()</function>. After this step,
+	the components (and the application as a whole) can be started
+	with <function>startComponents()</function>. In order to do
+	these steps at once, you can just write
+	<function>kickStart("file.xml")</function>.
+      </para>
+      <para>
+	The configuration does not need to be stored in XML format.
+	One can apply the same configuration by using the scripting
+	methods of the DeploymentComponent at the console prompt,
+	or by listing them in an Orocos script.
+      </para>
+    </section>
+    <section>
+      <title>The Orocos Deployer Application</title>
+      <para>
+	The Orocos Component Library provides a number of ready to use
+	applications for loading and starting components using the
+	DeployementComponent.
+      </para>
+      <para>
+	The main application is the
+	<command>deployer-&lt;target&gt;</command> program, where
+	<emphasis>&lt;target&gt;</emphasis> is replaced by the
+	Operating System target (OROCOS_TARGET) for which you want to
+	load components, for example
+	<command>deployer-gnulinux</command>.  The program can take an
+	optional argument <option>--start filename.xml</option> which
+	describes the components to load and is used to kick-start the
+	application. The XML specification is described below. When the
+	application is started, the TaskBrowser is presented to the
+	user for receiving interactive commands. The name of the DeploymentComponent
+	is by default 'Deployer'. In order to change this name, use for example
+	<command>deployer-gnulinux NewDeployerName</command>. See
+	also <command>deployer-&lt;target&gt; --help</command> for an overview
+	of the options.
+      </para>
+      <para>
+	There are three related programs to the deployer application.
+	<itemizedlist>
+	  <listitem><para><command>cdeployer-&lt;target&gt;</command>:
+	  like above but starts the CORBA enabled non-interactive
+	  deployer application. You are not presented with a
+	  TaskBrowser prompt, but the cdeployer tries to connect to a
+	  CORBA Naming Service, and if that fails, prints the IOR to a
+	  file and to the screen.</para></listitem>
+	  <listitem><para><command>ctaskbrowser-&lt;target&gt;
+	  ComponentName|IOR</command>: Connects to a remote component
+	  (like the cdeployer above) using the CORBA
+	  <emphasis>IOR</emphasis> address or using the CORBA Naming
+	  Service using
+	  <emphasis>ComponentName</emphasis>.</para></listitem>
+	  <listitem><para><command>deployer-corba-&lt;target&gt;</command>:
+	  Combines the cdeployer and deployer applications. It presents
+	  the TaskBrowser console and sets up a CORBA server. It can thus be
+	  commanded locally and accessed over a network. If you quit
+	  the TaskBrowser prompt, the application exits.</para></listitem>
+	</itemizedlist>
+      </para>
+      <para>
+	The complete list of options for the deployer, cdeployer and 
+	deployer-corba programs are:
+	<itemizedlist>
+	  <listitem><para><command>--help</command>Show program usage</para>
+	  </listitem>
+	  <listitem><para><command>--start xml-file</command> (also -s) Deploy the
+	  <emphasis>xml-file</emphasis>.</para></listitem>
+	  <listitem><para><command>--log-level level</command> (also -l) Sets the 
+		  Orocos log level to <emphasis>level</emphasis>. The level parameter 
+		  should be one of: Never, Fatal, Critical, Error, Warning, Info, 
+		  Debug, or Realtime. The parameter is case-insensitive. Warning: this 
+		  <emphasis>overrides</emphasis> the ORO_LOGLEVEL environment 
+		  variable.</para></listitem>
+	  <listitem><para><command>--no-consolelog</command> Turn off logging to
+		  the console (will still log to 'orocos.log')</para></listitem>
+	  <listitem><para><command>--DeployerName deployer-name</command> Name of 
+		  deployer component (the --DeployerName flag is optional)</para></listitem>
+	</itemizedlist>
+      </para>
+	  <para>Additionally, any CORBA options can be passed through these programs
+	  by adding a "--" command line option, followed by the CORBA-specific
+	  options.
+	  </para>
+	  <para>
+	  Some examples are
+	  <programlisting>
+  deployer-corba --log-level warning -s myfile.xml
+	  </programlisting>
+	  Sets the Orocos log level to <function>warning</function> and deploys
+	  file <function>myfile.xml</function>
+
+	  <programlisting>
+  deployer-corba -l fatal --no-consolelog -s leftfile.xml LeftDeployer
+	  </programlisting>
+	  Sets the Orocos log level to <function>fatal</function>, turns off all
+	  logging to console, names the deployer <function>LeftDeployer</function>
+	  and deploys file <function>leftfile.xml</function>
+
+	  <programlisting>
+  deployer-corba -l fatal --no-consolelog -s leftfile.xml LeftDeployer -- -ORBInitRef NameService=corbaloc:iiop:me.mine.home:2809/NameService -ORBFooBar 1
+	  </programlisting>
+	  As with the previous example, and also passes some options through to the
+	  CORBA layer.
+	  </para>
+    </section>
+  </section>
+  <section>
+      <title>Configuration Procedure</title>
+      <figure id="fig-deployment-flow"><title>Deployment Procedure</title>
+      <mediaobject>
+	<imageobject role="html">
+	  <imagedata fileref="images/DeploymentFlow.png" />
+	</imageobject>
+	<imageobject role="fo">
+	  <imagedata width="12cm" fileref="images/hires/DeploymentFlow.png" />
+	</imageobject>
+	<caption><para>The Deployment component API consists of import, 
+	loadComponents, configureComponents and startComponents.
+	</para></caption>
+      </mediaobject>
+      </figure>
+      <para>
+	The configuration format defines the instructions one can use
+	to load and configure Orocos components. One can divide the
+	instructions in three groups:
+	<itemizedlist>
+	  <listitem><para>Where to look for component libraries</para></listitem>
+	  <listitem><para>Which components to create and with which name</para></listitem>
+	  <listitem><para>How each component is setup</para></listitem>
+	</itemizedlist>
+      </para>
+      <para>
+	Let's demonstrate this principle with a simple application
+	example as shown in <xref linkend="fig-deployment-example"
+	/>. We want to setup an application with three components: a
+	Reporting component, a 'Controller' and a 'Plant'. The Plant
+	component provides access to the hardware, the Controller
+	component contains the control algorithm. The Reporting
+	component is here to sense the values exchanged and write
+	them to a file.
+      </para>
+      <figure id="fig-deployment-example"><title>Deployment Example Application</title>
+      <mediaobject>
+	<imageobject role="html">
+	  <imagedata fileref="images/deployment-example.png" />
+	</imageobject>
+	<imageobject role="fo">
+	  <imagedata fileref="images/hires/deployment-example.png" width="100%" scalefit="1" />
+	</imageobject>
+	<caption><para>A Reporter component monitors communication
+	between Plant and Controller. The Deployment component itself
+	is not shown.
+	</para></caption>
+      </mediaobject>
+      </figure>
+      <section>
+	<title>Where to look for component libraries</title>
+	<para>
+	  The <function>import</function> statement causes all
+	  component libraries in a given directory to be pre-loaded.
+	  It does not cause any component to be created, but
+	  allows the <classname>OCL::DeploymentComponent</classname> to know where the 
+	  component libraries are located. This function works recursively
+	  and may be called for multiple paths.
+	</para>
+	<para>
+	  In XML, the import statement looks like:
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <!-- ....  -->
+
+  <simple name="Import" type="string"><value>/usr/local/lib</value></simple>
+
+</properties>]]></programlisting>
+	</para>
+	<para>
+	  The script method equivalent is:
+	  <programlisting>  import("/usr/local/lib")</programlisting>
+	</para>
+	<para>
+	  Each library found under the given location is pre-loaded. The
+	  import statement allows you to load non-Orocos libraries as
+	  well. If a library contains one or more Orocos components, 
+	  the contained component types become available in the next step.
+	</para>
+	<para>
+	  To see the effects of the import function, the available
+	  types can be queried by invoking the
+	  <function>displayComponentTypes</function> (script) method:
+	  <screen>
+ (type 'ls' for context info) :displayComponentTypes()
+      Got :displayComponentTypes()
+ = I can create the following component types:
+   OCL::ConsoleReporting
+   OCL::FileReporting
+(void)</screen>
+	</para>
+	<para>
+	  In order to manage your XML files, one XML file can include
+	  another with the 'Include' directive. The include directive
+	  may occur at any place in the XML file (but under
+	  &lt;properties&gt;) and will be processed as-if the included
+	  file is inserted at that point.
+	</para>
+	<warning>
+	  <para>
+	    This option is new and experimental and may change in
+	    meaning and/or name in the future.
+	  </para>
+	</warning>
+	<para>
+	  In XML, the include statement looks like:
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <!-- ....  -->
+
+  <simple name="Include" type="string"><value>default-imports.xml</value></simple>
+  <simple name="Include" type="string"><value>default-components.xml</value></simple>
+
+</properties>]]></programlisting>
+	</para>
+      </section>
+      <section>
+	<title>Which components to create and with which name</title>
+	<para>
+	  Import makes components available, but does not create an
+	  <emphasis>specific instance</emphasis> yet.  In order to add
+	  a component of a given type to the current application,
+	  use the <function>loadComponent</function> function:
+	</para>
+	<para>
+	  In XML, the loadComponent statement of a reporting
+	  component would look like:
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <!-- ... import statements locate Orocos reporting library ...  -->
+  <simple name="Import" type="string"><value>/usr/local/lib</value></simple>
+
+  <struct name="Reporter" type="OCL::FileReporting">
+  </struct>
+
+</properties>]]></programlisting>
+	  This line causes the DeploymentComponent to look up
+	  the OCL::FileReporting type, and if found, creates
+	  a component of that type with the name "Reporter".
+	  This component is added as a peer component to the
+	  DeploymentComponent such that it becomes immediately
+	  available to the application. This step can be
+	  repeated any number of times with any number of types.
+	</para>
+	<para>
+	  Alternatively, the type may be a filename if that file
+	  contains only one component, which is exported using
+	  the <function>createComponent</function> function.
+	</para>
+	<para>
+	  The script method equivalent is:
+	  <programlisting>  loadComponent("Reporter", "OCL::FileReporting")</programlisting>
+	</para>
+      </section>
+      <section>
+	<title>How each component is setup</title>
+	<para>
+	  Now that one or more component instances are created, you
+	  can configure them by connecting components, assigning
+	  threads, configuration values and program scripts. Again,
+	  you can do this using XML or the scripting language.
+	</para>
+	<para>
+	  In XML, one adds additional elements to the component
+	  struct.
+	</para>
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <simple name="Import" type="string"><value>/usr/local/lib</value></simple>
+
+  <struct name="Reporter" type="OCL::FileReporting">
+
+    <struct name="Activity" type="PeriodicActivity">
+      <simple name="Period" type="double"><value>0.005</value></simple>
+      <simple name="Priority" type="short"><value>0</value></simple>
+      <simple name="Scheduler" type="string"><value>ORO_SCHED_OTHER</value></simple>
+    </struct>
+
+    <simple name="AutoConf" type="boolean"><value>1</value></simple>
+    <simple name="AutoSave" type="boolean"><value>1</value></simple>
+
+    <simple name="LoadProperties" type="string"><value>file-reporting.cpf</value></simple>
+
+    <struct name="Peers" type="PropertyBag">
+      <simple type="string"><value>Controller</value></simple>
+    </struct>
+  </struct>
+
+  <struct name="Controller" type="ControllerType">
+
+    <struct name="Activity" type="PeriodicActivity">
+      <simple name="Period" type="double"><value>0.001</value></simple>
+      <simple name="Priority" type="short"><value>99</value></simple>
+      <simple name="Scheduler" type="string"><value>ORO_SCHED_RT</value></simple>
+    </struct>
+
+    <simple name="AutoConf" type="boolean"><value>1</value></simple>
+    <simple name="AutoStart" type="boolean"><value>1</value></simple>
+    <simple name="AutoConnect" type="boolean"><value>1</value></simple>
+
+    <!-- This section allows to define properties without using a file (see below)
+         These properties can be overriden in the property files below. -->
+    <struct name="Properties" type="PropertyBag">
+      <simple name="K" type="double"><value>1.0</value></simple>
+    </struct>
+    <!-- Note: difference between 'PropertyFile' and 'UpdateProperties' (see below) -->
+    <simple name="PropertyFile" type="string"><value>controller-main.cpf</value></simple>
+    <simple name="UpdateProperties" type="string"><value>controller-opts.cpf</value></simple>
+
+    <struct name="Ports" type="PropertyBag">
+      <simple name="SensorValues" type="string"><value>SensorValuesConnection</value></simple>
+      <simple name="SteeringSignals" type="string"><value>DriveConnection</value></simple>
+    </struct>
+
+    <struct name="Peers" type="PropertyBag">
+      <simple type="string"><value>Plant</value></simple>
+    </struct>
+
+    <simple name="ProgramScript" type="string"><value>controller-program.ops</value></simple>
+    <simple name="StateMachineScript" type="string"><value>controller-states.ops</value></simple>
+  </struct>
+
+  <struct name="Plant" type="PlantType">
+    <struct name="Activity" type="NonPeriodicActivity">
+      <simple name="Priority" type="short"><value>0</value></simple>
+      <simple name="Scheduler" type="string"><value>ORO_SCHED_RT</value></simple>
+    </struct>
+    <simple name="AutoStart" type="boolean"><value>1</value></simple>
+    <struct name="Ports" type="PropertyBag">
+      <simple name="Position" type="string"><value>SensorValuesConnection</value></simple>
+      <simple name="Velocity" type="string"><value>DriveConnection</value></simple>
+    </struct>
+  </struct>
+</properties>]]></programlisting>
+	<para>
+	  The first section of all three components sets up the active
+	  behaviour of the component in the <option>Activity</option>
+	  element. Both have periodic activities, which run with a
+	  given period, priority and in a scheduler. The Controller
+	  and Plant run in a real-time scheduler, the Reporter
+	  doesn't. The activities are created and attached to each
+	  component during the
+	  <function>configureComponents()</function> step of the
+	  DeploymentComponent. Possible types of activities are
+	  <option>RTT::PeriodicActivity</option>, 
+	  <option>RTT::NonPeriodicActivity</option> and
+	  <option>RTT::SlaveActivity</option>. The latter allows a
+	  component to be executed by a master component. You can
+	  specify a master component using the <option>Master</option>
+	  simple element in the <option>Activity</option> struct. The
+	  DeploymentComponent makes slaves automatically a peer of
+	  their master.
+	</para>
+	<para>
+	  The next section of the Controller contains the <option>AutoConf</option> and <option>AutoStart</option>
+	  elements. If <option>AutoConf</option> is set to 1, the DeploymentComponent will call
+	  the component's configure() method during <function>configureComponents()</function>,
+	  after the properties are loaded. If <option>AutoStart</option> is set to 1, the component's start() 
+	  method will be called during <function>startComponents()</function>.
+	  By default <option>AutoConf</option> and <option>AutoStart</option> are 0 (off).
+	</para>
+	<para>
+	  The <option>AutoConnect</option> element indicates if the
+	  component's data ports should be automatically connected to
+	  peer ports which have the same name and type.  This flag is
+	  read during the <function>configureComponents()</function>
+	  step of the DeploymentComponent.  Both components must have
+	  the <option>AutoConnect</option> element set to 1 <emphasis>and
+	  one must be peer of the other</emphasis> in order
+	  to trigger automatic connection of ports. It is possible
+	  that a port is connected to one component using the Ports
+	  element and to another component using the
+	  <option>AutoConnect</option> flag. If an automatic port
+	  connection fails, the configuration procedure will not fail
+	  and just continue. An error message may be logged. By
+	  default, <option>AutoConnect</option> is 0 (off).
+	</para>
+	<para>
+	  The <option>Properties</option> struct allows to configure
+	  a component's properties from the main XML file. These values
+	  can be overridden by the listed property files.
+	</para>
+	<para>
+	  The <option>PropertyFile</option> element specifies from
+	  which XML file each component is configured and this file
+	  <emphasis>must</emphasis> contain values for all properties
+	  of the component. In case you only want to update part of
+	  the properties, use the <option>UpdateProperties</option>
+	  element. Finally, it is also possible to load and create
+	  new properties from a file using <option>LoadProperties</option>
+	  (the Reporting component requires this for example).
+	  You can use any number or combination of these elements.
+	  The order is respected. The properties are read during the
+	  <function>configureComponents()</function> step of the
+	  DeploymentComponent. When the <option>AutoSave</option>
+	  property is turned on, the listed property file will be
+	  saved again with the values of the Component, just before
+	  the Component is <function>cleanup()</function>.
+	</para>
+	<para>
+	  The last section of the Reporter component lists its
+	  peers. The Reporter has one peer, the Controller, with which
+	  it will be able to communicate and monitor its data
+	  ports. The Controller component has the Plant as peer, which
+	  means it can control it. It has two data ports listed as
+	  well (SensorValues and SteeringSignals), which are added to
+	  two connection objects.  These connections show up in the
+	  Plant component's <option>Ports</option> section as well. And it shows that
+	  the SensorValues Port is connected to the Position Port and
+	  the SteeringSignals Port is connected to the Velocity
+	  Port. If other component's ports in the same file refer to
+	  the same connection object, the ports are connected to each
+	  other by the DeploymentComponent during the
+	  <function>configureComponents()</function> step.
+	  The Component Builder's Manual goes into detail about
+	  the possible connection mechanisms.
+	</para>
+	<para>
+	  The Controller has at the end two additional elements
+	  describing which script files must be loaded into that
+	  component: <option>ProgramScript</option> and
+	  <option>StateMachineScript</option>. Any number of scripts
+	  can be loaded and they are loaded in order.  Both Orocos
+	  program scripts and state machine scripts can be
+	  loaded. This is again done during the
+	  <function>configureComponents()</function> step.
+	</para>
+      </section>
+      <section>
+	<title>Include XML files</title>
+	<para>
+	  The deployer XML format supports include directives, which
+	  allow you to manage your application configuration file in
+	  different files. This can be useful to separate the OS dependent
+	  settings from the OS independent settings, or share XML
+	  files between users. The include directive works similar like
+	  in "C":
+	</para>
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <!-- ... -->
+
+  <simple name="Include" type="string"><value>common-settings.xml</value></simple>
+
+  <!-- ... -->
+
+</properties>]]></programlisting>
+        <para>
+	  You can override settings or components in an include file
+	  by redefining them after the include statement. The last
+	  seen setting is always used by the deployer.
+	</para>
+	<note>
+	  <para>Currently, include directives always look into the
+	  current working directory, also when an included file
+	  includes a file from another directory.</para>
+	</note>
+      </section>
+      <section>
+	<title>CORBA extensions</title>
+	<para>
+	  The deployer XML format allows two CORBA specific boolean
+	  properties, which are optional: <option>Server</option>
+	  (defaults to '0') and <option>UseNamingService</option>
+	  (defaults to '1'). These properties are only used when you
+	  use the CORBA enabled
+	  <command>cdeployer-&lt;target&gt;</command> or
+	  <command>deployer-corba-&lt;target&gt;</command>
+	  applications.
+	</para>
+	<para>
+	  <programlisting><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <!-- ... -->
+
+  <struct name="Reporter" type="OCL::FileReporting">
+
+    <!-- CORBA specific extensions -->
+    <simple name="Server" type="boolean"><value>1</value></simple>
+    <simple name="UseNamingService" type="boolean"><value>1</value></simple>
+
+  </struct>
+
+</properties>]]></programlisting>
+	</para>
+	<para>
+	  By default, only the 'Deployer' starts as a CORBA
+	  server. You can have other components to start as a server
+	  as well by setting the <option>Server</option> property to
+	  1. By default, the component will try to use the CORBA
+	  Naming Service to register its name. If this is not wanted,
+	  set the <option>UseNamingService</option> property to 0.
+	</para>
+	<para>
+	  The script method equivalent of the above XML construct is:
+	  <programlisting>  server("Reporter", true)</programlisting>
+	  Which will create a CORBA server for the Reporter peer, after
+	  the Reporter was loaded with loadComponent().
+	</para>
+      </section>
+      <section>
+	<title>Connecting to CORBA components</title>
+	<para>
+	  The corba enabled deployers allow to create a proxy for a
+	  remote component using the name service, the IOR or the IOR file.
+	</para>
+	<para>
+	  Say you have a remote Orocos component with the name
+	  'MyComponent'. It was created in one corba enabled deployer
+	  application with the <option>Server</option> property set to 1.
+	  You can connect to it from another deployer application by using the XML
+	  syntax:<programlisting>
+<![CDATA[ <!-- Uses Naming Service to lookup 'Mycomponent' -->
+ <struct name="MyComponent" type="CORBA">
+ </struct>
+
+ <!-- Uses IOR file to lookup 'Mycomponent' -->
+ <struct name="MyComponent.ior" type="IORFile">
+ </struct>
+
+ <!-- Uses literal IOR to lookup 'Mycomponent' -->
+ <struct name="IOR:...." type="IOR">
+ </struct>
+]]></programlisting>
+          Which will make this component available in your current
+          application, using the same name as the original.  This also
+          works for the scripting deployer command 'loadComponent'.
+	  For example, you can type in the TaskBrowser:
+	  <programlisting>  loadComponent("MyComponent", "CORBA")
+  loadComponent("MyComponent.ior", "IORFile")
+  loadComponent("IOR:.....", "IOR")</programlisting>
+
+          which allows to quickly connect to a remote component once
+          you can copy/paste the IOR into the console.
+	</para>
+      </section>
+    </section>
+    <section>
+      <title>Setting up a deployable component library</title>
+      <para>
+	This section explains how to prepare a component library
+	for deployment. It is demonstrated with an example.
+      </para>
+      <section>
+	<title>Additional Code</title>
+	<para>
+	  There exist three C macros for preparing a component
+	  library.  The simplest way is when the resulting library
+	  will contain only one component type. Assume we have written
+	  the <classname>OCL::HelloWorld</classname> component ( in
+	  the OCL C++ namespace) which is compiled in the
+	  <filename>orocos-helloworld.so</filename> library. The
+	  following code is added to HelloWorld.cpp:
+	</para>
+	<programlisting>  #include "HelloWorld.hpp"
+  #include &lt;ocl/ComponentLoader.hpp&gt;
+
+  /* ... Hello World implementation file ... */
+
+  // You <emphasis>must</emphasis> specify the namespace:
+  ORO_CREATE_COMPONENT( OCL::HelloWorld )</programlisting>
+         <para>
+	   This macro inserts a function into the library which will
+	   allow the DeploymentComponent to create OCL::HelloWorld components.
+	 </para>
+	 <para>
+	   In case multiple components are defined in the same
+	   library, two other macros must be used. One macro for each
+	   component type and one macro once for the whole
+	   library. Say your library has components
+	   NS::<classname>ComponentX</classname> and
+	   NS::<classname>ComponentZ</classname> in namespace NS. In
+	   order to export both components, you could write in
+	   <filename>ComponentX.cpp</filename>:
+	 </para>
+	<programlisting>  #include "ComponentX.hpp"
+  #include &lt;ocl/ComponentLoader.hpp&gt;
+
+  /* ... ComponentX implementation file ... */
+  // <emphasis>once</emphasis>:
+  ORO_CREATE_COMPONENT_TYPE()
+  // <emphasis>For the ComponentX type</emphasis>:
+  ORO_LIST_COMPONENT_TYPE( NS::ComponentX )</programlisting>
+         <para>
+	   and in <filename>ComponentY.cpp</filename> the same but without the
+	   ORO_CREATE_COMPONENT_TYPE macro:
+	 </para>
+	<programlisting>  #include "ComponentY.hpp"
+  #include &lt;ocl/ComponentLoader.hpp&gt;
+
+  /* ... ComponentY implementation file ... */
+
+  // <emphasis>For the ComponentY type</emphasis>:
+  ORO_LIST_COMPONENT_TYPE( NS::ComponentY )</programlisting>
+         <para>
+	   For each additional component in the same library,
+	   the ORO_LIST_COMPONENT_TYPE macro is added. It is
+	   allowed to put all the ORO_LIST_COMPONENT_TYPE macros
+	   in a single file. 
+	 </para>
+	 <note>
+	   <para>
+	     You may not mix ORO_CREATE_COMPONENT and
+	     ORO_CREATE_COMPONENT_TYPE/ORO_LIST_COMPONENT_TYPE macros
+	     in one library. You must stick to one system, even
+	     if you link libraries.
+	   </para>
+	 </note>
+      </section>
+      <section>
+	<title>Compiling and linking a component library</title>
+	<para>
+	  In order to have a working library, care must be taken
+	  of the compilation flags. You may compile your library
+	  static or shared. But a static library will not be
+	  dynamically loadable. In the final executable the
+	  DeploymentComponent will be able to find the linked in
+	  components and setup the application using the XML file.
+	</para>
+	<important>
+	<para>
+	  The macros need some help to figure out if you are compiling
+	  a shared or static library. You need to define the
+	  <emphasis>OCL_DLL_EXPORT</emphasis> macro (see below) when
+	  compiling for a shared library. If this macro is not
+	  defined, it is assumed that you are compiling for a static
+	  library.
+	</para>
+	</important>
+	<para>
+	  The compilation flag of a component for a shared library
+	  might look like:
+	</para>
+	<programlisting>  CFLAGS= -O2 -Wall -fPIC -DOCL_DLL_EXPORT
+  LDFLAGS= -fPIC</programlisting>
+	<para>
+	  The compilation flag of a component for a static library
+	  lacks both options :
+	</para>
+	<programlisting>  CFLAGS= -O2 -Wall
+  LDFLAGS=</programlisting>
+      </section>
+    </section>
+</article>
