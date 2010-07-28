@@ -100,7 +100,7 @@ namespace ACES{
     {
         OCL::ReportingComponent* log;
         if (type == "File"){
-            log = (OCL::*ReportingComponent*) new OCL::FileReporting(args);
+            log = (OCL::ReportingComponent*) new OCL::FileReporting(args);
         }
         if(log){
             logList.push_back(log);

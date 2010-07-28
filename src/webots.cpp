@@ -1,8 +1,20 @@
 #include "webots.hpp"
 
 namespace Webots {
+/*
     Hardware::Hardware(ACES::taskCfg cfg, std::string args)
       : ACES::Hardware(cfg, args)
+    {
+        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
+            ("step", &Hardware::step, this);
+        this->methods()->addMethod(stepMethod,
+                                   "Advance the system time",
+                                   "TStep", "Lenght of step to advance(ms)");
+        cache = new RTT::Buffer<ACES::ProtoWord*>(250);
+    }
+*/
+    Hardware::Hardware(std::string name)
+      : ACES::Hardware(name)
     {
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
@@ -69,7 +81,7 @@ namespace Webots {
                 g->data = (void*)result;
                 ACES::ProtoWord* w =
                     (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
-                cache->Push(w);
+                return cache->Push(w);
                 //announceRx(w);
              }
              break;
@@ -88,12 +100,14 @@ namespace Webots {
                 WbDeviceTag joint = wb_robot_get_device(jid.c_str());
                 //wb_servo_set_position(joint, 3.14159/180.*angle);
                 wb_servo_set_position(joint, angle);
+                return true;
              }
              break;
 
             default:
              break;
         }
+        return false;
         //m->printme();
     }
 
@@ -163,6 +177,7 @@ namespace Webots {
         }
     }
 
+    //Credentials::Credentials(std::string args)
     Credentials::Credentials(std::string args)
     {
         std::istringstream s1(args);
@@ -172,14 +187,14 @@ namespace Webots {
         assign(id, dname, z, d);
     }
 
-    Device::Device(std::string config, std::string args)
-        : ACES::Device(config)
+    Device::Device(std::string name)
+      : ACES::Device(name)
     {
-        std::string rargs = args + (std::string)" " + name;
+        //std::string rargs = args + (std::string)" " + name;
         //RTT::Logger::log() << rargs << RTT::endlog();
-        ACES::Credentials *cred = new
-                Credentials(rargs);
-        credentials = cred;
+        //ACES::Credentials *cred = new Credentials(rargs);
+        //credentials = cred;
+        credentials = NULL;
     }
     
     bool Device::startHook(){
@@ -205,7 +220,7 @@ namespace Webots {
 
         //If our name matches the name on the packet, this one's for us,
         //pass it along to the States - let them sort it out
-        if( (c->devName) == name){
+        if( (c->devName) == getName()){
             //announceData(g);
 
             //if(name == "dRKP"){
@@ -215,8 +230,11 @@ namespace Webots {
         }
     }
 
-    Protocol::Protocol(std::string cfg, std::string args) 
-      : ACES::Protocol(cfg, args){}
+    //Protocol::Protocol(std::string cfg, std::string args) 
+    //  : ACES::Protocol(cfg, args){}
+
+    Protocol::Protocol(std::string name) 
+      : ACES::Protocol(name){}
 
     void Protocol::interpretRx(ACES::ProtoWord* rx){
         //Since webots isn't doing any real interpretation, we grab the
@@ -230,8 +248,13 @@ namespace Webots {
         returnBuf->Push((ACES::ProtoResult*)r);
     }
 
+/*
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : ACES::ScriptCtrl(cfg, args)
+    {}
+*/
+    ScriptCtrl::ScriptCtrl(std::string name)
+      : ACES::ScriptCtrl(name)
     {}
 
     std::map<std::string, void*>*
@@ -294,8 +317,8 @@ namespace Webots {
         return sv;
     }
 
-    ArmCtrl::ArmCtrl(std::string cfg, std::string args)
-      : ACES::ScriptCtrl(cfg, args)
+    ArmCtrl::ArmCtrl(std::string name)
+      : ACES::ScriptCtrl(name)
     {}
 
     std::map<std::string, void*>*
@@ -339,3 +362,11 @@ namespace Webots {
     }
 
 }
+
+#include <ocl/ComponentLoader.hpp>
+ORO_CREATE_COMPONENT_TYPE()
+ORO_LIST_COMPONENT_TYPE( Webots::Hardware )
+ORO_LIST_COMPONENT_TYPE( Webots::Device )
+ORO_LIST_COMPONENT_TYPE( Webots::Protocol )
+ORO_LIST_COMPONENT_TYPE( Webots::ScriptCtrl )
+ORO_LIST_COMPONENT_TYPE( Webots::ArmCtrl )

@@ -72,6 +72,10 @@ IF(NOT NETCDF_INSTALL)
   SET( NETCDF_INSTALL ${CMAKE_INSTALL_PREFIX} CACHE PATH "The NETCDF installation directory.")
 ENDIF(NOT NETCDF_INSTALL)
 
+IF(NOT WEBOTS_INSTALL)
+  SET( WEBOTS_INSTALL ${CMAKE_INSTALL_PREFIX} CACHE PATH "The Webots installation directory.")
+ENdIF (NOT WEBOTS_INSTALL)
+
 # The name of the resulting library.
 #SET( COMPONENTS_LIBRARY orocos-components CACHE STRING "Name of the resulting library")
 #INSTALL_TARGETS( /lib ${COMPONENTS_LIBRARY} )
@@ -162,6 +166,9 @@ INCLUDE (${PROJ_SOURCE_DIR}/config/FindComedi.cmake)
 ## Find Netcdf
 INCLUDE (${PROJ_SOURCE_DIR}/config/FindNetcdf.cmake)
 
+## Find Webots
+INCLUDE (${PROJ_SOURCE_DIR}/config/FindWebots.cmake)
+
 ## Uninstall target
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/config/cmake_uninstall.cmake.in"
@@ -202,6 +209,7 @@ SET(ENV{SELECTED_DIRS} "")
 #ADD_SUBDIRECTORY( state )
 #ADD_SUBDIRECTORY( controller )
 ADD_SUBDIRECTORY( common )
+ADD_SUBDIRECTORY( webots )
 
 MESSAGE("Selected Libraries: $ENV{SELECTED_LIBS}")
 SET(SELECTED_LIBS $ENV{SELECTED_LIBS})

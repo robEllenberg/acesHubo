@@ -10,7 +10,7 @@ hubo: robotisFlex.o svalue.o  hardware.o credentials.o state.o message.o  protoc
 	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -o controller
 
 webots-mini: controller.o goal.o device.o webots.o hardware.o protocol.o state.o dispatcher.o message.o credentials.o wbtest.o taskcfg.o logger.o
-	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux -lController -o minihubo
+	$(CXX) $(CXXFLAGS) $(OCLFLAGS) $(DEBUG) ${^} -lorocos-rtt-gnulinux -lorocos-ocl-common-gnulinux -lorocos-taskbrowser-gnulinux  -lorocos-reporting-gnulinux -lController -o minihubo
 	$(CP) minihubo ../webots/controllers/minihubo/
 
 webots-hubo: controller.o testsuite.o hardware.o protocol.o state.o svalue.o message.o credentials.o webots.o wbtest.o

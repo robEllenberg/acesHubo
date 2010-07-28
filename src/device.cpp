@@ -1,7 +1,7 @@
 #include "device.hpp"
 
 namespace ACES{
-
+/*
     Device::Device(std::string config) :
       taskCfg(config),
       RTT::TaskContext(name),
@@ -22,6 +22,21 @@ namespace ACES{
         );
             
     }
+*/
+
+    Device::Device(std::string name) :
+      RTT::TaskContext(name),
+      TxRequest("TxRequest"),
+      announceData("announceData")
+    {
+        this->events()->addEvent(&TxRequest, "TxRequest", "goal",
+                                 "The Goal/SP Data");
+        this->events()->addEvent(&announceData, "announceData", "data",
+                                 "Interperted data going to states");
+
+        requestBuf = new RTT::Buffer<Goal*>(50);
+        returnBuf = new RTT::Buffer<Goal*>(50);
+    }
 
     void Device::RxGoal(Goal* g){
         g->cred = credentials;
@@ -31,6 +46,10 @@ namespace ACES{
         //g->cred->printme();
         requestBuf->Push(g);
         //TxRequest(g);
+    }
+
+    void Device::attachCredentials(ACES::Credentials* c){
+        credentials = c;
     }
 
     bool Device::subscribeState(ProtoState* s){

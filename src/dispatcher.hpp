@@ -14,9 +14,9 @@
 #include "webots.hpp"
 #include "taskcfg.hpp"
 #include "device.hpp"
+#include "logger.hpp"
 
 namespace ACES{
-    class Logger;
     class Dispatcher : public RTT::TaskContext {
         public:
             Dispatcher(std::string name);

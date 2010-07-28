@@ -1,6 +1,7 @@
 #include "controller.hpp"
 namespace ACES{
 
+/*
     Controller::Controller(std::string cfg, std::string args)
       : taskCfg(cfg),
         RTT::TaskContext(name),
@@ -12,6 +13,14 @@ namespace ACES{
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
+    }
+*/
+    Controller::Controller(std::string name)
+      : RTT::TaskContext(name),
+        applyStateVector("applyStateVector")
+    {
+        this->events()->addEvent(&applyStateVector, "applyStateVector",
+            "SVmap", "map of state vect info");
     }
 
     bool Controller::configureHook(){
@@ -27,9 +36,9 @@ namespace ACES{
 
     void Controller::cleanupHook(){}
 
-    ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
-      : Controller(cfg, args),
-        walkScript((const char*)args.c_str(), std::ifstream::in),
+    ScriptCtrl::ScriptCtrl(std::string name)
+      : Controller(name),
+        //walkScript((const char*)args.c_str(), std::ifstream::in),
         stepMethod("step", &ScriptCtrl::step, this),
         runMethod("run", &ScriptCtrl::run, this),
         haltMethod("halt", &ScriptCtrl::halt, this),
@@ -97,8 +106,8 @@ namespace ACES{
             return false;
     }
 
-    NullCtrl::NullCtrl(std::string cfg, std::string args)
-      : Controller(cfg, args)
+    NullCtrl::NullCtrl(std::string name)
+      : Controller(name)
     {}
 
     void NullCtrl::updateHook()

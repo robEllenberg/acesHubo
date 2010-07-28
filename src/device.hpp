@@ -12,12 +12,13 @@
 #include "word.hpp"
 
 namespace ACES{
-    class Device :  protected taskCfg,
-                    public RTT::TaskContext
+    class Device :  public RTT::TaskContext
     {
         public:
-            Device(std::string config);
+            //Device(std::string config);
+            Device(std::string name);
             void RxGoal(Goal* g);
+            void attachCredentials(ACES::Credentials* c);
             bool subscribeState(ProtoState* s);
 
             bool configureHook();

@@ -1,6 +1,7 @@
 #include "protocol.hpp"
 
 namespace ACES {
+/*
     Protocol::Protocol(std::string cfg, std::string args):
       taskCfg(cfg),
       RTT::TaskContext(name),
@@ -22,7 +23,24 @@ namespace ACES {
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
     }
+*/
+    Protocol::Protocol(std::string name)
+      : RTT::TaskContext(name),
+      issueMessage("issueMessage"),
+      announceResult("announceResult")
+    {
+//        requestBuf = new std::deque<Message*>;
 
+        //TODO - Figure out why this flips out when we attempt to declare
+        // it as a member instead of a pointer 
+        requestBuf = new RTT::Buffer<Message*>(250);
+        returnBuf = new RTT::Buffer<ProtoResult*>(250);
+        
+        this->events()->addEvent(&issueMessage, "issueMessage", "msg",
+                                 "The message to be transmitted");
+        this->events()->addEvent(&announceResult, "announceResult", "result",
+                                 "Data struct containing processed result");
+    }
     
     bool Protocol::configureHook(){
         return true;
