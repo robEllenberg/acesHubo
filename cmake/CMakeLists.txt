@@ -144,7 +144,7 @@ INCLUDE(${PROJ_SOURCE_DIR}/config/component_rules.cmake)
 
 ## Find Orocos RTT.
 
-INCLUDE (${PROJ_SOURCE_DIR}/config/FindOrocosRTT.cmake)
+INCLUDE (${PROJ_SOURCE_DIR}/config/FindOrocos.cmake)
 IF (OROCOS_RTT_1.4)
   OROCOS_PKGCONFIG_REQUIRES("orocos-rtt-${OROCOS_TARGET}")
 ELSE (OROCOS_RTT_1.4)
@@ -210,6 +210,7 @@ SET(ENV{SELECTED_DIRS} "")
 #ADD_SUBDIRECTORY( controller )
 ADD_SUBDIRECTORY( common )
 ADD_SUBDIRECTORY( webots )
+ADD_SUBDIRECTORY( dispatcher )
 
 MESSAGE("Selected Libraries: $ENV{SELECTED_LIBS}")
 SET(SELECTED_LIBS $ENV{SELECTED_LIBS})
@@ -220,7 +221,7 @@ SET(OROCOS_COMPONENTS_REQUIRES "$ENV{OROCOS_COMPONENTS_REQUIRES}")
 #CONFIGURE_FILE( ${PROJ_SOURCE_DIR}/ocl/ocl-config.h.in ${PROJ_BINARY_DIR}/ocl/ocl-config.h @ONLY)
 CONFIGURE_FILE( ${PROJ_SOURCE_DIR}/aces.pc.in ${PROJ_BINARY_DIR}/aces-${OROCOS_TARGET}.pc @ONLY)
 INSTALL_FILES( /lib/pkgconfig FILES aces-${OROCOS_TARGET}.pc)
-INSTALL_FILES( /include/ocl FILES ocl/ocl-config.h)
+#INSTALL_FILES( /include/ocl FILES ocl/ocl-config.h)
 
 #MESSAGE("Selected dirs: $ENV{SELECTED_DIRS}")
 #SET(SELECTED_DIRS $ENV{SELECTED_DIRS})

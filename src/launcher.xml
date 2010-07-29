@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+    <simple name="Import" type="string"><value>/usr/local/webots/lib/libController.so</value></simple>
+    <simple name="Import" type="string"><value>/home/bob/thesis/aces/build/</value></simple>
+
+    <struct name="Test" type="Webots::ArmCtrl">
+        <struct name="Activity" type="PeriodicActivity">
+            <simple name="Period" type="double"><value>0.005</value></simple>
+            <simple name="Priority" type="short"><value>0</value></simple>
+            <simple name="Scheduler" type="string"><value>ORO_SCHED_RT</value></simple>
+        </struct>
+    </struct>
+    <struct name="S1" type="ACES::State">
+
+</properties>

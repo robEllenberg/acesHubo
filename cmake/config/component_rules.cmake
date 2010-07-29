@@ -2,7 +2,7 @@
 # Include and link against required stuff
 #
 
-ADD_DEFINITIONS( "-Wall" )
+#ADD_DEFINITIONS( "-Wall" )
 
 
 #
