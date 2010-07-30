@@ -1,7 +1,6 @@
 #include "protocol.hpp"
 
 namespace ACES {
-/*
     Protocol::Protocol(std::string cfg, std::string args):
       taskCfg(cfg),
       RTT::TaskContext(name),
@@ -23,7 +22,7 @@ namespace ACES {
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
     }
-*/
+
     Protocol::Protocol(std::string name)
       : RTT::TaskContext(name),
       issueMessage("issueMessage"),

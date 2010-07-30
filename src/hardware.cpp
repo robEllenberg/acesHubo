@@ -1,7 +1,7 @@
 #include "hardware.hpp"
 
 namespace ACES {
-/*
+
     Hardware::Hardware(taskCfg cfg, std::string args) :
         taskCfg(cfg),
         RTT::TaskContext(name),
@@ -13,7 +13,7 @@ namespace ACES {
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
                                               name));
     }
-*/    
+    
     Hardware::Hardware(std::string name)
       : RTT::TaskContext(name)
     {

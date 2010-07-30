@@ -1,8 +1,7 @@
 #include "device.hpp"
 
 namespace ACES{
-/*
-    Device::Device(std::string config) :
+    Device::Device(std::string config, int junk) :
       taskCfg(config),
       RTT::TaskContext(name),
       TxRequest("TxRequest"),
@@ -22,7 +21,6 @@ namespace ACES{
         );
             
     }
-*/
 
     Device::Device(std::string name) :
       RTT::TaskContext(name),

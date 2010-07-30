@@ -1,7 +1,7 @@
 #include "webots.hpp"
 
 namespace Webots {
-/*
+
     Hardware::Hardware(ACES::taskCfg cfg, std::string args)
       : ACES::Hardware(cfg, args)
     {
@@ -12,7 +12,7 @@ namespace Webots {
                                    "TStep", "Lenght of step to advance(ms)");
         cache = new RTT::Buffer<ACES::ProtoWord*>(250);
     }
-*/
+
     Hardware::Hardware(std::string name)
       : ACES::Hardware(name)
     {
@@ -187,6 +187,16 @@ namespace Webots {
         assign(id, dname, z, d);
     }
 
+    Device::Device(std::string cfg, std::string args)
+      : ACES::Device(cfg, 0)
+    {
+        std::string rargs = args + (std::string)" " + name;
+        //RTT::Logger::log() << rargs << RTT::endlog();
+        ACES::Credentials *cred = new Credentials(rargs);
+        credentials = cred;
+        //credentials = NULL;
+    }
+
     Device::Device(std::string name)
       : ACES::Device(name)
     {
@@ -230,8 +240,8 @@ namespace Webots {
         }
     }
 
-    //Protocol::Protocol(std::string cfg, std::string args) 
-    //  : ACES::Protocol(cfg, args){}
+    Protocol::Protocol(std::string cfg, std::string args) 
+      : ACES::Protocol(cfg, args){}
 
     Protocol::Protocol(std::string name) 
       : ACES::Protocol(name){}
@@ -248,11 +258,10 @@ namespace Webots {
         returnBuf->Push((ACES::ProtoResult*)r);
     }
 
-/*
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : ACES::ScriptCtrl(cfg, args)
     {}
-*/
+
     ScriptCtrl::ScriptCtrl(std::string name)
       : ACES::ScriptCtrl(name)
     {}
@@ -316,6 +325,10 @@ namespace Webots {
  
         return sv;
     }
+
+    ArmCtrl::ArmCtrl(std::string cfg, std::string args)
+      : ACES::ScriptCtrl(cfg)
+    {}
 
     ArmCtrl::ArmCtrl(std::string name)
       : ACES::ScriptCtrl(name)

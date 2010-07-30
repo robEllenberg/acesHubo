@@ -12,6 +12,7 @@ namespace ACES{
             double freq;
             int priority;
         public:
+            taskCfg();
             taskCfg(std::string cfg);
             std::string Name();
     };

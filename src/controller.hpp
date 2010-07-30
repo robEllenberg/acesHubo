@@ -18,10 +18,11 @@
 enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
 namespace ACES{
-    class Controller : public RTT::TaskContext
+    class Controller :  protected taskCfg,
+                        public RTT::TaskContext
     {
         public:
-            //Controller(std::string cfg, std::string args);
+            Controller(std::string cfg, std::string args);
             Controller(std::string name);
             bool configureHook();
             bool startHook();
@@ -37,7 +38,7 @@ namespace ACES{
     class ScriptCtrl : public Controller
     {
         public:
-            //ScriptCtrl(std::string cfg, std::string args);
+            ScriptCtrl(std::string cfg, std::string args);
             ScriptCtrl(std::string name);
             void updateHook();
 
@@ -59,7 +60,7 @@ namespace ACES{
     class NullCtrl : public Controller 
     {
         public:
-            //NullCtrl(std::string config, std::string args);
+            NullCtrl(std::string config, std::string args);
             NullCtrl(std::string name);
             void updateHook();
             //std::map<std::string, void*>* stateVect;

@@ -12,10 +12,13 @@
 #include "word.hpp"
 
 namespace ACES{
-    class Device :  public RTT::TaskContext
+    class Device :  protected taskCfg,
+                    public RTT::TaskContext
     {
         public:
-            //Device(std::string config);
+            //'int junk' is simply here to disambiguate the function calls,
+            //it does nothing 
+            Device(std::string config, int junk);
             Device(std::string name);
             void RxGoal(Goal* g);
             void attachCredentials(ACES::Credentials* c);

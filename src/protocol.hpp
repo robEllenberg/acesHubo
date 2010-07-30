@@ -28,10 +28,11 @@ namespace ACES {
 /*!
  * The Protocol virtual class 
  */
-    class Protocol : public RTT::TaskContext
+    class Protocol : protected taskCfg, 
+                     public RTT::TaskContext
     {
         public:
-            //Protocol(std::string cfg, std::string args);
+            Protocol(std::string cfg, std::string args);
             Protocol(std::string name);
             bool configureHook();
             bool startHook();

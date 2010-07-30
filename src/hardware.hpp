@@ -17,10 +17,10 @@
 
 namespace ACES {
     class Protocol;
-    class Hardware : //protected taskCfg,
+    class Hardware : protected taskCfg,
                      public RTT::TaskContext {
         public:
-            //Hardware(taskCfg cfg, std::string args);
+            Hardware(taskCfg cfg, std::string args);
             Hardware(std::string name);
             bool configureHook();
             bool startHook();

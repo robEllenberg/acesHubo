@@ -109,7 +109,7 @@ int ORO_main(int a, char** b){
     d->linkHP("wbHW", "wbPcol");
 
     d->addLogger("flog 10 5", "File", "tfile.txt");
-    d->linkLS("flog", "RSP");
+    //d->linkLS("flog", "RSP");
 
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
 

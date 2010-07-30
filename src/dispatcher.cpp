@@ -182,7 +182,7 @@ namespace ACES{
             return false;
         }
     }
-
+/*
     bool Dispatcher::linkLS(std::string logger, std::string state){
         Logger* l = (Logger*)this->getPeer(logger);
         ProtoState* s  = (ProtoState*)this->getPeer(state);
@@ -190,7 +190,7 @@ namespace ACES{
             return l->addTrack(state);
         }
     }
-
+*/
     bool Dispatcher::configureHook(){
         return true;
     }
