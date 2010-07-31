@@ -42,7 +42,7 @@ namespace ACES {
         std::istringstream s1(tracks, std::istringstream::in);
 
         s1.peek();
-        while( not s1.eof() ){
+        while( ! s1.eof() ){
             std::string stringTemp;
             s1 >> stringTemp;
             addTrack(stringTemp);

@@ -36,7 +36,7 @@ namespace ACES {
         //g->printme();
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;
-        while ( not set_stack->empty() ){
+        while (!set_stack->empty() ){
             Goal* h;
             set_stack->Pop(h);
             announceGoal(h);
@@ -54,11 +54,11 @@ namespace ACES {
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &ProtoState::setGoal,
                            c->engine()->events() ).handle();
-        if( not h.ready() ){
+        if(!h.ready() ){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
         return true;

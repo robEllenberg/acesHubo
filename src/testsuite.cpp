@@ -29,7 +29,7 @@ namespace TestSuite{
 
     void Protocol::aggregateRequests(
       std::list<ACES::Credentials*> &reqs){
-        while( not reqs.empty() ){
+        while( ! reqs.empty() ){
             ACES::Message *m = new ACES::Message( reqs.front() );
             reqs.pop_front();
             pending_stack->push_back(m);

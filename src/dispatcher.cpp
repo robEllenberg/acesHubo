@@ -128,7 +128,7 @@ namespace ACES{
         RTT::TaskContext* p = this->getPeer(pcol);
         RTT::TaskContext* d = this->getPeer(device);
 
-        if(p and d){
+        if(p && d){
             return ((Protocol*)p)->subscribeDevice((Device*)d);
         }
         else{
@@ -140,7 +140,7 @@ namespace ACES{
         RTT::TaskContext* d = getPeer(dev);
         RTT::TaskContext* s = getPeer(state);
         
-        if(s and d){
+        if(s && d){
             return ((Device*)d)->subscribeState((ProtoState*)s);
         }
         else{
@@ -152,7 +152,7 @@ namespace ACES{
         RTT::TaskContext* h = this->getPeer(hw);
         RTT::TaskContext* p = this->getPeer(pcol);
 
-        if (h and p){
+        if (h && p){
             return ((Hardware*)h)->subscribeProtocol((Protocol*)p);
         }
         else{
@@ -164,7 +164,7 @@ namespace ACES{
         RTT::TaskContext* s = this->getPeer(state);
         RTT::TaskContext* c = this->getPeer(ctrl);
 
-        if (s and c){
+        if (s && c){
             return ((ProtoState*)s)->subscribeController((Controller*)c);
         }
         else{
@@ -175,7 +175,7 @@ namespace ACES{
     bool Dispatcher::linkHC(std::string hw, std::string ctrl){
         Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
         RTT::TaskContext* c = this->getPeer(ctrl);
-        if (h and c){
+        if (h && c){
             return h->subscribeController((Controller*) c);
         }
         else{
@@ -186,7 +186,7 @@ namespace ACES{
     bool Dispatcher::linkLS(std::string logger, std::string state){
         Logger* l = (Logger*)this->getPeer(logger);
         ProtoState* s  = (ProtoState*)this->getPeer(state);
-        if(l and s){
+        if(l && s){
             return l->addTrack(state);
         }
     }

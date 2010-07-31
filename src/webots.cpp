@@ -124,11 +124,11 @@ namespace Webots {
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &Hardware::stepRequest,
                            this->engine()->events() ).handle();
-        if( not h.ready() ){
+        if(!h.ready() ){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
         return true;

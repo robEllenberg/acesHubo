@@ -67,7 +67,7 @@ namespace ACES {
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
 
@@ -79,7 +79,7 @@ namespace ACES {
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
  

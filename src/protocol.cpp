@@ -64,7 +64,7 @@ namespace ACES {
             RTT::Logger::log() << "PCol, RequestBuff size "
             << requestBuf->size() << RTT::endlog();
         }
-        if( not requestBuf->empty() ){
+        if(!requestBuf->empty() ){
             //pop next message off pending  
             //m->printme();
             Message* m = prepareMessage();
@@ -109,11 +109,11 @@ namespace ACES {
             .callback( this, &Protocol::addRequest,
                        d->engine()->events()
                      ).handle();
-        if( not h.ready()){
+        if(!h.ready()){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
 
@@ -121,11 +121,11 @@ namespace ACES {
             .callback( d, &Device::interpretResult,
                         this->engine()->events()
                      ).handle();
-        if( not h.ready()){
+        if(!h.ready()){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
         return true;

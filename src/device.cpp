@@ -58,11 +58,11 @@ namespace ACES{
             .callback( this, &Device::RxGoal
                      ,  s->engine()->events()
                      ).handle();
-        if( not h.ready() ){
+        if(!h.ready() ){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
 
@@ -70,11 +70,11 @@ namespace ACES{
             .callback( s, &ProtoState::RxData
                      ,  this->engine()->events()
                      ).handle();
-        if( not h.ready() ){
+        if(!h.ready() ){
             return false;
         }
         h.connect();
-        if( not h.connected() ){
+        if(!h.connected() ){
             return false;
         }
 
@@ -91,7 +91,7 @@ namespace ACES{
 */
     void Device::updateHook(){
         //Forward Path
-        while( not requestBuf->empty() ){
+        while(!requestBuf->empty() ){
             Goal* g;
             requestBuf->Pop(g);
             TxRequest(g);
