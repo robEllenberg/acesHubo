@@ -24,10 +24,6 @@ namespace ACES{
         public:
             Controller(std::string cfg, std::string args);
             Controller(std::string name);
-            bool configureHook();
-            bool startHook();
-            void stopHook();
-            void cleanupHook();
             virtual std::map<std::string, void*>* 
                     getStateVector(bool echo=0) = 0;
 

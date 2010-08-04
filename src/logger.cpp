@@ -9,13 +9,6 @@ namespace ACES {
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
     }
-    
-    bool Logger::configureHook(){
-        return true;
-    }
-
-    void Logger::cleanupHook(){
-    }
 
     void Logger::updateHook()
     {

@@ -1,0 +1,32 @@
+//#include <ocl/TaskBrowser.hpp>
+//#include <ocl/FileReporting.hpp>
+#include <rtt/os/main.h>
+#include <rtt/Logger.hpp>
+#include <rtt/TaskContext.hpp>
+
+#include "credentials.hpp"
+#include "controller.hpp"
+#include "message.hpp"
+#include "hardware.hpp"
+#include "webots.hpp"
+#include "dispatcher.hpp"
+
+int ORO_main(int a, char** b){
+    RTT::Logger* logger = RTT::Logger::Instance();
+    logger->setLogLevel(RTT::Logger::Debug);
+    
+    RTT::TaskContext launch("launch");
+    ACES::Dispatcher d("dispatch");
+	assert( launch.addPeer((RTT::TaskContext*)&d) );
+        
+    launch.setActivity(new RTT::Activity(5, 1.0/10.0, 0, "launch") );
+    launch.scripting()->loadPrograms("testprog.ops");
+    launch.start();
+    launch.engine()->programs()->getProgram("TestProgram")->start();
+
+    //d->scripting()->loadPrograms("testprog.ops");
+    //d->start();
+    //d->engine()->programs()->getProgram("TestProgram")->start();    
+	while(true){};
+	return 0;
+}

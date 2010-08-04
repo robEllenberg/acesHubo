@@ -2,7 +2,7 @@
 
 namespace Webots {
 
-    Hardware::Hardware(ACES::taskCfg cfg, std::string args)
+    Hardware::Hardware(std::string cfg, std::string args)
       : ACES::Hardware(cfg, args)
     {
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
@@ -113,10 +113,6 @@ namespace Webots {
 
     bool Hardware::recieve(){
         return true;
-    }
-
-    bool Hardware::isBusy(){
-        return false;
     }
 
     bool Hardware::subscribeController(ACES::Controller* c){

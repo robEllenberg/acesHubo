@@ -74,7 +74,7 @@ namespace ACES {
             RTT::Logger::log() << "PCol, ReturnBuff size "
             << returnBuf->size() << RTT::endlog();
         }
-        if(not returnBuf->empty() ){
+        if(! returnBuf->empty() ){
             
             ProtoResult* r;
             returnBuf->Pop(r);

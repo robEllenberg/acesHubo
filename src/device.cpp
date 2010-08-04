@@ -1,7 +1,7 @@
 #include "device.hpp"
 
 namespace ACES{
-    Device::Device(std::string config, int junk) :
+    Device::Device(std::string config, std::string junk) :
       taskCfg(config),
       RTT::TaskContext(name),
       TxRequest("TxRequest"),
@@ -97,7 +97,7 @@ namespace ACES{
             TxRequest(g);
         }
         //Return Path
-        while(not returnBuf->empty()){
+        while(! returnBuf->empty()){
             Goal* p;
             //Credentials* c = p->cred;
             returnBuf->Pop(p);

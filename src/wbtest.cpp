@@ -113,8 +113,8 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
 
-    OCL::FileReporting r("Reporter");
-    r.addPeer(d);
+    //OCL::FileReporting r("Reporter");
+    //r.addPeer(d);
 
     //RTT::TaskContext tc("progRun");
     //tc.setActivity(new RTT::Activity(5, 0.01, 0, "progRun") );
@@ -126,6 +126,7 @@ int ORO_main(int a, char** b){
     d->scripting()->loadPrograms("testprog.ops");
     d->start();
     //d->engine()->programs()->getProgram("TestProgram")->start();
+    
     Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();
     return 0;

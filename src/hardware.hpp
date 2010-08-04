@@ -20,19 +20,14 @@ namespace ACES {
     class Hardware : protected taskCfg,
                      public RTT::TaskContext {
         public:
-            Hardware(taskCfg cfg, std::string args);
+            Hardware(std::string cfg, std::string args);
             Hardware(std::string name);
-            bool configureHook();
-            bool startHook();
-            void stopHook();
-            virtual void updateHook();
-            void cleanupHook();
-            virtual bool isBusy(void) = 0;
 
             virtual bool transmit(Message* m) = 0;
             virtual bool recieve() = 0;
 
             bool subscribeProtocol(Protocol* p);
+            virtual bool subscribeController(Controller* c) = 0;
             //RTT::Method<bool(void)> isBusyMethod;
             RTT::Event<void(ProtoWord*)> announceRx;
     };

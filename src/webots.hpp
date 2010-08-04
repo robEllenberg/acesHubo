@@ -27,7 +27,7 @@ extern "C"{
 namespace Webots{
     class Hardware : public ACES::Hardware {
         public:
-            Hardware(ACES::taskCfg, std::string args);
+            Hardware(std::string cfg, std::string args);
             Hardware(std::string name);
             bool startHook();
             void updateHook();

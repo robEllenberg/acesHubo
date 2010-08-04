@@ -2,7 +2,7 @@
 
 namespace ACES {
 
-    Hardware::Hardware(taskCfg cfg, std::string args) :
+    Hardware::Hardware(std::string cfg, std::string args) :
         taskCfg(cfg),
         RTT::TaskContext(name),
         announceRx("announceRx")
@@ -21,49 +21,13 @@ namespace ACES {
                                  "Recieved Data");
     }
 
-    bool Hardware::configureHook(){
-        return true;
-    }
-
-    bool Hardware::startHook(){
-        //TODO - Re-add a check to clear a non-empty buffer
-        //before starting operation
-        //while( this->hardpoint_in->readsome((char*)&c, 1) ){}
-        return true;
-    }
-
-    void Hardware::stopHook(){
-        
-    }
-
-    void Hardware::cleanupHook(){
-    }
-
-
-    void Hardware::updateHook(){
-        //std::cout << "Update" << std::endl;
-        //RTT::Logger::log(RTT::Logger::Debug) << "Update"
-        //  << RTT::endlog();
-/*
-        while( inBuffer.size() ){
-            Message* m;
-            inBuffer.Pop(m);
-            transmit(m);
-
-            //delete m;
-            //TODO - add logic for managing responses from hw
-        }
-*/
-//        recieve();
-    }
-
     bool Hardware::subscribeProtocol(Protocol* p){
         this->connectPeers( (RTT::TaskContext*) p);
         RTT::Handle h = p->events()->setupConnection("issueMessage")
             .callback( this, &Hardware::transmit
                        ,p->engine()->events() ).handle();
             //).handle();
-        if(not h.ready() ){
+        if(! h.ready() ){
             return false;
         }
         h.connect();
@@ -75,7 +39,7 @@ namespace ACES {
             .callback( p, &Protocol::interpretRx,
                        this->engine()->events() ).handle();
 
-        if(not h.ready() ){
+        if(! h.ready() ){
             return false;
         }
         h.connect();

@@ -1,22 +1,31 @@
 #ifndef ACES_DISPATCHER_HPP
 #define ACES_DISPATCHER_HPP
 
+#define TESTSUITE 1
+
 #include <string>
 
 #include <rtt/TaskContext.hpp>
-#include <ocl/ReportingComponent.hpp>
-#include <ocl/FileReporting.hpp>
+//#include <ocl/ReportingComponent.hpp>
+//#include <ocl/FileReporting.hpp>
 
 #include "protocol.hpp"
 #include "controller.hpp"
 #include "state.hpp"
 #include "hardware.hpp"
-#include "webots.hpp"
 #include "taskcfg.hpp"
 #include "device.hpp"
 #include "logger.hpp"
+#ifdef WEBOTS
+    #include "webots.hpp"
+#endif
+#ifdef TESTSUITE
+    #include "testsuite.hpp"
+#endif
+
 
 namespace ACES{
+    class Logger;
     class Dispatcher : public RTT::TaskContext {
         public:
             Dispatcher(std::string name);
@@ -39,12 +48,25 @@ namespace ACES{
             bool linkHC(std::string hw, std::string ctrl);
             //bool linkLS(std::string logger, std::string state);
 
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addHardwareMethod;
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addProtocolMethod;            
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addStateMethod;            
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addControllerMethod;            
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addDeviceMethod;            
+            RTT::Method<bool(std::string, std::string, std::string)>
+                        addLoggerMethod;            
+                                                                                                
             std::list<ProtoState*> stateList;
             std::list<Protocol*> pList;
             std::list<Controller*> cList;
             std::list<Device*> dList;
             std::list<Hardware*> hwList;
-            std::list<OCL::ReportingComponent*> logList;
+            std::list<Logger*> logList;
             
             bool configureHook();
             bool startHook();

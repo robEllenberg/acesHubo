@@ -2,68 +2,122 @@
 
 namespace ACES{
     Dispatcher::Dispatcher(std::string name)
-        : RTT::TaskContext(name)
+        : RTT::TaskContext(name),
+          addHardwareMethod("addHardware", &Dispatcher::addHardware, this),
+          addProtocolMethod("addProtocol", &Dispatcher::addProtocol, this),
+          addStateMethod("addState", &Dispatcher::addState, this),
+          addControllerMethod("addController", &Dispatcher::addController, this),
+          addDeviceMethod("addDevice", &Dispatcher::addDevice, this),
+          addLoggerMethod("addLogger", &Dispatcher::addLogger, this)
     {
         //this->setActivity( new RTT::Activity(pri, 1.0/freq, 0, n) );
+        this->methods()->addMethod(addHardwareMethod, "addHardware",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+        this->methods()->addMethod(addProtocolMethod, "addProtocol",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+        this->methods()->addMethod(addStateMethod, "addState",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+        this->methods()->addMethod(addControllerMethod, "addController",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+        this->methods()->addMethod(addDeviceMethod, "addDevice",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+        this->methods()->addMethod(addLoggerMethod, "addLogger",
+                                   "config", "_name_ _priority_ _freq_",
+                                   "type", "_mainType_ _subType_",
+                                   "args", "arguments specific to the type");
+                                   
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,
                                  std::string args)
     {
-        Hardware* h;
-
-            if (type == "Webots") {
-                h = (Hardware*) new Webots::Hardware(cfg, args);
-            } 
-
-        hwList.push_back(h);
-        this->connectPeers(h);
+        Hardware* h = NULL;
+        
+        #ifdef WEBOTS        
+        if (type == "Webots") {
+            h = (Hardware*) new Webots::Hardware(cfg, args);
+        }
+        #endif 
+        #ifdef TESTSUITE
+        if (type == "TestSuite") {
+            h = (Hardware*) new TestSuite::Hardware(cfg, args);
+        }
+        #endif
+        if(h){
+            hwList.push_back(h);
+            return connectPeers(h);
+        }
+        return false;
     }
 
     bool Dispatcher::addProtocol(std::string cfg, std::string type,
                                  std::string args)
     {
-        Protocol* p;
+        Protocol* p = NULL;
+        #ifdef WEBOTS
         if ( type == "Webots"){
             p = (Protocol*) new Webots::Protocol(cfg, args);
         } 
+        #endif
+        #ifdef TESTSUITE
+        if ( type == "TestSuite"){
+            p = (Protocol*) new TestSuite::Protocol(cfg, args);
+        } 
+        #endif
         if(p){
             pList.push_back(p);
-            this->connectPeers(p);
+            return connectPeers(p);
         }
+        return false;
     }
 
     bool Dispatcher::addDevice(std::string cfg, std::string type,
                                std::string args)
     {
-        Device *d;
+        Device *d = NULL;
+        #ifdef WEBOTS 
         if (type == "Webots"){
             d = (Device*) new Webots::Device(cfg, args);
         }
+        #endif
+        #ifdef TESTSUITE
+        if ( type == "TestSuite"){
+            d = (Device*) new TestSuite::Device(cfg, args);
+        } 
+        #endif
         if(d){
             dList.push_back(d);
-            this->connectPeers(d);
+            return connectPeers(d);
         }
+        return false;
     }
 
     bool Dispatcher::addState(std::string cfg, std::string type,
                               std::string args)
     {
         //taskCfg c(cfg);
-        ProtoState* s;
-
+        ProtoState* s = NULL;
+        
         if( type == "Webots") {
             s = (ProtoState*) new ACES::State<float>(cfg, args);
             //((State<float>*)s)->printme();
         }
+		
         if(s){
             stateList.push_back(s);
-            connectPeers(s);
-            return true;
+            return connectPeers(s);
         }
-        else{
-            return false;
-        }
+        return false;
     }
 
     bool Dispatcher::addController(std::string cfg, std::string type,
@@ -75,7 +129,8 @@ namespace ACES{
         std::string t1, t2;
         s1 >> t1 >> t2;
 
-        Controller* ctrl;
+        Controller* ctrl = NULL;
+        #ifdef WEBOTS 
         if ( t1 == "Webots"){
             if (t2 == "Mini"){
                 ctrl = (Controller*) new Webots::ScriptCtrl(cfg, args);
@@ -87,10 +142,12 @@ namespace ACES{
                 ctrl = (Controller*) new Webots::ArmCtrl(cfg, args);
             }
         } 
+        #endif
+        #ifdef TESTSUITE
+        #endif
         if(ctrl){
             cList.push_back(ctrl);
-            this->connectPeers(ctrl);
-            return true;
+            return connectPeers(ctrl);
         }
         return false;
     }
@@ -98,16 +155,16 @@ namespace ACES{
     bool Dispatcher::addLogger(std::string cfg, std::string type,
                                std::string args)
     {
-        OCL::ReportingComponent* log;
+        Logger* log;
         if (type == "File"){
-            log = (OCL::ReportingComponent*) new OCL::FileReporting(args);
+            log = (Logger*) new FileLog(cfg, args);
         }
         if(log){
             logList.push_back(log);
-            this->connectPeers(log);
-            return true;
+            return connectPeers(log);
         }
         return false;
+
         /*
         Logger* log;
         if( type == "File"){
@@ -173,7 +230,8 @@ namespace ACES{
     }
 
     bool Dispatcher::linkHC(std::string hw, std::string ctrl){
-        Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
+        //Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
+		Hardware* h = (Hardware*)this->getPeer(hw);
         RTT::TaskContext* c = this->getPeer(ctrl);
         if (h && c){
             return h->subscribeController((Controller*) c);

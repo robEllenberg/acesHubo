@@ -22,19 +22,6 @@ namespace ACES{
             "SVmap", "map of state vect info");
     }
 
-    bool Controller::configureHook(){
-        return true;
-    }
-
-    bool Controller::startHook(){
-        return true;
-    }
-
-    void Controller::stopHook(){
-    }
-
-    void Controller::cleanupHook(){}
-
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
         walkScript((const char*)args.c_str(), std::ifstream::in),

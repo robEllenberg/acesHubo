@@ -22,9 +22,7 @@ namespace ACES{
         public:
             Logger(std::string cfg, std::string args);
 
-            bool configureHook();
             void updateHook();
-            void cleanupHook();
 
             bool subscribeDispatcher(Dispatcher* d);
             bool addTrack(std::string track);

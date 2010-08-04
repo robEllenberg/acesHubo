@@ -1,0 +1,42 @@
+OPTION( BUILD_ACES_COMMON "Build Common" ON )
+
+IF ( BUILD_ACES_COMMON )
+
+   SET(PREFIX "../../../aces/src/")
+   SET(NODES credentials;goal;message;taskcfg;word;controller;device;hardware;protocol;state)
+   SET(srcs "")
+   SET(hpps "")
+
+   FOREACH( el ${NODES})
+      SET(srcs "${PREFIX}${el}.cpp;${srcs}")
+      SET(hpps "${PREFIX}${el}.hpp;${hpps}")
+   ENDFOREACH(el)
+   MESSAGE ( STATUS "${srcs}")
+    MESSAGE ( STATUS "${PROJ_SOURCE_DIR}")
+
+   INCLUDE_DIRECTORIES( ../../../aces/src )
+
+   INCLUDE_DIRECTORIES( ${PROJ_SOURCE_DIR} ${PROJ_SOURCE_DIR}/src ${PROJ_BINARY_DIR}/src ${PROJ_BINARY_DIR}/src/os ${PROJ_BINARY_DIR}/src/os/${OROCOS_TARGET})
+   INCLUDE_DIRECTORIES( ${OROCOS-RTT_INCLUDE_DIRS} )
+
+   
+   #FILE( GLOB SRCS ${srcs})
+   #FILE( GLOB HPPS ${hpps})
+
+    ADD_EXECUTABLE( gantry-ctrl ${srcs} )
+    TARGET_LINK_LIBRARIES( gantry-ctrl orocos-rtt-dynamic_${OROCOS_TARGET})
+    SET_TARGET_PROPERTIES( gantry-ctrl PROPERTIES
+    COMPILE_FLAGS "${CMAKE_CXX_FLAGS_ADD}"
+    LINK_FLAGS "${CMAKE_LD_FLAGS_ADD}"
+    COMPILE_DEFINITIONS "${OROCOS-RTT_DEFINITIONS}" )
+    ADD_TEST( gantry-ctrl ${RUNTIME_OUTPUT_DIRECTORY}/main-test )
+
+
+   #GLOBAL_ADD_COMPONENT( aces-common ${SRCS} )
+   #GLOBAL_ADD_INCLUDE( aces ${HPPS})
+
+   #COMPONENT_ADD_DEPS( orocos-taskbrowser orocos-ocl-common )
+
+   #ADD_SUBDIRECTORY( tests )
+
+ENDIF ( BUILD_ACES_COMMON )

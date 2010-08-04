@@ -31,7 +31,7 @@ namespace ACES{
             //RTT::Logger::log() << " w/NoData ";
         }
 
-        if(not cred){
+        if(! cred){
             //RTT::Logger::log() << " NoCredentials";
             //RTT::Logger::log() <<RTT::endlog();
         }

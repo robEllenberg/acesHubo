@@ -18,7 +18,7 @@ namespace ACES{
         public:
             //'int junk' is simply here to disambiguate the function calls,
             //it does nothing 
-            Device(std::string config, int junk);
+            Device(std::string config, std::string junk);
             Device(std::string name);
             void RxGoal(Goal* g);
             void attachCredentials(ACES::Credentials* c);
