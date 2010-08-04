@@ -1,0 +1,7 @@
+program TestProgram {
+    //do start();
+    do dispatch.addHardware("hw1 5 10","TestSuite","");
+    do dispatch.start();
+    //do getPeer("dispatch");
+    //do dispatch.start();
+}
