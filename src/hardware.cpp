@@ -5,26 +5,84 @@ namespace ACES {
     Hardware::Hardware(std::string cfg, std::string args) :
         taskCfg(cfg),
         RTT::TaskContext(name),
-        announceRx("announceRx")
+        txUpStream("txUpStream"),
+        dsQueue(200),
+        usQueue(200)
     {
-        this->events()->addEvent(&announceRx, "announceRx", "word",
+        this->events()->addEvent(&txUpStream, "txUpStream", "word",
                                  "Recieved Data");
 
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
                                               name));
     }
-    
+/*    
     Hardware::Hardware(std::string name)
       : RTT::TaskContext(name)
     {
-         this->events()->addEvent(&announceRx, "announceRx", "word",
+         this->events()->addEvent(&txUpStream, "txUpStream", "word",
                                  "Recieved Data");
+    }
+*/
+    bool Hardware::rxDownStream(Message* m){
+        RTT::OS::MutexLock lock(dsqGuard);
+        dsQueue.push_back(m);
+        return true;
+    }
+
+    void Hardware::updateHook(){
+        Message* m = NULL;
+        while(dsQueue.size()){
+            { RTT::OS::MutexLock lock(dsqGuard);
+              m = processDSQueue();
+            }
+            transmit(m);
+        }
+        recieve();
+        ProtoWord* p = NULL;
+        while(usQueue.size()){
+            { RTT::OS::MutexLock lock(usqGuard);
+              p = processUSQueue();
+            }
+            txUpStream(p);
+        }
+    }
+
+    Message* Hardware::processDSQueue(){
+        Message* m = dsQueue.front();
+        dsQueue.pop_front();
+        return m;
+    }
+
+    ProtoWord* Hardware::processUSQueue(){
+        ProtoWord* p = usQueue.front();
+        usQueue.pop_front();
+        return p;
+    }
+
+    bool Hardware::transmit(Message* m){
+        Goal* g = NULL;
+        for(std::list<Goal*>::iterator it = m->goalList.begin();
+            it != m->goalList.end();
+            it++)
+        {
+            ACES::ProtoWord* w =
+                (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(*it));
+
+            { RTT::OS::MutexLock lock(usqGuard);
+              usQueue.push_back(w);
+            }
+        }
+        return true;
+    }
+    
+    bool Hardware::recieve(){
+        return true;
     }
 
     bool Hardware::subscribeProtocol(Protocol* p){
         this->connectPeers( (RTT::TaskContext*) p);
-        RTT::Handle h = p->events()->setupConnection("issueMessage")
-            .callback( this, &Hardware::transmit
+        RTT::Handle h = p->events()->setupConnection("txDownStream")
+            .callback( this, &Hardware::rxDownStream
                        ,p->engine()->events() ).handle();
             //).handle();
         if(! h.ready() ){
@@ -35,8 +93,8 @@ namespace ACES {
             return false;
         }
 
-        h = this->events()->setupConnection("announceRx")
-            .callback( p, &Protocol::interpretRx,
+        h = this->events()->setupConnection("txUpStream")
+            .callback( p, &Protocol::rxUpStream,
                        this->engine()->events() ).handle();
 
         if(! h.ready() ){

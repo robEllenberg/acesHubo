@@ -21,15 +21,25 @@ namespace ACES {
                      public RTT::TaskContext {
         public:
             Hardware(std::string cfg, std::string args);
-            Hardware(std::string name);
+            //Hardware(std::string name);
+            void updateHook();
 
-            virtual bool transmit(Message* m) = 0;
-            virtual bool recieve() = 0;
+            bool rxDownStream(Message* m);
+            RTT::Event<void(ProtoWord*)> txUpStream;
+
+            virtual bool transmit(Message* m);
+            virtual bool recieve();
+
+            virtual Message* processDSQueue();
+            std::deque<Message*> dsQueue;
+            RTT::OS::Mutex dsqGuard; 
+
+            virtual ProtoWord* processUSQueue();
+            std::deque<ProtoWord*> usQueue;
+            RTT::OS::Mutex usqGuard; 
 
             bool subscribeProtocol(Protocol* p);
             virtual bool subscribeController(Controller* c) = 0;
-            //RTT::Method<bool(void)> isBusyMethod;
-            RTT::Event<void(ProtoWord*)> announceRx;
     };
 
 /*

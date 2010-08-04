@@ -4,12 +4,12 @@ namespace ACES{
     Device::Device(std::string config, std::string junk) :
       taskCfg(config),
       RTT::TaskContext(name),
-      TxRequest("TxRequest"),
-      announceData("announceData")
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream")
     {
-        this->events()->addEvent(&TxRequest, "TxRequest", "goal",
+        this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
-        this->events()->addEvent(&announceData, "announceData", "data",
+        this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");
 
         requestBuf = new RTT::Buffer<Goal*>(50);
@@ -21,29 +21,24 @@ namespace ACES{
         );
             
     }
-
+/*
     Device::Device(std::string name) :
       RTT::TaskContext(name),
-      TxRequest("TxRequest"),
-      announceData("announceData")
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream")
     {
-        this->events()->addEvent(&TxRequest, "TxRequest", "goal",
+        this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
-        this->events()->addEvent(&announceData, "announceData", "data",
+        this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");
 
         requestBuf = new RTT::Buffer<Goal*>(50);
         returnBuf = new RTT::Buffer<Goal*>(50);
     }
-
-    void Device::RxGoal(Goal* g){
+*/
+    void Device::rxDownStream(Goal* g){
         g->cred = credentials;
-        /*if(g->mode == SET){
-            g->printme();
-        }*/
-        //g->cred->printme();
         requestBuf->Push(g);
-        //TxRequest(g);
     }
 
     void Device::attachCredentials(ACES::Credentials* c){
@@ -54,8 +49,8 @@ namespace ACES{
         this->connectPeers( (RTT::TaskContext*) s);
         //TODO - Figure out how calling this reception function
         //in a non-periodic thread affects RT characteristic
-        RTT::Handle h = s->events()->setupConnection("announceGoal")
-            .callback( this, &Device::RxGoal
+        RTT::Handle h = s->events()->setupConnection("txDownStream")
+            .callback( this, &Device::rxDownStream
                      ,  s->engine()->events()
                      ).handle();
         if(!h.ready() ){
@@ -66,8 +61,8 @@ namespace ACES{
             return false;
         }
 
-        h = this->events()->setupConnection("announceData")
-            .callback( s, &ProtoState::RxData
+        h = this->events()->setupConnection("txUpStream")
+            .callback( s, &ProtoState::rxUpStream
                      ,  this->engine()->events()
                      ).handle();
         if(!h.ready() ){
@@ -94,7 +89,8 @@ namespace ACES{
         while(!requestBuf->empty() ){
             Goal* g;
             requestBuf->Pop(g);
-            TxRequest(g);
+            RTT::Logger::log() << "device sent" << RTT::endlog();
+            txDownStream(g);
         }
         //Return Path
         while(! returnBuf->empty()){
@@ -102,7 +98,7 @@ namespace ACES{
             //Credentials* c = p->cred;
             returnBuf->Pop(p);
             //p->printme();
-            announceData(p);
+            txUpStream(p);
         }
     }
 //    void Device::stopHook(){}

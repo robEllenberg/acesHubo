@@ -11,7 +11,7 @@ namespace TestSuite{
     class Hardware : public ACES::Hardware {
         public:
             Hardware(std::string cfg, std::string args);
-            Hardware(std::string name);
+            //Hardware(std::string name);
             
             void updateHook();
             
@@ -28,14 +28,14 @@ namespace TestSuite{
     class Device : public ACES::Device {
         public:
             Device(std::string cfg, std::string args);
-            Device(std::string name);
+            //Device(std::string name);
             void interpretResult (ACES::ProtoResult *rx);    
     };
 
     class Protocol : public ACES::Protocol{
         public:
             Protocol(std::string cfg, std::string args);
-            Protocol(std::string name);            
+            //Protocol(std::string name);            
             void interpretRx(ACES::ProtoWord *);
     };
     

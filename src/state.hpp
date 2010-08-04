@@ -40,11 +40,11 @@ namespace ACES {
 
             void (*asgnfunct)(void*, void*);
 
-            RTT::Event<void(Goal*)> announceGoal;
+            RTT::Event<void(Goal*)> txDownStream;
             RTT::Buffer< Goal* > *set_stack;
             bool subscribeController(Controller* c);
-            void setGoal(std::map<std::string, void*>*);
-            void RxData(Goal* d);
+            void rxDownStream(std::map<std::string, void*>*);
+            void rxUpStream(Goal* d);
     };
 
     template <class T>

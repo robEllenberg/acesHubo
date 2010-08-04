@@ -8,9 +8,26 @@ namespace ACES{
           addStateMethod("addState", &Dispatcher::addState, this),
           addControllerMethod("addController", &Dispatcher::addController, this),
           addDeviceMethod("addDevice", &Dispatcher::addDevice, this),
-          addLoggerMethod("addLogger", &Dispatcher::addLogger, this)
+          addLoggerMethod("addLogger", &Dispatcher::addLogger, this),
+
+          startHWMethod("startHW", &Dispatcher::startHW, this),
+          startProtocolMethod("startProtocol", &Dispatcher::startProtocol, this),
+          startDeviceMethod("startDevice", &Dispatcher::startDevice, this),
+          startStateMethod("startState", &Dispatcher::startState, this),
+          startControllerMethod("startController", &Dispatcher::startController, this),
+          stopHWMethod("stopHW", &Dispatcher::stopHW, this),
+          stopProtocolMethod("stopProtocol", &Dispatcher::stopProtocol, this),
+          stopDeviceMethod("stopDevice", &Dispatcher::stopDevice, this),
+          stopStateMethod("stopState", &Dispatcher::stopState, this),
+          stopControllerMethod("stopController", &Dispatcher::stopController, this),
+          linkPDMethod("linkPD", &Dispatcher::linkPD, this),
+          linkDSMethod("linkDS", &Dispatcher::linkDS, this),
+          linkHPMethod("linkHP", &Dispatcher::linkHP, this),
+          linkSCMethod("linkSC", &Dispatcher::linkSC, this),
+          linkHCMethod("linkHC", &Dispatcher::linkHC, this),
+          linkLSMethod("linkLS", &Dispatcher::linkLS, this)
     {
-        //this->setActivity( new RTT::Activity(pri, 1.0/freq, 0, n) );
+        //this->setActivity( new RTT::Activity(5, 1.0/10.0, 0, name) );
         this->methods()->addMethod(addHardwareMethod, "addHardware",
                                    "config", "_name_ _priority_ _freq_",
                                    "type", "_mainType_ _subType_",
@@ -35,7 +52,38 @@ namespace ACES{
                                    "config", "_name_ _priority_ _freq_",
                                    "type", "_mainType_ _subType_",
                                    "args", "arguments specific to the type");
+
+        this->methods()->addMethod(startHWMethod, "startHW");
+        this->methods()->addMethod(startProtocolMethod, "startProtocol");
+        this->methods()->addMethod(startDeviceMethod, "startDevice");
+        this->methods()->addMethod(startStateMethod, "startState");
+        this->methods()->addMethod(startControllerMethod, "startController");
+
+        this->methods()->addMethod(stopHWMethod, "stopHW");
+        this->methods()->addMethod(stopProtocolMethod, "stopProtocol");
+        this->methods()->addMethod(stopDeviceMethod, "stopDevice");
+        this->methods()->addMethod(stopStateMethod, "stopState");
+        this->methods()->addMethod(stopControllerMethod, "stopController");
                                    
+        this->methods()->addMethod(linkPDMethod, "linkPD",
+                                   "protocol", "protocol",
+                                   "device", "device");
+        this->methods()->addMethod(linkDSMethod, "linkDS",
+                                   "device", "device",
+                                   "state", "state");
+        this->methods()->addMethod(linkHPMethod, "linkHP",
+                                   "hardware", "hardware",
+                                   "protocol", "protocol");
+        this->methods()->addMethod(linkSCMethod, "linkSC",
+                                   "state", "state",
+                                   "controller", "controller");
+        this->methods()->addMethod(linkHCMethod, "linkHC",
+                                   "hardware", "hardware",
+                                   "controller", "controller");
+        this->methods()->addMethod(linkLSMethod, "linkLS",
+                                   "logger", "logger",
+                                   "state", "state");
+    
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,
@@ -111,6 +159,10 @@ namespace ACES{
         if( type == "Webots") {
             s = (ProtoState*) new ACES::State<float>(cfg, args);
             //((State<float>*)s)->printme();
+        }
+
+        if( type == "TestSuite") {
+            s = (ProtoState*) new ACES::State<float>(cfg, args);
         }
 		
         if(s){
@@ -240,7 +292,7 @@ namespace ACES{
             return false;
         }
     }
-/*
+
     bool Dispatcher::linkLS(std::string logger, std::string state){
         Logger* l = (Logger*)this->getPeer(logger);
         ProtoState* s  = (ProtoState*)this->getPeer(state);
@@ -248,78 +300,109 @@ namespace ACES{
             return l->addTrack(state);
         }
     }
-*/
-    bool Dispatcher::configureHook(){
-        return true;
-    }
-   
-    bool Dispatcher::startHook(){
+
+    bool Dispatcher::startHW(){
         for(std::list<Hardware*>::iterator it = hwList.begin();
             it != hwList.end(); it++){
             (*it)->start();
         }
+        return true;
+    }
 
-        //RTT::Logger::log() << "Finished HW" << RTT::endlog();
-
+    bool Dispatcher::startProtocol(){
         for(std::list<Protocol*>::iterator it = pList.begin();
             it != pList.end(); it++){
             (*it)->start();
         }
+        return true;
+    }
 
+    bool Dispatcher::startDevice(){
         for(std::list<Device*>::iterator it = dList.begin();
             it != dList.end(); it++){
             (*it)->start();
         }
+        return true;
+    }
 
-        //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
+    bool Dispatcher::startState(){
         for(std::list<ProtoState*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->start();
         }
+        return true;
+    }
 
-        //RTT::Logger::log() << "Finished States" << RTT::endlog();
-
+    bool Dispatcher::startController(){
         for(std::list<Controller*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->start();
         }
+        return true;
+    }
+
+    bool Dispatcher::startHook(){
+        startHW();
+        startProtocol();
+        startDevice();
+        startState();
+        startController();
+        //RTT::Logger::log() << "Finished HW" << RTT::endlog();
+        //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
+        //RTT::Logger::log() << "Finished States" << RTT::endlog();
 
         //RTT::Logger::log() << "Finished Controllers" << RTT::endlog();
         return true;
     }
     
-    void Dispatcher::updateHook(){
-    }
-
-    void Dispatcher::stopHook(){
+    bool Dispatcher::stopController(){
         for(std::list<Controller*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->stop();
         }
+        return true;
+    }
 
+    bool Dispatcher::stopState(){
         for(std::list<ProtoState*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->stop();
         }
+        return true;
+    }
 
+    bool Dispatcher::stopDevice(){
         for(std::list<Device*>::iterator it = dList.begin();
             it != dList.end(); it++){
             (*it)->stop();
         }
+        return true;
+    }
 
+    bool Dispatcher::stopProtocol(){
         for(std::list<Protocol*>::iterator it = pList.begin();
             it != pList.end(); it++){
             (*it)->stop();
         }
+        return true;
+    }
 
+    bool Dispatcher::stopHW(){
         for(std::list<Hardware*>::iterator it = hwList.begin();
             it != hwList.end(); it++){
             (*it)->stop();
         }
+        return true;
     }
 
-    void Dispatcher::cleanupHook(){
+    void Dispatcher::stopHook(){
+        stopController();
+        stopState();
+        stopDevice();
+        stopProtocol();
+        stopHW();
     }
+
 } 

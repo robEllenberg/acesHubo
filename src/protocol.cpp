@@ -4,29 +4,33 @@ namespace ACES {
     Protocol::Protocol(std::string cfg, std::string args):
       taskCfg(cfg),
       RTT::TaskContext(name),
-      issueMessage("issueMessage"),
-      announceResult("announceResult")
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream"),
+      dsQueue(200),
+      usQueue(200)
     {
 //        requestBuf = new std::deque<Message*>;
 
         //TODO - Figure out why this flips out when we attempt to declare
         // it as a member instead of a pointer 
-        requestBuf = new RTT::Buffer<Message*>(250);
-        returnBuf = new RTT::Buffer<ProtoResult*>(250);
+        //returnBuf = new RTT::Buffer<ProtoResult*>(250);
+        //returnQueue = new std::deque<ProtoResult*>(250);
+        //requestQueue = new std::deque<Goal*>(250);
         
-        this->events()->addEvent(&issueMessage, "issueMessage", "msg",
+        this->events()->addEvent(&txDownStream, "txDownStream", "msg",
                                  "The message to be transmitted");
-        this->events()->addEvent(&announceResult, "announceResult", "result",
+        this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
     }
 
+/*
     Protocol::Protocol(std::string name)
       : RTT::TaskContext(name),
-      issueMessage("issueMessage"),
-      announceResult("announceResult")
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream")
     {
 //        requestBuf = new std::deque<Message*>;
 
@@ -35,78 +39,72 @@ namespace ACES {
         requestBuf = new RTT::Buffer<Message*>(250);
         returnBuf = new RTT::Buffer<ProtoResult*>(250);
         
-        this->events()->addEvent(&issueMessage, "issueMessage", "msg",
+        this->events()->addEvent(&txDownStream, "txDownStream", "msg",
                                  "The message to be transmitted");
-        this->events()->addEvent(&announceResult, "announceResult", "result",
+        this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
     }
-    
-    bool Protocol::configureHook(){
-        return true;
-    }
-    
-    bool Protocol::startHook(){
-        //RTT::Logger::log() << "Protocol Startup"
-        //                   << std::endl;
-       return true;
+*/
+
+    void Protocol::rxDownStream(Goal* g){
+        RTT::OS::MutexLock lock(dsqGuard);
+        dsQueue.push_back(g);
     }
 
+    void Protocol::rxUpStream(ProtoWord* w){
+        RTT::OS::MutexLock lock(usqGuard);
+        usQueue.push_back(w);
+    }
+
+/*
     void Protocol::updateHook(){
-        //std::list<ACES::Credentials*>* c = getNewRequests();
-        //aggregateRequests(*c);
-        //delete c;
-
-        //while(   (not this->hardware->isBusyMethod())
-        //      && this->requestBuf->size()
-        //      && this->theresStillTime() ){
-        //while( requestBuf.size() > 0){
-        if( requestBuf->size() > 200){
-            RTT::Logger::log() << "PCol, RequestBuff size "
-            << requestBuf->size() << RTT::endlog();
-        }
-        if(!requestBuf->empty() ){
+       //Set/Request data path
+        assert(dsQueue.size() < 100);
+        while( dsQueue.size() ){
             //pop next message off pending  
             //m->printme();
-            Message* m = prepareMessage();
-            issueMessage( m );
+            Message* m = NULL;
+            {   //Block to delete mutexlok after pop()
+                RTT::OS::MutexLock lock(pqGuard);
+                m = new Message( requestQueue->front() );
+                requestQueue->pop_front();
+            }
+            txDownStream( m );
         }
-        if (returnBuf->size() > 200){
-            RTT::Logger::log() << "PCol, ReturnBuff size "
-            << returnBuf->size() << RTT::endlog();
-        }
+
+        //Return data path
+        assert( usQueue->size() < 100);
         if(! returnBuf->empty() ){
-            
             ProtoResult* r;
             returnBuf->Pop(r);
-            announceResult(r);
+            txUpStream(r);
         }
     }
+*/
+    void Protocol::updateHook(){
+        Message* m = NULL;
+        assert(dsQueue.size() < 100);
+        while(dsQueue.size()){
+            { RTT::OS::MutexLock lock(dsqGuard);
+              m = processDSQueue();
+            }
+            txDownStream(m);
+        }
 
-    void Protocol::addRequest(Goal* g){
-        ACES::Message *m = new ACES::Message( g );
-        //g->printme();
-//        requestBuf->push_back(m);
-        requestBuf->Push(m);
-    }
-
-    void Protocol::stopHook(){
-    }
-    
-    void Protocol::cleanupHook(){
-    }
-
-    Message* Protocol::prepareMessage(){
-        //Message* m = requestBuf->front();
-        //requestBuf->pop_front();
-        Message* m;
-        requestBuf->Pop(m);
-        return m;
+        ProtoResult* r = NULL;
+        assert( usQueue->size() < 100);
+        while(usQueue.size()){
+            { RTT::OS::MutexLock lock(usqGuard);
+              r = processUSQueue();
+            }
+            txUpStream(r);
+        }
     }
     
     bool Protocol::subscribeDevice(Device* d){
         this->connectPeers( (RTT::TaskContext*) d );
-        RTT::Handle h = d->events()->setupConnection("TxRequest")
-            .callback( this, &Protocol::addRequest,
+        RTT::Handle h = d->events()->setupConnection("txDownStream")
+            .callback( this, &Protocol::rxDownStream,
                        d->engine()->events()
                      ).handle();
         if(!h.ready()){
@@ -117,8 +115,8 @@ namespace ACES {
             return false;
         }
 
-        h = this->events()->setupConnection("announceResult")
-            .callback( d, &Device::interpretResult,
+        h = this->events()->setupConnection("txUpStream")
+            .callback( d, &Device::rxUpStream,
                         this->engine()->events()
                      ).handle();
         if(!h.ready()){

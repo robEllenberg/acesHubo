@@ -1,0 +1,28 @@
+program Main {
+    //This is a comment
+    do addHardware("tsHW 10 10","TestSuite","");
+    do addProtocol("tsPro 80 10", "TestSuite", "");
+
+    do linkHP("tsHW", "tsPro");
+
+    do addDevice("dX 20 50", "TestSuite", "");
+    do addDevice("dY 20 50", "TestSuite", "");
+    do addDevice("dZ 20 50", "TestSuite", "");
+
+    do addState("X 10 50", "TestSuite", "Axis");
+    do addState("Y 10 50", "TestSuite", "Axis");
+    do addState("Z 10 50", "TestSuite", "Axis");
+
+    do linkDS("dX", "X");
+    do linkDS("dY", "Y");
+    do linkDS("dZ", "Z");
+    do linkPD("tsPro", "dX");
+    do linkPD("tsPro", "dY");
+    do linkPD("tsPro", "dZ");
+
+    do startHW();
+    do startProtocol();
+    do startDevice();
+    do startState();
+    do startController();
+}

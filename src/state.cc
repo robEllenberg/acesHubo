@@ -30,7 +30,7 @@
     void State<T>::go(T sp){
         T* p = new T(sp);
         Goal* g = new Goal(propID, SET, p);
-        announceGoal(g);
+        txDownStream(g);
     }
 
     template <class T>

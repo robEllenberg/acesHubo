@@ -4,9 +4,9 @@ namespace ACES {
     ProtoState::ProtoState(std::string config, std::string args) :
       taskCfg(config),
       RTT::TaskContext(name),
-      announceGoal("announceGoal")
+      txDownStream("txDownStream")
     {
-        this->events()->addEvent(&announceGoal, "announceGoal", "credentials",
+        this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
             "credentials associated w/the goal");
 
         if(args == "Joint"){
@@ -39,7 +39,7 @@ namespace ACES {
         while (!set_stack->empty() ){
             Goal* h;
             set_stack->Pop(h);
-            announceGoal(h);
+            txDownStream(h);
         }
     }
     
@@ -52,7 +52,7 @@ namespace ACES {
     bool ProtoState::subscribeController(Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
-                .callback( this, &ProtoState::setGoal,
+                .callback( this, &ProtoState::rxDownStream,
                            c->engine()->events() ).handle();
         if(!h.ready() ){
             return false;
@@ -64,7 +64,7 @@ namespace ACES {
         return true;
     }
 
-    void ProtoState::setGoal(std::map<std::string, void*>* p){
+    void ProtoState::rxDownStream(std::map<std::string, void*>* p){
        //RTT::Logger::log() << "trigger" << RTT::endlog();
        std::map<std::string, void* >::iterator mypair;
         mypair = p->find( name );
@@ -74,12 +74,12 @@ namespace ACES {
            
             //RTT::Logger::log() << this->name << " Announce: "
             //<< *((float*)val) << RTT::endlog();
-            //announceGoal(g);
+            //txDownStream(g);
             set_stack->Push(g);
         }
     }
 
-    void ProtoState::RxData(Goal* g){
+    void ProtoState::rxUpStream(Goal* g){
         //if(name == "RSP"){
         //    RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
         //}

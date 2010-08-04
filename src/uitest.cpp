@@ -1,4 +1,4 @@
-//#include <ocl/TaskBrowser.hpp>
+#include <ocl/TaskBrowser.hpp>
 //#include <ocl/FileReporting.hpp>
 #include <rtt/os/main.h>
 #include <rtt/Logger.hpp>
@@ -19,18 +19,20 @@ int ORO_main(int a, char** b){
     ACES::Dispatcher d("dispatch");
 	launch.connectPeers((RTT::TaskContext*)&d);
         
-    launch.setActivity(new RTT::Activity(5, 1.0/10.0, 0, "launch") );
-    launch.scripting()->loadPrograms("testprog.ops");
+    //launch.setActivity(new RTT::Activity(5, 1.0/10.0, 0, "launch") );
     //d.scripting()->loadPrograms("testprog.ops");
 
     launch.start();
-    
-    launch.engine()->programs()->getProgram("TestProgram")->start();    
 
-    //Orocos::TaskBrowser tbrowser(&launch);
-    //tbrowser.loop();
+    d.scripting()->loadPrograms("launch.ops");
+
+    d.start();
+    d.engine()->programs()->getProgram("Main")->start();    
+
+    Orocos::TaskBrowser tbrowser(&launch);
+    tbrowser.loop();
     //d->start();
     //launch.engine()->programs()->getProgram("TestProgram")->start();
-	while(true){};
+	//while(true){};
 	return 0;
 }

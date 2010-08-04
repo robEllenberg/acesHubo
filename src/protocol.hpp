@@ -33,44 +33,23 @@ namespace ACES {
     {
         public:
             Protocol(std::string cfg, std::string args);
-            Protocol(std::string name);
-            bool configureHook();
-            bool startHook();
+            //Protocol(std::string name);
             void updateHook();
-            void stopHook();
-            void cleanupHook();
+
+            RTT::Event<void(Message*)> txDownStream;
+            RTT::Event<void(ProtoResult*)> txUpStream;
+            virtual void rxDownStream(Goal*);
+            virtual void rxUpStream(ProtoWord*);
+
+            virtual Message* processDSQueue();
+            std::deque<Goal*> dsQueue;
+            RTT::OS::Mutex dsqGuard; 
+
+            virtual ProtoResult* processUSQueue();
+            std::deque<ProtoWord*> usQueue;
+            RTT::OS::Mutex usqGuard; 
+
             bool subscribeDevice(Device* d);
-
-            //! Processed, waiting for transmission. 
-            /*! The set of messages already processed by the
-             protocol waiting to be
-             submitted to the hardware for transmission.
-             */
-            //std::deque<Message*>* requestBuf;
-            RTT::Buffer<Message*>* requestBuf;
-            RTT::Buffer<ProtoResult*>* returnBuf;
-            //! The requests made to protocol by parameters
-            //RTT::ReadBufferPort<Credentials*>* request_stack;
-
-            //std::list<Credentials*>* getNewRequests();
-            void addRequest(Goal*);
-            virtual void interpretRx(ProtoWord*) = 0;
-
-            //virtual void aggregateRequests(
-            //    std::list<Credentials*> &reqs) = 0;
-
-            //virtual Message* buildMessage(
-            //                   Credentials* cred) = 0;
-
-            //virtual Credentials<T>* parseHWInput(
-            //                   Message* c) = 0 ;
-            //void issueMessage();
-
-            Message* prepareMessage();
-            RTT::Event<void(Message*)> issueMessage;
-            RTT::Event<void(ProtoResult*)> announceResult;
-            
-            //virtual bool registerParam(ACES::State*) = 0;
     };
 
     class charDevProtocol : public Protocol {

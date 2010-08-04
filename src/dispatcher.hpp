@@ -41,12 +41,25 @@ namespace ACES{
                            std::string args);
             bool addLogger(std::string cfg, std::string type,
                            std::string args);
+
+            bool startHW();
+            bool startProtocol();
+            bool startDevice();
+            bool startState();
+            bool startController();
+
+            bool stopHW();
+            bool stopProtocol();
+            bool stopDevice();
+            bool stopState();
+            bool stopController();
+
             bool linkPD(std::string pcol, std::string device);
             bool linkDS(std::string device, std::string state);
             bool linkHP(std::string hw, std::string pcol);
             bool linkSC(std::string state, std::string ctrl);
             bool linkHC(std::string hw, std::string ctrl);
-            //bool linkLS(std::string logger, std::string state);
+            bool linkLS(std::string logger, std::string state);
 
             RTT::Method<bool(std::string, std::string, std::string)>
                         addHardwareMethod;
@@ -60,7 +73,26 @@ namespace ACES{
                         addDeviceMethod;            
             RTT::Method<bool(std::string, std::string, std::string)>
                         addLoggerMethod;            
-                                                                                                
+
+            RTT::Method<bool(void)> startHWMethod;
+            RTT::Method<bool(void)> startProtocolMethod;
+            RTT::Method<bool(void)> startDeviceMethod;
+            RTT::Method<bool(void)> startStateMethod;
+            RTT::Method<bool(void)> startControllerMethod;
+
+            RTT::Method<bool(void)> stopHWMethod;
+            RTT::Method<bool(void)> stopProtocolMethod;
+            RTT::Method<bool(void)> stopDeviceMethod;
+            RTT::Method<bool(void)> stopStateMethod;
+            RTT::Method<bool(void)> stopControllerMethod;
+
+            RTT::Method<bool(std::string, std::string)> linkPDMethod;
+            RTT::Method<bool(std::string, std::string)> linkDSMethod;
+            RTT::Method<bool(std::string, std::string)> linkHPMethod;
+            RTT::Method<bool(std::string, std::string)> linkSCMethod;
+            RTT::Method<bool(std::string, std::string)> linkHCMethod;
+            RTT::Method<bool(std::string, std::string)> linkLSMethod;
+
             std::list<ProtoState*> stateList;
             std::list<Protocol*> pList;
             std::list<Controller*> cList;
@@ -68,11 +100,8 @@ namespace ACES{
             std::list<Hardware*> hwList;
             std::list<Logger*> logList;
             
-            bool configureHook();
             bool startHook();
-            void updateHook();
             void stopHook();
-            void cleanupHook();
     };
 }
 

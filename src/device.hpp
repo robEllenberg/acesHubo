@@ -19,8 +19,8 @@ namespace ACES{
             //'int junk' is simply here to disambiguate the function calls,
             //it does nothing 
             Device(std::string config, std::string junk);
-            Device(std::string name);
-            void RxGoal(Goal* g);
+            //Device(std::string name);
+            void rxDownStream(Goal* g);
             void attachCredentials(ACES::Credentials* c);
             bool subscribeState(ProtoState* s);
 
@@ -28,10 +28,10 @@ namespace ACES{
             void updateHook();
             void cleanupHook();
 
-            virtual void interpretResult(ProtoResult* rx) = 0 ;
+            virtual void rxUpStream(ProtoResult* rx) = 0 ;
 
-            RTT::Event<void(Goal*)> TxRequest;
-            RTT::Event<void(Goal*)> announceData;
+            RTT::Event<void(Goal*)> txDownStream;
+            RTT::Event<void(Goal*)> txUpStream;
             Credentials* credentials;
             RTT::Buffer<Goal*> *requestBuf;
             RTT::Buffer<Goal*> *returnBuf;

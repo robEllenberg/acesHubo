@@ -5,12 +5,12 @@ namespace TestSuite{
       : ACES::Hardware(cfg, args)
     { }
 
-    Hardware::Hardware(std::string name)
-      : ACES::Hardware(name)
-    { }
+//    Hardware::Hardware(std::string name)
+//      : ACES::Hardware(name)
+//    { }
 
     bool Hardware::transmit(ACES::Message* m){
-        m->printme();
+        //m->printme();
         RTT::Logger::log() << "Update" << RTT::endlog();
         return true;
     }
@@ -24,7 +24,7 @@ namespace TestSuite{
     }
     
     void Hardware::updateHook(){
-        RTT::Logger::log() << "HW Tick" << RTT::endlog();
+        //RTT::Logger::log() << "HW Tick" << RTT::endlog();
     }
     
     void Credentials::printme(){
@@ -34,11 +34,11 @@ namespace TestSuite{
     Device::Device(std::string cfg, std::string args)
       : ACES::Device(cfg, args)
     { }
-
+/*
     Device::Device(std::string name)
       : ACES::Device(name)
     { }
-    
+*/    
     void Device::interpretResult (ACES::ProtoResult *rx){
         //ACES::Result<ACES::Goal*>* r = (ACES::Result<ACES::Goal*>*)rx;
         //ACES::Goal* g = r->result;
@@ -54,11 +54,14 @@ namespace TestSuite{
     Protocol::Protocol(std::string cfg, std::string args)
       : ACES::Protocol(cfg, args)
     { }
-
+/*
     Protocol::Protocol(std::string name)
       : ACES::Protocol(name)
     { }
-     
+*/     
     void Protocol::interpretRx(ACES::ProtoWord *){
     }
+
+    //void Protocol::addRequest(Goal*){
+    //}
 };
