@@ -1,19 +1,28 @@
-OPTION( BUILD_WEBOTS "Build Webots" ON )
+OPTION( BUILD_DISPATCHER "Build Dispatcher" ON )
 
-IF ( BUILD_WEBOTS )
+IF ( BUILD_DISPATCHER )
 
-   FILE( GLOB SRCS ../../src/dispatcher.cpp)
-   FILE( GLOB HPPS ../../src/dispatcher.hpp)
+    FILE( GLOB SRCS ../../src/dispatcher.cpp)
+    FILE( GLOB HPPS ../../src/dispatcher.hpp)
 
-   INCLUDE_DIRECTORIES( ${WEBOTS_INCLUDE_DIRS} )
+    GLOBAL_ADD_COMPONENT( aces-dispatcher ${SRCS} )
+    GLOBAL_ADD_INCLUDE( aces ${HPPS})
+    COMPONENT_ADD_DEPS( aces-dispatcher aces-common )
 
-   GLOBAL_ADD_COMPONENT( aces-dispatcher ${SRCS} )
-   GLOBAL_ADD_INCLUDE( aces ${HPPS})
+    IF( BUILD_WEBOTS )
+        INCLUDE_DIRECTORIES( ${WEBOTS_INCLUDE_DIRS} )
+        COMPONENT_ADD_DEPS( aces-dispatcher aces-webots )
+        ADD_DEFINITIONS( -DWEBOTS )
+    ENDIF(BUILD_WEBOTS)
 
-   COMPONENT_ADD_DEPS( aces-dispatcher aces-webots aces-common )
-   #COMPONENT_ADD_LIBS( aces-common )
-   #ADD_SUBDIRECTORY( tests )
+    IF( BUILD_TESTSUITE )
+        COMPONENT_ADD_DEPS( aces-dispatcher aces-testsuite )
+        ADD_DEFINITIONS(-DTESTSUITE)
+    ENDIF( BUILD_TESTSUITE )
 
-   #PROGRAM_ADD_DEPS( wbtest orocos-taskb ) 
+    #COMPONENT_ADD_LIBS( aces-common )
+    #ADD_SUBDIRECTORY( tests )
 
-ENDIF ( BUILD_WEBOTS )
+    #PROGRAM_ADD_DEPS( wbtest orocos-taskb ) 
+
+ENDIF ( BUILD_DISPATCHER )

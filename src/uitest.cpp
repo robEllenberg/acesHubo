@@ -17,16 +17,20 @@ int ORO_main(int a, char** b){
     
     RTT::TaskContext launch("launch");
     ACES::Dispatcher d("dispatch");
-	assert( launch.addPeer((RTT::TaskContext*)&d) );
+	launch.connectPeers((RTT::TaskContext*)&d);
         
     launch.setActivity(new RTT::Activity(5, 1.0/10.0, 0, "launch") );
     launch.scripting()->loadPrograms("testprog.ops");
-    launch.start();
-    launch.engine()->programs()->getProgram("TestProgram")->start();
+    //d.scripting()->loadPrograms("testprog.ops");
 
-    //d->scripting()->loadPrograms("testprog.ops");
+    launch.start();
+    
+    launch.engine()->programs()->getProgram("TestProgram")->start();    
+
+    //Orocos::TaskBrowser tbrowser(&launch);
+    //tbrowser.loop();
     //d->start();
-    //d->engine()->programs()->getProgram("TestProgram")->start();    
+    //launch.engine()->programs()->getProgram("TestProgram")->start();
 	while(true){};
 	return 0;
 }

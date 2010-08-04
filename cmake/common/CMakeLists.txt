@@ -3,7 +3,7 @@ OPTION( BUILD_COMMON "Build Common" ON )
 IF ( BUILD_COMMON )
 
    SET(PREFIX ../../src/)
-   SET(NODES credentials;goal;message;taskcfg;word;controller;device;hardware;protocol;state)
+   SET(NODES credentials;goal;message;taskcfg;word;controller;device;hardware;protocol;state;logger)
    SET(srcs "")
    SET(hpps "")
 
