@@ -24,7 +24,7 @@ namespace TestSuite{
     }
     
     void Hardware::updateHook(){
-        RTT::Logger::log() << "HW Tick" << RTT::endlog();
+        RTT::Logger::log() << "HW(" << name << ") Tick" << RTT::endlog();
     }
     
     void Credentials::printme(){
