@@ -10,7 +10,7 @@ namespace ACES {
             "credentials associated w/the goal");
 
         if(args == "Joint"){
-            propID = JOINT;
+            nodeID = JOINT;
         }
 
       //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
@@ -21,17 +21,9 @@ namespace ACES {
         );
         
     }
-    
-    bool ProtoState::configureHook(){
-        return true;
-    }
-    
-    bool ProtoState::startHook(){
-        return true;
-    }
-    
+   
     void ProtoState::updateHook(){
-        Goal* g = new Goal(this->propID, REFRESH);
+        Goal* g = new Goal(this->nodeID, REFRESH);
         set_stack->Push(g);
         //g->printme();
         //RTT::Logger::log() << "Update State "
@@ -41,12 +33,6 @@ namespace ACES {
             set_stack->Pop(h);
             txDownStream(h);
         }
-    }
-    
-    void ProtoState::stopHook(){
-    }
-    
-    void ProtoState::cleanupHook(){
     }
 
     bool ProtoState::subscribeController(Controller* c){
@@ -70,7 +56,7 @@ namespace ACES {
         mypair = p->find( name );
         if(mypair != p->end() ){
             void* val = (*mypair).second;
-            Goal* g = new Goal(propID, SET, val);
+            Goal* g = new Goal(nodeID, SET, val);
            
             //RTT::Logger::log() << this->name << " Announce: "
             //<< *((float*)val) << RTT::endlog();
@@ -79,14 +65,16 @@ namespace ACES {
         }
     }
 
-    void ProtoState::rxUpStream(Goal* g){
+    void ProtoState::rxUpStream(ProtoResult* r){
         //if(name == "RSP"){
         //    RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
         //}
             //if(name == "RKP"){
             //    g->printme();
             //}
-        asgnfunct(g->data, this);
+        if(r->nodeID == nodeID){
+            asgnfunct(r, this);
+        }
     }
 
 }

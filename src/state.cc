@@ -29,14 +29,15 @@
     template <class T>
     void State<T>::go(T sp){
         T* p = new T(sp);
-        Goal* g = new Goal(propID, SET, p);
+        Goal* g = new Goal(nodeID, SET, p);
         txDownStream(g);
     }
 
     template <class T>
-    void State<T>::assign(void* meas, void* me){
-        State<T>* t = (State<T>*)me;
+    void State<T>::assign(ProtoResult* meas, void* me){
+        State<T>* th = (State<T>*)me;
         //t->value = *((T*)meas);
-        t->value.set(  *((T*)meas)  );
+        T* newVal = ((Result<T*>*)meas)->result;
+        th->value.set(  *newVal  );
     }
 

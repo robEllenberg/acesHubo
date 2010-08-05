@@ -17,6 +17,7 @@
 #include "controller.hpp"
 #include "taskcfg.hpp"
 #include "goal.hpp"
+#include "word.hpp"
 
 namespace ACES {
     //Webots Component Types
@@ -28,23 +29,18 @@ namespace ACES {
     {
         public:
             ProtoState(std::string config, std::string args) ;
+            void (*asgnfunct)(ProtoResult*, void*);
 
-            bool configureHook();
-            bool startHook();
             void updateHook();  
-            void stopHook();
-            void cleanupHook();
-
-            int propID;
-            //DATA_TYPE dtype;
-
-            void (*asgnfunct)(void*, void*);
 
             RTT::Event<void(Goal*)> txDownStream;
-            RTT::Buffer< Goal* > *set_stack;
-            bool subscribeController(Controller* c);
             void rxDownStream(std::map<std::string, void*>*);
-            void rxUpStream(Goal* d);
+            void rxUpStream(ProtoResult* d);
+
+            int nodeID;
+            RTT::Buffer< Goal* > *set_stack;
+
+            bool subscribeController(Controller* c);
     };
 
     template <class T>
@@ -54,9 +50,8 @@ namespace ACES {
 
             void printme();
             void go(T sp);
-            static void assign(void* meas, void* me);
+            static void assign(ProtoResult* meas, void* me);
 
-            //T value;
             RTT::Attribute<T> value;
             RTT::Method<void(T)> goMethod;
     };

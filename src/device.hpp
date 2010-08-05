@@ -20,21 +20,24 @@ namespace ACES{
             //it does nothing 
             Device(std::string config, std::string junk);
             //Device(std::string name);
-            void rxDownStream(Goal* g);
+            RTT::Event<void(Goal*)> txDownStream;
+            RTT::Event<void(ProtoResult*)> txUpStream;
+            virtual void rxUpStream(ProtoResult* rx);
+            virtual void rxDownStream(Goal* g);
+
+            void updateHook();
+
+            virtual Goal* processDSQueue();
+            std::deque<Goal*> dsQueue;
+            RTT::OS::Mutex dsqGuard;
+
+            virtual ProtoResult* processUSQueue();
+            std::deque<ProtoResult*> usQueue;
+            RTT::OS::Mutex usqGuard;
+
             void attachCredentials(ACES::Credentials* c);
             bool subscribeState(ProtoState* s);
-
-            bool configureHook();
-            void updateHook();
-            void cleanupHook();
-
-            virtual void rxUpStream(ProtoResult* rx) = 0 ;
-
-            RTT::Event<void(Goal*)> txDownStream;
-            RTT::Event<void(Goal*)> txUpStream;
             Credentials* credentials;
-            RTT::Buffer<Goal*> *requestBuf;
-            RTT::Buffer<Goal*> *returnBuf;
     };
 }
 

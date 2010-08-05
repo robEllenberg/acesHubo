@@ -10,7 +10,7 @@ namespace ACES{
             Goal(int id, int mode, void* d=0);
             void printme();
 
-            int propID;
+            int nodeID;
             int mode;
             void* data;
             Credentials* cred;

@@ -3,10 +3,10 @@
 namespace ACES{
 
     Goal::Goal(int id, int m, void* d){
-        propID = id;
+        nodeID = id;
         data = d;
         mode = m;
-        cred = 0;
+        cred = NULL;
     }
 
     void Goal::printme(){

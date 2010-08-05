@@ -18,14 +18,19 @@ namespace ACES{
     };
 
     class ProtoResult{
+        public:
+            ProtoResult(int dev, int node);
+            int devID;
+            int nodeID;
     };
 
     template <class T>
     class Result : public  ProtoResult{
         public:
-            Result(T r);
-            int id;
-            int busid;
+            //Result(T r);
+            Result(T r, int dev=0, int node=0);
+            //int id;
+            //int busid;
             T result;
     };
 
@@ -35,7 +40,10 @@ namespace ACES{
     }
 
     template <class T>
-    Result<T>::Result(T r){
+    //Result<T>::Result(T r){
+    Result<T>::Result(T r, int dev, int node)
+      : ProtoResult(dev, node)
+    {
         result = r;
     }
     

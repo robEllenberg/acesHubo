@@ -66,7 +66,7 @@ namespace ACES {
             it++)
         {
             ACES::ProtoWord* w =
-                (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(*it));
+                (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
 
             { RTT::OS::MutexLock lock(usqGuard);
               usQueue.push_back(w);

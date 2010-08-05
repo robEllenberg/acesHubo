@@ -4,16 +4,13 @@ namespace ACES{
     Device::Device(std::string config, std::string junk) :
       taskCfg(config),
       RTT::TaskContext(name),
-      txDownStream("txDownStream"),
-      txUpStream("txUpStream")
+      dsQueue(200),
+      usQueue(200)
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
         this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");
-
-        requestBuf = new RTT::Buffer<Goal*>(50);
-        returnBuf = new RTT::Buffer<Goal*>(50);
 
         this->setActivity(
             //TODO - allow user to set priority
@@ -32,13 +29,21 @@ namespace ACES{
         this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");
 
-        requestBuf = new RTT::Buffer<Goal*>(50);
-        returnBuf = new RTT::Buffer<Goal*>(50);
+        dsQueue = new RTT::Buffer<Goal*>(50);
+        usQueue = new RTT::Buffer<Goal*>(50);
     }
 */
     void Device::rxDownStream(Goal* g){
         g->cred = credentials;
-        requestBuf->Push(g);
+        RTT::OS::MutexLock lock(dsqGuard);
+        dsQueue.push_back(g);
+    }
+
+    void Device::rxUpStream(ProtoResult* rx){
+        if(rx->devID == credentials->devID){
+            RTT::OS::MutexLock lock(usqGuard);
+            usQueue.push_back(rx);
+        }
     }
 
     void Device::attachCredentials(ACES::Credentials* c){
@@ -76,32 +81,40 @@ namespace ACES{
         return true;
     }
 
-    bool Device::configureHook(){
-        return true;
-    }
-/*
-    bool Device::startHook(){
-        return true;
-    }
-*/
     void Device::updateHook(){
         //Forward Path
-        while(!requestBuf->empty() ){
-            Goal* g;
-            requestBuf->Pop(g);
-            RTT::Logger::log() << "device sent" << RTT::endlog();
+        assert(dsQueue.size() < 100);
+        Goal* g = NULL;
+        while( dsQueue.size() ){
+            g = processDSQueue();
+            //RTT::Logger::log() << "device sent" << RTT::endlog();
             txDownStream(g);
         }
         //Return Path
-        while(! returnBuf->empty()){
-            Goal* p;
+        assert(usQueue.size() < 100);
+        while( usQueue.size() ){
+            ProtoResult* p = processUSQueue();
             //Credentials* c = p->cred;
-            returnBuf->Pop(p);
             //p->printme();
             txUpStream(p);
         }
     }
-//    void Device::stopHook(){}
-    void Device::cleanupHook(){}
+    
+    Goal* Device::processDSQueue(){
+        RTT::OS::MutexLock lock(dsqGuard);
+        Goal* g = dsQueue.front();
+        dsQueue.pop_front();
+        return g;
+    }
 
+    ProtoResult* Device::processUSQueue(){
+        ProtoResult* p = NULL;
+        { RTT::OS::MutexLock lock(usqGuard);
+          p = usQueue.front();
+          usQueue.pop_front();
+        }
+        Goal* g = ( (Result<Goal*>*)p)->result;
+        Result<void*>* r = new Result<void*>(g->data, p->devID, p->nodeID);
+        return (ProtoResult*)r;
+    }
 }

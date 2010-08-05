@@ -85,20 +85,38 @@ namespace ACES {
         Message* m = NULL;
         assert(dsQueue.size() < 100);
         while(dsQueue.size()){
-            { RTT::OS::MutexLock lock(dsqGuard);
-              m = processDSQueue();
-            }
+            m = processDSQueue();
             txDownStream(m);
         }
 
         ProtoResult* r = NULL;
         assert( usQueue->size() < 100);
         while(usQueue.size()){
-            { RTT::OS::MutexLock lock(usqGuard);
-              r = processUSQueue();
-            }
+            r = processUSQueue();
             txUpStream(r);
         }
+    }
+
+    Message* Protocol::processDSQueue(){
+        RTT::OS::MutexLock lock(dsqGuard);
+        Goal* g = dsQueue.front();
+        dsQueue.pop_front();
+        Message* m = new Message(g);
+    }
+
+    ProtoResult* Protocol::processUSQueue(){
+        ProtoWord* p = NULL;
+        { RTT::OS::MutexLock lock(usqGuard);
+          p = usQueue.front();
+          usQueue.pop_front();
+        }
+        Word<Goal*>* w = (Word<Goal*>*)p;
+        Goal* g = w->data;
+        //void* v = g->data;
+        int dID = g->cred->devID;
+        int nID = g->nodeID;
+        Result<Goal*>* r = new Result<Goal*>(g, dID, nID);
+        return (ProtoResult*)r;
     }
     
     bool Protocol::subscribeDevice(Device* d){

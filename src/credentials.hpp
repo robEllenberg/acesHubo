@@ -14,6 +14,7 @@ namespace ACES {
     class Credentials {
         public:
             virtual void printme() = 0;
+            int devID;
             //std::string wb_device_id;
     };
 }
