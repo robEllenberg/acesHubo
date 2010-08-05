@@ -6,8 +6,8 @@ namespace ACES {
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
       txUpStream("txUpStream"),
-      dsQueue(200),
-      usQueue(200)
+      dsQueue(),
+      usQueue()
     {
 //        requestBuf = new std::deque<Message*>;
 

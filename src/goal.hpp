@@ -7,7 +7,7 @@ namespace ACES{
     enum MODES { REFRESH=1, SET};
     class Goal {
         public:
-            Goal(int id, int mode, void* d=0);
+            Goal(int id, int mode, void* d=NULL);
             void printme();
 
             int nodeID;

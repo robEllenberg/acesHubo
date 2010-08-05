@@ -23,7 +23,7 @@ namespace ACES {
     }
    
     void ProtoState::updateHook(){
-        Goal* g = new Goal(this->nodeID, REFRESH);
+        Goal* g = new Goal(this->nodeID, REFRESH, new float(3.14));
         set_stack->Push(g);
         //g->printme();
         //RTT::Logger::log() << "Update State "

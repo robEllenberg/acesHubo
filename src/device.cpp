@@ -4,8 +4,10 @@ namespace ACES{
     Device::Device(std::string config, std::string junk) :
       taskCfg(config),
       RTT::TaskContext(name),
-      dsQueue(200),
-      usQueue(200)
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream"),
+      dsQueue(),
+      usQueue()
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
@@ -34,6 +36,7 @@ namespace ACES{
     }
 */
     void Device::rxDownStream(Goal* g){
+        //RTT::Logger::log() << "rxDS, device" << RTT::endlog();
         g->cred = credentials;
         RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.push_back(g);

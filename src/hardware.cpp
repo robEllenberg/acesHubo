@@ -6,8 +6,8 @@ namespace ACES {
         taskCfg(cfg),
         RTT::TaskContext(name),
         txUpStream("txUpStream"),
-        dsQueue(200),
-        usQueue(200)
+        dsQueue(),
+        usQueue()
     {
         this->events()->addEvent(&txUpStream, "txUpStream", "word",
                                  "Recieved Data");
