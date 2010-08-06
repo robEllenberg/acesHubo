@@ -27,7 +27,7 @@ int ORO_main(int a, char** b){
     d.scripting()->loadPrograms("launch.ops");
 
     d.start();
-    d.engine()->programs()->getProgram("Main")->start();    
+    d.engine()->programs()->getProgram("main")->start();    
 
     Orocos::TaskBrowser tbrowser(&launch);
     tbrowser.loop();

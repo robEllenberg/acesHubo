@@ -15,11 +15,15 @@ namespace ACES{
           startDeviceMethod("startDevice", &Dispatcher::startDevice, this),
           startStateMethod("startState", &Dispatcher::startState, this),
           startControllerMethod("startController", &Dispatcher::startController, this),
+          startLoggerMethod("startLogger", &Dispatcher::startLogger, this),
+
           stopHWMethod("stopHW", &Dispatcher::stopHW, this),
           stopProtocolMethod("stopProtocol", &Dispatcher::stopProtocol, this),
           stopDeviceMethod("stopDevice", &Dispatcher::stopDevice, this),
           stopStateMethod("stopState", &Dispatcher::stopState, this),
           stopControllerMethod("stopController", &Dispatcher::stopController, this),
+          stopLoggerMethod("stopLogger", &Dispatcher::stopLogger, this),
+
           linkPDMethod("linkPD", &Dispatcher::linkPD, this),
           linkDSMethod("linkDS", &Dispatcher::linkDS, this),
           linkHPMethod("linkHP", &Dispatcher::linkHP, this),
@@ -58,12 +62,14 @@ namespace ACES{
         this->methods()->addMethod(startDeviceMethod, "startDevice");
         this->methods()->addMethod(startStateMethod, "startState");
         this->methods()->addMethod(startControllerMethod, "startController");
+        this->methods()->addMethod(startLoggerMethod, "startLogger");
 
         this->methods()->addMethod(stopHWMethod, "stopHW");
         this->methods()->addMethod(stopProtocolMethod, "stopProtocol");
         this->methods()->addMethod(stopDeviceMethod, "stopDevice");
         this->methods()->addMethod(stopStateMethod, "stopState");
         this->methods()->addMethod(stopControllerMethod, "stopController");
+        this->methods()->addMethod(stopLoggerMethod, "stopLogger");
                                    
         this->methods()->addMethod(linkPDMethod, "linkPD",
                                    "protocol", "protocol",
@@ -297,7 +303,7 @@ namespace ACES{
         Logger* l = (Logger*)this->getPeer(logger);
         ProtoState* s  = (ProtoState*)this->getPeer(state);
         if(l && s){
-            return l->addTrack(state);
+            return l->addTrack(s);
         }
     }
 
@@ -342,17 +348,35 @@ namespace ACES{
         return true;
     }
 
+    bool Dispatcher::startLogger(){
+        for(std::list<Logger*>::iterator it = logList.begin();
+            it != logList.end(); it++){
+            (*it)->start();
+        }
+        return true;
+    }
+
+
     bool Dispatcher::startHook(){
         startHW();
         startProtocol();
         startDevice();
         startState();
         startController();
+        startLogger();
         //RTT::Logger::log() << "Finished HW" << RTT::endlog();
         //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
         //RTT::Logger::log() << "Finished States" << RTT::endlog();
 
         //RTT::Logger::log() << "Finished Controllers" << RTT::endlog();
+        return true;
+    }
+
+    bool Dispatcher::stopLogger(){
+        for(std::list<Logger*>::iterator it = logList.begin();
+            it != logList.end(); it++){
+            (*it)->stop();
+        }
         return true;
     }
     
@@ -398,6 +422,7 @@ namespace ACES{
     }
 
     void Dispatcher::stopHook(){
+        stopLogger();
         stopController();
         stopState();
         stopDevice();

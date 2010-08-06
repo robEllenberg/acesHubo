@@ -71,18 +71,19 @@ namespace TestSuite{
     Spinner::Spinner(std::string cfg, std::string args)
      : ACES::State<float>::State(cfg, args){
         std::istringstream s1(args, std::istringstream::in);
-        float high, low;
+        float high, low, amp, dc;
         s1 >> low >> high;
-        this->high = high;
-        this->low = low;
+        amp = (high - low) / 2.0;
+        dc = (high + low) / 2.0;
+        this->amp = amp;
+        this->dc = dc;
         t = 0;
     }
     
     void Spinner::updateHook(){
-        float amp = high - low;
-        float dc = (high + low) / 2.0;
         float val = amp*sin(t) + dc;
         t += freq;
+        //RTT::Logger::log() << val <<RTT::endlog();
 
         ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH, new float(val));
         set_stack->Push(g);

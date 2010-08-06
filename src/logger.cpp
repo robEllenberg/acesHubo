@@ -22,15 +22,15 @@ namespace ACES {
     }
     
 
-    bool Logger::addTrack(std::string track){
-        ProtoState* s = (ProtoState*)(dispatch->getPeer(track));
+    bool Logger::addTrack(ProtoState* s){
+        //ProtoState* s = (ProtoState*)(dispatch->getPeer(track));
         if(s){
             trackList.push_back(s);
             return true;
         }
         return false;
     }
-
+/*
     bool Logger::addTracks(std::string tracks){
         std::istringstream s1(tracks, std::istringstream::in);
 
@@ -42,6 +42,7 @@ namespace ACES {
         }
         return true;
     }
+*/
 /*
     bool Logger::sample(){
         for( std::list<ProtoState*>::iterator it = trackList.begin();

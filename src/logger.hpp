@@ -25,8 +25,8 @@ namespace ACES{
             void updateHook();
 
             bool subscribeDispatcher(Dispatcher* d);
-            bool addTrack(std::string track);
-            bool addTracks(std::string tracks);
+            bool addTrack(ProtoState* s);
+            //bool addTracks(std::string tracks);
             virtual bool sample() = 0;
             //virtual bool store() = 0;
 

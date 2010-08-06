@@ -138,8 +138,8 @@ namespace ACES {
         }
 
         h = this->events()->setupConnection("txUpStream")
-            .callback( d, &Device::rxUpStream,
-                        this->engine()->events()
+            .callback( d, &Device::rxUpStream
+        //               ,this->engine()->events()
                      ).handle();
         if(!h.ready()){
             return false;

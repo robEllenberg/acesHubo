@@ -47,7 +47,7 @@ namespace TestSuite{
         public:
             Spinner(std::string cfg, std::string args);
             virtual void updateHook();
-            float high, low, t;
+            float amp, dc, t;
     };
     
 }

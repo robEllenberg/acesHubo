@@ -45,7 +45,7 @@ namespace ACES{
     void Device::rxUpStream(ProtoResult* rx){
         //RTT::Logger::log() << "rxUS, device" << RTT::endlog();
         if(rx->devID == credentials->devID){
-            rx->printme();
+            //rx->printme();
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }

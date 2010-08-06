@@ -1,7 +1,7 @@
-program Main {
+program main {
     /* BEGIN CONFIG SECTION */
     //Add a hardware node (usually and electrical bus)
-    do addHardware("tsHW 10 10","TestSuite","");
+    do addHardware("tsHW 90 100","TestSuite","");
     
     //Add a protocol node (interpreter for data on the bus)
     do addProtocol("tsPro 80 100", "TestSuite", "");
@@ -29,6 +29,12 @@ program Main {
     do linkPD("tsPro", "dY");
     do linkPD("tsPro", "dZ");
 
+    //Setup Logging
+    do addLogger("log1 5 200", "File", "testlog.txt");
+    do linkLS("log1", "X");
+    do linkLS("log1", "Y");
+    do linkLS("log1", "Z");
+
     /* END CONFIG SECTION */
 
     //Start the threads
@@ -37,6 +43,7 @@ program Main {
     do startDevice();
     do startState();
     do startController();
+    do startLogger();
 
     /* IMPORTANT STUFF HERE */
 }

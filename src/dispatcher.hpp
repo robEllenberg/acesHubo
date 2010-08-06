@@ -47,12 +47,14 @@ namespace ACES{
             bool startDevice();
             bool startState();
             bool startController();
+            bool startLogger();
 
             bool stopHW();
             bool stopProtocol();
             bool stopDevice();
             bool stopState();
             bool stopController();
+            bool stopLogger();
 
             bool linkPD(std::string pcol, std::string device);
             bool linkDS(std::string device, std::string state);
@@ -79,12 +81,14 @@ namespace ACES{
             RTT::Method<bool(void)> startDeviceMethod;
             RTT::Method<bool(void)> startStateMethod;
             RTT::Method<bool(void)> startControllerMethod;
+            RTT::Method<bool(void)> startLoggerMethod;
 
             RTT::Method<bool(void)> stopHWMethod;
             RTT::Method<bool(void)> stopProtocolMethod;
             RTT::Method<bool(void)> stopDeviceMethod;
             RTT::Method<bool(void)> stopStateMethod;
             RTT::Method<bool(void)> stopControllerMethod;
+            RTT::Method<bool(void)> stopLoggerMethod;
 
             RTT::Method<bool(std::string, std::string)> linkPDMethod;
             RTT::Method<bool(std::string, std::string)> linkDSMethod;
