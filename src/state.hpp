@@ -31,7 +31,7 @@ namespace ACES {
             ProtoState(std::string config, std::string args) ;
             void (*asgnfunct)(ProtoResult*, void*);
 
-            void updateHook();  
+            virtual void updateHook();  
 
             RTT::Event<void(Goal*)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);

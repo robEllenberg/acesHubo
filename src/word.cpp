@@ -5,4 +5,9 @@ namespace ACES{
         devID = dev;
         nodeID = node;
     }
+
+    void ProtoResult::printme(){
+        RTT::Logger::log() << "Result: devID=" << devID << " nodeID="
+                           << nodeID << RTT::endlog();
+    }
 }

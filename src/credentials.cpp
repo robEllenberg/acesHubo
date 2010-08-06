@@ -1,9 +1,10 @@
 #include "credentials.hpp"
 namespace ACES {
-/*
-    ProtoCredential::ProtoCredential(int t){
-        credType = t;
+    Credentials::Credentials(int id){
+        devID = id;
     }
-*/
 
+    void Credentials::printme(){
+        RTT::Logger::log() << "Credentials: ID=" << devID << RTT::endlog();
+    }
 }

@@ -72,6 +72,7 @@ namespace ACES {
             //if(name == "RKP"){
             //    g->printme();
             //}
+        //RTT::Logger::log() << "State rxUS" << RTT::endlog();
         if(r->nodeID == nodeID){
             asgnfunct(r, this);
         }

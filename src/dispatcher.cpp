@@ -162,7 +162,7 @@ namespace ACES{
         }
 
         if( type == "TestSuite") {
-            s = (ProtoState*) new ACES::State<float>(cfg, args);
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args);
         }
 		
         if(s){

@@ -27,8 +27,8 @@ namespace ACES {
             bool rxDownStream(Message* m);
             RTT::Event<void(ProtoWord*)> txUpStream;
 
-            virtual bool transmit(Message* m);
-            virtual bool recieve();
+            virtual bool txBus(Message* m);
+            virtual bool rxBus();
 
             virtual Message* processDSQueue();
             std::deque<Message*> dsQueue;

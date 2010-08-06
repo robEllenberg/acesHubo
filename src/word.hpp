@@ -20,6 +20,7 @@ namespace ACES{
     class ProtoResult{
         public:
             ProtoResult(int dev, int node);
+            virtual void printme();
             int devID;
             int nodeID;
     };

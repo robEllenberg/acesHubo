@@ -86,6 +86,8 @@ namespace ACES {
         assert(dsQueue.size() < 100);
         while(dsQueue.size()){
             m = processDSQueue();
+            //RTT::Logger::log() << "process sent" << RTT::endlog();
+            //m->printme();
             txDownStream(m);
         }
 
@@ -93,6 +95,8 @@ namespace ACES {
         assert( usQueue->size() < 100);
         while(usQueue.size()){
             r = processUSQueue();
+            //r->printme();
+            //RTT::Logger::log() << "process sent" << RTT::endlog();
             txUpStream(r);
         }
     }
@@ -102,6 +106,7 @@ namespace ACES {
         Goal* g = dsQueue.front();
         dsQueue.pop_front();
         Message* m = new Message(g);
+        return m;
     }
 
     ProtoResult* Protocol::processUSQueue(){
@@ -112,7 +117,6 @@ namespace ACES {
         }
         Word<Goal*>* w = (Word<Goal*>*)p;
         Goal* g = w->data;
-        //void* v = g->data;
         int dID = g->cred->devID;
         int nID = g->nodeID;
         Result<Goal*>* r = new Result<Goal*>(g, dID, nID);

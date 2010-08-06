@@ -43,16 +43,19 @@ namespace ACES{
     }
 
     void Device::rxUpStream(ProtoResult* rx){
+        //RTT::Logger::log() << "rxUS, device" << RTT::endlog();
         if(rx->devID == credentials->devID){
+            rx->printme();
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }
     }
 
+/*
     void Device::attachCredentials(ACES::Credentials* c){
         credentials = c;
     }
-
+*/
     bool Device::subscribeState(ProtoState* s){
         this->connectPeers( (RTT::TaskContext*) s);
         //TODO - Figure out how calling this reception function
@@ -97,6 +100,7 @@ namespace ACES{
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
             ProtoResult* p = processUSQueue();
+            //RTT::Logger::log() << "device recieve" << RTT::endlog();
             //Credentials* c = p->cred;
             //p->printme();
             txUpStream(p);

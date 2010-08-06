@@ -26,56 +26,62 @@ namespace ACES {
     bool Hardware::rxDownStream(Message* m){
         RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.push_back(m);
+        //m->printme();
         return true;
     }
 
     void Hardware::updateHook(){
         Message* m = NULL;
         while(dsQueue.size()){
-            { RTT::OS::MutexLock lock(dsqGuard);
-              m = processDSQueue();
-            }
-            transmit(m);
+            m = processDSQueue();
+            //m->printme();
+            //RTT::Logger::log() << "hw sent" << RTT::endlog();
+            txBus(m);
         }
-        recieve();
+        rxBus();
         ProtoWord* p = NULL;
         while(usQueue.size()){
-            { RTT::OS::MutexLock lock(usqGuard);
-              p = processUSQueue();
-            }
+            p = processUSQueue();
             txUpStream(p);
         }
     }
 
     Message* Hardware::processDSQueue(){
+        RTT::OS::MutexLock lock(dsqGuard);
         Message* m = dsQueue.front();
         dsQueue.pop_front();
         return m;
     }
 
     ProtoWord* Hardware::processUSQueue(){
+        RTT::OS::MutexLock lock(usqGuard);
         ProtoWord* p = usQueue.front();
         usQueue.pop_front();
         return p;
     }
 
-    bool Hardware::transmit(Message* m){
+    bool Hardware::txBus(Message* m){
         Goal* g = NULL;
-        for(std::list<Goal*>::iterator it = m->goalList.begin();
-            it != m->goalList.end();
-            it++)
-        {
-            ACES::ProtoWord* w =
-                (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
+        if( m->goalList.size() ){
+            for(std::list<Goal*>::iterator it = m->goalList.begin();
+                it != m->goalList.end();
+                it++)
+            {
+                ACES::ProtoWord* w =
+                    (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
 
-            { RTT::OS::MutexLock lock(usqGuard);
-              usQueue.push_back(w);
+                { RTT::OS::MutexLock lock(usqGuard);
+                  usQueue.push_back(w);
+                }
             }
+            return true;
         }
-        return true;
+        else{
+            return false;
+        }
     }
     
-    bool Hardware::recieve(){
+    bool Hardware::rxBus(){
         return true;
     }
 
@@ -83,8 +89,8 @@ namespace ACES {
         this->connectPeers( (RTT::TaskContext*) p);
         RTT::Handle h = p->events()->setupConnection("txDownStream")
             .callback( this, &Hardware::rxDownStream
-                       ,p->engine()->events() ).handle();
-            //).handle();
+            //           ,p->engine()->events() ).handle();
+            ).handle();
         if(! h.ready() ){
             return false;
         }
@@ -94,8 +100,9 @@ namespace ACES {
         }
 
         h = this->events()->setupConnection("txUpStream")
-            .callback( p, &Protocol::rxUpStream,
-                       this->engine()->events() ).handle();
+            .callback( p, &Protocol::rxUpStream
+            //           ,this->engine()->events() ).handle();
+            ).handle();
 
         if(! h.ready() ){
             return false;

@@ -35,7 +35,7 @@ namespace ACES{
             std::deque<ProtoResult*> usQueue;
             RTT::OS::Mutex usqGuard;
 
-            void attachCredentials(ACES::Credentials* c);
+            //void attachCredentials(ACES::Credentials* c);
             bool subscribeState(ProtoState* s);
             Credentials* credentials;
     };
