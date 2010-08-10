@@ -10,45 +10,19 @@ namespace Webots {
         this->methods()->addMethod(stepMethod,
                                    "Advance the system time",
                                    "TStep", "Lenght of step to advance(ms)");
-        cache = new RTT::Buffer<ACES::ProtoWord*>(250);
     }
 
-    Hardware::Hardware(std::string name)
-      : ACES::Hardware(name)
-    {
-        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
-            ("step", &Hardware::step, this);
-        this->methods()->addMethod(stepMethod,
-                                   "Advance the system time",
-                                   "TStep", "Lenght of step to advance(ms)");
-        cache = new RTT::Buffer<ACES::ProtoWord*>(250);
-    }
-       
-    bool Hardware::startHook(){
-        wb_robot_init();
-        return true;
-    }
-    
     void Hardware::updateHook(){
-        if(cache->size() > 200){
-            RTT::Logger::log() << "Cache Size " << cache->size() << RTT::endlog();
-        }
-        if (not cache->empty() ){
-            ACES::ProtoWord* w;
-            cache->Pop(w);
-            //ACES::Word<ACES::Goal*>* g = (ACES::Word<ACES::Goal*>*)w;
-            //ACES::Goal* d = g->data;
-            //d->printme();
-            announceRx(w);
-        }
+        //We want a null action on the tick, so we override this to nothing
+        //and use step(), to manually advance the clock.
     }
 
     void Hardware::step(int time){
-        ACES::Hardware::updateHook();
+    //    ACES::Hardware::updateHook();
         wb_robot_step(time);
     }
 
-    bool Hardware::transmit(ACES::Message* m){
+    bool Hardware::txBus(ACES::Message* m){
         ACES::Goal *g = m->goalList.front();
         //g->printme();
 
@@ -65,7 +39,7 @@ namespace Webots {
                 //Different commands are needed depending on the
                 //type of device we're looking up. Find the appropriate
                 //result for this propID
-                switch (g->propID){
+                switch (g->nodeID){
                     case (ACES::JOINT):{
                         *result = wb_servo_get_position(tag);
                      }
@@ -81,8 +55,10 @@ namespace Webots {
                 g->data = (void*)result;
                 ACES::ProtoWord* w =
                     (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
-                return cache->Push(w);
-                //announceRx(w);
+                { RTT::OS::MutexLock lock(usqGuard);
+                  usQueue.push_back(w);
+                }
+                return true;
              }
              break;
 
@@ -111,10 +87,6 @@ namespace Webots {
         //m->printme();
     }
 
-    bool Hardware::recieve(){
-        return true;
-    }
-
     bool Hardware::subscribeController(ACES::Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
@@ -137,6 +109,7 @@ namespace Webots {
     }
 
     Credentials::Credentials(Credentials* c)
+    : ACES::Credentials(c->devID)
     {
         assign(c->wb_device_id, c->devName, c->zero, c->direction);
     }
@@ -151,30 +124,21 @@ namespace Webots {
     }  
 
     Credentials::Credentials(std::string id_str, std::string devname,
-     float z, float dir)
+     float z, float dir) : ACES::Credentials(1)
     {
         assign(id_str, devname, z, dir);
     }  
 
     void Credentials::printme(){
-        /*
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
         RTT::Logger::log() << " Device Name= " << devName;
         RTT::Logger::log() << RTT::endlog();
-        */
-        if( wb_device_id == "RKP" ){
-            RTT::Logger::log() << "Webots: ID= " << wb_device_id;
-            RTT::Logger::log() << " Zero= " << zero;
-            RTT::Logger::log() << " Direction= " << direction;
-            RTT::Logger::log() << " Device Name= " << devName;
-            RTT::Logger::log() << RTT::endlog();
-        }
     }
 
-    //Credentials::Credentials(std::string args)
     Credentials::Credentials(std::string args)
+      : ACES::Credentials(1)
     {
         std::istringstream s1(args);
         float z, d;
@@ -184,23 +148,11 @@ namespace Webots {
     }
 
     Device::Device(std::string cfg, std::string args)
-      : ACES::Device(cfg, 0)
+      : ACES::Device(cfg)
     {
         std::string rargs = args + (std::string)" " + name;
         //RTT::Logger::log() << rargs << RTT::endlog();
-        ACES::Credentials *cred = new Credentials(rargs);
-        credentials = cred;
-        //credentials = NULL;
-    }
-
-    Device::Device(std::string name)
-      : ACES::Device(name)
-    {
-        //std::string rargs = args + (std::string)" " + name;
-        //RTT::Logger::log() << rargs << RTT::endlog();
-        //ACES::Credentials *cred = new Credentials(rargs);
-        //credentials = cred;
-        credentials = NULL;
+        credentials = (ACES::Credentials*)( new Credentials(rargs) );
     }
     
     bool Device::startHook(){
@@ -216,7 +168,7 @@ namespace Webots {
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
         wb_servo_disable_position(tag); 
     }
-
+/*
     void Device::interpretResult(ACES::ProtoResult* rx){
         ACES::Result<ACES::Goal*>* r = (ACES::Result<ACES::Goal*>*)rx;
         ACES::Goal* g = r->result;
@@ -235,13 +187,11 @@ namespace Webots {
             returnBuf->Push(g);
         }
     }
-
+*/
     Protocol::Protocol(std::string cfg, std::string args) 
       : ACES::Protocol(cfg, args){}
 
-    Protocol::Protocol(std::string name) 
-      : ACES::Protocol(name){}
-
+/*
     void Protocol::interpretRx(ACES::ProtoWord* rx){
         //Since webots isn't doing any real interpretation, we grab the
         //Goal off the word and simply put it into the new container
@@ -253,7 +203,7 @@ namespace Webots {
         //Broadcast the reponse
         returnBuf->Push((ACES::ProtoResult*)r);
     }
-
+*/
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : ACES::ScriptCtrl(cfg, args)
     {}
@@ -372,6 +322,7 @@ namespace Webots {
 
 }
 
+/*
 #include <ocl/ComponentLoader.hpp>
 ORO_CREATE_COMPONENT_TYPE()
 ORO_LIST_COMPONENT_TYPE( Webots::Hardware )
@@ -379,3 +330,4 @@ ORO_LIST_COMPONENT_TYPE( Webots::Device )
 ORO_LIST_COMPONENT_TYPE( Webots::Protocol )
 ORO_LIST_COMPONENT_TYPE( Webots::ScriptCtrl )
 ORO_LIST_COMPONENT_TYPE( Webots::ArmCtrl )
+*/

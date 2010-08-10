@@ -14,7 +14,7 @@ IF ( BUILD_WEBOTS )
    GLOBAL_ADD_INCLUDE( aces ${HPPS})
 
    COMPONENT_ADD_DEPS( aces-webots aces-common )
-   COMPONENT_ADD_LIBS( ${WEBOTS_LIBS} )
+   COMPONENT_ADD_LIBS( aces-webots ${WEBOTS_LIBS} )
     #orocos-ocl-common-gnulinux orocos-rtt-gnulinux orocos-taskbrowser-gnulinux
    #ADD_SUBDIRECTORY( tests )
 

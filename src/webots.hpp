@@ -29,17 +29,12 @@ namespace Webots{
         public:
             Hardware(std::string cfg, std::string args);
             Hardware(std::string name);
-            bool startHook();
             void updateHook();
+            bool txBus(ACES::Message* m);
 
-            bool isBusy(void);
-            bool transmit(ACES::Message* m);
-            bool recieve();
-            void setGoal();
             void step(int time=32);
             void stepRequest( std::map<std::string, void*>* );
             bool subscribeController(ACES::Controller* c);
-            RTT::Buffer< ACES::ProtoWord* > *cache;
     };
    
     class Credentials : public ACES::Credentials {
@@ -63,7 +58,6 @@ namespace Webots{
     class Device : public ACES::Device {
         public:
             Device(std::string config, std::string args);
-            Device(std::string name);
             void interpretResult(ACES::ProtoResult* rx);
             bool startHook();
             void stopHook();
@@ -73,7 +67,7 @@ namespace Webots{
         public:
             Protocol(std::string cfg, std::string args);
             Protocol(std::string name);
-            void interpretRx(ACES::ProtoWord* rx);
+            //void interpretRx(ACES::ProtoWord* rx);
             //ACES::Message* buildMessage(
             //                   Credentials* cred);
             //ACES::Credentials* parseHWInput(

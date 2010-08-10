@@ -18,7 +18,7 @@ namespace ACES{
         public:
             //'int junk' is simply here to disambiguate the function calls,
             //it does nothing 
-            Device(std::string config, std::string junk);
+            Device(std::string config);
             //Device(std::string name);
             RTT::Event<void(Goal*)> txDownStream;
             RTT::Event<void(ProtoResult*)> txUpStream;

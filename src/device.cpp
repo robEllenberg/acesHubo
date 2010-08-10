@@ -1,7 +1,7 @@
 #include "device.hpp"
 
 namespace ACES{
-    Device::Device(std::string config, std::string junk) :
+    Device::Device(std::string config) :
       taskCfg(config),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
@@ -20,42 +20,20 @@ namespace ACES{
         );
             
     }
-/*
-    Device::Device(std::string name) :
-      RTT::TaskContext(name),
-      txDownStream("txDownStream"),
-      txUpStream("txUpStream")
-    {
-        this->events()->addEvent(&txDownStream, "txDownStream", "goal",
-                                 "The Goal/SP Data");
-        this->events()->addEvent(&txUpStream, "txUpStream", "data",
-                                 "Interperted data going to states");
 
-        dsQueue = new RTT::Buffer<Goal*>(50);
-        usQueue = new RTT::Buffer<Goal*>(50);
-    }
-*/
     void Device::rxDownStream(Goal* g){
-        //RTT::Logger::log() << "rxDS, device" << RTT::endlog();
         g->cred = credentials;
         RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.push_back(g);
     }
 
     void Device::rxUpStream(ProtoResult* rx){
-        //RTT::Logger::log() << "rxUS, device" << RTT::endlog();
         if(rx->devID == credentials->devID){
-            //rx->printme();
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }
     }
 
-/*
-    void Device::attachCredentials(ACES::Credentials* c){
-        credentials = c;
-    }
-*/
     bool Device::subscribeState(ProtoState* s){
         this->connectPeers( (RTT::TaskContext*) s);
         //TODO - Figure out how calling this reception function
@@ -93,16 +71,12 @@ namespace ACES{
         Goal* g = NULL;
         while( dsQueue.size() ){
             g = processDSQueue();
-            //RTT::Logger::log() << "device sent" << RTT::endlog();
             txDownStream(g);
         }
         //Return Path
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
             ProtoResult* p = processUSQueue();
-            //RTT::Logger::log() << "device recieve" << RTT::endlog();
-            //Credentials* c = p->cred;
-            //p->printme();
             txUpStream(p);
         }
     }
