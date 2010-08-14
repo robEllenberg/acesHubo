@@ -1,0 +1,115 @@
+program main {
+    do addHardware("wbHW 1 600", "Webots", "");
+    do addProtocol("wbPcol 2 600", "Webots", "");
+
+    do addController("wbNull 10 15", "Webots Null", "");
+    do addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
+    do addController("wbArm 10 15", "Webots Arm", "sins.txt");
+
+    do addDevice("dHY 5 31", "Webots",  "HY  0.0 -1.0");
+    do addDevice("dLSP 5 31", "Webots", "LSP 0.0  1.0");
+    do addDevice("dLSR 5 31", "Webots", "LSR 0.0  1.0");
+    do addDevice("dRSP 5 31", "Webots", "RSP 0.0  1.0");
+    do addDevice("dRSR 5 31", "Webots", "RSR 0.0  1.0");
+    do addDevice("dLHY 5 31", "Webots", "LHY 0.0  1.0");
+    do addDevice("dLHR 5 31", "Webots", "LHR 0.0  1.0");
+    do addDevice("dLHP 5 31", "Webots", "LHP 0.0 -1.0");
+    do addDevice("dLKP 5 31", "Webots", "LKP 0.0  1.0");
+    do addDevice("dLAP 5 31", "Webots", "LAP 0.0 -1.0");
+    do addDevice("dLAR 5 31", "Webots", "LAR 0.0  1.0");
+    do addDevice("dRHY 5 31", "Webots", "RHY 0.0  1.0");
+    do addDevice("dRHR 5 31", "Webots", "RHR 0.0 -1.0");
+    do addDevice("dRHP 5 31", "Webots", "RHP 0.0 -1.0");
+    do addDevice("dRKP 5 31", "Webots", "RKP 0.0  1.0");
+    do addDevice("dRAP 5 31", "Webots", "RAP 0.0 -1.0");
+    do addDevice("dRAR 5 31", "Webots", "RAR 0.0  1.0");
+
+    do addState("HY 5 31",  "Webots", "Joint");
+    do addState("LSP 5 31", "Webots", "Joint");
+    do addState("LSR 5 31", "Webots", "Joint");
+    do addState("RSP 5 31", "Webots", "Joint");
+    do addState("RSR 5 31", "Webots", "Joint");
+    do addState("LHY 5 31", "Webots", "Joint");
+    do addState("LHR 5 31", "Webots", "Joint");
+    do addState("LHP 5 31", "Webots", "Joint");
+    do addState("LKP 5 31", "Webots", "Joint");
+    do addState("LAP 5 31", "Webots", "Joint");
+    do addState("LAR 5 31", "Webots", "Joint");
+    do addState("RHY 5 31", "Webots", "Joint");
+    do addState("RHR 5 31", "Webots", "Joint");
+    do addState("RHP 5 31", "Webots", "Joint");
+    do addState("RKP 5 31", "Webots", "Joint");
+    do addState("RAP 5 31", "Webots", "Joint");
+    do addState("RAR 5 31", "Webots", "Joint");
+
+    do linkDS("dHY",  "HY"); do linkPD("wbPcol", "dHY");
+    do linkPD("wbPcol", "dLSP"); do linkDS("dLSP", "LSP");
+    do linkPD("wbPcol", "dLSR"); do linkDS("dLSR", "LSR");
+    do linkPD("wbPcol", "dRSP"); do linkDS("dRSP", "RSP");
+    do linkPD("wbPcol", "dRSR"); do linkDS("dRSR", "RSR");
+    do linkPD("wbPcol", "dLHY"); do linkDS("dLHY", "LHY");
+    do linkPD("wbPcol", "dLHR"); do linkDS("dLHR", "LHR");
+    do linkPD("wbPcol", "dLHP"); do linkDS("dLHP", "LHP");
+    do linkPD("wbPcol", "dLKP"); do linkDS("dLKP", "LKP");
+    do linkPD("wbPcol", "dLAP"); do linkDS("dLAP", "LAP");
+    do linkPD("wbPcol", "dLAR"); do linkDS("dLAR", "LAR");
+    do linkPD("wbPcol", "dRHY"); do linkDS("dRHY", "RHY");
+    do linkPD("wbPcol", "dRHR"); do linkDS("dRHR", "RHR");
+    do linkPD("wbPcol", "dRHP"); do linkDS("dRHP", "RHP");
+    do linkPD("wbPcol", "dRKP"); do linkDS("dRKP", "RKP");
+    do linkPD("wbPcol", "dRAP"); do linkDS("dRAP", "RAP");
+    do linkPD("wbPcol", "dRAR"); do linkDS("dRAR", "RAR");
+
+
+    do linkSC("LSP", "wbArm");
+    do linkSC("LSR", "wbArm");
+    do linkSC("RSP", "wbArm");
+    do linkSC("RSR", "wbArm");
+    do linkSC("HY",  "wbctrl");
+    do linkSC("LHY", "wbctrl");
+    do linkSC("LHR", "wbctrl");
+    do linkSC("LHP", "wbctrl");
+    do linkSC("LKP", "wbctrl");
+    do linkSC("LAP", "wbctrl");
+    do linkSC("LAR", "wbctrl");
+    do linkSC("RHY", "wbctrl");
+    do linkSC("RHR", "wbctrl");
+    do linkSC("RHP", "wbctrl");
+    do linkSC("RKP", "wbctrl");
+    do linkSC("RAP", "wbctrl");
+    do linkSC("RAR", "wbctrl");
+
+
+    do linkHC("wbHW", "wbNull");
+    do linkHP("wbHW", "wbPcol");
+
+    do addLogger("flog 10 5", "File", "tfile.txt");
+    do linkLS("flog", "LSP");
+    do linkLS("flog", "LSR");
+    do linkLS("flog", "RSP");
+    do linkLS("flog", "RSR");
+    do linkLS("flog", "HY");
+    do linkLS("flog", "LHY");
+    do linkLS("flog", "LHR");
+    do linkLS("flog", "LHP");
+    do linkLS("flog", "LKP");
+    do linkLS("flog", "LAP");
+    do linkLS("flog", "LAR");
+    do linkLS("flog", "RHY");
+    do linkLS("flog", "RHR");
+    do linkLS("flog", "RHP");
+    do linkLS("flog", "RKP");
+    do linkLS("flog", "RAP");
+    do linkLS("flog", "RAR");
+
+    // END CONFIG SECTION 
+
+    //Start the threads
+    do startHW();
+    do startProtocol();
+    do startDevice();
+    do startState();
+    do startLogger();
+    do startController();
+    /* IMPORTANT STUFF HERE */
+}

@@ -28,7 +28,7 @@ namespace Webots{
     class Hardware : public ACES::Hardware {
         public:
             Hardware(std::string cfg, std::string args);
-            Hardware(std::string name);
+            bool startHook();
             void updateHook();
             bool txBus(ACES::Message* m);
 
@@ -53,6 +53,7 @@ namespace Webots{
             float zero;
             float direction;
             std::string devName;
+            static int idCount;
     };
 
     class Device : public ACES::Device {
@@ -66,24 +67,12 @@ namespace Webots{
     class Protocol : public ACES::Protocol {
         public:
             Protocol(std::string cfg, std::string args);
-            Protocol(std::string name);
-            //void interpretRx(ACES::ProtoWord* rx);
-            //ACES::Message* buildMessage(
-            //                   Credentials* cred);
-            //ACES::Credentials* parseHWInput(
-            //                   ACES::Message* c) ;
-            //void aggregateRequests(
-            //    std::list<ACES::Credentials*> &reqs);
-
-            //bool registerParam(ACES::State*);
-            //std::map<std::string, bool> joints;
     };
 
     class ScriptCtrl : public ACES::ScriptCtrl
     {
         public:
             ScriptCtrl(std::string config, std::string args);
-            ScriptCtrl(std::string name);
 
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);
@@ -93,7 +82,6 @@ namespace Webots{
     {
         public:
             ArmCtrl(std::string config, std::string args);
-            ArmCtrl(std::string name);
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);
     };

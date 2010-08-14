@@ -23,7 +23,6 @@ namespace ACES{
     {
         public:
             Controller(std::string cfg, std::string args);
-            Controller(std::string name);
             virtual std::map<std::string, void*>* 
                     getStateVector(bool echo=0) = 0;
 
@@ -35,7 +34,6 @@ namespace ACES{
     {
         public:
             ScriptCtrl(std::string cfg, std::string args);
-            ScriptCtrl(std::string name);
             void updateHook();
 
             void step();
@@ -57,7 +55,6 @@ namespace ACES{
     {
         public:
             NullCtrl(std::string config, std::string args);
-            NullCtrl(std::string name);
             void updateHook();
             //std::map<std::string, void*>* stateVect;
 

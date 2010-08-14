@@ -2,6 +2,8 @@
 
 namespace Webots {
 
+    int Credentials::idCount = 0;
+
     Hardware::Hardware(std::string cfg, std::string args)
       : ACES::Hardware(cfg, args)
     {
@@ -12,23 +14,30 @@ namespace Webots {
                                    "TStep", "Lenght of step to advance(ms)");
     }
 
+    bool Hardware::startHook(){
+        wb_robot_init();
+        return true;
+    }
+
     void Hardware::updateHook(){
         //We want a null action on the tick, so we override this to nothing
         //and use step(), to manually advance the clock.
     }
 
     void Hardware::step(int time){
-    //    ACES::Hardware::updateHook();
+        ACES::Hardware::updateHook();
         wb_robot_step(time);
     }
 
     bool Hardware::txBus(ACES::Message* m){
-        ACES::Goal *g = m->goalList.front();
-        //g->printme();
-
+    for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
+        it != m->goalList.end();
+        it++){
+        ACES::Goal* g = *it;
         switch( g->mode ){
             case (ACES::REFRESH):{
                 //Vessel for returning the information we find
+                //g->printme();
                 float* result = new float;
 
                 //Lookup the identifier for the component of interest
@@ -49,6 +58,11 @@ namespace Webots {
                      break;
                 }
 
+                //Apply the appropriate sign to the result, so it is
+                //consistant w/convention
+                float direction = (*c).direction;
+                *result = (*result) * direction;
+
                 //Place the result on the container & send it back
                 //TODO - This kind of bypasses the physical HW Rx
                 //structure, perhaps we should change that somehow
@@ -63,8 +77,7 @@ namespace Webots {
              break;
 
             case (ACES::SET):{
-                Credentials* c =
-                        (Credentials*)(g->cred);
+                Credentials* c = (Credentials*)(g->cred);
                 std::string jid = (*c).wb_device_id;
 
                 //Pull the seek value out of the SValue object
@@ -85,6 +98,7 @@ namespace Webots {
         }
         return false;
         //m->printme();
+    }
     }
 
     bool Hardware::subscribeController(ACES::Controller* c){
@@ -124,8 +138,10 @@ namespace Webots {
     }  
 
     Credentials::Credentials(std::string id_str, std::string devname,
-     float z, float dir) : ACES::Credentials(1)
+     float z, float dir) : ACES::Credentials(0)
     {
+        devID = ++Credentials::idCount; 
+
         assign(id_str, devname, z, dir);
     }  
 
@@ -138,8 +154,10 @@ namespace Webots {
     }
 
     Credentials::Credentials(std::string args)
-      : ACES::Credentials(1)
+      : ACES::Credentials(0)
     {
+        devID = ++Credentials::idCount; 
+
         std::istringstream s1(args);
         float z, d;
         std::string id, dname;
@@ -168,48 +186,12 @@ namespace Webots {
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
         wb_servo_disable_position(tag); 
     }
-/*
-    void Device::interpretResult(ACES::ProtoResult* rx){
-        ACES::Result<ACES::Goal*>* r = (ACES::Result<ACES::Goal*>*)rx;
-        ACES::Goal* g = r->result;
-        Credentials* c = (Credentials*) g->cred;
-        //RTT::Logger::log() << c->devName << ", " << name
-        //<< *((float*)g->data) << RTT::endlog();
 
-        //If our name matches the name on the packet, this one's for us,
-        //pass it along to the States - let them sort it out
-        if( (c->devName) == getName()){
-            //announceData(g);
-
-            //if(name == "dRKP"){
-            //    RTT::Logger::log() << "Got One" << RTT::endlog();
-            //}
-            returnBuf->Push(g);
-        }
-    }
-*/
     Protocol::Protocol(std::string cfg, std::string args) 
       : ACES::Protocol(cfg, args){}
 
-/*
-    void Protocol::interpretRx(ACES::ProtoWord* rx){
-        //Since webots isn't doing any real interpretation, we grab the
-        //Goal off the word and simply put it into the new container
-        ACES::Word<ACES::Goal*>* w = (ACES::Word<ACES::Goal*>*)rx;
-        ACES::Goal* g = w->data;
-        //RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
-        ACES::Result<ACES::Goal*>* r = new ACES::Result<ACES::Goal*>(g);
-        
-        //Broadcast the reponse
-        returnBuf->Push((ACES::ProtoResult*)r);
-    }
-*/
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : ACES::ScriptCtrl(cfg, args)
-    {}
-
-    ScriptCtrl::ScriptCtrl(std::string name)
-      : ACES::ScriptCtrl(name)
     {}
 
     std::map<std::string, void*>*
@@ -273,11 +255,7 @@ namespace Webots {
     }
 
     ArmCtrl::ArmCtrl(std::string cfg, std::string args)
-      : ACES::ScriptCtrl(cfg)
-    {}
-
-    ArmCtrl::ArmCtrl(std::string name)
-      : ACES::ScriptCtrl(name)
+      : ACES::ScriptCtrl(cfg, args)
     {}
 
     std::map<std::string, void*>*

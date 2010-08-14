@@ -30,7 +30,8 @@
     void State<T>::go(T sp){
         T* p = new T(sp);
         Goal* g = new Goal(nodeID, SET, p);
-        txDownStream(g);
+        set_stack->Push(g);
+        //txDownStream(g);
     }
 
     template <class T>

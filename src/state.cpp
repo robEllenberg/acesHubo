@@ -4,10 +4,13 @@ namespace ACES {
     ProtoState::ProtoState(std::string config, std::string args) :
       taskCfg(config),
       RTT::TaskContext(name),
-      txDownStream("txDownStream")
+      txDownStream("txDownStream"),
+      sampleMethod("sample", &ProtoState::sample, this)
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
             "credentials associated w/the goal");
+
+        this->methods()->addMethod(sampleMethod, "sample");
 
         if(args == "Joint"){
             nodeID = JOINT;
@@ -21,10 +24,15 @@ namespace ACES {
         );
         
     }
+
+    void ProtoState::sample(){
+        Goal* g = new Goal(this->nodeID, REFRESH);
+        set_stack->Push(g);
+    }
    
     void ProtoState::updateHook(){
-        Goal* g = new Goal(this->nodeID, REFRESH, new float(3.14));
-        set_stack->Push(g);
+        sample();
+
         //g->printme();
         //RTT::Logger::log() << "Update State "
         //<< this->name << RTT::Logger::endl;
@@ -38,25 +46,29 @@ namespace ACES {
     bool ProtoState::subscribeController(Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
-                .callback( this, &ProtoState::rxDownStream,
-                           c->engine()->events() ).handle();
+                .callback( this, &ProtoState::rxDownStream
+                          , c->engine()->events()
+                        ).handle();
         if(!h.ready() ){
+            assert(false);
             return false;
         }
         h.connect();
         if(!h.connected() ){
+            assert(false);
             return false;
         }
         return true;
     }
 
     void ProtoState::rxDownStream(std::map<std::string, void*>* p){
-       //RTT::Logger::log() << "trigger" << RTT::endlog();
+       //RTT::Logger::log() << "trigger " + name << RTT::endlog();
        std::map<std::string, void* >::iterator mypair;
         mypair = p->find( name );
         if(mypair != p->end() ){
             void* val = (*mypair).second;
             Goal* g = new Goal(nodeID, SET, val);
+            //g->printme();
            
             //RTT::Logger::log() << this->name << " Announce: "
             //<< *((float*)val) << RTT::endlog();

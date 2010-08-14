@@ -32,6 +32,7 @@ namespace ACES {
             void (*asgnfunct)(ProtoResult*, void*);
 
             virtual void updateHook();  
+            void sample();
 
             RTT::Event<void(Goal*)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);
@@ -39,6 +40,7 @@ namespace ACES {
 
             int nodeID;
             RTT::Buffer< Goal* > *set_stack;
+            RTT::Method<void()> sampleMethod;
 
             bool subscribeController(Controller* c);
     };

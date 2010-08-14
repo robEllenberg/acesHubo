@@ -31,10 +31,10 @@ namespace ACES {
     }
 
     void Hardware::updateHook(){
+        //RTT::Logger::log() << "hw sent" << RTT::endlog();
         Message* m = NULL;
         while(dsQueue.size()){
             m = processDSQueue();
-            //m->printme();
             //RTT::Logger::log() << "hw sent" << RTT::endlog();
             txBus(m);
         }

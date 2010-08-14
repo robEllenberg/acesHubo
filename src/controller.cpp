@@ -14,14 +14,6 @@ namespace ACES{
         );
     }
 
-    Controller::Controller(std::string name)
-      : RTT::TaskContext(name),
-        applyStateVector("applyStateVector")
-    {
-        this->events()->addEvent(&applyStateVector, "applyStateVector",
-            "SVmap", "map of state vect info");
-    }
-
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
         walkScript((const char*)args.c_str(), std::ifstream::in),
@@ -46,30 +38,6 @@ namespace ACES{
             "Open a new trajectory file", "sfile", "Script file path");
     }
 
-    ScriptCtrl::ScriptCtrl(std::string name)
-      : Controller(name),
-        //walkScript((const char*)args.c_str(), std::ifstream::in),
-        stepMethod("step", &ScriptCtrl::step, this),
-        runMethod("run", &ScriptCtrl::run, this),
-        haltMethod("halt", &ScriptCtrl::halt, this),
-        openScriptMethod("openScript", &ScriptCtrl::openScript, this)
-    {
-        //Set the current state of the simulation to stopped
-        simState = WB_CTRL_HALT;
-
-        //Make sure we have an existant script file
-        assert(walkScript.is_open());
-
-        this->methods()->addMethod(stepMethod,
-            "Advance the simulation one time step.");
-        this->methods()->addMethod(runMethod,
-            "Start the simulation (free running).");
-        this->methods()->addMethod(haltMethod,
-            "Halt the simulation.");
-        this->methods()->addMethod(openScriptMethod,
-            "Open a new trajectory file", "sfile", "Script file path");
-    }
-    
     void ScriptCtrl::updateHook(){
         switch(simState){
             case WB_CTRL_HALT:
@@ -118,10 +86,6 @@ namespace ACES{
 
     NullCtrl::NullCtrl(std::string cfg, std::string args)
       : Controller(cfg, args)
-    {}
-
-    NullCtrl::NullCtrl(std::string name)
-      : Controller(name)
     {}
 
     void NullCtrl::updateHook()
