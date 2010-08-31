@@ -1,0 +1,97 @@
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+\IEEEoverridecommandlockouts  
+\overrideIEEEmargins
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+
+
+%\usepackage{fullpage}
+%\usepackage{setspace}
+%\usepackage{graphicx}
+%\usepackage{listings}
+%\usepackage{subfig}
+%\usepackage{color}
+%\singlespacing
+%\onehalfspacing
+%\usepackage{times}
+%\usepackage{float}
+%\usepackage[justification=centering]{caption}
+
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{mathptmx} % assumes new font selection scheme installed
+\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+
+\title{\LARGE \bf Design of a Hardware Centric Framework for Robotics
+                  Programming%
+    \author{Robert M Sherbert}% <-this % stops a space
+    \date{4 September 2010}%
+}
+
+\begin{document}
+%
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+%
+%Document Starts Here
+%
+\begin{abstract}
+\end{abstract}
+
+\section{INTRODUCTION}
+Robotic systems hold immense promise for humanity in terms of efficiency and
+convenience. These benefits, unfortunately, are being realized at a crawling
+pace due to the complexity of the systems involved. To reduce complexity and
+lower development times, the community has developed a number of software
+packages know as ‘robotics development environments’. These environments,
+including Player/Stage, the Robot Operating System (ROS), Webots, and others
+have greatly reduced the difficulty of creating autonomous systems.
+However, the cost of robotics development in terms of both time and capital is
+still high. The development systems, while an excellent start, do not go far
+enough in addressing the issue of complexity in autonomous systems. This is
+because, as a whole, they are designed to facilitate high level code reuse.
+They are targeted at implementing complex algorithms such as vision
+processing, navigation, path planning, and human interaction. The philsophy
+behind this approach is admirable, but addresses the problem at the wrong level.
+Solving the code-reuse issue from the top down in a field which is highly
+dependent on physical hardware is a recipie for Due to the focus
+on these high level algorithms, the environments make abstractions over the
+low level system hardware and leave implementation of hardware specific code
+to the user. Unfortunately, there are many cases when this implementation can
+be just as difficult and time consuming as the burdens that the development
+systems remove.
+
+The biggest single shortcoming of modern robotic development environments is
+that they assume the user will generate an actuation controller for the
+robot as a black box for the system to use. This controller is expected to 
+providing high level features such as 'take a step', 'turn
+20' right', or 'accelerate at 1m/s'. However, the development environment does
+not provide facilities that aid in the implementation of such controllers.
+This is due to the fact that such devlopment tools were designed for use with
+statically stable robots (tracked robots, four wheeled vehicles, etc). Many
+novel robotic designs, however, derrive their utility from a geometry which is
+not statically stable. Such is the case with legged robots including
+humanoids, quadripeds, or hexapods. In these
+systems, a careful orchestration of actuators must be made in order to maintain
+stability, and the interplay between high level commands (step forward) and the
+actuation pattern needed to cary them out is not always straightforward.
+
+This paper details a design which attempts to address this problem from the
+bottom up. It describes a four layered architecture that attempts to abstract
+over the common layers 
+
+\section{OVERVIEW}
+\section{CONTROLLER}
+\section{STATE}
+\section{DEVICE}
+\section{PROTOCOL}
+\section{HARDWARE}
+\section{EXAMPLE/IMPLEMENTATION}
+
+\end{document}
+

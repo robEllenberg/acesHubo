@@ -3,7 +3,8 @@ program main {
     do addProtocol("wbPcol 2 600", "Webots", "");
 
     do addController("wbNull 10 15", "Webots Null", "");
-    do addController("wbctrl 10 15", "Webots Mini", "IKscript1.txt");
+    do addController("wbctrl 10 15", "Webots Mini",
+                     "IKscript1.txt");
     do addController("wbArm 10 15", "Webots Arm", "sins.txt");
 
     do addDevice("dHY 5 31", "Webots",  "HY  0.0 -1.0");
