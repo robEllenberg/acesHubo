@@ -4,6 +4,11 @@ ASSIGN := iros2011
 run : ${ASSIGN}.latex 
 	latex ${ASSIGN}.latex
 
+full: 
+	bibtex ${ASSIGN}
+	latex ${ASSIGN}.latex
+	latex ${ASSIGN}.latex
+
 pdf : run
 	dvips -t letter ${ASSIGN}.dvi
 	ps2pdf13 ${ASSIGN}.ps
@@ -14,6 +19,8 @@ clean :
 	-rm ${ASSIGN}.log
 	-rm ${ASSIGN}.ps
 	-rm ${ASSIGN}.toc
+	-rm ${ASSIGN}.blg
+	-rm ${ASSIGN}.bbl
 
 view :
 	evince ${ASSIGN}.pdf

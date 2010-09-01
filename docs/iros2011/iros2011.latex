@@ -44,12 +44,19 @@
 \end{abstract}
 
 \section{INTRODUCTION}
+   \begin{figure*}[!t]
+      \centering
+      \includegraphics[width=\textwidth]{../diagrams/DataFlow.eps}
+      \caption{DataFlow}
+      \label{dflow}
+   \end{figure*}
+
 Robotic systems hold immense promise for humanity in terms of efficiency and
 convenience. These benefits, unfortunately, are being realized at a crawling
 pace due to the complexity of the systems involved. To reduce complexity and
 lower development times, the community has developed a number of software
 packages know as ‘robotics development environments’. These environments,
-including Player/Stage, the Robot Operating System (ROS), Webots, and others
+including Player/Stage, the Robot Operating System~\cite{RefWorks:49}, Webots, and others
 have greatly reduced the difficulty of creating autonomous systems.
 However, the cost of robotics development in terms of both time and capital is
 still high. The development systems, while an excellent start, do not go far
@@ -68,11 +75,11 @@ systems remove.
 
 The biggest single shortcoming of modern robotic development environments is
 that they assume the user will generate an actuation controller for the
-robot as a black box for the system to use. This controller is expected to 
-providing high level features such as 'take a step', 'turn
-20' right', or 'accelerate at 1m/s'. However, the development environment does
+robot as a black box usage by the system. Such a controller is expected to 
+provide high level features e.g. 'take a step', 'turn
+20' right', or 'accelerate at 1m/s'. However, these development environments do
 not provide facilities that aid in the implementation of such controllers.
-This is due to the fact that such devlopment tools were designed for use with
+This is due to the fact that current devlopment tools were designed for use with
 statically stable robots (tracked robots, four wheeled vehicles, etc). Many
 novel robotic designs, however, derrive their utility from a geometry which is
 not statically stable. Such is the case with legged robots including
@@ -81,17 +88,55 @@ systems, a careful orchestration of actuators must be made in order to maintain
 stability, and the interplay between high level commands (step forward) and the
 actuation pattern needed to cary them out is not always straightforward.
 
-This paper details a design which attempts to address this problem from the
-bottom up. It describes a four layered architecture that attempts to abstract
-over the common layers 
+This paper details a framework that addresses the controller design
+problem from the
+bottom up. It describes a five layered data communication and interpretation
+architecture that mirrors common organizational patterns in robotic hardware.
+By creating software in which the data parsing and processing facilities are
+symmetric to the real world information, the difficulty in creating hardware
+interfaces
+for complex systems can be greatly eased. At the top of this communications
+architecture is placed an abstraction which allows the component hardware to be
+represented to the user in a format which mimics the mathematical lanugage
+commonly used in designing and simulating such controllers. This mimicry should
+allow a simple transition from paper design and simulation to a direct
+implementation in hardware.
+In this way, the framework's design allows it to fill the entire gap left by
+robotics development environments. It can be used to provide the black box that
+other development environments treat as a given. By doing this, the framework
+fills an important gap in the current state of robotics development tools.
 
+The paper begins with a high level overview of the framework's component
+structure, and the techniques used to pass data between the different
+components.
+The remainder of the paper will describe each of the components of the
+framework from the bottom upward. These components are titled as:
+Hardware, Protocol, Device, State, and Controller. Once each of the components
+has been detailed, an example case will be given in which the framework is
+applied to and used to control a simulated humanoid robot - (cliche phrase about
+complexity of humanoid?).
+%
 \section{OVERVIEW}
-\section{CONTROLLER}
-\section{STATE}
-\section{DEVICE}
-\section{PROTOCOL}
+Four layer comms + controller/logger
+    hw
+    protocol
+    device
+    state
+    controller/logger
+dataflow
+Orocos -> RT
+Event driven programming (Tekkotsu)
+
 \section{HARDWARE}
+\section{PROTOCOL}
+\section{DEVICE}
+\section{STATE}
+\section{CONTROLLER}
 \section{EXAMPLE/IMPLEMENTATION}
+
+\section{REFRENCES}
+\bibliographystyle{IEEEtran}
+\bibliography{sources}{}
 
 \end{document}
 
