@@ -4,12 +4,14 @@ ASSIGN := iros2011
 run : ${ASSIGN}.latex 
 	latex ${ASSIGN}.latex
 
-full: 
+full: run
 	bibtex ${ASSIGN}
 	latex ${ASSIGN}.latex
 	latex ${ASSIGN}.latex
+	dvips -t letter ${ASSIGN}.dvi
+	ps2pdf13 ${ASSIGN}.ps
 
-pdf : run
+pdf : 
 	dvips -t letter ${ASSIGN}.dvi
 	ps2pdf13 ${ASSIGN}.ps
 
