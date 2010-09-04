@@ -1,10 +1,8 @@
-\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf} 
 \IEEEoverridecommandlockouts  
 \overrideIEEEmargins
 % See the \addtolength command later in the file to balance the column lengths
 % on the last page of the document
-
-
 
 %\usepackage{fullpage}
 %\usepackage{setspace}
@@ -68,10 +66,10 @@ still high. The development systems, while an excellent start, do not go far
 enough in addressing the issue of complexity in autonomous systems. This is
 because, as a whole, they are designed to facilitate high level code reuse.
 They are targeted at implementing complex algorithms such as vision
-processing, navigation, path planning, and human interaction. The philsophy
+processing, navigation, path planning, and human interaction. The philosophy
 behind this approach is admirable, but addresses the problem at the wrong level.
 Solving the code-reuse issue from the top down in a field which is highly
-dependent on physical hardware is a recipie for Due to the focus
+dependent on physical hardware is a recipe for Due to the focus
 on these high level algorithms, the environments make abstractions over the
 low level system hardware and leave implementation of hardware specific code
 to the user. Unfortunately, there are many cases when this implementation can
@@ -84,14 +82,14 @@ robot as a black box usage by the system. Such a controller is expected to
 provide high level features e.g. 'take a step', 'turn
 20' right', or 'accelerate at 1m/s'. However, these development environments do
 not provide facilities that aid in the implementation of such controllers.
-This is due to the fact that current devlopment tools were designed for use with
+This is due to the fact that current development tools were designed for use with
 statically stable robots (tracked robots, four wheeled vehicles, etc). Many
-novel robotic designs, however, derrive their utility from a geometry which is
+novel robotic designs, however, derive their utility from a geometry which is
 not statically stable. Such is the case with legged robots including
-humanoids, quadripeds, or hexapods. In these
+humanoids, quadrupeds, or hexapods. In these
 systems, a careful orchestration of actuators must be made in order to maintain
 stability, and the interplay between high level commands (step forward) and the
-actuation pattern needed to cary them out is not always straightforward.
+actuation pattern needed to carry them out is not always straightforward.
 
 This paper details a framework that addresses the controller design
 problem from the
@@ -102,7 +100,7 @@ symmetric to the real world information, the difficulty in creating hardware
 interfaces
 for complex systems can be greatly eased. At the top of this communications
 architecture is placed an abstraction which allows the component hardware to be
-represented to the user in a format which mimics the mathematical lanugage
+represented to the user in a format which mimics the mathematical language
 commonly used in designing and simulating such controllers. This mimicry should
 allow a simple transition from paper design and simulation to a direct
 implementation in hardware.
@@ -122,6 +120,30 @@ applied and used to control a simulated humanoid robot - (cliche phrase about
 complexity of humanoid?).
 %
 \section{OVERVIEW}
+    \begin{comment}
+    three layer comms + math abstraction (controller + state)
+        hw
+        protocol
+        device
+        ------
+        state
+        controller/logger
+    event driven
+        error handling benefits of event driven arch
+    RT <- Orocos
+        Orocos scripting language for ctrler + FSM
+
+    Tick/period for each component
+
+    dataflow (via diagram)
+        How downstream (downselect) works
+            *
+        How upstream (upselect) works
+            *
+    example system (via diagram)
+    ability to interconnect and rearrange components in different combinations
+    and varieties 
+    \end{comment}
    \begin{figure}[!b]
       \centering
       \includegraphics[width=\columnwidth]{../diagrams/prog_struct2.eps}
@@ -131,38 +153,28 @@ complexity of humanoid?).
 
 Note: Through the rest of the paper a number of software components are
 discussed which share names with common concepts in engineering. Where there is
-a resue of a generic name, the software specific component is captialized, while
+a reuse of a generic name, the software specific component is capitalized, while
 the common usage is left as usual. E.g. "State" (software component) vs. "state"
 (control theory variable).
-
-
 
 The framework attempts to provide two useful divisions of abstraction:
 the first is to provide a method of mirroring hardware configuration, while the
 second is to provide abstraction of the hardware in convenient mathematical
 notation. 
 
-three layer comms + math abstaction (controller + state)
-    hw
-    protocol
-    device
-    ------
-    state
-    controller/logger
-event driven
-    error handling benefits of event driven arch
-RT <- Orocos
-    Orocos scripting language for ctrler + FSM
-
-Tick/period for each component
-
-dataflow (via diagram)
-    How downstream (downselect) works
-        *
-    How upstream (upselect) works
-        *
-example system (via diagram)
-
+The State component is intentionally left as an abstract type. The only
+identifying data the State carries are its name, a node ID number (which is
+specific to the Device it is connected to),
+its data type, and the information that
+constitutes its connections to other parts of the system (Devices and
+Controllers). This design allows a very easy transition between two systems
+that follow the same mathematical models, but have very different hardware. The
+States and Devices remain unmodified, while only the Protocol and Hardware need
+to be changed. The downside to this flexibility is the additional effort
+required to identify where the information is going as it travels through the
+system. This is accomplished by tagging the State and Device with ID numbers
+that are unique to the Device and Protocol, respectively.
+%
 \subsection{HARDWARE}
     \begin{comment}
     *Gatekeeper for hardware driver
@@ -176,7 +188,7 @@ example system (via diagram)
 The Hardware component is the simplest to understand, as its functionality is
 very straightforward. It serves primarily to act as a gatekeeper to the physical
 hardware from the core of the program.
-It's job is twofold: to take the message packets that it recieves from the Protocol
+It's job is twofold: to take the message packets that it receives from the Protocol
 component and place them onto the physical bus, and to take the data words which
 are received from the physical bus and assure they they reach the subscribed
 Protocols. In most cases, the Hardware acts
@@ -192,11 +204,11 @@ the Hardware's event handler, and the Message is placed on a queue. When the
 Hardware's tick triggers and the Hardware updates, it examines the the queue
 for data, uses a user defined processing function to render this Message packet
 into individual words, suspends the scheduler, places those words onto the
-bus, and reenables the scheduler.
+bus, and re-enables the scheduler.
 
 The dataflow in the upstream direction functions as follows: The Hardware
-recieves words from the bus in one of two fashions (dependent on the
-partiular type of physical hardware involved). The first possibility is that an
+receives words from the bus in one of two fashions (dependent on the
+particular type of physical hardware involved). The first possibility is that an
 event is generated whenever new data becomes available. The second possibility
 is that the new data is quietly placed on a buffer that is part of the kernel
 driver. In the former case, an event handler is placed on the Hardware which
@@ -208,49 +220,166 @@ defined handling function, and emits
 them as events to any subscribed Protocols.
 %
 \subsection{PROTOCOL}
+    \begin{comment}
+    *Data protocol, a communication protocol specified by a particular manufacturer
+    *State machine interpreter for data protocol
+
+    *Device (P-responds) -> DSQueue -> (P-emits)Hardware
+    *DS Processing function
+    *Hardware -> USQueue/State Machine -> (event)Protocol
+    *US Processing function
+    \end{comment}
    \begin{figure}[t]
       \centering
       \includegraphics[height=2in]{../diagrams/protocol.eps}
       \caption{DataFlow}
-      \label{protocol}
+      \label{protocolDS}
+   \end{figure}
+   \begin{figure}[b]
+      \centering
+      \includegraphics[width=\columnwidth]{../diagrams/protocol_us.eps}
+      \caption{DataFlow}
+      \label{protocolUS}
    \end{figure}
 
-*Data protocol, a communication protocol specified by a particular manufacturer
-*State machine interpreter for data protocol
+%
+It is common for manufacturers of the multifarious sensors and actuators
+used in robotics to design custom data
+protocols for a particular part or line of parts. For the sake of this paper, a
+data protocol is a defined structure (including order, endian-ness, etc) on a
+grouping of digital words used to convey some information between two
+devices. It is the unfortunate state
+of robotics that manufacturers rarely collaborate in designing these protocols,
+and almost no standards exist among them. This lack of standards is part of the
+reason that implementing robotics experiments takes extraordinary amounts of
+time.
+Despite the lack of collaboration, it is not uncommon for protocols from
+separate manufactures to share common characteristics. For a given
+classification of device (motor controller, accelerometer, etc), the types of
+data sent across the bus are nearly identical across manufacturers,
+even if the structure of transmission changes. This allows for a certain level
+of abstraction to be made over the classification.
+%These protocols are almost universially stream based (or can be modeled as
+%streams), which makes k
 
-*Device (P-responds) -> DSQueue -> (P-emits)Hardware
-*DS Processing function
-*Hardware -> USQueue/State Machine -> (event)Protocol
-*US Processing function
+The Protocol component of this framework is a software representation of such
+a data transmission format on a bus. As
+such it acquires an important role in organizing data flow in both the downstream
+and upstream directions. On the downstream path, the Protocol buffers and
+arranges requests in such a way as to maximize bandwidth efficiency of the bus.
+In the upstream direction, the Protocol must convert a word stream into a data
+structure which can be used by the other components (Device, State) to identify
+the intended destination of the data.
 
-The dataflow in the downstream direction functions as follows:
-The dataflow in the upstream direction functions as follows:
+The dataflow in the downstream direction functions as follows: Requests are
+received from the State via the Device through an event emission and handler
+function. These requests are placed onto a queue. When the Protocol's tick
+expires, all elements within the queue are examined by a user defined
+optimization function. It is the goal of this function to generate a word level
+packet which efficiently represents the requests on the queue at that time. This
+behavior is beneficial because it allows maximal usage of the bus. Many vendors
+will design protocols so that they are most bandwidth efficient when multiple
+devices are commanded at the same time (shared header and check sum over a
+packet with numerous commands). Once the optimization algorithm has finished its
+processing, it passes its result to the Hardware component via an event
+emission.
+
+The dataflow in the upstream direction functions as follows: First, an
+encapsulated word is received by a handler function in the Protocol via an
+event emitted by the Hardware. This capsule is placed in a queue data structure.
+When the Protocol's device tick triggers it removes the oldest element from the
+queue and processes it.
+For processing, the word is unpackaged and fed into a lexical
+analyzer (scanner) defined by the user for the specific Protocol type.
+\footnote{A scanner is a pattern matching program usually used in the design of
+programming languages. Such programs convert strings of characters
+(source code) that are arranged according to regular expressions into symbolic
+tokens that can be used by a higher level program (parser) to create a
+meaningful interpretation (binary executable) of the original string. At it's
+core, the scanner is simply a way of defining state-machine based pattern
+recognition programs in a standard format.}
+The scanner compares the word stream against a listing of user defined
+templates. 
+%The scanner is used to identify the common components of a data packet.
+%Depending on the type of component this could include identificiation numbers,
+%relevant data, etc.
+If the scanner has made a match with the incoming word
+stream, it extracts the meaningful data from the stream, and places it within
+a data structure. The structure is attached to an event and emitted to the
+devices. It then proceeds to process the remaining words in the queue until
+either there are no more words, or the time allotment runs out.
+
 \subsection{DEVICE}
+    \begin{comment}
+    *Represents a physical node on a bus
+    *Has 'credentials' - identifying information (usually IDs or string tags)
+
+    *State(event) -> DSQueue -> Protocol 
+    *DS Processing function
+    *Protocol -> USQueue/State Machine -> (event)Protocol
+    *US Processing function
+    \end{comment}
    \begin{figure}[t]
       \centering
       \includegraphics[width=\columnwidth]{../diagrams/device.eps}
-      \caption{DataFlow}
-      \label{protocol}
+      \caption{device}
+      \label{device}
    \end{figure}
+The function of the Device component is to represent a physical node on a bus,
+such as
+a motor controller. Each Device could have one or more states associated with
+it (in the case of a motor controller, these  would be angular velocity, current
+draw, etc). The Device's purpose is to help in performing down- and up-select operations
+as data passes through it on route to either the Protocol or State components.
 
+certain information about the
 
-*Represents a physical node on a bus
-*Has 'credentials' - identifying information (usually IDs or string tags)
+The dataflow in the downstream direction functions as follows:
 
-*State(event) -> DSQueue -> Protocol 
-*DS Processing function
-*Protocol -> USQueue/State Machine -> (event)Protocol
-*US Processing function
+On the downstream the goal is to ensure that the Protocol and Hardware
+components have enough identifying information available to them to construct a
+properly formed data packet. The Device accomplishes this goal by tagging. Each
+request that is generated by a State has a placeholder for a data structure
+called a 'credential'. The credentials contain the bus specific identifying
+information needed for packet generation further downstream. When a request
+reaches the device it places a reference to the credential on the State, and
+emits an event containing the State to its subscribed Protocols.
+%IMPORTANT - highlight this strongly somewhere more visable
+In this way, the State's relationship to a particular bus is defined \emph{by where
+it is placed in the system}, as opposed to particular configuration information
+placed on it. To port a controller from one system to another becomes a simple
+function of rearranging the States to connect with different Devices and
+Protocols associated with the new physical hardware.
+
+The dataflow in the upstream direction functions as follows:
+When the device receives a message from a Protocol through its event handler,
+it places a copy of the message on a local queue. When the Device's tick
+expires, the device iterates through the elements in the queue. For each
+element in the upstream queue, the Device examines the credential information
+contained in the message that the Protocol has constructed.
+The credentials are compared to
+the ones assigned to the Device by the user. If they match, the Device
+accepts the message and  emits it to its subscribed States.
 
 \subsection{STATE}
-*Tieback to the device via type number - type numbers specified per device
-   \begin{figure}[t]
+    \begin{comment}
+    Periodically requests update from lower levels
+    Stores historical data about the quantity
+    Algorithms for predicting future values (kalman filters)
+    Algorithms for filtering/averaging
+    Broadcasts update events (set or request data)
+    Presents data as an accessible member (does not broadcast data)
+    %
+    How is all of this achieved:
+    *Tieback to the device via type number - type numbers specified per device
+    \end{comment}
+    \begin{figure}[t]
       \centering
       \includegraphics[height=2in]{../diagrams/state.eps}
       \caption{DataFlow}
       \label{state}
-   \end{figure}
-
+    \end{figure}
+%
 The State level is the most conceptually important part of the framework.
 It represents a single 'quantity of interest' in the system which is either
 sensed directly by some hardware component or is derived from the values of
@@ -261,15 +390,15 @@ velocity and a current consumption - both of which are good candidates
 for States. It is this data which robotics deals
 with on a fundamental level, and this data which is of true interest to the
 designer. The purpose of the State abstraction is to give the user unfettered
-access to this information in a convinent and meaningful way. The State
+access to this information in a convenient and meaningful way. The State
 component is responsible for providing the system's most up to date picture of
 physical reality to the user, and for maintaining that picture according to a
-pre-specified time period. The most important part of the State, howerver, is
-the aveneue through which it presents the data to the user.
+pre-specified time period. The most important part of the State, however, is
+the avenue through which it presents the data to the user.
 
 The State's data presentation method is what gives it its name. The
 concept for the State is to embody what would normally be represented as a state
-variable during system desgin.
+variable during system design.
 Consider a State $\omega$, associated with a motor's angular rate, as sensed by
 an encoder (handled by the lower level abstractions). The State allows all
 functions on $\omega$ which would normally be operable on a state variable. This
@@ -285,7 +414,7 @@ sensed quantity is given by $\omega[0]$
 for purposes of calculation. Values on the time interval $(0, \infty)$
 or on the time interval $(-\infty, -hist_{max})$ can be estimated if the user
 specifies an appropriate estimation algorithm to use, such as a Kalman filter.
-Transforms to the frequency domain can be achieved by specificing an
+Transforms to the frequency domain can be achieved by specifying an
 appropriately sized windowing period, and using the historical data to generate
 the appropriate transform.
 
@@ -293,25 +422,14 @@ Because the program is implemented within a computer, the sampling is inherently
 discrete time. The program only has available to it the values at integer
 multiples of the sampling period $\frac{1}{f}$,  ($\omega[0]$, $\omega[
 \frac{1}{f}]$, $\omega[\frac{2}{f}]$, etc. values between these must be
-extrapolated from the samples. The program can do this extrapolation seemlessly
+extrapolated from the samples. The program can do this extrapolation seamlessly
 if the user requests it and specifies an algorithm to do so (linear fit,
 $n^{th}$ order polynomial, etc). So that a request for $\omega~[\frac{3}{2f}]$ returns
 the average of the two surrounding points.
 
-Another function of the State is as an emisary of the Controller. The State must
+Another function of the State is as an emissary of the Controller. The State must
 understand its type (w/r/t ability to modify). 
 %
-%
-%
-Periodically requsts update from lower levels
-Stores historical data about the quantity
-Algorithms for predicting future values (kalman filters)
-Algorithms for filtering/averaging
-Broadcasts update events (set or request data)
-Presents data as an accessible member (does not broadcast data)
-%
-How is all of this achieved:
-
 \subsection{CONTROLLER/Logger}
     \begin{figure}[t]
         \centering
@@ -324,19 +442,19 @@ How is all of this achieved:
         *samples from the data presented by state
         *user written control law + state machine given
     \end{comment}
-The Controller component is the handoff between the user (and higher level
+The Controller component is the hand off between the user (and higher level
 robotics frameworks) and ACES. It provides centralized read and write access
 to the various States within the system, an can be extended for accessibility
 from other programs. Because of this, it is the most loosely defined component.
 The program defines functionality for adding connections to States, for sending
 and receiving data from States, and (through Orocos) 
 
-
-
 \section{EXAMPLE/IMPLEMENTATION}
 
+%
+%
 \bibliographystyle{IEEEtran}
 \bibliography{sources}{}
-
+%
 \end{document}
 
