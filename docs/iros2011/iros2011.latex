@@ -27,8 +27,8 @@
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed
 
-\title{\LARGE \bf Design of a Hardware Centric Framework for Robotics
-                  Programming%
+\title{\LARGE \bf ACES: Abstracted Controls Engineering Software\\%
+       \large A Framework for Low-Level Robotics Programming
     \author{Robert M Sherbert}% <-this % stops a space
     \date{4 September 2010}%
 }
@@ -143,6 +143,26 @@ complexity of humanoid?).
     example system (via diagram)
     ability to interconnect and rearrange components in different combinations
     and varieties 
+
+Programmatic Features:
+    RT via orocos
+    event driven
+        benefits - error handling
+
+Structure:
+It describes a layered data communication and interpretation
+architecture that mirrors common organizational patterns in robotic hardware.
+
+    comms: device, protocol, hardware
+    control: state, controller
+    logger
+
+Data Flow (diagram):
+    downstream
+    upstream
+
+Example:
+    diagram
     \end{comment}
    \begin{figure}[!b]
       \centering
@@ -150,30 +170,75 @@ complexity of humanoid?).
       \caption{DataFlow}
       \label{protstruct}
    \end{figure}
-
-Note: Through the rest of the paper a number of software components are
+The ACES framework provides two main features using a five layered component
+based design. The first and more important feature, constituting the upper two
+layers of the program, is ACES' ability to abstract system hardware
+in terms of components called 'States'. The States mirror as closely as
+possible the
+concept of state variables from control theory. The second main feature,
+consituting the three remaining layers, is a communication stack designed to
+ease common implementation problems when using robotics hardware. These
+features are enabled by the highly threaded Real Time architecture and event based
+programming upon which ACES is built. The particular layered design and data
+flow through the system provides convenient ways to implement common tasks
+along with the extenibility to handle unusual cases.
+%
+\footnote{Through the rest of the paper a number of software components are
 discussed which share names with common concepts in engineering. Where there is
 a reuse of a generic name, the software specific component is capitalized, while
 the common usage is left as usual. E.g. "State" (software component) vs. "state"
-(control theory variable).
+(control theory variable).}
 
-The framework attempts to provide two useful divisions of abstraction:
-the first is to provide a method of mirroring hardware configuration, while the
-second is to provide abstraction of the hardware in convenient mathematical
-notation. 
+The framework provides two divisions of abstraction:
+Control and Communication. The control components, known as State and
+Controller, attempt to provide a bridge between the mathematical design of robot
+controllers and their implementation within the computer. When an engineer
+designs a controller mathematically, concern is only with the physical
+principles at work in the robot's environment, sensors, and actuators. When the
+controller implementation is made within the computer, however, the engineer
+must also consider numerous aspects of the computation itself. The Controller
+and State components alleviate some of these concerns. The State presents to
+the user a software component which embodies a single physical quantity, such
+as a position, velocity, acceleration, current, etc, independent of any
+hardware interaction concerns required to obtain the data. In addition to
+presenting the current value, it provides quantities which are mathematically
+easy to access such as a time history, integrals/derivatives, filterd versions of
+the signal, transform methods, etc. The Controller component provies a
+reference point from which these various States can be accessed, and the user
+can generate a control signal. The user can author a controller within the
+Controller component using notation very similar to standard mathematical
+expressions.
+%(For example consider the simplest controller...)
 
-The State component is intentionally left as an abstract type. The only
-identifying data the State carries are its name, a node ID number (which is
-specific to the Device it is connected to),
-its data type, and the information that
-constitutes its connections to other parts of the system (Devices and
-Controllers). This design allows a very easy transition between two systems
-that follow the same mathematical models, but have very different hardware. The
-States and Devices remain unmodified, while only the Protocol and Hardware need
-to be changed. The downside to this flexibility is the additional effort
-required to identify where the information is going as it travels through the
-system. This is accomplished by tagging the State and Device with ID numbers
-that are unique to the Device and Protocol, respectively.
+The communication components, known as Device, Protocol, and Hardware, provide
+methods to easily interact with robotics hardware and
+helps to facilitate usage of the control components. Robotics hardware (sensors
+and actuators) are often stand alone devices which exist seperately from the
+control unit and must be accessed through some bus. The communication
+components are designed to mirror this topology. The Device provides a software
+stand in for the individual node on the bus; be it a motor controller,
+accelerometer, etc. The Protocol is a representation for whatever communication
+format the manufacturer has specified; this could be a completely custom packet
+format, or a simple scaling function for an analog-to-digital converter.
+The Hardware component provides the interface between the ACES framework and
+the operating system. Its primary function is as a gatekeeper task.
+
+To provide this level of abstraction and data transparency to the user, ACES is
+designed in a highly thread based manner. Each component of the system is
+driven by its own thread, with an individually assigned priority and update
+frequency. The thread based design helps to remove the strict coupling between
+hardware sampling concerns and the controller implementation. This also allows
+an easy mechanism to allot appropriate operational frequencies to the various
+parts of the system. 
+%(transition)
+The primary method of data passing through the system 
+%Elaborate on 'strict coupling'? - Normally, the control loop and sampling is
+%done pretty much in the same place, but w/this yada yada
+was constructed on top of a system called Orocos (Open Robot Control Software)
+\cite{}. Orocos and its RTT (Real Time Toolkit) component provide the Real Time
+system abstraction for ACES. Orocos supports a 
+
+The dataflow through the system follows a fairly simple trajectory.
 %
 \subsection{HARDWARE}
     \begin{comment}
@@ -264,7 +329,7 @@ of abstraction to be made over the classification.
 
 The Protocol component of this framework is a software representation of such
 a data transmission format on a bus. As
-such it acquires an important role in organizing data flow in both the downstream
+such it acquires an important role in organizing dataflow in both the downstream
 and upstream directions. On the downstream path, the Protocol buffers and
 arranges requests in such a way as to maximize bandwidth efficiency of the bus.
 In the upstream direction, the Protocol must convert a word stream into a data
@@ -331,19 +396,24 @@ a motor controller. Each Device could have one or more states associated with
 it (in the case of a motor controller, these  would be angular velocity, current
 draw, etc). The Device's purpose is to help in performing down- and up-select operations
 as data passes through it on route to either the Protocol or State components.
-
-certain information about the
-
-The dataflow in the downstream direction functions as follows:
-
 On the downstream the goal is to ensure that the Protocol and Hardware
 components have enough identifying information available to them to construct a
-properly formed data packet. The Device accomplishes this goal by tagging. Each
+properly formed data packet. The Device accomplishes this goal by tagging the
+request with identifying credentials. On the upstream the goal for the Device
+is simply to determine if the recieved message and its corresponding data
+should be carried along to the Device's associated states. This is done by
+simple comparison between the reconstructed message and the Device's tagged
+identifying information.
+
+The dataflow in the downstream direction functions as follows: Each
 request that is generated by a State has a placeholder for a data structure
 called a 'credential'. The credentials contain the bus specific identifying
 information needed for packet generation further downstream. When a request
-reaches the device it places a reference to the credential on the State, and
-emits an event containing the State to its subscribed Protocols.
+reaches the Device from the State through its event handler, the request is
+placed on a queue. When the Device's tick expires, it processes each of the
+elements in the queue. For each queued message, 
+the Device places a reference to its credential on the message, and
+emits an event containing the message to its subscribed Protocols.
 %IMPORTANT - highlight this strongly somewhere more visable
 In this way, the State's relationship to a particular bus is defined \emph{by where
 it is placed in the system}, as opposed to particular configuration information
@@ -375,7 +445,7 @@ accepts the message and  emits it to its subscribed States.
     \end{comment}
     \begin{figure}[t]
       \centering
-      \includegraphics[height=2in]{../diagrams/state.eps}
+      \includegraphics[width=\columnwidth]{../diagrams/state.eps}
       \caption{DataFlow}
       \label{state}
     \end{figure}
@@ -429,11 +499,25 @@ the average of the two surrounding points.
 
 Another function of the State is as an emissary of the Controller. The State must
 understand its type (w/r/t ability to modify). 
+
+The State component is intentionally left as an abstract type. The only
+identifying data the State carries are its name, a node ID number (which is
+specific to the Device it is connected to),
+its data type, and the information that
+constitutes its connections to other parts of the system (Devices and
+Controllers). This design allows a very easy transition between two systems
+that follow the same mathematical models, but have very different hardware. The
+States and Devices remain unmodified, while only the Protocol and Hardware need
+to be changed. The downside to this flexibility is the additional effort
+required to identify where the information is going as it travels through the
+system. This is accomplished by tagging the State and Device with ID numbers
+that are unique to the Device and Protocol, respectively.
+
 %
 \subsection{CONTROLLER/Logger}
     \begin{figure}[t]
         \centering
-        \includegraphics[height=1.5in]{../diagrams/controller.eps}
+        \includegraphics[width=2.5in]{../diagrams/controller.eps}
         \caption{Controller}
         \label{ctrl}
     \end{figure}
