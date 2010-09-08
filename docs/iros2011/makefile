@@ -11,6 +11,10 @@ full: run
 	dvips -t letter ${ASSIGN}.dvi
 	ps2pdf13 ${ASSIGN}.ps
 
+bib :
+	wget http://www.citeulike.org/bibtex/user/bobsherbert/tag/iros2011
+	mv iros2011 sources.bib
+
 pdf : 
 	dvips -t letter ${ASSIGN}.dvi
 	ps2pdf13 ${ASSIGN}.ps
