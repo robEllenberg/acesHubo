@@ -2,6 +2,7 @@
 #define ACES_WORD_HPP
 
 #include <rtt/Logger.hpp>
+#include "credentials.hpp"
 
 namespace ACES{
     class ProtoWord {
@@ -19,17 +20,21 @@ namespace ACES{
 
     class ProtoResult{
         public:
-            ProtoResult(int dev, int node);
+            ProtoResult(int dev, int node, Credentials* c);
             virtual void printme();
             int devID;
             int nodeID;
+            /*! The semiCred is a Credential containing whatever identifying
+             *  information the Protocol was able to extract about the device
+             *  from the packet */
+            Credentials* semiCred;
     };
 
     template <class T>
     class Result : public  ProtoResult{
         public:
             //Result(T r);
-            Result(T r, int dev=0, int node=0);
+            Result(T r, Credentials* c, int dev=0, int node=0);
             //int id;
             //int busid;
             T result;
@@ -42,8 +47,8 @@ namespace ACES{
 
     template <class T>
     //Result<T>::Result(T r){
-    Result<T>::Result(T r, int dev, int node)
-      : ProtoResult(dev, node)
+    Result<T>::Result(T r, Credentials* c, int dev, int node)
+      : ProtoResult(dev, node, c)
     {
         result = r;
     }

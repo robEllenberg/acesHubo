@@ -140,12 +140,20 @@ namespace ACES{
     {
         Device *d = NULL;
         #ifdef WEBOTS 
-        if (type == "Webots"){
-            d = (Device*) new Webots::Device(cfg, args);
+        std::istringstream s(type);
+        s >> type1;
+        s >> type2;
+        if (type1 == "Webots"){
+            if(type2 == "Joint"){
+                d = (Device*) new Webots::JointDevice(cfg, args);
+            }
+            if(type2 == "GPS"){
+                d = (Device*) new Webots::GPSDevice(cfg, args);
+            }
         }
         #endif
         #ifdef TESTSUITE
-        if ( type == "TestSuite"){
+        if ( type1 == "TestSuite"){
             d = (Device*) new TestSuite::Device(cfg, args);
         } 
         #endif
@@ -163,7 +171,18 @@ namespace ACES{
         ProtoState* s = NULL;
         
         if( type == "Webots") {
-            s = (ProtoState*) new ACES::State<float>(cfg, args);
+            if ( args == "Joint" ){
+                s = (ProtoState*) new ACES::State<float>(cfg, JOINT);
+            }
+            if ( args == "X" ) {
+                s = (ProtoState*) new ACES::State<float>(cfg, X);
+            }
+            if ( args == "Y" ) {
+                s = (ProtoState*) new ACES::State<float>(cfg, Y);
+            }
+            if ( args == "Z" ) {
+                s = (ProtoState*) new ACES::State<float>(cfg, Z);
+            }
             //((State<float>*)s)->printme();
         }
 

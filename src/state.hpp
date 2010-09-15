@@ -21,14 +21,15 @@
 
 namespace ACES {
     //Webots Component Types
-    enum COMP_TYPE { JOINT=1 };
+    enum COMP_TYPE { JOINT=1, GPS};
+    enum AXIS { X=1, Y, Z};
     //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
 
     class ProtoState : public taskCfg,
                        public RTT::TaskContext
     {
         public:
-            ProtoState(std::string config, std::string args) ;
+            ProtoState(std::string config, int nID) ;
             void (*asgnfunct)(ProtoResult*, void*);
 
             virtual void updateHook();  

@@ -25,6 +25,9 @@ program main {
     do addDevice("dRAP 5 31", "Webots", "RAP 0.0 -1.0");
     do addDevice("dRAR 5 31", "Webots", "RAR 0.0  1.0");
 
+    do addDevice("dGPS 5 31", "Webots GPS", "NAMEOFGPSNODE");
+    do addDevice("dGPS 5 31", "Webots Joint", "NAMEOFGPSNODE");
+
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");
     do addState("LSR 5 31", "Webots", "Joint");

@@ -46,20 +46,36 @@ namespace Webots{
             Credentials(std::string args);
             Credentials(std::string id_str, std::string devname,
                         float z, float dir);
+            bool compare(ACES::Credentials* cred);
 
             void printme();
 
             std::string wb_device_id;
             float zero;
             float direction;
-            std::string devName;
+            //std::string devName;
             static int idCount;
     };
 
-    class Device : public ACES::Device {
+    class GPSCredentials : public ACES::Credentials {
         public:
-            Device(std::string config, std::string args);
-            void interpretResult(ACES::ProtoResult* rx);
+            GPSCredentials(std::string args);
+            int axis;
+            bool compare(ACES::Credentials* cred);
+    };
+
+    class JointDevice : public ACES::Device {
+        public:
+            JointDevice(std::string config, std::string args);
+            //void interpretResult(ACES::ProtoResult* rx);
+            bool startHook();
+            void stopHook();
+    };
+
+    class GPSDevice : public ACES::Device {
+        public:
+            GPSDevice(std::string config, std::string args);
+            //void interpretResult(ACES::ProtoResult* rx);
             bool startHook();
             void stopHook();
     };

@@ -48,12 +48,35 @@ namespace Webots {
                 //Different commands are needed depending on the
                 //type of device we're looking up. Find the appropriate
                 //result for this propID
-                switch (g->nodeID){
+                switch (c->devID){
                     case (ACES::JOINT):{
                         *result = wb_servo_get_position(tag);
                      }
                      break;
-                    default:
+
+                     case (ACES::IMU):{
+                        double *val = wb_gps_get_values(tag);
+                        switch (c->nodeID){
+                            case(ACES::X):
+                                *result = val[0];
+                            break;
+
+                            case(ACES::Y):
+                                *result = val[1];
+                            break;
+
+                            case(ACES::Z):
+                                *result = val[2];
+                            break;
+
+                            default:
+                                *result = 0.0;
+                            break;
+                        }
+                     }
+                     break;
+
+                     default:
                         *result = 0;
                      break;
                 }
@@ -125,66 +148,115 @@ namespace Webots {
     Credentials::Credentials(Credentials* c)
     : ACES::Credentials(c->devID)
     {
-        assign(c->wb_device_id, c->devName, c->zero, c->direction);
+        assign(c->wb_device_id, /*c->devName,*/ c->zero, c->direction);
     }
 
-    void Credentials::assign(std::string id_str, std::string devname,
+    void Credentials::assign(std::string id_str, //std::string devname,
                            float z, float dir)
     {
         wb_device_id = id_str;
         zero = z;
         direction = dir;
-        devName = devname;
+        //devName = devname;
     }  
 
-    Credentials::Credentials(std::string id_str, std::string devname,
+    Credentials::Credentials(std::string id_str, //std::string devname,
      float z, float dir) : ACES::Credentials(0)
     {
-        devID = ++Credentials::idCount; 
+        //devID = ++Credentials::idCount; 
+        devID = ACES::JOINT;
 
-        assign(id_str, devname, z, dir);
+        assign(id_str, /*devname,*/ z, dir);
     }  
 
     void Credentials::printme(){
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
-        RTT::Logger::log() << " Device Name= " << devName;
+        //RTT::Logger::log() << " Device Name= " << devName;
         RTT::Logger::log() << RTT::endlog();
     }
 
     Credentials::Credentials(std::string args)
       : ACES::Credentials(0)
     {
-        devID = ++Credentials::idCount; 
+        //devID = ++Credentials::idCount; 
+        devID = ACES::JOINT;
 
         std::istringstream s1(args);
         float z, d;
-        std::string id, dname;
-        s1 >> id >> z >> d >> dname;
-        assign(id, dname, z, d);
+        std::string id/*, dname*/;
+        s1 >> id >> z >> d /*>> dname*/;
+        assign(id, /*dname,*/ z, d);
     }
 
-    Device::Device(std::string cfg, std::string args)
+    bool Credentials::compare(ACES::Credentials* cred){
+        //Cast to a webots cred from a generic one
+        Credentials* wcred = (Credentials*)cred;
+        bool same = (wb_device_id == wcred->wb_device_id);        
+        //same &= (zero == wcred->zero);
+        //same &= (direction;
+        return same;
+    }
+
+    JointDevice::Device(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
-        std::string rargs = args + (std::string)" " + name;
+        //std::string rargs = args + (std::string)" " + name;
         //RTT::Logger::log() << rargs << RTT::endlog();
-        credentials = (ACES::Credentials*)( new Credentials(rargs) );
+        credentials = (ACES::Credentials*)( new Credentials(args) );
+        //credentials.devName = name;
     }
     
-    bool Device::startHook(){
+    bool JointDevice::startHook(){
         Credentials* c = (Credentials*)credentials;
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
         //TODO - Magic Number removal (Samples every 8 ms)
         wb_servo_enable_position(tag, 8); 
+        
         return true;
     }
     
-    void Device::stopHook(){
+    void JointDevice::stopHook(){
         Credentials* c = (Credentials*)credentials;
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
         wb_servo_disable_position(tag); 
+    }
+
+    GPSDevice::Device(std::string cfg, std::string args)
+      : ACES::Device(cfg)
+    {
+        //RTT::Logger::log() << rargs << RTT::endlog();
+        credentials = (ACES::Credentials*)( new GPSCredentials(args) );
+    }
+
+    bool GPSDevice::startHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        //TODO - Magic Number removal (Samples every 8 ms)
+        wb_gps_enable(tag, 8);
+        
+        return true;
+    }
+
+    GPSCredentials::GPSCredentials(std::string args){
+        devID = ACES::IMU;
+    }
+
+
+    bool GPSCredentials::compare(ACES::Credentials* cred){
+        //Cast to a webots cred from a generic one
+        GPSCredentials* wcred = (Credentials*)cred;
+        bool same = (axis == wcred->axis);        
+        //same &= (zero == wcred->zero);
+        //same &= (direction;
+        return same;
+    }
+
+    void GPSDevice::stopHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        wb_gps_disable(tag); 
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 

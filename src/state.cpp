@@ -1,7 +1,7 @@
 #include "state.hpp"
 namespace ACES {
 
-    ProtoState::ProtoState(std::string config, std::string args) :
+    ProtoState::ProtoState(std::string config, int nID) :
       taskCfg(config),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
@@ -12,9 +12,7 @@ namespace ACES {
 
         this->methods()->addMethod(sampleMethod, "sample");
 
-        if(args == "Joint"){
-            nodeID = JOINT;
-        }
+        nodeID = nID;
 
       //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
       set_stack = new RTT::Buffer< Goal* >(50);

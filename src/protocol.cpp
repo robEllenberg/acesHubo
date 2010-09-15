@@ -119,7 +119,7 @@ namespace ACES {
         Goal* g = w->data;
         int dID = g->cred->devID;
         int nID = g->nodeID;
-        Result<Goal*>* r = new Result<Goal*>(g, dID, nID);
+        Result<Goal*>* r = new Result<Goal*>(g, g->cred, dID, nID);
         return (ProtoResult*)r;
     }
     

@@ -1,9 +1,10 @@
 #include "word.hpp"
 
 namespace ACES{
-    ProtoResult::ProtoResult(int dev, int node){
+    ProtoResult::ProtoResult(int dev, int node, Credentials* c){
         devID = dev;
         nodeID = node;
+        semiCred = c;
     }
 
     void ProtoResult::printme(){
