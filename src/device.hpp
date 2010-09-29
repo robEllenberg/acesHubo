@@ -16,8 +16,6 @@ namespace ACES{
                     public RTT::TaskContext
     {
         public:
-            //'int junk' is simply here to disambiguate the function calls,
-            //it does nothing 
             Device(std::string config);
             //Device(std::string name);
             RTT::Event<void(Goal*)> txDownStream;

@@ -19,9 +19,13 @@
 #include "device.hpp"
 #include "word.hpp"
 
+enum COMP_TYPE { JOINT=1, GPS, IMU};
+enum AXIS { X=1, Y, Z};
+
 extern "C"{
     #include <webots/robot.h>
     #include <webots/servo.h>
+    #include <webots/gps.h>
 }
 
 namespace Webots{

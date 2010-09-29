@@ -49,23 +49,23 @@ namespace Webots {
                 //type of device we're looking up. Find the appropriate
                 //result for this propID
                 switch (c->devID){
-                    case (ACES::JOINT):{
+                    case (JOINT):{
                         *result = wb_servo_get_position(tag);
                      }
                      break;
 
-                     case (ACES::IMU):{
-                        double *val = wb_gps_get_values(tag);
+                     case (IMU):{
+                        const double *val = wb_gps_get_values(tag);
                         switch (c->nodeID){
-                            case(ACES::X):
+                            case(X):
                                 *result = val[0];
                             break;
 
-                            case(ACES::Y):
+                            case(Y):
                                 *result = val[1];
                             break;
 
-                            case(ACES::Z):
+                            case(Z):
                                 *result = val[2];
                             break;
 

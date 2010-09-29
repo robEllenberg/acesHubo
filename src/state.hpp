@@ -21,8 +21,6 @@
 
 namespace ACES {
     //Webots Component Types
-    enum COMP_TYPE { JOINT=1, GPS};
-    enum AXIS { X=1, Y, Z};
     //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
 
     class ProtoState : public taskCfg,
