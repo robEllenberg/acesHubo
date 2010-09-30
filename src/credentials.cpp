@@ -11,6 +11,15 @@ namespace ACES {
         this->devID = idnum;
     }
 
+    bool Credentials::operator==(const Credentials& other){
+        if(devID == other.devID){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     void Credentials::printme(){
         RTT::Logger::log() << "Credentials: ID=" << devID << RTT::endlog();
     }

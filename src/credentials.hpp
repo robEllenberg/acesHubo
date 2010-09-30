@@ -17,6 +17,7 @@ namespace ACES {
             Credentials(std::string args);
             virtual void printme();
             virtual bool compare(Credentials* cred);
+            virtual bool operator==(const Credentials& other);
             int devID;
             //std::string wb_device_id;
     };

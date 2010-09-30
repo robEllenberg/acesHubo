@@ -56,7 +56,7 @@ namespace Webots {
 
                      case (IMU):{
                         const double *val = wb_gps_get_values(tag);
-                        switch (c->nodeID){
+                        switch (g->nodeID){
                             case(X):
                                 *result = val[0];
                             break;
@@ -164,7 +164,7 @@ namespace Webots {
      float z, float dir) : ACES::Credentials(0)
     {
         //devID = ++Credentials::idCount; 
-        devID = ACES::JOINT;
+        devID = JOINT;
 
         assign(id_str, /*devname,*/ z, dir);
     }  
@@ -181,7 +181,7 @@ namespace Webots {
       : ACES::Credentials(0)
     {
         //devID = ++Credentials::idCount; 
-        devID = ACES::JOINT;
+        devID = JOINT;
 
         std::istringstream s1(args);
         float z, d;
@@ -199,7 +199,7 @@ namespace Webots {
         return same;
     }
 
-    JointDevice::Device(std::string cfg, std::string args)
+    JointDevice::JointDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
         //std::string rargs = args + (std::string)" " + name;
@@ -223,7 +223,7 @@ namespace Webots {
         wb_servo_disable_position(tag); 
     }
 
-    GPSDevice::Device(std::string cfg, std::string args)
+    GPSDevice::GPSDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
         //RTT::Logger::log() << rargs << RTT::endlog();
@@ -239,10 +239,10 @@ namespace Webots {
         return true;
     }
 
-    GPSCredentials::GPSCredentials(std::string args){
-        devID = ACES::IMU;
+    GPSCredentials::GPSCredentials(std::string args)
+      :ACES::Credentials(){
+        devID = IMU;
     }
-
 
     bool GPSCredentials::compare(ACES::Credentials* cred){
         //Cast to a webots cred from a generic one

@@ -20,9 +20,9 @@ namespace ACES{
 
     class ProtoResult{
         public:
-            ProtoResult(int dev, int node, Credentials* c);
+            ProtoResult(int node, Credentials* c);
             virtual void printme();
-            int devID;
+            //int devID;
             int nodeID;
             /*! The semiCred is a Credential containing whatever identifying
              *  information the Protocol was able to extract about the device
@@ -34,7 +34,7 @@ namespace ACES{
     class Result : public  ProtoResult{
         public:
             //Result(T r);
-            Result(T r, Credentials* c, int dev=0, int node=0);
+            Result(T r, Credentials* c, int node=0);
             //int id;
             //int busid;
             T result;
@@ -47,8 +47,8 @@ namespace ACES{
 
     template <class T>
     //Result<T>::Result(T r){
-    Result<T>::Result(T r, Credentials* c, int dev, int node)
-      : ProtoResult(dev, node, c)
+    Result<T>::Result(T r, Credentials* c, int node)
+      : ProtoResult(node, c)
     {
         result = r;
     }

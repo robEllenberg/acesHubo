@@ -117,9 +117,8 @@ namespace ACES {
         }
         Word<Goal*>* w = (Word<Goal*>*)p;
         Goal* g = w->data;
-        int dID = g->cred->devID;
         int nID = g->nodeID;
-        Result<Goal*>* r = new Result<Goal*>(g, g->cred, dID, nID);
+        Result<Goal*>* r = new Result<Goal*>(g, g->cred, nID);
         return (ProtoResult*)r;
     }
     

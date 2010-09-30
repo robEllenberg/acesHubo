@@ -29,12 +29,9 @@ namespace ACES{
 
     void Device::rxUpStream(ProtoResult* rx){
         //First we check if the two device types are the same
-        if(rx->devID == credentials->devID){
-            //Then we check if they are the same device
-            if ( credentials->compare(rx->semiCred) ){
-                RTT::OS::MutexLock lock(usqGuard);
-                usQueue.push_back(rx);
-            }
+        if(rx->semiCred == credentials){
+            RTT::OS::MutexLock lock(usqGuard);
+            usQueue.push_back(rx);
         }
     }
 
@@ -99,7 +96,7 @@ namespace ACES{
           usQueue.pop_front();
         }
         Goal* g = ( (Result<Goal*>*)p)->result;
-        Result<void*>* r = new Result<void*>(g->data, g->cred, p->devID, p->nodeID);
+        Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
         return (ProtoResult*)r;
     }
 }

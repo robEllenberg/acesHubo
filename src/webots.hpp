@@ -43,12 +43,12 @@ namespace Webots{
    
     class Credentials : public ACES::Credentials {
         private:
-            void assign(std::string id_str, std::string devname, float z,
+            void assign(std::string id_str, float z,
                         float dir);
         public:
             Credentials(Credentials* c);
             Credentials(std::string args);
-            Credentials(std::string id_str, std::string devname,
+            Credentials(std::string id_str,
                         float z, float dir);
             bool compare(ACES::Credentials* cred);
 
@@ -84,6 +84,7 @@ namespace Webots{
             void stopHook();
     };
 
+    //Probably no point in having this - as it does not make any extensions yet
     class Protocol : public ACES::Protocol {
         public:
             Protocol(std::string cfg, std::string args);
