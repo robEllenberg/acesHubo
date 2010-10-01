@@ -1,6 +1,6 @@
     template <class T>
-    State<T>::State(std::string cfg, std::string args) :
-      ProtoState(cfg, args),
+    State<T>::State(std::string cfg, int nID) :
+      ProtoState(cfg, nID),
       goMethod("go", &State<T>::go, this),
       value("value")
     {

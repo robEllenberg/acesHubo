@@ -20,7 +20,7 @@ int ORO_main(int a, char** b){
     ACES::Dispatcher* d = new ACES::Dispatcher("dispatch");
 
     RTT::Logger::log() << "Begin Creation" << RTT::endlog();
-
+/*
     d->addHardware("wbHW 1 600", "Webots", "");
     d->addProtocol("wbPcol 2 600", "Webots", "");
 
@@ -107,12 +107,11 @@ int ORO_main(int a, char** b){
 
     d->linkHC("wbHW", "wbNull");
     d->linkHP("wbHW", "wbPcol");
-
     d->addLogger("flog 10 5", "File", "tfile.txt");
     //d->linkLS("flog", "RSP");
 
     RTT::Logger::log() << "Begin Browser" << RTT::endlog();
-
+*/
     //OCL::FileReporting r("Reporter");
     //r.addPeer(d);
 

@@ -113,13 +113,11 @@ namespace Webots {
         step();
     }
 
-/*
-    Credentials::Credentials(Credentials* c)
-    : ACES::Credentials(c->devID)
+    Credentials::Credentials(COMP_TYPE id)
+    : ACES::Credentials((int)id)
     {
-        assign(c->wb_device_id, c->zero, c->direction);
+        //assign(c->wb_device_id, c->zero, c->direction);
     }
-*/
 
 /*
     void JointCredentials::assign(std::string id_str, //std::string devname,
@@ -172,9 +170,16 @@ namespace Webots {
     }
 
     GPSCredentials::GPSCredentials(std::string args)
-      : Credentials(IMU){
+      : Credentials(GPS)
+    {
+        std::istringstream s1(args);
+        std::string id;
+        s1 >> id;
+
+        wb_device_id = id;
     }
 
+/*
     bool GPSCredentials::operator==(const ACES::Credentials& cred){
         //Cast to a webots cred from a generic one
         GPSCredentials* wcred = (GPSCredentials*)&cred;
@@ -183,6 +188,7 @@ namespace Webots {
         //same &= (direction;
         return same;
     }
+*/
 
     JointDevice::JointDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
@@ -242,7 +248,7 @@ namespace Webots {
     {
         WbDeviceTag tag =
                 wb_robot_get_device( (j->wb_device_id).c_str() );
-        const double *val = wb_gps_get_values(tag);
+        const double *val = wb_accelerometer_get_values(tag);
         //We must clone the vector because Webots owns the memory
         //and will yank the values out from under us at the next
         //timestep
@@ -260,6 +266,21 @@ namespace Webots {
         credentials = (ACES::Credentials*)( new GPSCredentials(args) );
     }
 
+    void* GPSDevice::refresh(GPSCredentials* g){
+        WbDeviceTag tag =
+                wb_robot_get_device( (g->wb_device_id).c_str() );
+
+        const double *val = wb_gps_get_values(tag);
+        //We must clone the vector because Webots owns the memory
+        //and will yank the values out from under us at the next
+        //timestep
+        std::vector<double>* res = new std::vector<double>(3);
+        (*res)[0] = val[0];
+        (*res)[1] = val[1];
+        (*res)[2] = val[2];
+        return (void*)res;
+    }
+
     bool GPSDevice::startHook(){
         Credentials* c = (Credentials*)credentials;
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
@@ -273,6 +294,26 @@ namespace Webots {
         Credentials* c = (Credentials*)credentials;
         WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
         wb_gps_disable(tag); 
+    }
+
+    //!Override the default USQueue processor in order to split the
+    //!three data elements out of the GPS node's return packet
+    ACES::ProtoResult* GPSDevice::processUSQueue(){
+        //TODO - Provide an implementation that doesn't triple up the
+        //requests into webots
+        ACES::ProtoResult* p = NULL;
+        { RTT::OS::MutexLock lock(usqGuard);
+          p = usQueue.front();
+          usQueue.pop_front();
+        }
+        ACES::Goal* g = ( (ACES::Result<ACES::Goal*>*)p)->result;
+        std::vector<double>* response = (std::vector<double>*)g->data;
+
+        float* f = new float((*response)[p->nodeID]);
+        ACES::Result<void*>* r = new ACES::Result<void*>
+                                    ((void*)f,
+                                      g->cred, p->nodeID);
+        return (ACES::ProtoResult*)r;
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 

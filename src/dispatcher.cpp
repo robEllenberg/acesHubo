@@ -141,6 +141,7 @@ namespace ACES{
         Device *d = NULL;
         #ifdef WEBOTS 
         std::istringstream s(type);
+        std::string type1, type2;
         s >> type1;
         s >> type2;
         if (type1 == "Webots"){

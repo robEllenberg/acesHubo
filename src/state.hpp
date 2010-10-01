@@ -47,7 +47,7 @@ namespace ACES {
     template <class T>
     class State : public ProtoState {
         public:
-            State(std::string config, std::string args);
+            State(std::string config, int nID);
 
             void printme();
             void go(T sp);

@@ -7,26 +7,26 @@ program main {
                      "IKscript1.txt");
     do addController("wbArm 10 15", "Webots Arm", "sins.txt");
 
-    do addDevice("dHY 5 31", "Webots",  "HY  0.0 -1.0");
-    do addDevice("dLSP 5 31", "Webots", "LSP 0.0  1.0");
-    do addDevice("dLSR 5 31", "Webots", "LSR 0.0  1.0");
-    do addDevice("dRSP 5 31", "Webots", "RSP 0.0  1.0");
-    do addDevice("dRSR 5 31", "Webots", "RSR 0.0  1.0");
-    do addDevice("dLHY 5 31", "Webots", "LHY 0.0  1.0");
-    do addDevice("dLHR 5 31", "Webots", "LHR 0.0  1.0");
-    do addDevice("dLHP 5 31", "Webots", "LHP 0.0 -1.0");
-    do addDevice("dLKP 5 31", "Webots", "LKP 0.0  1.0");
-    do addDevice("dLAP 5 31", "Webots", "LAP 0.0 -1.0");
-    do addDevice("dLAR 5 31", "Webots", "LAR 0.0  1.0");
-    do addDevice("dRHY 5 31", "Webots", "RHY 0.0  1.0");
-    do addDevice("dRHR 5 31", "Webots", "RHR 0.0 -1.0");
-    do addDevice("dRHP 5 31", "Webots", "RHP 0.0 -1.0");
-    do addDevice("dRKP 5 31", "Webots", "RKP 0.0  1.0");
-    do addDevice("dRAP 5 31", "Webots", "RAP 0.0 -1.0");
-    do addDevice("dRAR 5 31", "Webots", "RAR 0.0  1.0");
+    do addDevice("dHY 5 31", "Webots Joint",  "HY  0.0 -1.0");
+    do addDevice("dLSP 5 31", "Webots Joint", "LSP 0.0  1.0");
+    do addDevice("dLSR 5 31", "Webots Joint", "LSR 0.0  1.0");
+    do addDevice("dRSP 5 31", "Webots Joint", "RSP 0.0  1.0");
+    do addDevice("dRSR 5 31", "Webots Joint", "RSR 0.0  1.0");
+    do addDevice("dLHY 5 31", "Webots Joint", "LHY 0.0  1.0");
+    do addDevice("dLHR 5 31", "Webots Joint", "LHR 0.0  1.0");
+    do addDevice("dLHP 5 31", "Webots Joint", "LHP 0.0 -1.0");
+    do addDevice("dLKP 5 31", "Webots Joint", "LKP 0.0  1.0");
+    do addDevice("dLAP 5 31", "Webots Joint", "LAP 0.0 -1.0");
+    do addDevice("dLAR 5 31", "Webots Joint", "LAR 0.0  1.0");
+    do addDevice("dRHY 5 31", "Webots Joint", "RHY 0.0  1.0");
+    do addDevice("dRHR 5 31", "Webots Joint", "RHR 0.0 -1.0");
+    do addDevice("dRHP 5 31", "Webots Joint", "RHP 0.0 -1.0");
+    do addDevice("dRKP 5 31", "Webots Joint", "RKP 0.0  1.0");
+    do addDevice("dRAP 5 31", "Webots Joint", "RAP 0.0 -1.0");
+    do addDevice("dRAR 5 31", "Webots Joint", "RAR 0.0  1.0");
 
-    do addDevice("dGPS 5 31", "Webots GPS", "NAMEOFGPSNODE");
-    do addDevice("dGPS 5 31", "Webots Joint", "NAMEOFGPSNODE");
+    //do addDevice("dGPS 5 31", "Webots GPS", "NAMEOFGPSNODE");
+    //do addDevice("dGPS 5 31", "Webots Joint", "NAMEOFGPSNODE");
 
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");

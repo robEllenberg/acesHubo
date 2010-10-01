@@ -26,6 +26,7 @@ extern "C"{
     #include <webots/robot.h>
     #include <webots/servo.h>
     #include <webots/gps.h>
+    #include <webots/accelerometer.h>
 }
 
 namespace Webots{
@@ -74,8 +75,7 @@ namespace Webots{
     class GPSCredentials : public Credentials {
         public:
             GPSCredentials(std::string args);
-            int axis;
-            bool operator==(const ACES::Credentials& cred);
+            //bool operator==(const ACES::Credentials& cred);
     };
 
     class JointDevice : public ACES::Device {
@@ -101,6 +101,7 @@ namespace Webots{
             //!Used by the HW to interact w/Webots for the refresh
             static void* refresh(GPSCredentials* g);
             //void interpretResult(ACES::ProtoResult* rx);
+            virtual ACES::ProtoResult* processUSQueue();
             bool startHook();
             void stopHook();
     };
