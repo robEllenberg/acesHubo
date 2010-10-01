@@ -41,16 +41,16 @@ namespace Webots{
             bool subscribeController(ACES::Controller* c);
     };
    
-    class Credentials : public ACES::Credentials {
+    class JointCredentials : public ACES::Credentials {
         private:
-            void assign(std::string id_str, float z,
-                        float dir);
+            //void assign(std::string id_str, float z,
+            //            float dir);
         public:
-            Credentials(Credentials* c);
-            Credentials(std::string args);
-            Credentials(std::string id_str,
-                        float z, float dir);
-            bool compare(ACES::Credentials* cred);
+            //Credentials(Credentials* c);
+            JointCredentials(std::string args);
+            //Credentials(std::string id_str,
+            //            float z, float dir);
+            virtual bool operator==(const ACES::Credentials& other);
 
             void printme();
 

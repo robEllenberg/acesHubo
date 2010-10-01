@@ -38,7 +38,7 @@ namespace Webots {
             case (ACES::REFRESH):{
                 //Vessel for returning the information we find
                 //g->printme();
-                float* result = new float;
+                void* result;
 
                 //Lookup the identifier for the component of interest
                 Credentials* c = (Credentials*)(g->cred);
@@ -50,46 +50,38 @@ namespace Webots {
                 //result for this propID
                 switch (c->devID){
                     case (JOINT):{
-                        *result = wb_servo_get_position(tag);
+                        float* res  = new float;
+                        *res = wb_servo_get_position(tag);
+
+                        //Apply the appropriate sign to the result, so it is
+                        //consistant w/convention
+                        float direction = (*c).direction;
+                        *res = (*res) * direction;
+                        result = (void*)res;
                      }
                      break;
 
                      case (IMU):{
                         const double *val = wb_gps_get_values(tag);
-                        switch (g->nodeID){
-                            case(X):
-                                *result = val[0];
-                            break;
-
-                            case(Y):
-                                *result = val[1];
-                            break;
-
-                            case(Z):
-                                *result = val[2];
-                            break;
-
-                            default:
-                                *result = 0.0;
-                            break;
-                        }
+                        //We must clone the vector because Webots owns the memory
+                        //and will yank the values out from under us at the next
+                        //timestep
+                        std::vector<double>* res = new std::vector<double>(3);
+                        (*res)[0] = val[0];
+                        (*res)[1] = val[1];
+                        (*res)[2] = val[2];
+                        result = (void*) res;
                      }
                      break;
 
                      default:
-                        *result = 0;
+                        result = NULL;
                      break;
                 }
-
-                //Apply the appropriate sign to the result, so it is
-                //consistant w/convention
-                float direction = (*c).direction;
-                *result = (*result) * direction;
-
                 //Place the result on the container & send it back
                 //TODO - This kind of bypasses the physical HW Rx
                 //structure, perhaps we should change that somehow
-                g->data = (void*)result;
+                g->data = result;
                 ACES::ProtoWord* w =
                     (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
                 { RTT::OS::MutexLock lock(usqGuard);
@@ -145,13 +137,14 @@ namespace Webots {
         step();
     }
 
-    Credentials::Credentials(Credentials* c)
-    : ACES::Credentials(c->devID)
-    {
-        assign(c->wb_device_id, /*c->devName,*/ c->zero, c->direction);
-    }
+//    Credentials::Credentials(Credentials* c)
+//    : ACES::Credentials(c->devID)
+//    {
+//        assign(c->wb_device_id, /*c->devName,*/ c->zero, c->direction);
+//  }
 
-    void Credentials::assign(std::string id_str, //std::string devname,
+/*
+    void JointCredentials::assign(std::string id_str, //std::string devname,
                            float z, float dir)
     {
         wb_device_id = id_str;
@@ -159,17 +152,15 @@ namespace Webots {
         direction = dir;
         //devName = devname;
     }  
+*/
 
-    Credentials::Credentials(std::string id_str, //std::string devname,
-     float z, float dir) : ACES::Credentials(0)
-    {
-        //devID = ++Credentials::idCount; 
-        devID = JOINT;
+//    JointCredentials::JointCredentials(std::string id_str, //std::string devname,
+//     float z, float dir) : ACES::Credentials(JOINT)
+//    {
+//        assign(id_str, /*devname,*/ z, dir);
+//    }  
 
-        assign(id_str, /*devname,*/ z, dir);
-    }  
-
-    void Credentials::printme(){
+    void JointCredentials::printme(){
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
@@ -177,20 +168,20 @@ namespace Webots {
         RTT::Logger::log() << RTT::endlog();
     }
 
-    Credentials::Credentials(std::string args)
-      : ACES::Credentials(0)
+    JointCredentials::JointCredentials(std::string args)
+      : ACES::Credentials(JOINT)
     {
-        //devID = ++Credentials::idCount; 
-        devID = JOINT;
-
         std::istringstream s1(args);
         float z, d;
         std::string id/*, dname*/;
         s1 >> id >> z >> d /*>> dname*/;
-        assign(id, /*dname,*/ z, d);
+
+        wb_device_id = id;
+        zero = z;
+        direction = d;
     }
 
-    bool Credentials::compare(ACES::Credentials* cred){
+    bool JointCredentials::operator==(ACES::Credentials* cred){
         //Cast to a webots cred from a generic one
         Credentials* wcred = (Credentials*)cred;
         bool same = (wb_device_id == wcred->wb_device_id);        
@@ -240,8 +231,7 @@ namespace Webots {
     }
 
     GPSCredentials::GPSCredentials(std::string args)
-      :ACES::Credentials(){
-        devID = IMU;
+      :ACES::Credentials(IMU ){
     }
 
     bool GPSCredentials::compare(ACES::Credentials* cred){
