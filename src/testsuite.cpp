@@ -20,7 +20,7 @@ namespace TestSuite{
     { }
 
     Spinner::Spinner(std::string cfg, std::string args)
-     : ACES::State<float>::State(cfg, args){
+     : ACES::State<float>::State(cfg, 1){
         std::istringstream s1(args, std::istringstream::in);
         float high, low, amp, dc;
         s1 >> low >> high;

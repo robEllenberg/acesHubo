@@ -2,11 +2,12 @@
 
 namespace Webots {
 
-    int Credentials::idCount = 0;
+    int JointCredentials::idCount = 0;
 
     Hardware::Hardware(std::string cfg, std::string args)
-      : ACES::Hardware(cfg, args)
+                      : ACES::Hardware(cfg, args)
     {
+    
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
         this->methods()->addMethod(stepMethod,
@@ -30,55 +31,55 @@ namespace Webots {
     }
 
     bool Hardware::txBus(ACES::Message* m){
-    for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
-        it != m->goalList.end();
-        it++){
-        ACES::Goal* g = *it;
-        switch( g->mode ){
-            case (ACES::REFRESH):{
-                //Vessel for returning the information we find
-                //g->printme();
-                void* result;
+        for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
+          it != m->goalList.end(); it++)
+        {
+            ACES::Goal* g = *it;
+            void* result = NULL;
+            Credentials* c = (Credentials*)(g->cred);
 
-                //Lookup the identifier for the component of interest
-                Credentials* c = (Credentials*)(g->cred);
-                WbDeviceTag tag =
-                    wb_robot_get_device( (c->wb_device_id).c_str() );
+            switch( c->devID ){
+                case(JOINT):{
+                    switch(g->mode){
+                        case(ACES::REFRESH):
+                            result = JointDevice::
+                                        refresh((JointCredentials*)c);
+                            break;
+                        case(ACES::SET):
+                            JointDevice::set((JointCredentials*)c, g);
+                            break; 
+                        default:
+                            break;
+                    }
+                }; break;
 
-                //Different commands are needed depending on the
-                //type of device we're looking up. Find the appropriate
-                //result for this propID
-                switch (c->devID){
-                    case (JOINT):{
-                        float* res  = new float;
-                        *res = wb_servo_get_position(tag);
+                case(IMU):{
+                    switch(g->mode){
+                        case(ACES::REFRESH):
+                            result = IMUDevice::
+                                        refresh((IMUCredentials*)c);
+                            break;
+                        default:
+                            break;
+                    }
+                }; break;
 
-                        //Apply the appropriate sign to the result, so it is
-                        //consistant w/convention
-                        float direction = (*c).direction;
-                        *res = (*res) * direction;
-                        result = (void*)res;
-                     }
-                     break;
+                case(GPS):{
+                    switch(g->mode){
+                        case(ACES::REFRESH):
+                            GPSDevice::refresh((GPSCredentials*)c);
+                            break;
+                        default:
+                            break;
+                    }
+                }; break;
 
-                     case (IMU):{
-                        const double *val = wb_gps_get_values(tag);
-                        //We must clone the vector because Webots owns the memory
-                        //and will yank the values out from under us at the next
-                        //timestep
-                        std::vector<double>* res = new std::vector<double>(3);
-                        (*res)[0] = val[0];
-                        (*res)[1] = val[1];
-                        (*res)[2] = val[2];
-                        result = (void*) res;
-                     }
-                     break;
-
-                     default:
-                        result = NULL;
-                     break;
-                }
-                //Place the result on the container & send it back
+                default:
+                    break;
+            }
+        
+            //Place the result on the container & send it back if appropriate
+            if(g->mode == ACES::REFRESH){
                 //TODO - This kind of bypasses the physical HW Rx
                 //structure, perhaps we should change that somehow
                 g->data = result;
@@ -87,33 +88,8 @@ namespace Webots {
                 { RTT::OS::MutexLock lock(usqGuard);
                   usQueue.push_back(w);
                 }
-                return true;
-             }
-             break;
-
-            case (ACES::SET):{
-                Credentials* c = (Credentials*)(g->cred);
-                std::string jid = (*c).wb_device_id;
-
-                //Pull the seek value out of the SValue object
-                float* tp = (float*)(g->data);
-                float target = *tp;
-                float angle = (*c).direction
-                               * (target - (*c).zero);
-
-                WbDeviceTag joint = wb_robot_get_device(jid.c_str());
-                //wb_servo_set_position(joint, 3.14159/180.*angle);
-                wb_servo_set_position(joint, angle);
-                return true;
-             }
-             break;
-
-            default:
-             break;
+            }
         }
-        return false;
-        //m->printme();
-    }
     }
 
     bool Hardware::subscribeController(ACES::Controller* c){
@@ -137,11 +113,13 @@ namespace Webots {
         step();
     }
 
-//    Credentials::Credentials(Credentials* c)
-//    : ACES::Credentials(c->devID)
-//    {
-//        assign(c->wb_device_id, /*c->devName,*/ c->zero, c->direction);
-//  }
+/*
+    Credentials::Credentials(Credentials* c)
+    : ACES::Credentials(c->devID)
+    {
+        assign(c->wb_device_id, c->zero, c->direction);
+    }
+*/
 
 /*
     void JointCredentials::assign(std::string id_str, //std::string devname,
@@ -154,11 +132,14 @@ namespace Webots {
     }  
 */
 
-//    JointCredentials::JointCredentials(std::string id_str, //std::string devname,
-//     float z, float dir) : ACES::Credentials(JOINT)
-//    {
-//        assign(id_str, /*devname,*/ z, dir);
-//    }  
+/*
+    JointCredentials::JointCredentials(std::string id_str, 
+                                       float z, float dir)
+                                      : ACES::Credentials(JOINT)
+    {
+        assign(id_str, z, dir);
+    }  
+*/
 
     void JointCredentials::printme(){
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
@@ -169,7 +150,7 @@ namespace Webots {
     }
 
     JointCredentials::JointCredentials(std::string args)
-      : ACES::Credentials(JOINT)
+      : Credentials(JOINT)
     {
         std::istringstream s1(args);
         float z, d;
@@ -181,10 +162,23 @@ namespace Webots {
         direction = d;
     }
 
-    bool JointCredentials::operator==(ACES::Credentials* cred){
+    bool JointCredentials::operator==(const ACES::Credentials& cred){
         //Cast to a webots cred from a generic one
-        Credentials* wcred = (Credentials*)cred;
+        JointCredentials* wcred = (JointCredentials*)&cred;
         bool same = (wb_device_id == wcred->wb_device_id);        
+        //same &= (zero == wcred->zero);
+        //same &= (direction;
+        return same;
+    }
+
+    GPSCredentials::GPSCredentials(std::string args)
+      : Credentials(IMU){
+    }
+
+    bool GPSCredentials::operator==(const ACES::Credentials& cred){
+        //Cast to a webots cred from a generic one
+        GPSCredentials* wcred = (GPSCredentials*)&cred;
+        bool same = (axis == wcred->axis);        
         //same &= (zero == wcred->zero);
         //same &= (direction;
         return same;
@@ -195,9 +189,39 @@ namespace Webots {
     {
         //std::string rargs = args + (std::string)" " + name;
         //RTT::Logger::log() << rargs << RTT::endlog();
-        credentials = (ACES::Credentials*)( new Credentials(args) );
+        credentials = (Credentials*)( new JointCredentials(args) );
         //credentials.devName = name;
     }
+
+    void* JointDevice::refresh(JointCredentials* j){
+        float* res  = new float;
+        WbDeviceTag tag =
+                wb_robot_get_device( (j->wb_device_id).c_str() );
+
+        *res = wb_servo_get_position(tag);
+
+        //Apply the appropriate sign to the result, so it is
+        //consistant w/convention
+        *res = (*res) * (j->direction);
+    
+        return (void*)res;
+     }
+
+     bool JointDevice::set(JointCredentials* j,
+                                       ACES::Goal* g){
+        std::string jid = j->wb_device_id;
+        WbDeviceTag joint = wb_robot_get_device(jid.c_str());
+
+        //Pull the seek value out of the credentials 
+        float* tp = (float*)(g->data);
+        float target = *tp;
+        float angle = j->direction
+                       * (target - j->zero);
+
+        //wb_servo_set_position(joint, 3.14159/180.*angle);
+        wb_servo_set_position(joint, angle);
+        return true;
+     }
     
     bool JointDevice::startHook(){
         Credentials* c = (Credentials*)credentials;
@@ -214,6 +238,21 @@ namespace Webots {
         wb_servo_disable_position(tag); 
     }
 
+    void* IMUDevice::refresh(IMUCredentials* j)
+    {
+        WbDeviceTag tag =
+                wb_robot_get_device( (j->wb_device_id).c_str() );
+        const double *val = wb_gps_get_values(tag);
+        //We must clone the vector because Webots owns the memory
+        //and will yank the values out from under us at the next
+        //timestep
+        std::vector<double>* res = new std::vector<double>(3);
+        (*res)[0] = val[0];
+        (*res)[1] = val[1];
+        (*res)[2] = val[2];
+        return (void*)res;
+     }
+
     GPSDevice::GPSDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
@@ -228,19 +267,6 @@ namespace Webots {
         wb_gps_enable(tag, 8);
         
         return true;
-    }
-
-    GPSCredentials::GPSCredentials(std::string args)
-      :ACES::Credentials(IMU ){
-    }
-
-    bool GPSCredentials::compare(ACES::Credentials* cred){
-        //Cast to a webots cred from a generic one
-        GPSCredentials* wcred = (Credentials*)cred;
-        bool same = (axis == wcred->axis);        
-        //same &= (zero == wcred->zero);
-        //same &= (direction;
-        return same;
     }
 
     void GPSDevice::stopHook(){

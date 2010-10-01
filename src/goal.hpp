@@ -13,7 +13,8 @@ namespace ACES{
             int nodeID; //!Identify the type of node on the Device
             int mode; //!The objective of this Goal packet (Refresh, Set, etc)
             void* data; //!Information used downstream e.g. Setpoint
-            //!Filled in by device to identify request to the protocol
+
+            //!Filled in by Device to identify request to the protocol
             Credentials* cred; 
     };
 }

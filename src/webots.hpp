@@ -40,8 +40,16 @@ namespace Webots{
             void stepRequest( std::map<std::string, void*>* );
             bool subscribeController(ACES::Controller* c);
     };
+
+    class Credentials : public ACES::Credentials {
+    //TODO - Lookup appropriate WbDeviceTag elements when the cred
+    //is created, saves lots of lookup processing.
+        public:
+            Credentials(COMP_TYPE id);
+            std::string wb_device_id;
+    };
    
-    class JointCredentials : public ACES::Credentials {
+    class JointCredentials : public Credentials {
         private:
             //void assign(std::string id_str, float z,
             //            float dir);
@@ -54,31 +62,44 @@ namespace Webots{
 
             void printme();
 
-            std::string wb_device_id;
             float zero;
             float direction;
             //std::string devName;
             static int idCount;
     };
 
-    class GPSCredentials : public ACES::Credentials {
+    class IMUCredentials : public Credentials {
+    };
+
+    class GPSCredentials : public Credentials {
         public:
             GPSCredentials(std::string args);
             int axis;
-            bool compare(ACES::Credentials* cred);
+            bool operator==(const ACES::Credentials& cred);
     };
 
     class JointDevice : public ACES::Device {
         public:
             JointDevice(std::string config, std::string args);
+            //!Used by the HW to interact w/Webots for the refresh
+            static void* refresh(JointCredentials* j);
+            static bool set(JointCredentials* j,
+                                       ACES::Goal* g);
             //void interpretResult(ACES::ProtoResult* rx);
             bool startHook();
             void stopHook();
     };
 
+    class IMUDevice : public ACES::Device {
+        public:
+            static void* refresh(IMUCredentials* j);
+    };
+
     class GPSDevice : public ACES::Device {
         public:
             GPSDevice(std::string config, std::string args);
+            //!Used by the HW to interact w/Webots for the refresh
+            static void* refresh(GPSCredentials* g);
             //void interpretResult(ACES::ProtoResult* rx);
             bool startHook();
             void stopHook();
