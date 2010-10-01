@@ -28,6 +28,9 @@ program main {
     do addDevice("dGPS 5 31", "Webots GPS", "zero");
     do addState("centerX 5 5",  "Webots", "X");
     do addState("centerY 5 5",  "Webots", "Y");
+    do linkPD("wbPcol", "dGPS");
+    do linkDS("dGPS", "centerX");
+    do linkDS("dGPS", "centerY");
 
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");
@@ -64,7 +67,6 @@ program main {
     do linkPD("wbPcol", "dRKP"); do linkDS("dRKP", "RKP");
     do linkPD("wbPcol", "dRAP"); do linkDS("dRAP", "RAP");
     do linkPD("wbPcol", "dRAR"); do linkDS("dRAR", "RAR");
-
 
     do linkSC("LSP", "wbArm");
     do linkSC("LSR", "wbArm");
