@@ -67,7 +67,8 @@ namespace Webots {
                 case(GPS):{
                     switch(g->mode){
                         case(ACES::REFRESH):
-                            GPSDevice::refresh((GPSCredentials*)c);
+                            result = GPSDevice::
+                                      refresh((GPSCredentials*)c);
                             break;
                         default:
                             break;
@@ -82,6 +83,8 @@ namespace Webots {
             if(g->mode == ACES::REFRESH){
                 //TODO - This kind of bypasses the physical HW Rx
                 //structure, perhaps we should change that somehow
+                assert(result); //Make sure we're actually sending
+                                //something
                 g->data = result;
                 ACES::ProtoWord* w =
                     (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
@@ -278,7 +281,8 @@ namespace Webots {
         (*res)[0] = val[0];
         (*res)[1] = val[1];
         (*res)[2] = val[2];
-        RTT::Logger::log() << val[0] << val[1] << val[2] << RTT::endlog();
+        //RTT::Logger::log() << (*res)[0] << " " << (*res)[1]
+        //                   << " " << (*res)[2] << RTT::endlog();
         return (void*)res;
     }
 
@@ -310,11 +314,16 @@ namespace Webots {
         ACES::Goal* g = ( (ACES::Result<ACES::Goal*>*)p)->result;
         std::vector<double>* response = (std::vector<double>*)g->data;
 
-        //float* f = new float((*response)[p->nodeID]);
-        float* f = new float((*response)[0]);
-        ACES::Result<void*>* r = new ACES::Result<void*>
-                                    ((void*)f,
-                                      g->cred, p->nodeID);
+        float* f = new float((*response)[p->nodeID]);
+        //float* f = new float( (*response)[0] );
+        //ACES::Result<void*>* r = new ACES::Result<void*>
+        //                            ((void*)f,
+        //                              g->cred, p->nodeID);
+
+        //ACES::Goal* g = ( (ACES::Result<ACES::Goal*>*)p)->result;
+        //float* f = new float(0.0);
+        ACES::Result<void*>* r = new ACES::Result<void*>(
+                                     (void*)f, g->cred, p->nodeID);
         return (ACES::ProtoResult*)r;
     }
 
