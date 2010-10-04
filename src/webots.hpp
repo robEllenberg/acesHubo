@@ -19,7 +19,7 @@
 #include "device.hpp"
 #include "word.hpp"
 
-enum COMP_TYPE { JOINT=1, GPS, IMU};
+enum COMP_TYPE { JOINT=5, GPS, IMU};
 enum AXIS { X=1, Y, Z};
 
 extern "C"{
@@ -48,6 +48,7 @@ namespace Webots{
         public:
             Credentials(COMP_TYPE id);
             std::string wb_device_id;
+            virtual void printme();
     };
    
     class JointCredentials : public Credentials {
@@ -59,9 +60,9 @@ namespace Webots{
             JointCredentials(std::string args);
             //Credentials(std::string id_str,
             //            float z, float dir);
-            virtual bool operator==(const ACES::Credentials& other);
+            //virtual bool operator==(const ACES::Credentials& other);
 
-            void printme();
+            virtual void printme();
 
             float zero;
             float direction;
@@ -76,6 +77,7 @@ namespace Webots{
         public:
             GPSCredentials(std::string args);
             //bool operator==(const ACES::Credentials& cred);
+            //virtual void printme();
     };
 
     class JointDevice : public ACES::Device {
@@ -101,7 +103,7 @@ namespace Webots{
             //!Used by the HW to interact w/Webots for the refresh
             static void* refresh(GPSCredentials* g);
             //void interpretResult(ACES::ProtoResult* rx);
-            virtual ACES::ProtoResult* processUSQueue();
+            virtual std::list<ACES::ProtoResult*> processUSQueue();
             bool startHook();
             void stopHook();
     };

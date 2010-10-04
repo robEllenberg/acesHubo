@@ -21,6 +21,6 @@ namespace ACES {
     }
 
     void Credentials::printme(){
-        RTT::Logger::log() << "Credentials: ID=" << devID << RTT::endlog();
+        RTT::Logger::log() << "(Base) Credentials: devID=" << devID << RTT::endlog();
     }
 }

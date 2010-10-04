@@ -122,6 +122,12 @@ namespace Webots {
         //assign(c->wb_device_id, c->zero, c->direction);
     }
 
+    void Credentials::printme(){
+        ACES::Credentials::printme();
+        RTT::Logger::log() << "(Webots) Credentials: wb_dev_id="
+                           << wb_device_id << RTT::endlog();
+    }
+
 /*
     void JointCredentials::assign(std::string id_str, //std::string devname,
                            float z, float dir)
@@ -143,11 +149,18 @@ namespace Webots {
 */
 
     void JointCredentials::printme(){
+        Credentials::printme();
+        RTT::Logger::log() << "(Joint) Credentials: zero=" << zero
+                           << " direction=" << direction 
+                           << RTT::endlog();
+
+    /*
         RTT::Logger::log() << "Webots: ID= " << wb_device_id;
         RTT::Logger::log() << " Zero= " << zero;
         RTT::Logger::log() << " Direction= " << direction;
         //RTT::Logger::log() << " Device Name= " << devName;
         RTT::Logger::log() << RTT::endlog();
+    */
     }
 
     JointCredentials::JointCredentials(std::string args)
@@ -163,6 +176,7 @@ namespace Webots {
         direction = d;
     }
 
+/*
     bool JointCredentials::operator==(const ACES::Credentials& cred){
         //Cast to a webots cred from a generic one
         JointCredentials* wcred = (JointCredentials*)&cred;
@@ -171,7 +185,7 @@ namespace Webots {
         //same &= (direction;
         return same;
     }
-
+*/
     GPSCredentials::GPSCredentials(std::string args)
       : Credentials(GPS)
     {
@@ -303,7 +317,7 @@ namespace Webots {
 
     //!Override the default USQueue processor in order to split the
     //!three data elements out of the GPS node's return packet
-    ACES::ProtoResult* GPSDevice::processUSQueue(){
+    std::list<ACES::ProtoResult*> GPSDevice::processUSQueue(){
         //TODO - Provide an implementation that doesn't triple up the
         //requests into webots
         ACES::ProtoResult* p = NULL;
@@ -314,17 +328,15 @@ namespace Webots {
         ACES::Goal* g = ( (ACES::Result<ACES::Goal*>*)p)->result;
         std::vector<double>* response = (std::vector<double>*)g->data;
 
-        float* f = new float((*response)[p->nodeID]);
-        //float* f = new float( (*response)[0] );
-        //ACES::Result<void*>* r = new ACES::Result<void*>
-        //                            ((void*)f,
-        //                              g->cred, p->nodeID);
-
-        //ACES::Goal* g = ( (ACES::Result<ACES::Goal*>*)p)->result;
-        //float* f = new float(0.0);
-        ACES::Result<void*>* r = new ACES::Result<void*>(
-                                     (void*)f, g->cred, p->nodeID);
-        return (ACES::ProtoResult*)r;
+        std::list<ACES::ProtoResult*> pr_list;
+        for(int i =0; i < 3; i++){
+            float* f = new float((*response)[i]);
+            ACES::Result<void*>* r = new ACES::Result<void*>(
+                                     (void*)f, g->cred, i);
+            //RTT::Logger::log() << i << RTT::endlog();
+            pr_list.push_back( (ACES::ProtoResult*)r );
+        }
+                return pr_list;
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 

@@ -3,6 +3,7 @@ namespace ACES {
 
     ProtoState::ProtoState(std::string config, int nID) :
       taskCfg(config),
+      nodeIDAttr("nodeID"),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
       sampleMethod("sample", &ProtoState::sample, this)
@@ -12,7 +13,9 @@ namespace ACES {
 
         this->methods()->addMethod(sampleMethod, "sample");
 
+        this->attributes()->addAttribute(&nodeIDAttr);
         nodeID = nID;
+        nodeIDAttr.set(nID);
 
       //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
       set_stack = new RTT::Buffer< Goal* >(50);

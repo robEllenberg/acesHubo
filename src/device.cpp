@@ -7,12 +7,14 @@ namespace ACES{
       txDownStream("txDownStream"),
       txUpStream("txUpStream"),
       dsQueue(),
-      usQueue()
+      usQueue(),
+      credMethod("credentials", &Device::printCred, this)
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
         this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");
+        this->methods()->addMethod(credMethod, "credentials");
 
         this->setActivity(
             //TODO - allow user to set priority
@@ -29,7 +31,7 @@ namespace ACES{
 
     void Device::rxUpStream(ProtoResult* rx){
         //First we check if the two device types are the same
-        if(rx->semiCred == credentials){
+        if(&(rx->semiCred) == &credentials){
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }
@@ -77,8 +79,12 @@ namespace ACES{
         //Return Path
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
-            ProtoResult* p = processUSQueue();
-            txUpStream(p);
+            std::list<ProtoResult*> p = processUSQueue();
+            for(std::list<ProtoResult*>::iterator it = p.begin(); it !=
+                p.end();  it++){
+                    //(*it)->printme();
+                    txUpStream(*it);
+                }
         }
     }
     
@@ -89,7 +95,7 @@ namespace ACES{
         return g;
     }
 
-    ProtoResult* Device::processUSQueue(){
+    std::list<ProtoResult*> Device::processUSQueue(){
         ProtoResult* p = NULL;
         { RTT::OS::MutexLock lock(usqGuard);
           p = usQueue.front();
@@ -97,6 +103,11 @@ namespace ACES{
         }
         Goal* g = ( (Result<Goal*>*)p)->result;
         Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
-        return (ProtoResult*)r;
+        std::list<ProtoResult*> pr_list(1, (ProtoResult*)r);
+        return pr_list;
+    }
+
+    bool Device::printCred(){
+        credentials->printme();
     }
 }

@@ -27,10 +27,10 @@ program main {
 
     do addDevice("dGPS 5 31", "Webots GPS", "zero");
     do addState("centerX 5 5",  "Webots", "X");
-    do addState("centerY 5 5",  "Webots", "Y");
+    //do addState("centerY 5 5",  "Webots", "Y");
     do linkPD("wbPcol", "dGPS");
     do linkDS("dGPS", "centerX");
-    do linkDS("dGPS", "centerY");
+    //do linkDS("dGPS", "centerY");
 
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");

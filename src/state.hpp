@@ -38,6 +38,8 @@ namespace ACES {
             void rxUpStream(ProtoResult* d);
 
             int nodeID;
+            RTT::Attribute<int> nodeIDAttr;
+
             RTT::Buffer< Goal* > *set_stack;
             RTT::Method<void()> sampleMethod;
 

@@ -18,7 +18,6 @@ namespace ACES {
             virtual void printme();
             virtual bool operator==(const Credentials& other);
             int devID;
-            //std::string wb_device_id;
     };
 }
 #endif

@@ -29,13 +29,16 @@ namespace ACES{
             std::deque<Goal*> dsQueue;
             RTT::OS::Mutex dsqGuard;
 
-            virtual ProtoResult* processUSQueue();
+            virtual std::list<ProtoResult*> processUSQueue();
             std::deque<ProtoResult*> usQueue;
             RTT::OS::Mutex usqGuard;
 
             //void attachCredentials(ACES::Credentials* c);
             bool subscribeState(ProtoState* s);
             Credentials* credentials;
+
+            bool printCred();
+            RTT::Method<bool()> credMethod;
     };
 }
 
