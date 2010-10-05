@@ -49,6 +49,7 @@ namespace Webots{
             Credentials(COMP_TYPE id);
             std::string wb_device_id;
             virtual void printme();
+            virtual bool operator==(ACES::Credentials& other);
     };
    
     class JointCredentials : public Credentials {

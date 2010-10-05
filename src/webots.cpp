@@ -122,6 +122,21 @@ namespace Webots {
         //assign(c->wb_device_id, c->zero, c->direction);
     }
 
+    bool Credentials::operator==(ACES::Credentials& other){
+        if(not ACES::Credentials::operator==(other) ){
+            return false;
+        }
+        if(dynamic_cast<Credentials*>(&other) ){
+            Credentials* c = (Credentials*)&other;
+            if(c->wb_device_id == wb_device_id){
+                return true;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
     void Credentials::printme(){
         ACES::Credentials::printme();
         RTT::Logger::log() << "(Webots) Credentials: wb_dev_id="

@@ -11,7 +11,7 @@ namespace ACES {
         this->devID = idnum;
     }
 
-    bool Credentials::operator==(const Credentials& other){
+    bool Credentials::operator==(Credentials& other){
         if(devID == other.devID){
             return true;
         }
