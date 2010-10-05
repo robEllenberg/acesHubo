@@ -116,10 +116,10 @@ namespace Webots {
         step();
     }
 
-    Credentials::Credentials(COMP_TYPE id)
+    Credentials::Credentials(COMP_TYPE id, std::string wb_id)
     : ACES::Credentials((int)id)
     {
-        //assign(c->wb_device_id, c->zero, c->direction);
+        wb_device_id = wb_id;
     }
 
     bool Credentials::operator==(ACES::Credentials& other){
@@ -131,10 +131,12 @@ namespace Webots {
             if(c->wb_device_id == wb_device_id){
                 return true;
             }
+            else{
+                return false;
+            }
         }
-        else{
-            return false;
-        }
+
+        return false;
     }
 
     void Credentials::printme(){
@@ -143,91 +145,50 @@ namespace Webots {
                            << wb_device_id << RTT::endlog();
     }
 
-/*
-    void JointCredentials::assign(std::string id_str, //std::string devname,
-                           float z, float dir)
-    {
-        wb_device_id = id_str;
-        zero = z;
-        direction = dir;
-        //devName = devname;
-    }  
-*/
-
-/*
-    JointCredentials::JointCredentials(std::string id_str, 
-                                       float z, float dir)
-                                      : ACES::Credentials(JOINT)
-    {
-        assign(id_str, z, dir);
-    }  
-*/
-
     void JointCredentials::printme(){
         Credentials::printme();
         RTT::Logger::log() << "(Joint) Credentials: zero=" << zero
                            << " direction=" << direction 
                            << RTT::endlog();
-
-    /*
-        RTT::Logger::log() << "Webots: ID= " << wb_device_id;
-        RTT::Logger::log() << " Zero= " << zero;
-        RTT::Logger::log() << " Direction= " << direction;
-        //RTT::Logger::log() << " Device Name= " << devName;
-        RTT::Logger::log() << RTT::endlog();
-    */
     }
 
-    JointCredentials::JointCredentials(std::string args)
-      : Credentials(JOINT)
+    JointCredentials::JointCredentials(std::string wb_id, float z, float dir)
+      : Credentials(JOINT, wb_id)
+    {
+        //wb_device_id = wb_id;
+        zero = z;
+        direction = dir;
+    }
+
+    JointCredentials* JointCredentials::makeJointCredentials(std::string args)
     {
         std::istringstream s1(args);
         float z, d;
-        std::string id/*, dname*/;
-        s1 >> id >> z >> d /*>> dname*/;
-
-        wb_device_id = id;
-        zero = z;
-        direction = d;
+        std::string id;
+        s1 >> id >> z >> d;
+        JointCredentials *j = new JointCredentials(id, z, d);
+        return j;
     }
 
-/*
-    bool JointCredentials::operator==(const ACES::Credentials& cred){
-        //Cast to a webots cred from a generic one
-        JointCredentials* wcred = (JointCredentials*)&cred;
-        bool same = (wb_device_id == wcred->wb_device_id);        
-        //same &= (zero == wcred->zero);
-        //same &= (direction;
-        return same;
-    }
-*/
-    GPSCredentials::GPSCredentials(std::string args)
-      : Credentials(GPS)
+    GPSCredentials* GPSCredentials::makeGPSCredentials(std::string args)
     {
         std::istringstream s1(args);
-        std::string id;
-        s1 >> id;
-
-        wb_device_id = id;
+        std::string name;
+        s1 >> name;
+        GPSCredentials *g = new GPSCredentials(name);
+        return g;
     }
 
-/*
-    bool GPSCredentials::operator==(const ACES::Credentials& cred){
-        //Cast to a webots cred from a generic one
-        GPSCredentials* wcred = (GPSCredentials*)&cred;
-        bool same = (axis == wcred->axis);        
-        //same &= (zero == wcred->zero);
-        //same &= (direction;
-        return same;
-    }
-*/
+    GPSCredentials::GPSCredentials(std::string wb_id)
+      : Credentials(GPS, wb_id)
+    {}
 
     JointDevice::JointDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
         //std::string rargs = args + (std::string)" " + name;
         //RTT::Logger::log() << rargs << RTT::endlog();
-        credentials = (Credentials*)( new JointCredentials(args) );
+        credentials = (Credentials*) JointCredentials::makeJointCredentials(args);
         //credentials.devName = name;
     }
 

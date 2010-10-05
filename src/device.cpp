@@ -31,7 +31,10 @@ namespace ACES{
 
     void Device::rxUpStream(ProtoResult* rx){
         //First we check if the two device types are the same
-        if(&(rx->semiCred) == &credentials){
+        rx->semiCred->printme();
+        credentials->printme();
+        if(*(rx->semiCred) == *credentials){
+            RTT::Logger::log() << "(dev) Cred Match" << RTT::endlog();
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }
@@ -74,15 +77,21 @@ namespace ACES{
         Goal* g = NULL;
         while( dsQueue.size() ){
             g = processDSQueue();
+            if(g){
+                RTT::Logger::log() << "(dev) got DS" << RTT::endlog();
+            }
             txDownStream(g);
         }
         //Return Path
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
             std::list<ProtoResult*> p = processUSQueue();
-            for(std::list<ProtoResult*>::iterator it = p.begin(); it !=
-                p.end();  it++){
-                    //(*it)->printme();
+            if(p.size()){
+                RTT::Logger::log() << "(dev) got US" << RTT::endlog();
+            }
+            for(std::list<ProtoResult*>::iterator it = p.begin();
+                it != p.end();  it++){
+                    (*it)->printme();
                     txUpStream(*it);
                 }
         }
@@ -101,7 +110,8 @@ namespace ACES{
           p = usQueue.front();
           usQueue.pop_front();
         }
-        Goal* g = ( (Result<Goal*>*)p)->result;
+        //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
+        Goal* g = ( (Result<Goal*>*) p)->result;
         Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
         std::list<ProtoResult*> pr_list(1, (ProtoResult*)r);
         return pr_list;

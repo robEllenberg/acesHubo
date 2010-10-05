@@ -46,7 +46,7 @@ namespace Webots{
     //TODO - Lookup appropriate WbDeviceTag elements when the cred
     //is created, saves lots of lookup processing.
         public:
-            Credentials(COMP_TYPE id);
+            Credentials(COMP_TYPE id, std::string wb_id);
             std::string wb_device_id;
             virtual void printme();
             virtual bool operator==(ACES::Credentials& other);
@@ -54,20 +54,16 @@ namespace Webots{
    
     class JointCredentials : public Credentials {
         private:
-            //void assign(std::string id_str, float z,
-            //            float dir);
         public:
-            //Credentials(Credentials* c);
-            JointCredentials(std::string args);
-            //Credentials(std::string id_str,
-            //            float z, float dir);
+            JointCredentials(std::string wb_id, float zero, float dir);
+            static JointCredentials* makeJointCredentials(std::string args);
+
             //virtual bool operator==(const ACES::Credentials& other);
 
             virtual void printme();
 
             float zero;
             float direction;
-            //std::string devName;
             static int idCount;
     };
 
@@ -76,7 +72,9 @@ namespace Webots{
 
     class GPSCredentials : public Credentials {
         public:
-            GPSCredentials(std::string args);
+            GPSCredentials(std::string wb_id);
+            static GPSCredentials* makeGPSCredentials(std::string args);
+
             //bool operator==(const ACES::Credentials& cred);
             //virtual void printme();
     };

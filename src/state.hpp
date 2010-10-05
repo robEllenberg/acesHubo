@@ -31,14 +31,17 @@ namespace ACES {
             void (*asgnfunct)(ProtoResult*, void*);
 
             virtual void updateHook();  
-            void sample();
+            virtual void sample();
 
             RTT::Event<void(Goal*)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);
             void rxUpStream(ProtoResult* d);
 
+            //TODO - Remove nodeID entirely in favor of nodeIDAttr
             int nodeID;
             RTT::Attribute<int> nodeIDAttr;
+
+            RTT::Attribute<bool> samplingAttr;
 
             RTT::Buffer< Goal* > *set_stack;
             RTT::Method<void()> sampleMethod;

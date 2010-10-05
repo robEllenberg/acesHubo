@@ -30,10 +30,10 @@ program main {
     do linkPD("tsPro", "dZ");
 
     //Setup Logging
-    do addLogger("log1 5 200", "File", "testlog.txt");
-    do linkLS("log1", "X");
-    do linkLS("log1", "Y");
-    do linkLS("log1", "Z");
+    //do addLogger("log1 5 200", "File", "testlog.txt");
+    //do linkLS("log1", "X");
+    //do linkLS("log1", "Y");
+    //do linkLS("log1", "Z");
 
     /* END CONFIG SECTION */
 

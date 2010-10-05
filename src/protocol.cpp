@@ -86,8 +86,10 @@ namespace ACES {
         assert(dsQueue.size() < 100);
         while(dsQueue.size()){
             m = processDSQueue();
-            //RTT::Logger::log() << "process sent" << RTT::endlog();
-            //m->printme();
+            if(m){
+                RTT::Logger::log() << "(Protocol) got DS" << RTT::endlog();
+                //m->printme();
+            }
             txDownStream(m);
         }
 
@@ -95,8 +97,10 @@ namespace ACES {
         assert( usQueue->size() < 100);
         while(usQueue.size()){
             r = processUSQueue();
-            //r->printme();
-            //RTT::Logger::log() << "process sent" << RTT::endlog();
+            if(r){
+                //r->printme();
+                RTT::Logger::log() << "(Protocol) got US" << RTT::endlog();
+            }
             txUpStream(r);
         }
     }

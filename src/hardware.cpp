@@ -15,14 +15,7 @@ namespace ACES {
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
                                               name));
     }
-/*    
-    Hardware::Hardware(std::string name)
-      : RTT::TaskContext(name)
-    {
-         this->events()->addEvent(&txUpStream, "txUpStream", "word",
-                                 "Recieved Data");
-    }
-*/
+
     bool Hardware::rxDownStream(Message* m){
         RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.push_back(m);
@@ -35,13 +28,18 @@ namespace ACES {
         Message* m = NULL;
         while(dsQueue.size()){
             m = processDSQueue();
-            //RTT::Logger::log() << "hw sent" << RTT::endlog();
+            if(m){
+                RTT::Logger::log() << "(HW) got DS" << RTT::endlog();
+            }
             txBus(m);
         }
         rxBus();
         ProtoWord* p = NULL;
         while(usQueue.size()){
             p = processUSQueue();
+            if(p){
+                RTT::Logger::log() << "(HW) got US" << RTT::endlog();
+            }
             txUpStream(p);
         }
     }

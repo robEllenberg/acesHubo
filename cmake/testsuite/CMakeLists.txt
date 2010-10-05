@@ -21,6 +21,13 @@ IF ( BUILD_TESTSUITE )
     ADD_EXECUTABLE( testsuite ${TSSRCS} )
     TARGET_LINK_LIBRARIES( testsuite ${OROCOS_RTT_LIBS} )
     TARGET_LINK_LIBRARIES( testsuite ${OROCOS_OCL_LIBS} )
+
+    ADD_EXECUTABLE( credtest ../../src/test/credeq.cpp )
+    TARGET_LINK_LIBRARIES( credtest ${OROCOS_RTT_LIBS} )
+    TARGET_LINK_LIBRARIES( credtest ${OROCOS_OCL_LIBS} )
+    PROGRAM_ADD_DEPS( credtest aces-common ) 
+    PROGRAM_ADD_DEPS( credtest aces-webots ) 
+
     #TARGET_LINK_LIBRARIES( wbtest ${WEBOTS_LIBS} )
     MESSAGE( STATUS "${OROCOS_OCL_LIBS}")
     MESSAGE( STATUS "${OROCOS_RTT_LIBS}")
