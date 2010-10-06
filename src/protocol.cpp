@@ -87,7 +87,7 @@ namespace ACES {
         while(dsQueue.size()){
             m = processDSQueue();
             if(m){
-                RTT::Logger::log() << "(Protocol) got DS" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(Protocol) got DS" << RTT::endlog();
                 //m->printme();
             }
             txDownStream(m);
@@ -99,7 +99,7 @@ namespace ACES {
             r = processUSQueue();
             if(r){
                 //r->printme();
-                RTT::Logger::log() << "(Protocol) got US" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(Protocol) got US" << RTT::endlog();
             }
             txUpStream(r);
         }

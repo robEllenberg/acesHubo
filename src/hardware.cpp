@@ -29,7 +29,7 @@ namespace ACES {
         while(dsQueue.size()){
             m = processDSQueue();
             if(m){
-                RTT::Logger::log() << "(HW) got DS" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS" << RTT::endlog();
             }
             txBus(m);
         }
@@ -38,7 +38,7 @@ namespace ACES {
         while(usQueue.size()){
             p = processUSQueue();
             if(p){
-                RTT::Logger::log() << "(HW) got US" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US" << RTT::endlog();
             }
             txUpStream(p);
         }

@@ -19,6 +19,8 @@ namespace ACES {
 
         nodeID = nID;
         nodeIDAttr.set(nID);
+
+        //Switching this default to false prevents automatic sampling from starting
         samplingAttr.set(false);
 
         //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
@@ -30,7 +32,7 @@ namespace ACES {
     }
 
     void ProtoState::sample(){
-        RTT::Logger::log() << "SAMPLE (ori)!" << RTT::endlog();
+        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!" << RTT::endlog();
         Goal* g = new Goal(this->nodeID, REFRESH);
         set_stack->Push(g);
     }
@@ -75,24 +77,16 @@ namespace ACES {
         if(mypair != p->end() ){
             void* val = (*mypair).second;
             Goal* g = new Goal(nodeID, SET, val);
-            //g->printme();
-           
-            //RTT::Logger::log() << this->name << " Announce: "
-            //<< *((float*)val) << RTT::endlog();
-            //txDownStream(g);
             set_stack->Push(g);
         }
     }
 
     void ProtoState::rxUpStream(ProtoResult* r){
-        //if(name == "RSP"){
-        //    RTT::Logger::log() << *((float*)(g->data)) << RTT::endlog();
-        //}
-            //if(name == "RKP"){
-            //    g->printme();
-            //}
-        RTT::Logger::log() << "State rxUS" << RTT::endlog();
-        if(r->nodeID == nodeID){
+        RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS" << RTT::endlog();
+        RTT::Logger::log() <<  "r nid =" << r->nodeID << " my nid="
+                           << nodeIDAttr.get() << RTT::endlog();
+        if(r->nodeID == nodeIDAttr.get()){
+            RTT::Logger::log() << RTT::Logger::Debug << "(state) assign" << RTT::endlog();
             asgnfunct(r, this);
         }
     }

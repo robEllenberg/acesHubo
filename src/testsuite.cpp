@@ -36,7 +36,7 @@ namespace TestSuite{
         t += freq;
         //RTT::Logger::log() << val <<RTT::endlog();
 
-        RTT::Logger::log() << "SAMPLE (spin)!" << RTT::endlog();
+        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!" << RTT::endlog();
         ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH, new float(val));
         set_stack->Push(g);
         /*

@@ -33,6 +33,7 @@
         State<T>* th = (State<T>*)me;
         //t->value = *((T*)meas);
         T* newVal = ((Result<T*>*)meas)->result;
+        RTT::Logger::log() << RTT::Logger::Debug << "(state) Value: " << *newVal;
         th->value.set(  *newVal  );
     }
 

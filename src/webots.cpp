@@ -296,6 +296,7 @@ namespace Webots {
     std::list<ACES::ProtoResult*> GPSDevice::processUSQueue(){
         //TODO - Provide an implementation that doesn't triple up the
         //requests into webots
+        RTT::Logger::log() << "GPS  Dev US override" << RTT::endlog();
         ACES::ProtoResult* p = NULL;
         { RTT::OS::MutexLock lock(usqGuard);
           p = usQueue.front();
@@ -308,11 +309,10 @@ namespace Webots {
         for(int i =0; i < 3; i++){
             float* f = new float((*response)[i]);
             ACES::Result<void*>* r = new ACES::Result<void*>(
-                                     (void*)f, g->cred, i);
-            //RTT::Logger::log() << i << RTT::endlog();
+                                     (void*)f, g->cred, X+i);
             pr_list.push_back( (ACES::ProtoResult*)r );
         }
-                return pr_list;
+        return pr_list;
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 

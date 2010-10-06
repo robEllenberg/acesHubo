@@ -31,10 +31,9 @@ namespace ACES{
 
     void Device::rxUpStream(ProtoResult* rx){
         //First we check if the two device types are the same
-        rx->semiCred->printme();
-        credentials->printme();
         if(*(rx->semiCred) == *credentials){
-            RTT::Logger::log() << "(dev) Cred Match" << RTT::endlog();
+            RTT::Logger::log() << RTT::Logger::Debug
+                               << "(dev) Cred Match" << RTT::endlog();
             RTT::OS::MutexLock lock(usqGuard);
             usQueue.push_back(rx);
         }
@@ -78,7 +77,7 @@ namespace ACES{
         while( dsQueue.size() ){
             g = processDSQueue();
             if(g){
-                RTT::Logger::log() << "(dev) got DS" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got DS" << RTT::endlog();
             }
             txDownStream(g);
         }
@@ -87,12 +86,13 @@ namespace ACES{
         while( usQueue.size() ){
             std::list<ProtoResult*> p = processUSQueue();
             if(p.size()){
-                RTT::Logger::log() << "(dev) got US" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US" << RTT::endlog();
             }
             for(std::list<ProtoResult*>::iterator it = p.begin();
                 it != p.end();  it++){
                     (*it)->printme();
                     txUpStream(*it);
+                    (*it)->printme();
                 }
         }
     }
