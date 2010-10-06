@@ -7,6 +7,8 @@ namespace ACES {
       samplingAttr("sampling"),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
+      dsQueue(),
+      usQueue(),
       sampleMethod("sample", &ProtoState::sample, this)
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
@@ -23,8 +25,9 @@ namespace ACES {
         //Switching this default to false prevents automatic sampling from starting
         samplingAttr.set(false);
 
-        //set_stack = new RTT::Buffer< std::map<std::string, void*>* >(50);
-        set_stack = new RTT::Buffer< Goal* >(50);
+        //dsQueue = new RTT::Buffer< std::map<std::string, void*>* >(50);
+        //dsQueue = new RTT::Buffer< Goal* >(50);
+        //dsQueue = new RTT::Buffer< Goal* >(50);
 
         this->setActivity(
                 new RTT::Activity( priority, 1.0/freq, 0, name)
@@ -34,7 +37,7 @@ namespace ACES {
     void ProtoState::sample(){
         RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!" << RTT::endlog();
         Goal* g = new Goal(this->nodeID, REFRESH);
-        set_stack->Push(g);
+        dsQueue->Push(g);
     }
    
     void ProtoState::updateHook(){
@@ -42,13 +45,25 @@ namespace ACES {
             sample();
         }
 
-        //g->printme();
-        //RTT::Logger::log() << "Update State "
-        //<< this->name << RTT::Logger::endl;
-        while (!set_stack->empty() ){
+        assert(dsQueue.size() < 100);
+        while (!dsQueue->empty() ){
             Goal* h;
-            set_stack->Pop(h);
+            dsQueue->Pop(h);
             txDownStream(h);
+        }
+        
+        assert(usQueue.size() < 100);
+        while( usQueue.size()){
+            ProtoResult* rx;
+            { RTT::OS::MutexLock lock(dsqGuard);
+              RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS" << RTT::endlog();
+              RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
+                                 << nodeIDAttr.get() << RTT::endlog();
+            }
+            if(r->nodeID == nodeIDAttr.get()){
+                RTT::Logger::log() << RTT::Logger::Debug << "(state) assign" << RTT::endlog();
+                asgnfunct(r, this);
+            }
         }
     }
 
@@ -77,17 +92,14 @@ namespace ACES {
         if(mypair != p->end() ){
             void* val = (*mypair).second;
             Goal* g = new Goal(nodeID, SET, val);
-            set_stack->Push(g);
+            dsQueue->Push(g);
         }
     }
 
-    void ProtoState::rxUpStream(ProtoResult* r){
-        RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS" << RTT::endlog();
-        RTT::Logger::log() <<  "r nid =" << r->nodeID << " my nid="
-                           << nodeIDAttr.get() << RTT::endlog();
-        if(r->nodeID == nodeIDAttr.get()){
-            RTT::Logger::log() << RTT::Logger::Debug << "(state) assign" << RTT::endlog();
-            asgnfunct(r, this);
+    void ProtoState::rxUpStream(ProtoResult* rx){
+        if(rx->nodeID == nodeIDAttr.get()){
+            RTT::OS::MutexLock lock(usqGuard);
+            usQueue.push_back(rx);
         }
     }
 
