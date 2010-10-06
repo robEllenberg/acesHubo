@@ -34,17 +34,12 @@ namespace TestSuite{
     void Spinner::sample(){
         float val = amp*sin(t) + dc;
         t += freq;
-        //RTT::Logger::log() << val <<RTT::endlog();
 
         RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!" << RTT::endlog();
         ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH, new float(val));
-        set_stack->Push(g);
-        /*
-        while (!set_stack->empty() ){
-            ACES::Goal* h;
-            set_stack->Pop(h);
-            txDownStream(h);
+
+        { RTT::OS::MutexLock lock(dsqGuard);
+          dsQueue.push_back(g);
         }
-        */
     }
 };

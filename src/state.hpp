@@ -35,6 +35,9 @@ namespace ACES {
 
             RTT::Event<void(Goal*)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);
+            RTT::OS::Mutex dsqGuard;
+            //RTT::Buffer< Goal* > *dsQueue;
+            std::deque<Goal*> dsQueue;
             void rxUpStream(ProtoResult* d);
             std::deque<ProtoResult*> usQueue;
             RTT::OS::Mutex usqGuard;
@@ -42,11 +45,8 @@ namespace ACES {
             //TODO - Remove nodeID entirely in favor of nodeIDAttr
             int nodeID;
             RTT::Attribute<int> nodeIDAttr;
-
             RTT::Attribute<bool> samplingAttr;
 
-            RTT::OS::Mutex dsqGuard;
-            RTT::Buffer< Goal* > *dsQueue;
             RTT::Method<void()> sampleMethod;
 
             bool subscribeController(Controller* c);

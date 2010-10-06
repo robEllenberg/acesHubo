@@ -57,7 +57,7 @@ namespace ACES{
 
         h = this->events()->setupConnection("txUpStream")
             .callback( s, &ProtoState::rxUpStream
-                     ,  this->engine()->events()
+          //           ,  this->engine()->events()
                      ).handle();
         if(!h.ready() ){
             return false;
@@ -92,8 +92,8 @@ namespace ACES{
                 it != p.end();  it++){
                     (*it)->printme();
                     txUpStream(*it);
-                    (*it)->printme();
-                }
+                    RTT::Logger::log() << "(dev) nID:" << (*it)->nodeID << RTT::endlog();
+            }
         }
     }
     

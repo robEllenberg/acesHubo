@@ -15,8 +15,8 @@
 
 int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
-    //logger->setLogLevel(RTT::Logger::Info);
-    logger->setLogLevel(RTT::Logger::Debug);
+    logger->setLogLevel(RTT::Logger::Info);
+    //logger->setLogLevel(RTT::Logger::Debug);
 
     ACES::Dispatcher* d = new ACES::Dispatcher("dispatch");
 

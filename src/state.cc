@@ -24,8 +24,10 @@
     void State<T>::go(T sp){
         T* p = new T(sp);
         Goal* g = new Goal(nodeID, SET, p);
-        set_stack->Push(g);
-        //txDownStream(g);
+
+        { RTT::OS::MutexLock lock(dsqGuard);
+          dsQueue.push_back(g);
+        }
     }
 
     template <class T>
