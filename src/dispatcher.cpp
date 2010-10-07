@@ -151,6 +151,12 @@ namespace ACES{
             if(type2 == "GPS"){
                 d = (Device*) new Webots::GPSDevice(cfg, args);
             }
+            if(type2 == "Accelerometer"){
+                d = (Device*) new Webots::AccelerometerDevice(cfg, args);
+            }
+            if(type2 == "Gyro"){
+                d = (Device*) new Webots::GyroscopeDevice(cfg, args);
+            }
         }
         #endif
         #ifdef TESTSUITE

@@ -316,14 +316,22 @@ namespace Webots {
     }
 
     AccelerometerDevice::AccelerometerDevice(std::string config, std::string args)
-    : TripletDevice(config, args, ACCELEROMETER){}
+    : TripletDevice(config, args, ACCELEROMETER)
+    {
+        wb_start_fun = wb_accelerometer_enable;
+        wb_stop_fun = wb_accelerometer_disable;
+    }
 
     const double * AccelerometerDevice::getTriplet( WbDeviceTag tag){
         return wb_accelerometer_get_values(tag);
     }
 
     GyroscopeDevice::GyroscopeDevice(std::string config, std::string args) 
-    : TripletDevice(config, args, GYRO){}
+    : TripletDevice(config, args, GYRO)
+    {
+        wb_start_fun  = wb_gyro_enable;
+        wb_stop_fun  = wb_gyro_disable;
+    }
 
     const double * GyroscopeDevice::getTriplet( WbDeviceTag tag){
         return wb_gyro_get_values(tag);

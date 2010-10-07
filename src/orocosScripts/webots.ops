@@ -35,6 +35,26 @@ program main {
     do linkDS("dGPS", "centerY");
     do linkDS("dGPS", "centerZ");
 
+    do addDevice("dIMUAcc 5 31", "Webots Accelerometer", "imuacc");
+    do addState("imuaccX 5 5",  "Webots", "X");
+    do addState("imuaccY 5 5",  "Webots", "Y");
+    do addState("imuaccZ 5 5",  "Webots", "Z");
+
+    do linkPD("wbPcol", "dIMUAcc");
+    do linkDS("dIMUAcc", "imuaccX");
+    do linkDS("dIMUAcc", "imuaccY");
+    do linkDS("dIMUAcc", "imuaccZ");
+
+    do addDevice("dIMUGyro 5 31", "Webots Gyro", "imugyro");
+    do addState("imugyroX 5 5",  "Webots", "X");
+    do addState("imugyroY 5 5",  "Webots", "Y");
+    do addState("imugyroZ 5 5",  "Webots", "Z");
+
+    do linkPD("wbPcol", "dIMUGyro");
+    do linkDS("dIMUGyro", "imugyroX");
+    do linkDS("dIMUGyro", "imugyroY");
+    do linkDS("dIMUGyro", "imugyroZ");
+
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");
     do addState("LSR 5 31", "Webots", "Joint");
@@ -89,14 +109,20 @@ program main {
     do linkSC("RAP", "wbctrl");
     do linkSC("RAR", "wbctrl");
 
-
     do linkHC("wbHW", "wbNull");
     do linkHP("wbHW", "wbPcol");
 
     do addLogger("flog 10 5", "File", "tfile.txt");
-    do linkLS("flog", "centerX");
-    do linkLS("flog", "centerY");
-    do linkLS("flog", "centerZ");
+    //do linkLS("flog", "centerX");
+    //do linkLS("flog", "centerY");
+    //do linkLS("flog", "centerZ");
+    do linkLS("flog", "imuaccX");
+    do linkLS("flog", "imuaccY");
+    do linkLS("flog", "imuaccZ");
+    do linkLS("flog", "imugyroX");
+    do linkLS("flog", "imugyroY");
+    do linkLS("flog", "imugyroZ");
+
     /*
     do linkLS("flog", "LSP");
     do linkLS("flog", "LSR");
