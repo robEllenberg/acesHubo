@@ -19,13 +19,14 @@
 #include "device.hpp"
 #include "word.hpp"
 
-enum COMP_TYPE { JOINT=5, GPS, IMU};
+enum COMP_TYPE { JOINT=5, GPS, ACCELEROMETER, GYRO};
 enum AXIS { X=1, Y, Z};
 
 extern "C"{
     #include <webots/robot.h>
     #include <webots/servo.h>
     #include <webots/gps.h>
+    #include <webots/gyro.h>
     #include <webots/accelerometer.h>
 }
 
@@ -46,7 +47,8 @@ namespace Webots{
     //TODO - Lookup appropriate WbDeviceTag elements when the cred
     //is created, saves lots of lookup processing.
         public:
-            Credentials(COMP_TYPE id, std::string wb_id);
+            Credentials(COMP_TYPE devID, std::string wb_id);
+            static Credentials* makeCredentials(COMP_TYPE devID, std::string name);
             std::string wb_device_id;
             virtual void printme();
             virtual bool operator==(ACES::Credentials& other);
@@ -67,18 +69,6 @@ namespace Webots{
             static int idCount;
     };
 
-    class IMUCredentials : public Credentials {
-    };
-
-    class GPSCredentials : public Credentials {
-        public:
-            GPSCredentials(std::string wb_id);
-            static GPSCredentials* makeGPSCredentials(std::string args);
-
-            //bool operator==(const ACES::Credentials& cred);
-            //virtual void printme();
-    };
-
     class JointDevice : public ACES::Device {
         public:
             JointDevice(std::string config, std::string args);
@@ -91,20 +81,34 @@ namespace Webots{
             void stopHook();
     };
 
-    class IMUDevice : public ACES::Device {
+    class TripletDevice : public ACES::Device {
         public:
-            static void* refresh(IMUCredentials* j);
-    };
-
-    class GPSDevice : public ACES::Device {
-        public:
-            GPSDevice(std::string config, std::string args);
-            //!Used by the HW to interact w/Webots for the refresh
-            static void* refresh(GPSCredentials* g);
-            //void interpretResult(ACES::ProtoResult* rx);
+            TripletDevice(std::string config, std::string args, COMP_TYPE devID);
+            static void* refresh(Credentials* c);
+            //virtual const double* getTriplet(WbDeviceTag tag) = 0;
             virtual std::list<ACES::ProtoResult*> processUSQueue();
+            void (*wb_start_fun)(WbDeviceTag tag, int ms);
+            void (*wb_stop_fun)(WbDeviceTag tag);
             bool startHook();
             void stopHook();
+    };
+
+    class GPSDevice : public TripletDevice {
+        public:
+            GPSDevice(std::string config, std::string args);
+            static const double* getTriplet(WbDeviceTag tag);
+    };
+
+    class AccelerometerDevice : public TripletDevice {
+        public:
+            AccelerometerDevice(std::string config, std::string args);
+            static const double* getTriplet(WbDeviceTag tag);
+    };
+
+    class GyroscopeDevice : public TripletDevice {
+        public:
+            GyroscopeDevice(std::string config, std::string args);
+            static const double* getTriplet(WbDeviceTag tag);
     };
 
     //Probably no point in having this - as it does not make any extensions yet

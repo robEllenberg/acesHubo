@@ -53,22 +53,14 @@ namespace Webots {
                     }
                 }; break;
 
-                case(IMU):{
+                //Fall through is intentional
+                case(GPS):
+                case(ACCELEROMETER):
+                case(GYRO):{
                     switch(g->mode){
                         case(ACES::REFRESH):
-                            result = IMUDevice::
-                                        refresh((IMUCredentials*)c);
-                            break;
-                        default:
-                            break;
-                    }
-                }; break;
-
-                case(GPS):{
-                    switch(g->mode){
-                        case(ACES::REFRESH):
-                            result = GPSDevice::
-                                      refresh((GPSCredentials*)c);
+                            result = TripletDevice::
+                                        refresh((Credentials*)c);
                             break;
                         default:
                             break;
@@ -122,6 +114,17 @@ namespace Webots {
         wb_device_id = wb_id;
     }
 
+    Credentials* Credentials::makeCredentials(COMP_TYPE devID, std::string name)
+    {
+        /*
+        std::istringstream s1(args);
+        std::string name;
+        s1 >> name;
+        */
+        Credentials *c = new Credentials(devID, name);
+        return c;
+    }
+
     bool Credentials::operator==(ACES::Credentials& other){
         if(not ACES::Credentials::operator==(other) ){
             return false;
@@ -170,26 +173,10 @@ namespace Webots {
         return j;
     }
 
-    GPSCredentials* GPSCredentials::makeGPSCredentials(std::string args)
-    {
-        std::istringstream s1(args);
-        std::string name;
-        s1 >> name;
-        GPSCredentials *g = new GPSCredentials(name);
-        return g;
-    }
-
-    GPSCredentials::GPSCredentials(std::string wb_id)
-      : Credentials(GPS, wb_id)
-    {}
-
     JointDevice::JointDevice(std::string cfg, std::string args)
       : ACES::Device(cfg)
     {
-        //std::string rargs = args + (std::string)" " + name;
-        //RTT::Logger::log() << rargs << RTT::endlog();
         credentials = (Credentials*) JointCredentials::makeJointCredentials(args);
-        //credentials.devName = name;
     }
 
     void* JointDevice::refresh(JointCredentials* j){
@@ -237,66 +224,68 @@ namespace Webots {
         wb_servo_disable_position(tag); 
     }
 
-    void* IMUDevice::refresh(IMUCredentials* j)
+    TripletDevice::TripletDevice(std::string config, std::string args, COMP_TYPE devID)
+     :ACES::Device(config)
     {
-        WbDeviceTag tag =
-                wb_robot_get_device( (j->wb_device_id).c_str() );
-        const double *val = wb_accelerometer_get_values(tag);
-        //We must clone the vector because Webots owns the memory
-        //and will yank the values out from under us at the next
-        //timestep
-        std::vector<double>* res = new std::vector<double>(3);
-        (*res)[0] = val[0];
-        (*res)[1] = val[1];
-        (*res)[2] = val[2];
-        return (void*)res;
-     }
-
-    GPSDevice::GPSDevice(std::string cfg, std::string args)
-      : ACES::Device(cfg)
-    {
-        //RTT::Logger::log() << rargs << RTT::endlog();
-        credentials = (ACES::Credentials*)( new GPSCredentials(args) );
+        credentials = (ACES::Credentials*)Credentials::makeCredentials(devID, args);
     }
 
-    void* GPSDevice::refresh(GPSCredentials* g){
-        WbDeviceTag tag =
-                wb_robot_get_device( (g->wb_device_id).c_str() );
+    bool TripletDevice::startHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        //TODO - Magic Number removal (Samples every 8 ms)
+        wb_start_fun(tag, 8);
+        
+        return true;
+    }
 
-        const double *val = wb_gps_get_values(tag);
+    void TripletDevice::stopHook(){
+        Credentials* c = (Credentials*)credentials;
+        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
+        wb_stop_fun(tag); 
+    }
+
+    void* TripletDevice::refresh(Credentials* c){
+        WbDeviceTag tag =
+                wb_robot_get_device( (c->wb_device_id).c_str() );
+
+        const double *triplet = NULL; 
+        switch(c->devID){
+        //devID is statically determined because doing so dynamically would require
+        //placing a reference to a specific Device within the credential (so the compiler
+        //can do the virtual function resolution)
+            case(GPS):
+                triplet = GPSDevice::getTriplet(tag);
+                break;
+            case(ACCELEROMETER):
+                triplet = AccelerometerDevice::getTriplet(tag);
+                break;
+            case(GYRO):
+                triplet = GyroscopeDevice::getTriplet(tag);
+                break;
+        }
+        assert(triplet);
+        //TODO - We need to make sure somehow that the values are not refreshed
+        //before we can copy them off
+
         //We must clone the vector because Webots owns the memory
         //and will yank the values out from under us at the next
         //timestep
         std::vector<double>* res = new std::vector<double>(3);
-        (*res)[0] = val[0];
-        (*res)[1] = val[1];
-        (*res)[2] = val[2];
+        (*res)[0] = triplet[0];
+        (*res)[1] = triplet[1];
+        (*res)[2] = triplet[2];
         //RTT::Logger::log() << (*res)[0] << " " << (*res)[1]
         //                   << " " << (*res)[2] << RTT::endlog();
         return (void*)res;
     }
 
-    bool GPSDevice::startHook(){
-        Credentials* c = (Credentials*)credentials;
-        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
-        //TODO - Magic Number removal (Samples every 8 ms)
-        wb_gps_enable(tag, 8);
-        
-        return true;
-    }
-
-    void GPSDevice::stopHook(){
-        Credentials* c = (Credentials*)credentials;
-        WbDeviceTag tag = wb_robot_get_device( (c->wb_device_id).c_str() );
-        wb_gps_disable(tag); 
-    }
-
     //!Override the default USQueue processor in order to split the
-    //!three data elements out of the GPS node's return packet
-    std::list<ACES::ProtoResult*> GPSDevice::processUSQueue(){
+    //!three data elements out of the node's return packet
+    std::list<ACES::ProtoResult*> TripletDevice::processUSQueue(){
         //TODO - Provide an implementation that doesn't triple up the
         //requests into webots
-        RTT::Logger::log() << "GPS  Dev US override" << RTT::endlog();
+        //RTT::Logger::log() << "Triplet  Dev US override" << RTT::endlog();
         ACES::ProtoResult* p = NULL;
         { RTT::OS::MutexLock lock(usqGuard);
           p = usQueue.front();
@@ -313,6 +302,31 @@ namespace Webots {
             pr_list.push_back( (ACES::ProtoResult*)r );
         }
         return pr_list;
+    }
+
+    GPSDevice::GPSDevice(std::string config, std::string args) 
+    : TripletDevice(config, args, GPS)
+    {
+        wb_start_fun = wb_gps_enable;
+        wb_stop_fun = wb_gps_disable;
+    }
+
+    const double * GPSDevice::getTriplet( WbDeviceTag tag){
+        return wb_gps_get_values(tag);
+    }
+
+    AccelerometerDevice::AccelerometerDevice(std::string config, std::string args)
+    : TripletDevice(config, args, ACCELEROMETER){}
+
+    const double * AccelerometerDevice::getTriplet( WbDeviceTag tag){
+        return wb_accelerometer_get_values(tag);
+    }
+
+    GyroscopeDevice::GyroscopeDevice(std::string config, std::string args) 
+    : TripletDevice(config, args, GYRO){}
+
+    const double * GyroscopeDevice::getTriplet( WbDeviceTag tag){
+        return wb_gyro_get_values(tag);
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 
