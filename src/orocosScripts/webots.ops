@@ -55,6 +55,24 @@ program main {
     do linkDS("dIMUGyro", "imugyroY");
     do linkDS("dIMUGyro", "imugyroZ");
 
+    do addDevice("dRFootForce 5 31", "Webots Force", "RFoot");
+    do addState("rffX 5 5",  "Webots", "X");
+    do addState("rffY 5 5",  "Webots", "Y");
+    do addState("rffZ 5 5",  "Webots", "Z");
+    do linkPD("wbPcol", "dRFootForce");
+    do linkDS("dRFootForce", "rffX");
+    do linkDS("dRFootForce", "rffY");
+    do linkDS("dRFootForce", "rffZ");
+
+    do addDevice("dLFootForce 5 31", "Webots Force", "LFoot");
+    do addState("lffX 5 5",  "Webots", "X");
+    do addState("lffY 5 5",  "Webots", "Y");
+    do addState("lffZ 5 5",  "Webots", "Z");
+    do linkPD("wbPcol", "dLFootForce");
+    do linkDS("dLFootForce", "lffX");
+    do linkDS("dLFootForce", "lffY");
+    do linkDS("dLFootForce", "lffZ");
+
     do addState("HY 5 31",  "Webots", "Joint");
     do addState("LSP 5 31", "Webots", "Joint");
     do addState("LSR 5 31", "Webots", "Joint");
@@ -113,15 +131,23 @@ program main {
     do linkHP("wbHW", "wbPcol");
 
     do addLogger("flog 10 5", "File", "tfile.txt");
-    //do linkLS("flog", "centerX");
-    //do linkLS("flog", "centerY");
-    //do linkLS("flog", "centerZ");
+    /*
+    do linkLS("flog", "centerX");
+    do linkLS("flog", "centerY");
+    do linkLS("flog", "centerZ");
     do linkLS("flog", "imuaccX");
     do linkLS("flog", "imuaccY");
     do linkLS("flog", "imuaccZ");
     do linkLS("flog", "imugyroX");
     do linkLS("flog", "imugyroY");
     do linkLS("flog", "imugyroZ");
+    */
+    do linkLS("flog", "rffX");
+    do linkLS("flog", "rffY");
+    do linkLS("flog", "rffZ");
+    do linkLS("flog", "lffX");
+    do linkLS("flog", "lffY");
+    do linkLS("flog", "lffZ");
 
     /*
     do linkLS("flog", "LSP");

@@ -19,7 +19,7 @@
 #include "device.hpp"
 #include "word.hpp"
 
-enum COMP_TYPE { JOINT=5, GPS, ACCELEROMETER, GYRO};
+enum COMP_TYPE { JOINT=5, GPS, ACCELEROMETER, GYRO, FORCE};
 enum AXIS { X=1, Y, Z};
 
 extern "C"{
@@ -27,6 +27,7 @@ extern "C"{
     #include <webots/servo.h>
     #include <webots/gps.h>
     #include <webots/gyro.h>
+    #include <webots/touch_sensor.h>
     #include <webots/accelerometer.h>
 }
 
@@ -108,6 +109,12 @@ namespace Webots{
     class GyroscopeDevice : public TripletDevice {
         public:
             GyroscopeDevice(std::string config, std::string args);
+            static const double* getTriplet(WbDeviceTag tag);
+    };
+
+    class ForceDevice : public TripletDevice {
+        public:
+            ForceDevice(std::string config, std::string args);
             static const double* getTriplet(WbDeviceTag tag);
     };
 

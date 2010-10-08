@@ -56,6 +56,7 @@ namespace Webots {
                 //Fall through is intentional
                 case(GPS):
                 case(ACCELEROMETER):
+                case(FORCE):
                 case(GYRO):{
                     switch(g->mode){
                         case(ACES::REFRESH):
@@ -263,6 +264,9 @@ namespace Webots {
             case(GYRO):
                 triplet = GyroscopeDevice::getTriplet(tag);
                 break;
+            case(FORCE):
+                triplet = ForceDevice::getTriplet(tag);
+                break;
         }
         assert(triplet);
         //TODO - We need to make sure somehow that the values are not refreshed
@@ -335,6 +339,17 @@ namespace Webots {
 
     const double * GyroscopeDevice::getTriplet( WbDeviceTag tag){
         return wb_gyro_get_values(tag);
+    }
+
+    ForceDevice::ForceDevice(std::string config, std::string args) 
+    : TripletDevice(config, args, FORCE)
+    {
+        wb_start_fun  = wb_touch_sensor_enable;
+        wb_stop_fun  = wb_touch_sensor_disable;
+    }
+
+    const double * ForceDevice::getTriplet( WbDeviceTag tag){
+        return wb_touch_sensor_get_values(tag);
     }
 
     Protocol::Protocol(std::string cfg, std::string args) 

@@ -157,6 +157,9 @@ namespace ACES{
             if(type2 == "Gyro"){
                 d = (Device*) new Webots::GyroscopeDevice(cfg, args);
             }
+            if(type2 == "Force"){
+                d = (Device*) new Webots::ForceDevice(cfg, args);
+            }
         }
         #endif
         #ifdef TESTSUITE
