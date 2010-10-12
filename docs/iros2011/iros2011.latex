@@ -19,6 +19,7 @@
 
 %My includes
 \usepackage{verbatim} % for the \begin{comment} command
+\usepackage{draftcopy} % for the DRAFT background
 
 %includes from the IEEE template
 \usepackage{graphics} % for pdf, bitmapped graphics files
@@ -608,12 +609,14 @@ either there are no more words or the time allotment runs out.
     %
     %Here because the col-span figure has to be defined on the page before it
     %appears
+    \begin{comment}
     \begin{figure*}[t]
         \centering
         \includegraphics[width=\textwidth]{./src/log1.eps}
         \caption{Log from ACES test run}
         \label{log1}
     \end{figure*}
+    \end{comment}
     %
 % 
 The Hardware component is the simplest to understand, as its functionality is
