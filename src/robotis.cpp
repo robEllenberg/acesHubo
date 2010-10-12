@@ -1,47 +1,51 @@
 #include "robotis.hpp"
 
 namespace Robotis {
+    Protocol::Protocol(std::string cfg, std::string args){
+     :ACES::Protocol(cfg, args){}
 
-    Protocol::Protocol(std::string n,
-        ACES::Hardware* hw, int pri, int UpdateFreq)
-                   : ACES::Protocol(n, hw, pri, UpdateFreq){
-
+    bool Protocol::startHook(){
         yylex_init ( &scanner ) ;
         curPacket = new RobotisPacket() ;
         yyset_extra(curPacket, scanner) ;
+        return true;
     }
 
-    Protocol::~Protocol(){
+    Protocol::stopHook(){
         delete curPacket;
-        yylex_destroy( scanner);
+        yylex_destroy(scanner);
     }
     
-    std::vector<ACES::Message*>*
-    Protocol::interpreter(std::deque<char>* s){
-        std::vector<ACES::Message*>* m =
-           new std::vector<ACES::Message*>;
-        if(s->size() == 0){
-            return m;
+    Credentials credFromPacket(RobotisPacket* p){
+        //We need to generate a packet which will pass through the
+        //comparison operator on the motor of interest, the zero and direction
+        //information don't matter
+        return Credentials(p->id, 0.0, 0.0);
+    }
+
+    ProtoResult* Protocol::processUSQueue()
+    {
+        ProtoWord* p = NULL;
+        { RTT::OS::MutexLock lock(usqGuard);
+          p = usQueue.front();
+          usQueue.pop_front();
+        }
+        Word<char*>* w = (Word<char*>*)p;
+        yy_scan_bytes((const char*)(w->data), 1, this->scanner);
+        //If yylex returns 1 we have matched a full packet
+        //if return is 0 we have only eaten a character
+        if( yylex(this->scanner) ){ 
+            RobotisPacket* p  = curPacket;
+            curPacket = new RobotisPacket();
+            yyset_extra(curPacket, scanner) ;
+            Result<RobotisPacket>* r = new Result<RobotisPacket>(*p, credFromPacket(p), 0);
+            return (ProtoResult*)r;
         }
         else{
-                while(! s->empty() ){
-                    char c = s->front();
-                    s->pop_front();
-                //this->processInput(c);
-                }
+            return 0;
         }
     }
-
-    std::deque<char>* Protocol::scanInput(){
-	unsigned char c = 0;
-	std::deque<char>* s = new std::deque<char>;
-	while( (hwInBuffer->buffer()->Pop(c)) != 0 ){
-	    s->push_back(c);
-	    std::cout << "Pull " << c << std::endl;
-	}
-	return s;
-    }
-    
+   
     unsigned char checksum(std::list<unsigned char> l){
         unsigned char sum = 0;
         std::list<unsigned char>::iterator it;
@@ -85,66 +89,117 @@ namespace Robotis {
         return m;
     }
 
-ACES::Credentials* Protocol::parseHWInput(unsigned char* c){
-   //RTT::Logger::log() << "parse: " <<std::hex
-   //  << (int)c << std::dec << std::endl;
-    yy_scan_bytes((const char*)c, 1, this->scanner);
-    //If yylex returns 1 we have matched a full packet
-    //if return is 0 we have only eaten a character
-    if( yylex(this->scanner) ){ 
-        RobotisPacket* p  = curPacket;
-        curPacket = new RobotisPacket();
-        unsigned char low = p->parameters->at(36);
-        unsigned char high = p->parameters->at(37);
-        float angle = angleScale(low, high);
-        ACES::Credentials* cred =
-          new ACES::Credentials( (*p).id, angle );
-        delete p;
-        yyset_extra(curPacket, scanner) ;
-        return cred;
-    }
-    else{
-        return 0;
-    }
-}
-
-/*
-    State::State(std::string n, ACES::Credentials* c,
-      ACES::Dispatcher* d, int pri, int UpdateFreq)
-      : ACES::State(n, c, d, pri, UpdateFreq){
-    }
-*/
-    Hardware::Hardware(std::string name,
-        std::ifstream *in, std::ofstream *out, int priority,
-        int UpdateFreq)
-            : ACES::charDevHardware(name, in,out,
-                                    priority, UpdateFreq)
-    {}
-
-/* //In retrospect a bad idea
-    ACES::Hardware* Hardware::operator<<(ACES::Message* m){        
-        for(std::list<unsigned char>::iterator it = (*m).lineRepresentation.begin();
-             it != (*m).lineRepresentation.end();
-             it++){
-                 //If there's a 0 in the stream we have to handle it with the special case of
-                 // std::ends or the stream will ignore it.
-                this->hardpoint_out->put(*it);
-             }
-        this->hardpoint_out->flush();
-        // *this->hardpoint << std::endl;        
-    }
-*/
-
     RobotisPacket::RobotisPacket(){
         counter = 0;
         id = 0;
         len = 0;
         error = 0;
         checksum = 0;
-        parameters = new std::vector<unsigned char>;
+        parameters = new std::vector<unsigned char>();
     }
 
     RobotisPacket::~RobotisPacket(){
         delete parameters;
+    }
+
+    Device::Device(std::string cfg, std::string args)
+     :ACES::Device(cfg)
+    {
+        credentials = (ACES::Credentials*) makeCredentials(std::string args);
+    }
+
+    bool Device::startHook(){
+    }
+
+    void Device::stopHook(){
+    }
+
+    std::list<ProtoResult*> Device::processUSQueue(){
+        ProtoResult* p = NULL;
+        { RTT::OS::MutexLock lock(usqGuard);
+          p = usQueue.front();
+          usQueue.pop_front();
+        }
+        std::list<ProtoResult*> pr_list();
+        //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
+        RobotisPacket p = ( (Result<RobotisPacket>*) p)->result;
+
+        requestPos, requestLen
+        for(int i = 0; i < requestLen; ){
+            switch(PARAM_LEN[requestPos+i]){
+                case 2:
+                    i+=2;
+                    break;
+                case 1:
+                    i++;
+                    break;
+                case 0:
+                    assert(0);
+                    break;
+                default:
+                    assert(0);
+                    break;
+            }
+
+        }
+            
+        for(std::vector<unsigned char>::iterator it = p.parameters.begin();
+            it != p.parameters.end(); it++)
+        {
+            
+        }
+
+        Result<Robotis*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
+        return pr_list;
+
+            /*
+            unsigned char low = p->parameters->at(36);
+            unsigned char high = p->parameters->at(37);
+            float angle = angleScale(low, high);
+            ACES::Credentials* cred =
+              new ACES::Credentials( (*p).id, angle );
+            delete p;
+            */
+    }
+
+    Credentials::Credentials(int motNum, float zero, float dir)
+     :ACES::Credentials((int)JOINT)
+    {
+        motorNum = motNum;
+        angle = ang;
+        direction = dir;
+    }
+
+    static Credentials* makeCredentials(std::string args){
+        //Format is "IDnum zero direction"
+        std::istringstream s1(args);
+        float z, d;
+        int num;
+        s1 >> num >> z >> d;
+        return new Credentials(num, z, d);
+    }
+
+    void Credentials::printme(){
+        ACES::Credentials::printme();
+        RTT::Logger::log() << "(Robotis) Credentials: Motor Number="
+                           << motorNum
+                           << " Angle=" << angle << RTT::endlog();
+    }
+
+    bool Credentials::operator==(ACES::Credentials& other){
+        if(not ACES::Credentials::operator==(other) ){
+            return false;
+        }
+        if(dynamic_cast<Credentials*>(&other) ){
+            Credentials* c = (Credentials*)&other;
+            if(c->motorNum == motorNum){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        return false;
     }
 }

@@ -77,7 +77,8 @@ namespace ACES{
         while( dsQueue.size() ){
             g = processDSQueue();
             if(g){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got DS" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got DS"
+                                   << RTT::endlog();
             }
             txDownStream(g);
         }
@@ -86,13 +87,15 @@ namespace ACES{
         while( usQueue.size() ){
             std::list<ProtoResult*> p = processUSQueue();
             if(p.size()){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US" << RTT::endlog();
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US"
+                                   << RTT::endlog();
             }
             for(std::list<ProtoResult*>::iterator it = p.begin();
                 it != p.end();  it++){
                     (*it)->printme();
                     txUpStream(*it);
-                    RTT::Logger::log() << "(dev) nID:" << (*it)->nodeID << RTT::endlog();
+                    RTT::Logger::log() << "(dev) nID:" << (*it)->nodeID
+                                       << RTT::endlog();
             }
         }
     }

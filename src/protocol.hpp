@@ -51,9 +51,5 @@ namespace ACES {
 
             bool subscribeDevice(Device* d);
     };
-
-    class charDevProtocol : public Protocol {
-        
-    };
 }    
 #endif

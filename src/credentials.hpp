@@ -4,13 +4,7 @@
 #include <rtt/Logger.hpp>
 
 namespace ACES {
-/*
-    class ProtoCredential{
-        public:
-            ProtoCredential(int t);
-            int credType;
-    };
-*/
+
     class Credentials {
         public:
             Credentials(int id);
