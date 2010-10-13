@@ -120,20 +120,23 @@ namespace Robotis {
                     p->instruct = READ;
                     p->parameters->push_back((unsigned char) g->nodeID);
                     p->parameters->push_back(
-                        (unsigned char) PARAM_LEN(g->nodeID) );
+                        (unsigned char) PARAM_LEN[g->nodeID] );
                     break;
+
                 case(SET):
                     p->instruct = WRITE;
                     p->parameters->push_back((unsigned char) g->nodeID);
-
-                    sp = (float*)(g->data);
-                    int i = reverseScale(*sp, g->nodeID);
-                    //scaling function
-                    //decide if two or one byte
-                    //if one cast and push
-                    //if two cast and push low byte then high byte
+                    
+                    sp = (float*)(g->data);     //Grab set-point from goal
+                    //Scale the set-point
+                    unsigned short ssp = DSScale(*sp, g->nodeID); 
+                    //Byte-chop the scaled point and add it to the param list
+                    appendParams( p->parameters, ssp, PARAM_LEN[g->nodeID] );
                     break;
             }
+            //Goal *g2 = new Goal(g->nodeID, g->mode, (void*)p);
+            //Change the data contents of the goal and send it along
+            g->data = (void*)p;
             return g;
         }
         else{
@@ -142,11 +145,7 @@ namespace Robotis {
     }
 
     std::list<ACES::ProtoResult*> Device::processUSQueue(){
-        ACES::ProtoResult* p = NULL;
-        { RTT::OS::MutexLock lock(usqGuard);
-          p = usQueue.front();
-          usQueue.pop_front();
-        }
+        ACES::ProtoResult* p = getUSQelement();
         std::list<ACES::ProtoResult*> pr_list;
         //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
         RobotisPacket r = ( (ACES::Result<RobotisPacket>*) p)->result;
@@ -154,7 +153,7 @@ namespace Robotis {
         //requestPos, requestLen
         //map [nID]->tentry
         for(int i = 0, j = 0; i < requestLen; j = i){
-            unsigned int tentry = 0;
+            unsigned short tentry = 0;
             switch(PARAM_LEN[requestPos+i]){
                 case 2:
                     unsigned char low, high;
@@ -254,15 +253,34 @@ namespace Robotis {
         return sum;
     }
 
-    float USScale(int in, int nodeID){
+    float USScale(unsigned short in, int nodeID){
     }
 
-    int DSStreamScale(float in, int nodeID){
+    unsigned short DSScale(float in, int nodeID){
         int result = 0;
         switch(nodeID){
             default:        //case of no scaling function
                 result = (int)in;
                 break;
         }
+    }
+
+    bool appendParams( std::vector<unsigned char>* params,
+                       unsigned short data, int size )
+    {
+        //we are assuming that shorts are 16 bit
+        unsigned char low = 0, high = 0;
+        low = data & 0x00FF;
+        high = data & 0xFF00;
+        switch(size){
+            case(2):
+                params->push_back(low);
+                params->push_back(high);
+            case(1):
+                params->push_back(low);
+            deafult:
+                assert(0);
+        }
+        return true;
     }
 };

@@ -151,7 +151,7 @@ namespace Robotis {
     Credentials* credFromPacket(RobotisPacket* p);
     unsigned char checksum(std::string& str);
     float USScale(int in, int nodeID);
-    int DSStreamScale(float in, int nodeID);
+    unsigned short DSScale(float in, int nodeID);
 }    
 
  
