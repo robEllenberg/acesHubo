@@ -79,8 +79,8 @@ namespace ACES{
             if(g){
                 RTT::Logger::log() << RTT::Logger::Debug << "(dev) got DS"
                                    << RTT::endlog();
+                txDownStream(g);
             }
-            txDownStream(g);
         }
         //Return Path
         assert(usQueue.size() < 100);
@@ -100,19 +100,29 @@ namespace ACES{
         }
     }
     
-    Goal* Device::processDSQueue(){
+    Goal* Device::getDSQelement()
+    {
         RTT::OS::MutexLock lock(dsqGuard);
         Goal* g = dsQueue.front();
         dsQueue.pop_front();
         return g;
     }
 
+    Goal* Device::processDSQueue(){
+        return getDSQelement(); 
+    }
+
+    ProtoResult* Device::getUSQelement()
+    { 
+        RTT::OS::MutexLock lock(usqGuard);
+        ProtoResult* p = usQueue.front();
+        usQueue.pop_front();
+        return p;
+    }
+
     std::list<ProtoResult*> Device::processUSQueue(){
-        ProtoResult* p = NULL;
-        { RTT::OS::MutexLock lock(usqGuard);
-          p = usQueue.front();
-          usQueue.pop_front();
-        }
+        ProtoResult* p = getUSQelement();
+        
         //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
         Goal* g = ( (Result<Goal*>*) p)->result;
         Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);

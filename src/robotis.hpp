@@ -30,6 +30,9 @@ extern "C"{
 }
 
 namespace Robotis {
+    enum COMP_TYPE { JOINT=3 };
+
+    enum INST { PING=1, READ, WRITE, REG_WRITE, ACTION, RESET, SYNC_WRITE=0x83 };
 
     enum PARAM_TABLE { 
             MODEL_NUMBER = 0x0,                VERSION_OF_FIRMWARE = 0x2,
@@ -51,7 +54,7 @@ namespace Robotis {
             LOCK = 0x2F,                       PUNCH = 0x30
     };
 
-    const unsigned char PARAM_LEN = {
+    const unsigned char PARAM_LEN[] = {
             2, 0,           //MODEL_NUMBER = 0x0
             1,              //VERSION_OF_FIRMWARE = 0x2
             1,              //ID = 0x3
@@ -97,21 +100,10 @@ namespace Robotis {
             unsigned char id;
             unsigned char len;
             unsigned char error;
+            unsigned char instruct;
             std::vector<unsigned char>* parameters;
             unsigned char checksum;
             void printme();
-    };
-
-    Credentials credFromPacket(RobotisPacket* p);
-    unsigned char checksum(std::string& str);
-    float angleScale(unsigned char low, unsigned char high);
-    
-    class Hardware : public ACES::charDevHardware {
-        public:
-            Hardware(std::string name,
-                std::ifstream *in, std::ofstream *out,
-                int priority, int UpdateFreq);
-            //ACES::Hardware* operator<<(ACES::Message* m);
     };
 
     class Protocol : public ACES::Protocol {
@@ -119,17 +111,12 @@ namespace Robotis {
             Protocol(std::string cfg, std::string args); 
             bool startHook();
             void stopHook();
-            ProtoResult* Protocol::processUSQueue();
+            ACES::ProtoResult* processUSQueue();
+            Message* processDSQueue();
 
             //~Protocol();
-            //std::vector<ACES::Message*>* interpreter(
-            //         std::deque<char>*);
-            //std::deque<char>* scanInput();
+            //ACES::Message* buildMessage(ACES::Credentials* cred);
 
-            //ACES::Message* buildMessage(
-            //     ACES::Credentials* cred);
-
-            //ACES::Credentials* parseHWInput(unsigned char* c);
             yyscan_t scanner;
             RobotisPacket* curPacket;
             unsigned char incoming_id;
@@ -139,13 +126,14 @@ namespace Robotis {
     class Device : public ACES::Device {
         public:
             Device(std::string config, std::string args);
-            //virtual std::list<ACES::ProtoResult*> processUSQueue();
             bool startHook();
             void stopHook();
-            virtual std::list<ProtoResult*> processUSQueue();
+            virtual Goal* Device::processDSQueue();
+            virtual std::list<ACES::ProtoResult*> processUSQueue();
         private:
             int requestPos; //!The memory table position of the last request issued
             int requestLen; //!The size of data from the last issued request
+            bool lockout;
     };
 
     class Credentials : public ACES::Credentials {
@@ -155,13 +143,18 @@ namespace Robotis {
             virtual void printme();
             virtual bool operator==(ACES::Credentials& other);
 
-            float angle;
+            float zero;
             float direction;
             int motorNum;
     };
     
+    Credentials* credFromPacket(RobotisPacket* p);
+    unsigned char checksum(std::string& str);
+    float USScale(int in, int nodeID);
+    int DSStreamScale(float in, int nodeID);
 }    
 
+ 
 //Function defs for the lexer
 extern "C" {
     int yylex ( yyscan_t yyscanner );

@@ -62,20 +62,28 @@ namespace ACES {
         }
     }
 
-    Message* Protocol::processDSQueue(){
+    Goal* Protocol::getDSQelement(){
         RTT::OS::MutexLock lock(dsqGuard);
         Goal* g = dsQueue.front();
         dsQueue.pop_front();
+        return g;
+    }
+
+    Message* Protocol::processDSQueue(){
+        Goal* g = getDSQelement();
         Message* m = new Message(g);
         return m;
     }
 
+    ProtoWord* Protocol::getUSQelement(){
+        RTT::OS::MutexLock lock(usqGuard);
+        ProtoWord* p = usQueue.front();
+        usQueue.pop_front();
+        return p;
+    }
+
     ProtoResult* Protocol::processUSQueue(){
-        ProtoWord* p = NULL;
-        { RTT::OS::MutexLock lock(usqGuard);
-          p = usQueue.front();
-          usQueue.pop_front();
-        }
+        ProtoWord* p = getUSQelement();
         Word<Goal*>* w = (Word<Goal*>*)p;
         Goal* g = w->data;
         int nID = g->nodeID;

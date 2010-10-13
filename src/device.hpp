@@ -26,10 +26,12 @@ namespace ACES{
             void updateHook();
 
             virtual Goal* processDSQueue();
+            Goal* getDSQelement();
             std::deque<Goal*> dsQueue;
             RTT::OS::Mutex dsqGuard;
 
             virtual std::list<ProtoResult*> processUSQueue();
+            ProtoResult* getUSQelement();
             std::deque<ProtoResult*> usQueue;
             RTT::OS::Mutex usqGuard;
 

@@ -42,10 +42,12 @@ namespace ACES {
             virtual void rxUpStream(ProtoWord*);
 
             virtual Message* processDSQueue();
+            Goal* getDSQelement();
             std::deque<Goal*> dsQueue;
             RTT::OS::Mutex dsqGuard; 
 
             virtual ProtoResult* processUSQueue();
+            ProtoWord* getUSQelement();
             std::deque<ProtoWord*> usQueue;
             RTT::OS::Mutex usqGuard; 
 

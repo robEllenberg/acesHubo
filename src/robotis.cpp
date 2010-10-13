@@ -1,8 +1,22 @@
 #include "robotis.hpp"
 
 namespace Robotis {
-    Protocol::Protocol(std::string cfg, std::string args){
-     :ACES::Protocol(cfg, args){}
+    RobotisPacket::RobotisPacket(){
+        counter = 0;
+        id = 0;
+        len = 0;
+        error = 0;
+        checksum = 0;
+        parameters = new std::vector<unsigned char>();
+    }
+
+    RobotisPacket::~RobotisPacket(){
+        delete parameters;
+    }
+
+
+    Protocol::Protocol(std::string cfg, std::string args)
+     : ACES::Protocol(cfg, args){}
 
     bool Protocol::startHook(){
         yylex_init ( &scanner ) ;
@@ -11,26 +25,19 @@ namespace Robotis {
         return true;
     }
 
-    Protocol::stopHook(){
+    void Protocol::stopHook(){
         delete curPacket;
         yylex_destroy(scanner);
     }
-    
-    Credentials credFromPacket(RobotisPacket* p){
-        //We need to generate a packet which will pass through the
-        //comparison operator on the motor of interest, the zero and direction
-        //information don't matter
-        return Credentials(p->id, 0.0, 0.0);
-    }
 
-    ProtoResult* Protocol::processUSQueue()
+    ACES::ProtoResult* Protocol::processUSQueue()
     {
-        ProtoWord* p = NULL;
+        ACES::ProtoWord* p = NULL;
         { RTT::OS::MutexLock lock(usqGuard);
           p = usQueue.front();
           usQueue.pop_front();
         }
-        Word<char*>* w = (Word<char*>*)p;
+        ACES::Word<char*>* w = (ACES::Word<char*>*)p;
         yy_scan_bytes((const char*)(w->data), 1, this->scanner);
         //If yylex returns 1 we have matched a full packet
         //if return is 0 we have only eaten a character
@@ -38,33 +45,25 @@ namespace Robotis {
             RobotisPacket* p  = curPacket;
             curPacket = new RobotisPacket();
             yyset_extra(curPacket, scanner) ;
-            Result<RobotisPacket>* r = new Result<RobotisPacket>(*p, credFromPacket(p), 0);
-            return (ProtoResult*)r;
+            ACES::Result<RobotisPacket>* r =
+                new ACES::Result<RobotisPacket>(*p,
+                (ACES::Credentials*)credFromPacket(p),
+                0);
+            return (ACES::ProtoResult*)r;
         }
         else{
             return 0;
         }
     }
-   
-    unsigned char checksum(std::list<unsigned char> l){
-        unsigned char sum = 0;
-        std::list<unsigned char>::iterator it;
-        for(it = l.begin(); it != l.end(); it++){
-            sum += (*it);
-        }
-        sum = ~sum;
-        return sum;
+
+    ACES::Message* Protocol::processDSQueue()
+    {
+        Goal* g = getDSQelement();
+        //goal carries void data
+        g->data
     }
 
-    float angleScale(unsigned char low, unsigned char high){
-        unsigned int base = high;
-        base <<= 8;
-        base |= low;
-        //Scale from range (0,1024) to (0,300)
-        float angle = 300./1024.* base;  
-        return angle;
-    }
-        
+    /*
     ACES::Message* Protocol::buildMessage(
       ACES::Credentials* cred){
         std::list<unsigned char> id (1, cred->id);
@@ -88,49 +87,87 @@ namespace Robotis {
         ACES::Message* m = new ACES::Message(head);
         return m;
     }
-
-    RobotisPacket::RobotisPacket(){
-        counter = 0;
-        id = 0;
-        len = 0;
-        error = 0;
-        checksum = 0;
-        parameters = new std::vector<unsigned char>();
-    }
-
-    RobotisPacket::~RobotisPacket(){
-        delete parameters;
-    }
+    */
 
     Device::Device(std::string cfg, std::string args)
      :ACES::Device(cfg)
     {
-        credentials = (ACES::Credentials*) makeCredentials(std::string args);
+        credentials =
+            (ACES::Credentials*)Credentials::makeCredentials(args);
     }
 
     bool Device::startHook(){
+        lockout = false;
     }
 
     void Device::stopHook(){
     }
 
-    std::list<ProtoResult*> Device::processUSQueue(){
-        ProtoResult* p = NULL;
+    Goal* Device::processDSQueue(){
+        if(not lockout){
+            Goal* g = getDSQelement();
+            float* sp;
+            RobotisPacket* p = new RobotisPacket();
+            p->id = credentials->motorNum;
+            p->parameters = new std::vector<unsigned char>;
+
+            switch(g->mode){
+                case(REFRESH):
+                    requestPos = g->nodeID;
+                    requestLen = PARAM_LEN[requestPos];
+                    lockout = true;
+
+                    p->instruct = READ;
+                    p->parameters->push_back((unsigned char) g->nodeID);
+                    p->parameters->push_back(
+                        (unsigned char) PARAM_LEN(g->nodeID) );
+                    break;
+                case(SET):
+                    p->instruct = WRITE;
+                    p->parameters->push_back((unsigned char) g->nodeID);
+
+                    sp = (float*)(g->data);
+                    int i = reverseScale(*sp, g->nodeID);
+                    //scaling function
+                    //decide if two or one byte
+                    //if one cast and push
+                    //if two cast and push low byte then high byte
+                    break;
+            }
+            return g;
+        }
+        else{
+            return NULL;
+        }
+    }
+
+    std::list<ACES::ProtoResult*> Device::processUSQueue(){
+        ACES::ProtoResult* p = NULL;
         { RTT::OS::MutexLock lock(usqGuard);
           p = usQueue.front();
           usQueue.pop_front();
         }
-        std::list<ProtoResult*> pr_list();
+        std::list<ACES::ProtoResult*> pr_list;
         //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
-        RobotisPacket p = ( (Result<RobotisPacket>*) p)->result;
+        RobotisPacket r = ( (ACES::Result<RobotisPacket>*) p)->result;
 
-        requestPos, requestLen
-        for(int i = 0; i < requestLen; ){
+        //requestPos, requestLen
+        //map [nID]->tentry
+        for(int i = 0, j = 0; i < requestLen; j = i){
+            unsigned int tentry = 0;
             switch(PARAM_LEN[requestPos+i]){
                 case 2:
+                    unsigned char low, high;
+                    //Check the order here
+                    low = (*r.parameters)[i];
+                    high = (*r.parameters)[i+1];
+                    tentry = high;
+                    tentry <<= 8;
+                    tentry |= low;
                     i+=2;
                     break;
                 case 1:
+                    tentry = (*r.parameters)[i];
                     i++;
                     break;
                 case 0:
@@ -140,33 +177,30 @@ namespace Robotis {
                     assert(0);
                     break;
             }
-
-        }
+            float* data = new float;
+            *data = (float)tentry;
             
-        for(std::vector<unsigned char>::iterator it = p.parameters.begin();
-            it != p.parameters.end(); it++)
-        {
-            
-        }
+            //This is for scaling functions, etc
+            switch(requestPos+i){
+                case ###:
+                    break;
+                case ###:
+                    break;
+            }
 
-        Result<Robotis*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
+            ACES::Result<float*>* r =
+                new ACES::Result<float*>(data, p->semiCred, requestPos+j);
+            pr_list.push_back( (ACES::ProtoResult*)r );
+        }
+        lockout = false;
         return pr_list;
-
-            /*
-            unsigned char low = p->parameters->at(36);
-            unsigned char high = p->parameters->at(37);
-            float angle = angleScale(low, high);
-            ACES::Credentials* cred =
-              new ACES::Credentials( (*p).id, angle );
-            delete p;
-            */
     }
 
-    Credentials::Credentials(int motNum, float zero, float dir)
+    Credentials::Credentials(int motNum, float z, float dir)
      :ACES::Credentials((int)JOINT)
     {
         motorNum = motNum;
-        angle = ang;
+        zero = z;
         direction = dir;
     }
 
@@ -183,7 +217,7 @@ namespace Robotis {
         ACES::Credentials::printme();
         RTT::Logger::log() << "(Robotis) Credentials: Motor Number="
                            << motorNum
-                           << " Angle=" << angle << RTT::endlog();
+                           << " Zero=" << zero << RTT::endlog();
     }
 
     bool Credentials::operator==(ACES::Credentials& other){
@@ -202,4 +236,33 @@ namespace Robotis {
 
         return false;
     }
-}
+
+    Credentials* credFromPacket(RobotisPacket* p){
+        //We need to generate a packet which will pass through the
+        //comparison operator on the motor of interest, the zero and direction
+        //information don't matter
+        return new Credentials(p->id, 0.0, 0.0);
+    }
+
+    unsigned char checksum(std::list<unsigned char> l){
+        unsigned char sum = 0;
+        std::list<unsigned char>::iterator it;
+        for(it = l.begin(); it != l.end(); it++){
+            sum += (*it);
+        }
+        sum = ~sum;
+        return sum;
+    }
+
+    float USScale(int in, int nodeID){
+    }
+
+    int DSStreamScale(float in, int nodeID){
+        int result = 0;
+        switch(nodeID){
+            default:        //case of no scaling function
+                result = (int)in;
+                break;
+        }
+    }
+};
