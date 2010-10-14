@@ -29,18 +29,20 @@ namespace ACES {
         while(dsQueue.size()){
             m = processDSQueue();
             if(m){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS" << RTT::endlog();
-            }
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
+                                   << RTT::endlog();
             txBus(m);
+            }
         }
         rxBus();
         ProtoWord* p = NULL;
         while(usQueue.size()){
             p = processUSQueue();
             if(p){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US" << RTT::endlog();
-            }
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US"
+                                   << RTT::endlog();
             txUpStream(p);
+            }
         }
     }
 

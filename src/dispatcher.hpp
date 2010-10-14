@@ -19,6 +19,9 @@
 #ifdef WEBOTS
     #include "webots.hpp"
 #endif
+#ifdef ROBOTIS 
+    #include "robotis.hpp"
+#endif
 #ifdef TESTSUITE
     #include "testsuite.hpp"
 #endif

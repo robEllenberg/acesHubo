@@ -102,4 +102,113 @@ namespace ACES{
             new std::map<std::string, void*>;
         return sv; 
     }
+
+    LegCtrl::LegCtrl(std::string cfg, std::string args)
+      : ScriptCtrl(cfg, args)
+    {}
+
+    std::map<std::string, void*>*
+      LegCtrl::getStateVector(bool echo)
+    {
+        //The state vector is a lookup table by the name of the joint
+        std::map<std::string, void*> *sv =
+            new std::map<std::string, void*>;
+
+        std::vector<float> angles;      //Temp container
+        //Fill w/the script info if we have data left, 
+        //otherwise zero fill the vector
+        if(not walkScript.eof()){
+            //For the moment, 13 is magic, based on the #of joints and
+            //the length of the script-file format.
+            for(int i = 0; i<13; i++){  
+                //offset = it+i;
+                float value;
+                walkScript >> value;
+                angles.push_back(value);
+               if(echo){
+                    RTT::Logger::log() << value << ", ";
+               }
+            }
+        }else{
+            for(int i=0; i< 13; i++){
+                angles.push_back(0.0);
+                if(echo){
+                    RTT::Logger::log() << "EOF" << ", ";
+                }
+            }
+            //Issue an empty vector if we don't want to do anything
+            //(picked up by HW to advance timestep in sim)
+            return sv;
+        }
+        if(echo){
+            RTT::Logger::log() << RTT::endlog();
+        }
+
+        //Eat the remainder of the line
+        char a[1000];
+        walkScript.getline(a, 1000);
+
+        //Populate the state vector
+        (*sv)["HY"] = new float(angles[0]);
+        (*sv)["LHY"] = new float(angles[1]);
+        (*sv)["LHR"] = new float(angles[2]);
+        (*sv)["LHP"] = new float(angles[3]);
+        (*sv)["LKP"] = new float(angles[4]);
+        (*sv)["LAP"] = new float(angles[5]);
+        (*sv)["LAR"] = new float(angles[6]);
+        (*sv)["RHY"] = new float(angles[7]);
+        (*sv)["RHR"] = new float(angles[8]);
+        (*sv)["RHP"] = new float(angles[9]);
+        (*sv)["RKP"] = new float(angles[10]);
+        (*sv)["RAP"] = new float(angles[11]);
+        (*sv)["RAR"] = new float(angles[12]);
+        //(*sv)["RSP"] = new float(1.2);
+ 
+        return sv;
+    }
+
+    ArmCtrl::ArmCtrl(std::string cfg, std::string args)
+      : ScriptCtrl(cfg, args)
+    {}
+
+    std::map<std::string, void*>*
+      ArmCtrl::getStateVector(bool echo)
+    {
+        //The state vector is a lookup table by the name of the joint
+        std::map<std::string, void*> *sv =
+            new std::map<std::string, void*>;
+
+        std::vector<float> angles;      //Temp container
+        //Fill w/the script info if we have data left, 
+        //otherwise zero fill the vector
+        if(not walkScript.eof()){
+            //For the moment, 13 is magic, based on the #of joints and
+            //the length of the script-file format.
+            for(int i = 0; i<2; i++){  
+                //offset = it+i;
+                float value;
+                walkScript >> value;
+                angles.push_back(value);
+               if(echo){
+                    RTT::Logger::log() << value << ", ";
+               }
+            }
+        }else{
+           return sv;
+        }
+        if(echo){
+            RTT::Logger::log() << RTT::endlog();
+        }
+
+        //Eat the remainder of the line
+        char a[1000];
+        walkScript.getline(a, 1000);
+
+        //Populate the state vector
+        (*sv)["RSP"] = new float(angles[0]);
+        (*sv)["LSP"] = new float(angles[1]);
+
+        return sv;
+    }
+
 }

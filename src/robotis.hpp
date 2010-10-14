@@ -112,7 +112,7 @@ namespace Robotis {
             bool startHook();
             void stopHook();
             ACES::ProtoResult* processUSQueue();
-            Message* processDSQueue();
+            ACES::Message* processDSQueue();
 
             //~Protocol();
             //ACES::Message* buildMessage(ACES::Credentials* cred);
@@ -128,7 +128,7 @@ namespace Robotis {
             Device(std::string config, std::string args);
             bool startHook();
             void stopHook();
-            virtual Goal* Device::processDSQueue();
+            virtual ACES::Goal* Device::processDSQueue();
             virtual std::list<ACES::ProtoResult*> processUSQueue();
         private:
             int requestPos; //!The memory table position of the last request issued
@@ -152,6 +152,7 @@ namespace Robotis {
     unsigned char checksum(std::string& str);
     float USScale(int in, int nodeID);
     unsigned short DSScale(float in, int nodeID);
+    float USlimit(float c, float low, float high);
 }    
 
  

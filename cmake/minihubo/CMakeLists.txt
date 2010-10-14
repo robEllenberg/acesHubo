@@ -1,6 +1,6 @@
-OPTION( BUILD_MINI "Build MiniHubo Controller" ON )
+OPTION( BUILD_ROBOTIS "Build MiniHubo Controller" ON )
 
-IF ( BUILD_MINI )
+IF ( BUILD_ROBOTIS )
 
    FILE( GLOB SRCS ../../src/robotis.cpp)
    FILE( GLOB HPPS ../../src/robotis.hpp)
@@ -10,10 +10,10 @@ IF ( BUILD_MINI )
 
    #INCLUDE_DIRECTORIES( ${WEBOTS_INCLUDE_DIRS} )
 
-   GLOBAL_ADD_COMPONENT( aces-mini ${SRCS} )
+   GLOBAL_ADD_COMPONENT( aces-robotis ${SRCS} )
    GLOBAL_ADD_INCLUDE( aces ${HPPS})
 
-   COMPONENT_ADD_DEPS( aces-mini aces-common )
+   COMPONENT_ADD_DEPS( aces-robotis aces-common )
    #COMPONENT_ADD_LIBS( aces-webots ${WEBOTS_LIBS} )
     #orocos-ocl-common-gnulinux orocos-rtt-gnulinux orocos-taskbrowser-gnulinux
    #ADD_SUBDIRECTORY( tests )
@@ -26,4 +26,4 @@ IF ( BUILD_MINI )
     #MESSAGE( STATUS "${OROCOS_RTT_LIBS}")
     #PROGRAM_ADD_DEPS( wbtest aces-dispatcher ) 
 
-ENDIF ( BUILD_MINI )
+ENDIF ( BUILD_ROBOTIS )

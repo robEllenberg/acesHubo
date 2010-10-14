@@ -74,7 +74,7 @@ ENDIF(NOT NETCDF_INSTALL)
 
 IF(NOT WEBOTS_INSTALL)
   SET( WEBOTS_INSTALL ${CMAKE_INSTALL_PREFIX} CACHE PATH "The Webots installation directory.")
-ENdIF (NOT WEBOTS_INSTALL)
+ENDIF (NOT WEBOTS_INSTALL)
 
 # The name of the resulting library.
 #SET( COMPONENTS_LIBRARY orocos-components CACHE STRING "Name of the resulting library")

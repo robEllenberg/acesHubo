@@ -102,6 +102,11 @@ namespace ACES{
             h = (Hardware*) new Webots::Hardware(cfg, args);
         }
         #endif 
+        #ifdef ROBOTIS
+        if (type == "CharDev") {
+            h = (Hardware*) new CharDev::Hardware(cfg, args);
+        }
+        #endif
         #ifdef TESTSUITE
         if (type == "TestSuite") {
             h = (Hardware*) new TestSuite::Hardware(cfg, args);
@@ -122,6 +127,11 @@ namespace ACES{
         if ( type == "Webots"){
             p = (Protocol*) new Webots::Protocol(cfg, args);
         } 
+        #endif
+        #ifdef ROBOTIS
+        if (type == "Robotis"){
+            p = (Protocol*) new Robotis::Protocol(cfg, args);
+        }
         #endif
         #ifdef TESTSUITE
         if ( type == "TestSuite"){
@@ -162,6 +172,11 @@ namespace ACES{
             }
         }
         #endif
+        #ifdef ROBOTIS
+        if (type1 == "Robotis"){
+            d = (Device*) new Robotis::Device(cfg, args);
+        }
+        #endif
         #ifdef TESTSUITE
         if ( type1 == "TestSuite"){
             d = (Device*) new TestSuite::Device(cfg, args);
@@ -196,6 +211,10 @@ namespace ACES{
             //((State<float>*)s)->printme();
         }
 
+        if ( type == "Robotis"){
+            s = (ProtoState*) new ACES::State<float>(cfg, GOAL_POSITION);
+        } 
+
         if( type == "TestSuite") {
             s = (ProtoState*) new TestSuite::Spinner(cfg, args);
         }
@@ -218,15 +237,15 @@ namespace ACES{
 
         Controller* ctrl = NULL;
         #ifdef WEBOTS 
-        if ( t1 == "Webots"){
-            if (t2 == "Mini"){
-                ctrl = (Controller*) new Webots::ScriptCtrl(cfg, args);
+        if ( t1 == "Mini"){
+            if (t2 == "Leg"){
+                ctrl = (Controller*) new LegCtrl(cfg, args);
             }
             if (t2 == "Null"){
                 ctrl = (Controller*) new NullCtrl(cfg, args);
             }
             if (t2 == "Arm"){
-                ctrl = (Controller*) new Webots::ArmCtrl(cfg, args);
+                ctrl = (Controller*) new ArmCtrl(cfg, args);
             }
         } 
         #endif

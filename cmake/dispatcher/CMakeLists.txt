@@ -20,6 +20,11 @@ IF ( BUILD_DISPATCHER )
         ADD_DEFINITIONS(-DTESTSUITE)
     ENDIF( BUILD_TESTSUITE )
 
+    IF( BUILD_ROBOTIS )
+        COMPONENT_ADD_DEPS( aces-dispatcher aces-robotis )
+        ADD_DEFINITIONS(-DROBOTIS)
+    ENDIF( BUILD_ROBOTIS )
+
     #COMPONENT_ADD_LIBS( aces-common )
     #ADD_SUBDIRECTORY( tests )
 

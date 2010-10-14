@@ -58,9 +58,14 @@ namespace Robotis {
 
     ACES::Message* Protocol::processDSQueue()
     {
-        Goal* g = getDSQelement();
-        //goal carries void data
-        g->data
+        Goal* e = NULL, g = getDSQelement();
+        RobotisPacket* p = (RobotisPacket*)g->data;
+
+        ACES::Message* m = new ACES::Message();
+
+        unsigned char* c = new unsigned char;
+        e = new ACES::Goal(g->nodeID, g->mode, (void*)
+        m->goalList.push_back(e);
     }
 
     /*
@@ -177,15 +182,10 @@ namespace Robotis {
                     break;
             }
             float* data = new float;
-            *data = (float)tentry;
+            //*data = (float)tentry;
             
-            //This is for scaling functions, etc
-            switch(requestPos+i){
-                case ###:
-                    break;
-                case ###:
-                    break;
-            }
+            //The scaling function
+            *data = USScale(tentry, requestPos);
 
             ACES::Result<float*>* r =
                 new ACES::Result<float*>(data, p->semiCred, requestPos+j);
@@ -232,7 +232,6 @@ namespace Robotis {
                 return false;
             }
         }
-
         return false;
     }
 
@@ -254,15 +253,40 @@ namespace Robotis {
     }
 
     float USScale(unsigned short in, int nodeID){
+        float result = 0.;
+        switch(nodeID){
+            case GOAL_POSITION:
+                result = (in*300./1024.);
+                result = USlimit(result, 0., 300.);
+                break;
+            default:        //case of no scaling function
+                result = (float)in;
+                break;
+        }
+        return result;
     }
 
     unsigned short DSScale(float in, int nodeID){
-        int result = 0;
+        unsigned short result = 0;
         switch(nodeID){
+            case GOAL_POSITION:
+                //TODO - needs proper rounding
+                result = (unsigned short)(in*1024./300.);
             default:        //case of no scaling function
-                result = (int)in;
+                result = (unsigned short)in;
                 break;
         }
+        return result;
+    }
+
+    float USlimit(float c, float low, float high){
+        if(c < low){
+            return low;
+        }
+        if(c > high){
+            return high;
+        }
+        return c;
     }
 
     bool appendParams( std::vector<unsigned char>* params,

@@ -2,10 +2,9 @@ program main {
     do addHardware("wbHW 1 600", "Webots", "");
     do addProtocol("wbPcol 2 600", "Webots", "");
 
-    do addController("wbNull 10 15", "Webots Null", "");
-    do addController("wbctrl 10 15", "Webots Mini",
-                     "IKscript1.txt");
-    do addController("wbArm 10 15", "Webots Arm", "sins.txt");
+    do addController("wbNull 10 15", "Mini Null", "");
+    do addController("wbctrl 10 15", "Mini Leg", "IKscript1.txt");
+    do addController("wbArm 10 15", "Mini Arm", "sins.txt");
 
     do addDevice("dHY 5 31", "Webots Joint",  "HY  0.0 -1.0");
     do addDevice("dLSP 5 31", "Webots Joint", "LSP 0.0  1.0");

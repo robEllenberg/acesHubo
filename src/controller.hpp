@@ -62,6 +62,23 @@ namespace ACES{
                     getStateVector(bool echo=0);
 
     };
+
+    class LegCtrl : public ScriptCtrl
+    {
+        public:
+            LegCtrl(std::string config, std::string args);
+
+            std::map<std::string, void*>* 
+                    getStateVector(bool echo=0);
+    };
+
+    class ArmCtrl : public ScriptCtrl
+    {
+        public:
+            ArmCtrl(std::string config, std::string args);
+            std::map<std::string, void*>* 
+                    getStateVector(bool echo=0);
+    };
 }
 
 #endif

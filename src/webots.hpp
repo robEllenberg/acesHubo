@@ -123,23 +123,6 @@ namespace Webots{
         public:
             Protocol(std::string cfg, std::string args);
     };
-
-    class ScriptCtrl : public ACES::ScriptCtrl
-    {
-        public:
-            ScriptCtrl(std::string config, std::string args);
-
-            std::map<std::string, void*>* 
-                    getStateVector(bool echo=0);
-    };
-
-    class ArmCtrl : public ACES::ScriptCtrl
-    {
-        public:
-            ArmCtrl(std::string config, std::string args);
-            std::map<std::string, void*>* 
-                    getStateVector(bool echo=0);
-    };
 }    
 
 #endif
