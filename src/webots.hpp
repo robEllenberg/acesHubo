@@ -32,16 +32,20 @@ extern "C"{
 }
 
 namespace Webots{
-    class Hardware : public ACES::Hardware {
+    template <class T>
+    class Hardware : public ACES::Hardware<T> {
         public:
             Hardware(std::string cfg, std::string args);
             bool startHook();
             void updateHook();
-            bool txBus(ACES::Message* m);
+            bool txBus(ACES::Message<T>* m);
 
             void step(int time=32);
             void stepRequest( std::map<std::string, void*>* );
             bool subscribeController(ACES::Controller* c);
+
+            //std::deque< ACES::Word<T> > usQueue;
+            //RTT::OS::Mutex usqGuard; 
     };
 
     class Credentials : public ACES::Credentials {
@@ -119,7 +123,8 @@ namespace Webots{
     };
 
     //Probably no point in having this - as it does not make any extensions yet
-    class Protocol : public ACES::Protocol {
+    template <class T>
+    class Protocol : public ACES::Protocol<T> {
         public:
             Protocol(std::string cfg, std::string args);
     };

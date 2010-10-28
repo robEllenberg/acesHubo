@@ -4,10 +4,10 @@ namespace Webots {
 
     int JointCredentials::idCount = 0;
 
-    Hardware::Hardware(std::string cfg, std::string args)
-                      : ACES::Hardware(cfg, args)
+    template <class T>
+    Hardware<T>::Hardware(std::string cfg, std::string args)
+                      : ACES::Hardware<T>(cfg, args)
     {
-    
         RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
             ("step", &Hardware::step, this);
         this->methods()->addMethod(stepMethod,
@@ -15,22 +15,26 @@ namespace Webots {
                                    "TStep", "Lenght of step to advance(ms)");
     }
 
-    bool Hardware::startHook(){
+    template <class T>
+    bool Hardware<T>::startHook(){
         wb_robot_init();
         return true;
     }
 
-    void Hardware::updateHook(){
+    template <class T>
+    void Hardware<T>::updateHook(){
         //We want a null action on the tick, so we override this to nothing
         //and use step(), to manually advance the clock.
     }
 
-    void Hardware::step(int time){
-        ACES::Hardware::updateHook();
+    template <class T>
+    void Hardware<T>::step(int time){
+        ACES::Hardware<T>::updateHook();
         wb_robot_step(time);
     }
 
-    bool Hardware::txBus(ACES::Message* m){
+    template <class T>
+    bool Hardware<T>::txBus(ACES::Message<T>* m){
         for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
           it != m->goalList.end(); it++)
         {
@@ -79,16 +83,21 @@ namespace Webots {
                 assert(result); //Make sure we're actually sending
                                 //something
                 g->data = result;
-                ACES::ProtoWord* w =
-                    (ACES::ProtoWord*)(new ACES::Word<ACES::Goal*>(g));
-                { RTT::OS::MutexLock lock(usqGuard);
-                  usQueue.push_back(w);
-                }
+                //ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
+                ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
+
+                usQueue.enqueue(w);
+                //{ RTT::OS::MutexLock lock(usqGuard);
+                //  usQueue.push_back(w);
+                //}
             }
         }
     }
 
-    bool Hardware::subscribeController(ACES::Controller* c){
+
+
+    template <class T>
+    bool Hardware<T>::subscribeController(ACES::Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
         RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &Hardware::stepRequest,
@@ -103,7 +112,8 @@ namespace Webots {
         return true;
     }
 
-    void Hardware::stepRequest( std::map<std::string, void*>* ){
+    template <class T>
+    void Hardware<T>::stepRequest( std::map<std::string, void*>* ){
         //TODO - This will advance the simulation before the 
         //new state information is processed
         step();
@@ -352,8 +362,9 @@ namespace Webots {
         return wb_touch_sensor_get_values(tag);
     }
 
-    Protocol::Protocol(std::string cfg, std::string args) 
-      : ACES::Protocol(cfg, args){}
+    template <class T>
+    Protocol<T>::Protocol(std::string cfg, std::string args) 
+      : ACES::Protocol<T>(cfg, args){}
 
 
 }

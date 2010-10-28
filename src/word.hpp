@@ -5,13 +5,8 @@
 #include "credentials.hpp"
 
 namespace ACES{
-    class ProtoWord {
-        public:
-            virtual void printme() = 0;
-    };
-    
     template <class T>
-    class Word : public ProtoWord {
+    class Word {
         public:
             Word(T d);
             T data;

@@ -11,7 +11,8 @@
 
 namespace TestSuite{
 
-    class Hardware : public ACES::Hardware {
+    template <typename T>
+    class Hardware : public ACES::Hardware<T> {
         public:
             Hardware(std::string cfg, std::string args);
             bool subscribeController(ACES::Controller* c);
@@ -22,7 +23,8 @@ namespace TestSuite{
             Device(std::string cfg, std::string args);
     };
 
-    class Protocol : public ACES::Protocol{
+    template <typename T>
+    class Protocol : public ACES::Protocol<T>{
         public:
             Protocol(std::string cfg, std::string args);
     };

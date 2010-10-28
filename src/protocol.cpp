@@ -1,43 +1,21 @@
 #include "protocol.hpp"
 
 namespace ACES {
-    Protocol::Protocol(std::string cfg, std::string args):
-      taskCfg(cfg),
-      RTT::TaskContext(name),
-      txDownStream("txDownStream"),
-      txUpStream("txUpStream"),
-      dsQueue(),
-      usQueue()
-    {
-//        requestBuf = new std::deque<Message*>;
-
-        //TODO - Figure out why this flips out when we attempt to declare
-        // it as a member instead of a pointer 
-        //returnBuf = new RTT::Buffer<ProtoResult*>(250);
-        //returnQueue = new std::deque<ProtoResult*>(250);
-        //requestQueue = new std::deque<Goal*>(250);
-        
-        this->events()->addEvent(&txDownStream, "txDownStream", "msg",
-                                 "The message to be transmitted");
-        this->events()->addEvent(&txUpStream, "txUpStream", "result",
-                                 "Data struct containing processed result");
-        this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name )
-        );
-    }
-
-    void Protocol::rxDownStream(Goal* g){
+    template <class T>
+    void Protocol<T>::rxDownStream(Goal* g){
         RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.push_back(g);
     }
 
-    void Protocol::rxUpStream(ProtoWord* w){
+    template <class T>
+    void Protocol<T>::rxUpStream(Word<T> w){
         RTT::OS::MutexLock lock(usqGuard);
         usQueue.push_back(w);
     }
 
-    void Protocol::updateHook(){
-        Message* m = NULL;
+    template <class T>
+    void Protocol<T>::updateHook(){
+        Message<T>* m = NULL;
         assert(dsQueue.size() < 100);
         while(dsQueue.size()){
             m = processDSQueue();
@@ -62,28 +40,32 @@ namespace ACES {
         }
     }
 
-    Goal* Protocol::getDSQelement(){
+    template <class T>
+    Goal* Protocol<T>::getDSQelement(){
         RTT::OS::MutexLock lock(dsqGuard);
         Goal* g = dsQueue.front();
         dsQueue.pop_front();
         return g;
     }
 
-    Message* Protocol::processDSQueue(){
+    template <class T>
+    Message<T>* Protocol<T>::processDSQueue(){
         Goal* g = getDSQelement();
-        Message* m = new Message(g);
+        Message<T>* m = new Message<T>(g);
         return m;
     }
 
-    ProtoWord* Protocol::getUSQelement(){
+    template <class T>
+    Word<T> Protocol<T>::getUSQelement(){
         RTT::OS::MutexLock lock(usqGuard);
-        ProtoWord* p = usQueue.front();
+        Word<T> p = usQueue.front();
         usQueue.pop_front();
         return p;
     }
 
-    ProtoResult* Protocol::processUSQueue(){
-        ProtoWord* p = getUSQelement();
+    template <class T>
+    ProtoResult* Protocol<T>::processUSQueue(){
+        Word<T> p = getUSQelement();
         Word<Goal*>* w = (Word<Goal*>*)p;
         Goal* g = w->data;
         int nID = g->nodeID;
@@ -91,7 +73,8 @@ namespace ACES {
         return (ProtoResult*)r;
     }
     
-    bool Protocol::subscribeDevice(Device* d){
+    template <class T>
+    bool Protocol<T>::subscribeDevice(Device* d){
         this->connectPeers( (RTT::TaskContext*) d );
         RTT::Handle h = d->events()->setupConnection("txDownStream")
             .callback( this, &Protocol::rxDownStream,

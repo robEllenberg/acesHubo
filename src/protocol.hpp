@@ -21,13 +21,17 @@
 
 namespace ACES {
     class Credentials;
+
     template <class T>
     class State;
+
+    template <class T>
     class Hardware;
 //! Abstract class for describing a data protocol
 /*!
  * The Protocol virtual class 
  */
+    template <class T>
     class Protocol : protected taskCfg, 
                      public RTT::TaskContext
     {
@@ -36,22 +40,49 @@ namespace ACES {
             //Protocol(std::string name);
             void updateHook();
 
-            RTT::Event<void(Message*)> txDownStream;
+            RTT::Event<void( Message<T>* )> txDownStream;
             RTT::Event<void(ProtoResult*)> txUpStream;
             virtual void rxDownStream(Goal*);
-            virtual void rxUpStream(ProtoWord*);
+            virtual void rxUpStream(Word<T>);
 
-            virtual Message* processDSQueue();
+            virtual Message<T>* processDSQueue();
             Goal* getDSQelement();
             std::deque<Goal*> dsQueue;
             RTT::OS::Mutex dsqGuard; 
 
             virtual ProtoResult* processUSQueue();
-            ProtoWord* getUSQelement();
-            std::deque<ProtoWord*> usQueue;
+            Word<T> getUSQelement();
+            std::deque< Word<T> > usQueue;
             RTT::OS::Mutex usqGuard; 
 
             bool subscribeDevice(Device* d);
     };
-}    
+
+    template <class T>
+    Protocol<T>::Protocol(std::string cfg, std::string args):
+      taskCfg(cfg),
+      RTT::TaskContext(name),
+      txDownStream("txDownStream"),
+      txUpStream("txUpStream"),
+      dsQueue(),
+      usQueue()
+    {
+        //requestBuf = new std::deque<Message*>;
+
+        //TODO - Figure out why this flips out when we attempt to declare
+        // it as a member instead of a pointer 
+        //returnBuf = new RTT::Buffer<ProtoResult*>(250);
+        //returnQueue = new std::deque<ProtoResult*>(250);
+        //requestQueue = new std::deque<Goal*>(250);
+        
+        this->events()->addEvent(&txDownStream, "txDownStream", "msg",
+                                 "The message to be transmitted");
+        this->events()->addEvent(&txUpStream, "txUpStream", "result",
+                                 "Data struct containing processed result");
+        this->setActivity(
+            new RTT::Activity( priority, 1.0/freq, 0, name )
+        );
+    }
+
+}
 #endif

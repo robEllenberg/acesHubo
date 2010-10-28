@@ -122,20 +122,20 @@ namespace ACES{
     bool Dispatcher::addProtocol(std::string cfg, std::string type,
                                  std::string args)
     {
-        Protocol* p = NULL;
+        RTT::TaskContext* p = NULL;
         #ifdef WEBOTS
         if ( type == "Webots"){
-            p = (Protocol*) new Webots::Protocol(cfg, args);
+            p = (RTT::TaskContext*) new Webots::Protocol(cfg, args);
         } 
         #endif
         #ifdef ROBOTIS
         if (type == "Robotis"){
-            p = (Protocol*) new Robotis::Protocol(cfg, args);
+            p = (RTT::TaskContext*) new Robotis::Protocol(cfg, args);
         }
         #endif
         #ifdef TESTSUITE
         if ( type == "TestSuite"){
-            p = (Protocol*) new TestSuite::Protocol(cfg, args);
+            p = (RTT::TaskContext*) new TestSuite::Protocol(cfg, args);
         } 
         #endif
         if(p){
@@ -195,6 +195,7 @@ namespace ACES{
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
+        #ifdef WEBOTS
         if( type == "Webots") {
             if ( args == "Joint" ){
                 s = (ProtoState*) new ACES::State<float>(cfg, JOINT);
@@ -210,14 +211,19 @@ namespace ACES{
             }
             //((State<float>*)s)->printme();
         }
+        #endif
 
+        #ifdef ROBOTIS 
         if ( type == "Robotis"){
             s = (ProtoState*) new ACES::State<float>(cfg, GOAL_POSITION);
         } 
+        #endif
 
+        #ifdef TESTSUITE
         if( type == "TestSuite") {
             s = (ProtoState*) new TestSuite::Spinner(cfg, args);
         }
+        #endif
 		
         if(s){
             stateList.push_back(s);
