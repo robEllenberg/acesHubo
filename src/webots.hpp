@@ -38,7 +38,7 @@ namespace Webots{
             Hardware(std::string cfg, std::string args);
             bool startHook();
             void updateHook();
-            bool txBus(ACES::Message<T>* m);
+            virtual bool txBus(ACES::Message<T>* m);
 
             void step(int time=32);
             void stepRequest( std::map<std::string, void*>* );

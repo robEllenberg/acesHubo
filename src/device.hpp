@@ -12,6 +12,7 @@
 #include "word.hpp"
 
 namespace ACES{
+    template <class S, class P>
     class Device :  protected taskCfg,
                     public RTT::TaskContext
     {

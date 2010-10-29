@@ -86,7 +86,7 @@ namespace Webots {
                 //ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
                 ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
 
-                usQueue.enqueue(w);
+                this->usQueue.enqueue(w);
                 //{ RTT::OS::MutexLock lock(usqGuard);
                 //  usQueue.push_back(w);
                 //}

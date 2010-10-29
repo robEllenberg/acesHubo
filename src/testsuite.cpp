@@ -1,11 +1,13 @@
 #include "testsuite.hpp"
 
 namespace TestSuite{
-    Hardware::Hardware(std::string cfg, std::string args)
-      : ACES::Hardware(cfg, args)
+    template <class T>
+    Hardware<T>::Hardware(std::string cfg, std::string args)
+      : ACES::Hardware<T>(cfg, args)
     { }
    
-    bool Hardware::subscribeController(ACES::Controller* c){
+    template <class T>
+    bool Hardware<T>::subscribeController(ACES::Controller* c){
         return true;
     }
 
@@ -15,12 +17,13 @@ namespace TestSuite{
         credentials = new ACES::Credentials(args);
     }
     
-    Protocol::Protocol(std::string cfg, std::string args)
-      : ACES::Protocol(cfg, args)
+    template <class T>
+    Protocol<T>::Protocol(std::string cfg, std::string args)
+      : ACES::Protocol<T>(cfg, args)
     { }
 
     Spinner::Spinner(std::string cfg, std::string args)
-     : ACES::State<float>::State(cfg, 1){
+     : ACES::State<float>(cfg, 1){
         std::istringstream s1(args, std::istringstream::in);
         float high, low, amp, dc;
         s1 >> low >> high;

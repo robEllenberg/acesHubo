@@ -6,8 +6,8 @@ namespace ACES{
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
       txUpStream("txUpStream"),
-      dsQueue(),
-      usQueue(),
+      dsQueue(10),
+      usQueue(10),
       credMethod("credentials", &Device::printCred, this)
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "goal",
