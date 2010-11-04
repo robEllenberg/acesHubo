@@ -28,14 +28,14 @@ namespace ACES {
     }
 
     template <class HW, class P>    
-    void Protocol<HW,P>::rxDownStream(PDWord<P> g){
+    void Protocol<HW,P>::rxDownStream(PDWord<P>* g){
         dsQueue.enqueue(g);
         //RTT::OS::MutexLock lock(dsqGuard);
         //dsQueue.push_back(g);
     }
 
     template <class HW, class P>    
-    void Protocol<HW,P>::rxUpStream(HWord<HW> w){
+    void Protocol<HW,P>::rxUpStream(HWord<HW>* w){
         usQueue.enqueue(w);
         //RTT::OS::MutexLock lock(usqGuard);
         //usQueue.push_back(w);

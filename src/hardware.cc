@@ -5,6 +5,7 @@ namespace ACES {
     bool Hardware<T>::rxBus(){
         return true;
     }
+
     template <class T>
     Hardware<T>::Hardware(std::string cfg, std::string args) :
         taskCfg(cfg),
@@ -38,8 +39,8 @@ namespace ACES {
     }
 */
     template <typename T>
-    HWord<T> Hardware<T>::processUSQueue(){
-        HWord<T> w; 
+    HWord<T>* Hardware<T>::processUSQueue(){
+        HWord<T>* w = NULL; 
         usQueue.dequeue(w);
         return w;
     }
@@ -65,7 +66,7 @@ namespace ACES {
             }
         }
         rxBus();
-        HWord<T> p;
+        HWord<T>* p = NULL;
         while(usQueue.size()){
             p = processUSQueue();
             if(p){
@@ -84,7 +85,7 @@ namespace ACES {
             //    it != m->goalList.end();
             //    it++)
             //{
-                ACES::HWord<T> w = m->Pop();
+                HWord<T>* w = m->Pop();
                 //ACES::ProtoWord* w =
                 //    (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
                 usQueue.enqueue(w);

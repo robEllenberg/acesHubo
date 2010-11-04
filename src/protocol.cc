@@ -27,18 +27,19 @@ namespace ACES{
     template <class HW, class P>    
     Message<HW>* Protocol<HW, P>::processDSQueue(){
         //Goal* g = getDSQelement();
-        PDWord<P> g;
+        PDWord<P>* g = NULL;
         dsQueue.dequeue(g);
-        Message<HW> m;
+        Message<HW>* m = new Message<HW>();
         m->Push(g);
         return m;
     }
 
     template <class HW, class P>    
-    PDWord<P> Protocol<HW, P>::processUSQueue(){
-        HWord<HW> p;
+    PDWord<P>* Protocol<HW, P>::processUSQueue(){
+        HWord<HW>* p = NULL;
         usQueue.dequeue(p);
         //TODO - Specialized processing function from HWord->PDWord
+        assert(false); //TODO enforcement
 
         //Word<Goal*>* w = (Word<Goal*>*)p;
         //Goal* g = w->data;

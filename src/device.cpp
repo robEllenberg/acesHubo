@@ -25,7 +25,7 @@ namespace ACES{
     }
 
     template <class S, class P>
-    void Device<S,P>::rxDownStream(SWord<S> g){
+    void Device<S,P>::rxDownStream(SWord<S>* g){
         g->cred = credentials;
         //RTT::OS::MutexLock lock(dsqGuard);
         dsQueue.enqueue(g);
@@ -33,7 +33,7 @@ namespace ACES{
     }
 
     template <class S, class P>
-    void Device<S,P>::rxUpStream(PDWord<P> rx){
+    void Device<S,P>::rxUpStream(PDWord<P>* rx){
         //First we check if the two device types are the same
         if(*(rx->semiCred) == *credentials){
             RTT::Logger::log() << RTT::Logger::Debug
@@ -80,7 +80,7 @@ namespace ACES{
     void Device<S,P>::updateHook(){
         //Forward Path
         assert(dsQueue.size() < 100);
-        SWord<S> g;
+        SWord<S>* g = NULL;
         while( dsQueue.size() ){
             g = processDSQueue();
             if(g){
@@ -92,13 +92,13 @@ namespace ACES{
         //Return Path
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
-            std::deque< PDWord<P> >p;
+            std::deque< PDWord<P>* >p;
             p = processUSQueue();
             if(p.size()){
                 RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US"
                                    << RTT::endlog();
             }
-            typename std::deque< PDWord<P> >::iterator it;
+            typename std::deque< PDWord<P>* >::iterator it;
             for(it = p.begin();
                 it != p.end();  it++){
                     (*it)->printme();
@@ -132,12 +132,13 @@ namespace ACES{
 */
 
     template <class S, class P>
-    std::list< PDWord<P> > Device<S,P>::processUSQueue(){
-        SWord<S> s;
+    std::deque< PDWord<P>* > Device<S,P>::processUSQueue(){
+        SWord<S>* s = NULL;
         usQueue.dequeue(s);
-        PDWord<P> p(s.getData(), s.getNodeID(), s.getDevID(), s.getCred);
+        PDWord<P>* p = new PDWord<P>(s.getData(), s.getNodeID(),
+                                     s.getDevID(), s.getCred);
         
-        return std::list< PDWord<P> >(1, p);
+        return std::deque< PDWord<P>* >(1, p);
         //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
         //Goal* g = ( (Result<Goal*>*) p)->result;
         //Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);

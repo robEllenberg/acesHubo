@@ -14,10 +14,10 @@ namespace ACES{
         public:
             void printme();
             int size();
-            T Pop();
-            T Push(T item);
+            T* Pop();
+            T* Push(T* item);
         protected:
-            std::deque< HWord<T> > wordList;
+            std::deque< HWord<T>* > wordList;
     };
 
     template <class T>
@@ -26,21 +26,21 @@ namespace ACES{
     }
 
     template <class T>
-    T Message<T>::Pop(){
-        T item = wordList.front();
+    T* Message<T>::Pop(){
+        T* item = wordList.front();
         wordList.pop_front();
         return item;
     }
 
     template <class T>
-    T Message<T>::Push(T item){
+    T* Message<T>::Push(T* item){
         wordList.push_back(item);
         return item;
     }
 
     template <class T>
     void Message<T>::printme(){
-        typename std::deque< HWord<T> >::iterator it;
+        typename std::deque< HWord<T>* >::iterator it;
         for(it = wordList.begin(); it != wordList.end(); it++){
                 //RTT::Logger::log() << "\t";
                 (*it)->printme();

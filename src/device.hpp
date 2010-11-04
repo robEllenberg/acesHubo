@@ -19,13 +19,13 @@ namespace ACES{
         public:
             Device(std::string config);
             //Device(std::string name);
-            virtual void rxUpStream(PDWord<P>);
-            virtual void rxDownStream(SWord<S>);
+            virtual void rxUpStream(PDWord<P>*);
+            virtual void rxDownStream(SWord<S>*);
 
             void updateHook();
 
-            virtual SWord<S> processDSQueue();
-            virtual std::list< PDWord<P> > processUSQueue();
+            virtual SWord<S>* processDSQueue();
+            virtual std::deque< PDWord<P>* > processUSQueue();
             //bool subscribeState(ProtoState* s);
             bool subscribeState(RTT::TaskContext* s);
             bool printCred();
@@ -39,13 +39,13 @@ namespace ACES{
             RTT::OS::Mutex usqGuard;
 */
         protected:
-            RTT::Event<void(PDWord<P>)> txDownStream;
-            RTT::Event<void(SWord<S>)> txUpStream;
+            RTT::Event<void(PDWord<P>*)> txDownStream;
+            RTT::Event<void(SWord<S>*)> txUpStream;
             RTT::Method<bool()> credMethod;
 
-            RTT::Queue< SWord<S>, RTT::BlockingPolicy,
+            RTT::Queue< SWord<S>*, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue< SWord<S>, RTT::NonBlockingPolicy,
+            RTT::Queue< SWord<S>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
 
             Credentials* credentials;
