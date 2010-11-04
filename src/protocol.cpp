@@ -59,10 +59,11 @@ namespace ACES {
 */
 
     template <class HW, class P>    
-    bool Protocol<HW,P>::subscribeDevice(Device* d){
+        template<class S>
+    bool Protocol<HW,P>::subscribeDevice(RTT::TaskContext* d){
         this->connectPeers( (RTT::TaskContext*) d );
         RTT::Handle h = d->events()->setupConnection("txDownStream")
-            .callback( this, &Protocol::rxDownStream,
+            .callback( this, &Protocol<HW,P>::rxDownStream,
                        d->engine()->events()
                      ).handle();
         if(!h.ready()){
@@ -74,7 +75,7 @@ namespace ACES {
         }
 
         h = this->events()->setupConnection("txUpStream")
-            .callback( d, &Device::rxUpStream
+            .callback( d, &Device<S, P>::rxUpStream
         //               ,this->engine()->events()
                      ).handle();
         if(!h.ready()){
@@ -86,5 +87,37 @@ namespace ACES {
         }
         return true;
     }
+
+    template <class HW, class P>
+    bool Protocol<HW,P>::connectHardware(RTT::TaskContext* h){
+        this->connectPeers(h);
+        RTT::Handle hand = this->events()->setupConnection("txDownStream")
+            .callback( h, &Hardware<HW>::rxDownStream
+            //           ,p->engine()->events() ).handle();
+            ).handle();
+        if(! hand.ready() ){
+            return false;
+        }
+        hand.connect();
+        if(!hand.connected() ){
+            return false;
+        }
+
+        hand = h->events()->setupConnection("txUpStream")
+            .callback( this, &Protocol<HW,P>::rxUpStream
+            //           ,this->engine()->events() ).handle();
+            ).handle();
+
+        if(! hand.ready() ){
+            return false;
+        }
+        hand.connect();
+        if(!hand.connected() ){
+            return false;
+        }
+ 
+        return true;
+    }
+
 }
 

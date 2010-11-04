@@ -11,15 +11,16 @@ namespace TestSuite{
         return true;
     }
 
-    Device::Device(std::string name, std::string args)
-      : ACES::Device(name)
+    template <class S, class P>
+    Device<S,P>::Device(std::string name, std::string args)
+      : ACES::Device<S,P>(name)
     {
-        credentials = new ACES::Credentials(args);
+        this->credentials = new ACES::Credentials(args);
     }
     
-    template <class T>
-    Protocol<T>::Protocol(std::string cfg, std::string args)
-      : ACES::Protocol<T>(cfg, args)
+    template <class HW, class P>
+    Protocol<HW,P>::Protocol(std::string cfg, std::string args)
+      : ACES::Protocol<HW,P>(cfg, args)
     { }
 
     Spinner::Spinner(std::string cfg, std::string args)
@@ -38,9 +39,10 @@ namespace TestSuite{
         float val = amp*sin(t) + dc;
         t += freq;
 
-        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!" << RTT::endlog();
-        ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH, new float(val));
-
+        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!"
+                           << RTT::endlog();
+        ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH,
+                                       new float(val));
         { RTT::OS::MutexLock lock(dsqGuard);
           dsQueue.push_back(g);
         }

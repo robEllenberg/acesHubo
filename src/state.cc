@@ -2,13 +2,9 @@ namespace ACES{
 
     template <class T>
     State<T>::State(std::string cfg, int nID) :
-      //ProtoState(cfg, nID),
-      taskCfg(cfg),
-      RTT::TaskContext(name),
+      ProtoState(cfg, nID),
       goMethod("go", &State<T>::go, this),
       value("value"),
-      nodeID("nodeID"),
-      samplingAttr("sampling"),
       txDownStream("txDownStream"),
       dsQueue(10),
       usQueue(10),
@@ -16,17 +12,7 @@ namespace ACES{
     {
         this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
             "credentials associated w/the goal");
-
         this->methods()->addMethod(sampleMethod, "sample");
-
-        this->attributes()->addAttribute(&nodeID);
-        this->attributes()->addAttribute(&samplingAttr);
-
-        nodeID.set(nID);
-
-        //Switching this default to false prevents automatic
-        //sampling from starting
-        samplingAttr.set(true);
 
         //dsQueue = new RTT::Buffer< std::map<std::string, void*>* >(50);
         //dsQueue = new RTT::Buffer< Goal* >(50);
@@ -35,7 +21,6 @@ namespace ACES{
         this->setActivity(
                 new RTT::Activity( priority, 1.0/freq, 0, name)
         );
-        //value = 0;
         bool one = this->methods()->addMethod(goMethod, "go",
                                    "SP",
                                    "Set Point");
@@ -83,8 +68,6 @@ namespace ACES{
             }
         }
     }
-
-
 
     template <class T>
     bool State<T>::subscribeController(Controller* c){
@@ -144,5 +127,10 @@ namespace ACES{
             //  dsQueue.push_back(g);
             //}
         }
+    }
+
+    template <class T>
+    std::string State<T>::logVal(){
+        return std::string(this->value.get());
     }
 }

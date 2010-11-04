@@ -1,7 +1,8 @@
 #include "device.hpp"
 
 namespace ACES{
-    Device::Device(std::string config) :
+    template <class S, class P>
+    Device<S,P>::Device(std::string config) :
       taskCfg(config),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
@@ -23,23 +24,28 @@ namespace ACES{
             
     }
 
-    void Device::rxDownStream(Goal* g){
+    template <class S, class P>
+    void Device<S,P>::rxDownStream(SWord<S> g){
         g->cred = credentials;
-        RTT::OS::MutexLock lock(dsqGuard);
-        dsQueue.push_back(g);
+        //RTT::OS::MutexLock lock(dsqGuard);
+        dsQueue.enqueue(g);
+        //dsQueue.push_back(g);
     }
 
-    void Device::rxUpStream(ProtoResult* rx){
+    template <class S, class P>
+    void Device<S,P>::rxUpStream(PDWord<P> rx){
         //First we check if the two device types are the same
         if(*(rx->semiCred) == *credentials){
             RTT::Logger::log() << RTT::Logger::Debug
                                << "(dev) Cred Match" << RTT::endlog();
-            RTT::OS::MutexLock lock(usqGuard);
-            usQueue.push_back(rx);
+            //RTT::OS::MutexLock lock(usqGuard);
+            //usQueue.push_back(rx);
+            usQueue.enqueue(rx);
         }
     }
 
-    bool Device::subscribeState(ProtoState* s){
+    template <class S, class P>
+    bool Device<S,P>::subscribeState(RTT::TaskContext* s){
         this->connectPeers( (RTT::TaskContext*) s);
         //TODO - Figure out how calling this reception function
         //in a non-periodic thread affects RT characteristic
@@ -56,7 +62,7 @@ namespace ACES{
         }
 
         h = this->events()->setupConnection("txUpStream")
-            .callback( s, &ProtoState::rxUpStream
+            .callback( s, &State<S>::rxUpStream
           //           ,  this->engine()->events()
                      ).handle();
         if(!h.ready() ){
@@ -70,10 +76,11 @@ namespace ACES{
         return true;
     }
 
-    void Device::updateHook(){
+    template <class S, class P>
+    void Device<S,P>::updateHook(){
         //Forward Path
         assert(dsQueue.size() < 100);
-        Goal* g = NULL;
+        SWord<S> g;
         while( dsQueue.size() ){
             g = processDSQueue();
             if(g){
@@ -85,12 +92,14 @@ namespace ACES{
         //Return Path
         assert(usQueue.size() < 100);
         while( usQueue.size() ){
-            std::list<ProtoResult*> p = processUSQueue();
+            std::deque< PDWord<P> >p;
+            p = processUSQueue();
             if(p.size()){
                 RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US"
                                    << RTT::endlog();
             }
-            for(std::list<ProtoResult*>::iterator it = p.begin();
+            typename std::deque< PDWord<P> >::iterator it;
+            for(it = p.begin();
                 it != p.end();  it++){
                     (*it)->printme();
                     txUpStream(*it);
@@ -100,6 +109,7 @@ namespace ACES{
         }
     }
     
+/*
     Goal* Device::getDSQelement()
     {
         RTT::OS::MutexLock lock(dsqGuard);
@@ -119,18 +129,25 @@ namespace ACES{
         usQueue.pop_front();
         return p;
     }
+*/
 
-    std::list<ProtoResult*> Device::processUSQueue(){
-        ProtoResult* p = getUSQelement();
+    template <class S, class P>
+    std::list< PDWord<P> > Device<S,P>::processUSQueue(){
+        SWord<S> s;
+        usQueue.dequeue(s);
+        PDWord<P> p(s.getData(), s.getNodeID(), s.getDevID(), s.getCred);
         
+        return std::list< PDWord<P> >(1, p);
         //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
-        Goal* g = ( (Result<Goal*>*) p)->result;
-        Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
-        std::list<ProtoResult*> pr_list(1, (ProtoResult*)r);
-        return pr_list;
+        //Goal* g = ( (Result<Goal*>*) p)->result;
+        //Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
+        //std::list<ProtoResult*> pr_list(1, (ProtoResult*)r);
+        //return pr_list;
     }
 
-    bool Device::printCred(){
+    template <class S, class P>
+    bool Device<S,P>::printCred(){
         credentials->printme();
     }
+
 }

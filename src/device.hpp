@@ -25,8 +25,9 @@ namespace ACES{
             void updateHook();
 
             virtual SWord<S> processDSQueue();
-            virtual std::list<ProtoResult*> processUSQueue();
-            bool subscribeState(ProtoState* s);
+            virtual std::list< PDWord<P> > processUSQueue();
+            //bool subscribeState(ProtoState* s);
+            bool subscribeState(RTT::TaskContext* s);
             bool printCred();
 /*
             Goal* getDSQelement();
@@ -42,9 +43,9 @@ namespace ACES{
             RTT::Event<void(SWord<S>)> txUpStream;
             RTT::Method<bool()> credMethod;
 
-            RTT::Queue< SWord<T>, RTT::BlockingPolicy,
+            RTT::Queue< SWord<S>, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue< SWord<T>, RTT::NonBlockingPolicy,
+            RTT::Queue< SWord<S>, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
 
             Credentials* credentials;

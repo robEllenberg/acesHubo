@@ -100,10 +100,10 @@ namespace ACES{
             RTT::Method<bool(std::string, std::string)> linkHCMethod;
             RTT::Method<bool(std::string, std::string)> linkLSMethod;
 
-            std::list<ProtoState*> stateList;
+            std::list<RTT::TaskContext*> stateList;
             std::list<RTT::TaskContext*> pList;
             std::list<Controller*> cList;
-            std::list<Device*> dList;
+            std::list<RTT::TaskContext*> dList;
             std::list<RTT::TaskContext*> hwList;
             std::list<Logger*> logList;
             

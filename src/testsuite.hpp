@@ -18,13 +18,14 @@ namespace TestSuite{
             bool subscribeController(ACES::Controller* c);
     };
     
-    class Device : public ACES::Device {
+    template <class S, class P>
+    class Device : public ACES::Device<S,P> {
         public:
             Device(std::string cfg, std::string args);
     };
 
-    template <typename T>
-    class Protocol : public ACES::Protocol<T>{
+    template <class HW, class P>
+    class Protocol : public ACES::Protocol<HW, P>{
         public:
             Protocol(std::string cfg, std::string args);
     };

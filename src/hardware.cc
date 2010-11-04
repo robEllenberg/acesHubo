@@ -5,38 +5,6 @@ namespace ACES {
     bool Hardware<T>::rxBus(){
         return true;
     }
-
-    template <class T>
-    bool Hardware<T>::subscribeProtocol(Protocol<T>* p){
-        this->connectPeers( (RTT::TaskContext*) p);
-        RTT::Handle h = p->events()->setupConnection("txDownStream")
-            .callback( this, &Hardware::rxDownStream
-            //           ,p->engine()->events() ).handle();
-            ).handle();
-        if(! h.ready() ){
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
-            return false;
-        }
-
-        h = this->events()->setupConnection("txUpStream")
-            .callback( p, &Protocol<T>::rxUpStream
-            //           ,this->engine()->events() ).handle();
-            ).handle();
-
-        if(! h.ready() ){
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
-            return false;
-        }
- 
-        return true;
-    }
-
     template <class T>
     Hardware<T>::Hardware(std::string cfg, std::string args) :
         taskCfg(cfg),
@@ -70,8 +38,8 @@ namespace ACES {
     }
 */
     template <typename T>
-    Word<T> Hardware<T>::processUSQueue(){
-        Word<T> w; 
+    HWord<T> Hardware<T>::processUSQueue(){
+        HWord<T> w; 
         usQueue.dequeue(w);
         return w;
     }
@@ -97,7 +65,7 @@ namespace ACES {
             }
         }
         rxBus();
-        Word<T> p;
+        HWord<T> p;
         while(usQueue.size()){
             p = processUSQueue();
             if(p){
@@ -116,7 +84,7 @@ namespace ACES {
             //    it != m->goalList.end();
             //    it++)
             //{
-                ACES::Word<T> w = m->Pop();
+                ACES::HWord<T> w = m->Pop();
                 //ACES::ProtoWord* w =
                 //    (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
                 usQueue.enqueue(w);

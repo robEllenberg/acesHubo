@@ -17,7 +17,7 @@ namespace ACES{
             T Pop();
             T Push(T item);
         protected:
-            std::deque< Word<T> > wordList;
+            std::deque< HWord<T> > wordList;
     };
 
     template <class T>
@@ -40,7 +40,7 @@ namespace ACES{
 
     template <class T>
     void Message<T>::printme(){
-        typename std::deque< Word<T> >::iterator it;
+        typename std::deque< HWord<T> >::iterator it;
         for(it = wordList.begin(); it != wordList.end(); it++){
                 //RTT::Logger::log() << "\t";
                 (*it)->printme();

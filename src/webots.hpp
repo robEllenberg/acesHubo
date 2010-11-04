@@ -74,21 +74,24 @@ namespace Webots{
             static int idCount;
     };
 
-    class JointDevice : public ACES::Device {
+    template<class P> 
+    class JointDevice : public ACES::Device<float, P> {
         public:
             JointDevice(std::string config, std::string args);
             //!Used by the HW to interact w/Webots for the refresh
-            static void* refresh(JointCredentials* j);
-            static bool set(JointCredentials* j,
-                                       ACES::Goal* g);
             //void interpretResult(ACES::ProtoResult* rx);
             bool startHook();
             void stopHook();
     };
 
-    class TripletDevice : public ACES::Device {
+    bool setJoint(JointCredentials* j, HWord<float> s);
+    static void* refresh(JointCredentials* j);
+
+    template<class P> 
+    class TripletDevice : public ACES::Device<float, P> {
         public:
-            TripletDevice(std::string config, std::string args, COMP_TYPE devID);
+            TripletDevice(std::string config, std::string args,
+                          COMP_TYPE devID);
             static void* refresh(Credentials* c);
             //virtual const double* getTriplet(WbDeviceTag tag) = 0;
             virtual std::list<ACES::ProtoResult*> processUSQueue();

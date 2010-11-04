@@ -11,7 +11,9 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Method.hpp>
 #include <rtt/Command.hpp>
+#include <rtt/Queue.hpp>
 #include <rtt/Buffer.hpp>
+#include <rtt/BufferPolicy.hpp>
 
 #include "credentials.hpp"
 #include "controller.hpp"
@@ -23,14 +25,16 @@ namespace ACES {
     //Webots Component Types
     //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
 
-/*
     class ProtoState : public taskCfg,
                        public RTT::TaskContext
     {
         public:
             ProtoState(std::string config, int nID) ;
-
-
+            std::string getName();
+            virtual std::string logVal() = 0;
+            RTT::Attribute<int> nodeID;
+            RTT::Attribute<bool> samplingAttr;
+ 
             //RTT::OS::Mutex dsqGuard;
             //RTT::Buffer< Goal* > *dsQueue;
             //std::deque<Goal*> dsQueue;
@@ -40,11 +44,10 @@ namespace ACES {
             //TODO - Remove nodeID entirely in favor of nodeIDAttr
             //int nodeID;
     };
-*/
+
 
     template <class T>
-    class State : public taskCfg,
-                  public RTT::TaskContext
+    class State : public ProtoState
     {
         public:
             State(std::string config, int nID);
@@ -52,6 +55,7 @@ namespace ACES {
 
             virtual void updateHook();  
             virtual void sample();
+            virtual std::string logVal();
 
             RTT::Event<void(SWord<T>)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);
@@ -63,8 +67,6 @@ namespace ACES {
 
             RTT::Attribute<T> value;
             RTT::Method<void(T)> goMethod;
-            RTT::Attribute<int> nodeID;
-            RTT::Attribute<bool> samplingAttr;
             RTT::Method<void()> sampleMethod;
 
             bool subscribeController(Controller* c);

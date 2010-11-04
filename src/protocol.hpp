@@ -40,8 +40,8 @@ namespace ACES {
             Protocol(std::string cfg, std::string args);
             void updateHook();
 
-            virtual void rxDownStream(HWord<HW>);
-            virtual void rxUpStream(PDWord<P>);
+            virtual void rxDownStream(PDWord<P>);
+            virtual void rxUpStream(HWord<HW>);
 
             virtual Message<HW>* processDSQueue();
             //Goal* getDSQelement();
@@ -53,10 +53,14 @@ namespace ACES {
             //std::deque< Word<W> > usQueue;
             //RTT::OS::Mutex usqGuard; 
 
-            bool subscribeDevice(Device* d);
+            template<class S>
+            bool subscribeDevice(RTT::TaskContext* d);
+            //'subscribe' used in the upstream direction, 'connect' used
+            //for downstream direction
+            bool connectHardware(RTT::TaskContext* h);
         protected:
             RTT::Event<void(Message<HW>)> txDownStream;
-            RTT::Event<void(PDWord<P>)> txUpStream;
+            RTT::Event< void(PDWord<P>) > txUpStream;
             //T, read, write
             RTT::Queue< HWord<HW>, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;

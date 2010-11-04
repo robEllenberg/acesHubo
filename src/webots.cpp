@@ -36,10 +36,10 @@ namespace Webots {
     template <class T>
     bool Hardware<T>::txBus(ACES::Message<T>* m){
         for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
-          it != m->goalList.end(); it++)
+            it != m->goalList.end(); it++)
         {
             ACES::Goal* g = *it;
-            void* result = NULL;
+            float result;
             Credentials* c = (Credentials*)(g->cred);
 
             switch( c->devID ){
@@ -204,16 +204,16 @@ namespace Webots {
         return (void*)res;
      }
 
-     bool JointDevice::set(JointCredentials* j,
-                                       ACES::Goal* g){
+     bool setJoint(JointCredentials* j, HWord<float> s){
+                   //ACES::Goal* g){
         std::string jid = j->wb_device_id;
         WbDeviceTag joint = wb_robot_get_device(jid.c_str());
 
         //Pull the seek value out of the credentials 
-        float* tp = (float*)(g->data);
-        float target = *tp;
-        float angle = j->direction
-                       * (target - j->zero);
+        //float* tp = (float*)(g->data);
+        //float target = *tp;
+        float target = s.getData();
+        float angle = j->direction * (target - j->zero);
 
         //wb_servo_set_position(joint, 3.14159/180.*angle);
         wb_servo_set_position(joint, angle);

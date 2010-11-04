@@ -16,7 +16,7 @@
 #include "word.hpp"
 
 namespace ACES {
-    template <class T>
+    template <class HW, class P>
     class Protocol;
 
     template <class T>
@@ -32,7 +32,7 @@ namespace ACES {
             virtual bool txBus(Message<T>* m);
             virtual bool rxBus();
 
-            virtual Word<T> processUSQueue();
+            virtual HWord<T> processUSQueue();
             //T, read, write
             //Word<T> getUSQelement();
             //std::deque< Word<T> > usQueue;
@@ -43,11 +43,10 @@ namespace ACES {
             //std::deque< Message<T>* > dsQueue;
             //RTT::OS::Mutex dsqGuard; 
 
-            bool subscribeProtocol(Protocol<T>* p);
             virtual bool subscribeController(Controller* c) = 0;
         protected:
-            RTT::Event<void( Word<T> )> txUpStream;
-            RTT::Queue< Word<T>, RTT::BlockingPolicy,
+            RTT::Event<void( HWord<T> )> txUpStream;
+            RTT::Queue< HWord<T>, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
             RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;

@@ -25,7 +25,7 @@ namespace ACES{
     }
 
     template <class HW, class P>    
-    Message<HW> Protocol<HW, P>::processDSQueue(){
+    Message<HW>* Protocol<HW, P>::processDSQueue(){
         //Goal* g = getDSQelement();
         PDWord<P> g;
         dsQueue.dequeue(g);
@@ -35,7 +35,7 @@ namespace ACES{
     }
 
     template <class HW, class P>    
-    ProtoResult* Protocol<HW, P>::processUSQueue(){
+    PDWord<P> Protocol<HW, P>::processUSQueue(){
         HWord<HW> p;
         usQueue.dequeue(p);
         //TODO - Specialized processing function from HWord->PDWord
