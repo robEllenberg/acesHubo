@@ -75,8 +75,8 @@ namespace ACES {
             RTT::Queue< SWord<T>, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
     };
-
-    #include "state.cc"
 }
     
+#include "state.cc"
+
 #endif

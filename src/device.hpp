@@ -19,29 +19,35 @@ namespace ACES{
         public:
             Device(std::string config);
             //Device(std::string name);
-            RTT::Event<void(Goal*)> txDownStream;
-            RTT::Event<void(ProtoResult*)> txUpStream;
-            virtual void rxUpStream(ProtoResult* rx);
-            virtual void rxDownStream(Goal* g);
+            virtual void rxUpStream(PDWord<P>);
+            virtual void rxDownStream(SWord<S>);
 
             void updateHook();
 
-            virtual Goal* processDSQueue();
+            virtual SWord<S> processDSQueue();
+            virtual std::list<ProtoResult*> processUSQueue();
+            bool subscribeState(ProtoState* s);
+            bool printCred();
+/*
             Goal* getDSQelement();
             std::deque<Goal*> dsQueue;
             RTT::OS::Mutex dsqGuard;
 
-            virtual std::list<ProtoResult*> processUSQueue();
             ProtoResult* getUSQelement();
             std::deque<ProtoResult*> usQueue;
             RTT::OS::Mutex usqGuard;
-
-            //void attachCredentials(ACES::Credentials* c);
-            bool subscribeState(ProtoState* s);
-            Credentials* credentials;
-
-            bool printCred();
+*/
+        protected:
+            RTT::Event<void(PDWord<P>)> txDownStream;
+            RTT::Event<void(SWord<S>)> txUpStream;
             RTT::Method<bool()> credMethod;
+
+            RTT::Queue< SWord<T>, RTT::BlockingPolicy,
+                       RTT::BlockingPolicy> usQueue;
+            RTT::Queue< SWord<T>, RTT::NonBlockingPolicy,
+                       RTT::BlockingPolicy> dsQueue;
+
+            Credentials* credentials;
     };
 }
 

@@ -1,3 +1,5 @@
+namespace ACES{
+
     template <class T>
     State<T>::State(std::string cfg, int nID) :
       //ProtoState(cfg, nID),
@@ -40,6 +42,49 @@
         this->attributes()->addAttribute(&value);
         asgnfunct = assign;
     }
+
+    template <class T>
+    void State<T>::updateHook(){
+        if( samplingAttr.get() ){
+            sample();
+        }
+
+        assert(dsQueue.size() < 100);
+        while (dsQueue.size() ){
+            SWord<T> h;
+            dsQueue.dequeue(h);
+
+            //{ RTT::OS::MutexLock lock(dsqGuard);
+            //  h = dsQueue.front();
+            //  dsQueue.pop_front();
+            //}
+            txDownStream(h);
+        }
+        
+        assert(usQueue.size() < 100);
+        while( usQueue.size() ){
+            SWord<T> rx;
+            usQueue.dequeue(rx);
+
+            //ProtoResult* rx = NULL;
+            //{ RTT::OS::MutexLock lock(usqGuard);
+            //  rx = usQueue.front();
+            //  usQueue.pop_front();
+            //}
+            RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS"
+                               << RTT::endlog();
+            //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
+            //                     << nodeIDAttr.get() << RTT::endlog();
+            
+            if(rx.getNodeID() == nodeID.get()){
+                RTT::Logger::log() << RTT::Logger::Debug << "(state) assign"
+                                   << RTT::endlog();
+                asgnfunct(rx, this);
+            }
+        }
+    }
+
+
 
     template <class T>
     bool State<T>::subscribeController(Controller* c){
@@ -100,3 +145,4 @@
             //}
         }
     }
+}

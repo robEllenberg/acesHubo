@@ -25,13 +25,14 @@ namespace ACES {
     template <class T>
     class State;
 
-    template <class T>
+    template <class H>
     class Hardware;
 //! Abstract class for describing a data protocol
 /*!
  * The Protocol virtual class 
  */
-    template <class T>
+    template <class HW, class P>    //A hardware-word based class & protocol
+                                    //specific one.
     class Protocol : protected taskCfg, 
                      public RTT::TaskContext
     {
@@ -39,29 +40,30 @@ namespace ACES {
             Protocol(std::string cfg, std::string args);
             void updateHook();
 
-            virtual void rxDownStream(Goal*);
-            virtual void rxUpStream(Word<T>);
+            virtual void rxDownStream(HWord<HW>);
+            virtual void rxUpStream(PDWord<P>);
 
-            virtual Message<T>* processDSQueue();
+            virtual Message<HW>* processDSQueue();
             //Goal* getDSQelement();
             //std::deque<Goal*> dsQueue;
             //RTT::OS::Mutex dsqGuard; 
 
-            virtual ProtoResult* processUSQueue();
-            //Word<T> getUSQelement();
-            //std::deque< Word<T> > usQueue;
+            virtual PDWord<P> processUSQueue();
+            //Word<w> getUSQelement();
+            //std::deque< Word<W> > usQueue;
             //RTT::OS::Mutex usqGuard; 
 
             bool subscribeDevice(Device* d);
         protected:
-            RTT::Event<void( Message<T>* )> txDownStream;
-            RTT::Event<void(ProtoResult*)> txUpStream;
+            RTT::Event<void(Message<HW>)> txDownStream;
+            RTT::Event<void(PDWord<P>)> txUpStream;
             //T, read, write
-            RTT::Queue< Word<T>, RTT::BlockingPolicy,
+            RTT::Queue< HWord<HW>, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue<Goal*, RTT::NonBlockingPolicy,
+            RTT::Queue<PDWord<P>, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
     };
-
 }
+
+#include "protocol.cc"
 #endif
