@@ -2,11 +2,6 @@
 namespace ACES {
 
     template <class T>
-    bool Hardware<T>::rxBus(){
-        return true;
-    }
-
-    template <class T>
     Hardware<T>::Hardware(std::string cfg, std::string args) :
         taskCfg(cfg),
         RTT::TaskContext(name),
@@ -21,23 +16,11 @@ namespace ACES {
                                               name));
     }
 
-/*
-    template <typename T>
-    Word<T> Hardware<T>::getUSQelement(){
-        RTT::OS::MutexLock lock(usqGuard);
-        Word<T> w = usQueue.front();
-        usQueue.pop_front();
-        return w;
+    template <class T>
+    bool Hardware<T>::rxBus(){
+        return true;
     }
 
-    template <class T>
-    Message<T>* Hardware<T>::getDSQelement(){
-        RTT::OS::MutexLock lock(dsqGuard);
-        Message<T>* m = dsQueue.front();
-        dsQueue.pop_front();
-        return m; 
-    }
-*/
     template <typename T>
     HWord<T>* Hardware<T>::processUSQueue(){
         HWord<T>* w = NULL; 
@@ -57,41 +40,26 @@ namespace ACES {
     void Hardware<T>::updateHook(){
         //RTT::Logger::log() << "hw sent" << RTT::endlog();
         Message<T>* m = NULL;
-        while(not dsQueue.isEmpty() ){
-            m = processDSQueue();
-            if(m){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
-                                   << RTT::endlog();
+        while(m = processDSQueue()){
+            RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
+                               << RTT::endlog();
             txBus(m);
-            }
         }
         rxBus();
         HWord<T>* p = NULL;
-        while(usQueue.size()){
-            p = processUSQueue();
-            if(p){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US"
-                                   << RTT::endlog();
+        while(p = processUSQueue()){
+            RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US"
+                               << RTT::endlog();
             txUpStream(p);
-            }
         }
     }
 
     template <class T>
     bool Hardware<T>::txBus(Message<T>* m){
-        //Goal* g = NULL;
         while( m->size() ){
-            //for(std::list<Goal*>::iterator it = m->goalList.begin();
-            //    it != m->goalList.end();
-            //    it++)
-            //{
-                HWord<T>* w = m->Pop();
-                //ACES::ProtoWord* w =
-                //    (ACES::ProtoWord*)(new ACES::Word<Goal*>(*it));
-                usQueue.enqueue(w);
-                //{ RTT::OS::MutexLock lock(usqGuard);
-                //  usQueue.push_back(w);
-                //}
+            HWord<T>* w = m->Pop();
+            usQueue.enqueue(w);
+            //TODO - Delete the word
         }
         return true;
     }
@@ -99,53 +67,6 @@ namespace ACES {
     template <class T>
     bool Hardware<T>::rxDownStream(Message<T>* m){
         dsQueue.enqueue(m);
-        //RTT::OS::MutexLock lock(dsqGuard);
-        //dsQueue.push_back(m);
-        //m->printme();
         return true;
     }
-
-/*
-    charDevHardware::charDevHardware(std::string name,
-                       std::ifstream *in,
-                       std::ofstream *out, int priority,
-                       int UpdateFreq) : 
-            Hardware(name, priority, UpdateFreq),
-            outBuffer("Out", 10),
-            inBuffer("In")
-        {
-            hardpoint_in = in;
-            hardpoint_out = out;
-        };
-
-    void charDevHardware::updateHook(){
-        this->checkForLineData();
-        this->checkForProtocolData();
-    }
-
-    void charDevHardware::checkForProtocolData(){
-        unsigned char c;
-        unsigned char count = 0;
-        Message* cpv;
-        while( this->inBuffer.size() and (count < 8) ){
-            this->inBuffer.Pop(cpv);
-            //RTT::Logger::log() << "Protocol Sent: "
-            //<< c << std::endl;
-
-            //this->hardpoint_out->put(
-            //        ((Message*)cpv)->cval);
-            count++;
-        }
-        this->hardpoint_out->flush();
-    }
-
-    void charDevHardware::checkForLineData(){
-        unsigned char c;
-        while( this->hardpoint_in->readsome((char*)&c, 1) ){
-            //TODO - Reimplement, post removal of SVal's
-            //charDevSValue* cpv = new charDevSValue(c);
-            //outBuffer.buffer()->Push((Message*)cpv);	
-	    }
-    }
-*/
 }

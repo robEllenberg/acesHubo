@@ -1,36 +1,29 @@
 namespace ACES{
     template <class HW, class P>    
     void Protocol<HW,P>::updateHook(){
-        assert(dsQueue.size() < 100);
-        while(not dsQueue.isEmpty() ){
-            Message<HW> m = processDSQueue();
-            if(m){
-                RTT::Logger::log() << RTT::Logger::Debug
-                                   << "(Protocol) got DS" << RTT::endlog();
-                //m->printme();
-            }
+        Message<HW>* m = NULL;
+        while( m = processDSQueue() ){
+            RTT::Logger::log() << RTT::Logger::Debug
+                               << "(Protocol) got DS" << RTT::endlog();
             txDownStream(m);
         }
 
-        assert( usQueue->size() < 100);
-        while(usQueue.size()){
-            PDWord<P> r = processUSQueue();
-            if(r){
-                //r->printme();
-                RTT::Logger::log() << RTT::Logger::Debug
-                                   << "(Protocol) got US" << RTT::endlog();
-                txUpStream(r);
-            }
+        PDWord<P>* r = NULL;
+        while(r = processUSQueue()){
+            RTT::Logger::log() << RTT::Logger::Debug
+                               << "(Protocol) got US" << RTT::endlog();
+            txUpStream(r);
         }
     }
 
     template <class HW, class P>    
     Message<HW>* Protocol<HW, P>::processDSQueue(){
         //Goal* g = getDSQelement();
-        PDWord<P>* g = NULL;
-        dsQueue.dequeue(g);
+        PDWord<P>* w = NULL;
+        dsQueue.dequeue(w);
         Message<HW>* m = new Message<HW>();
-        m->Push(g);
+        HWord<HW> h = new HWord<HW>()
+        m->Push(w);
         return m;
     }
 

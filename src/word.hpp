@@ -12,6 +12,7 @@ namespace ACES{
         public:
             HWord();
             HWord(T d);
+            HWord(PDWord*);
             virtual void printme();
             T getData();
         protected:
@@ -56,6 +57,11 @@ namespace ACES{
     template <class T>
     HWord<T>::HWord(){
         data = 0;
+    }
+
+    template <class T>
+    HWord<T>::HWord(PDWord* p){
+        data = p->getData();
     }
 
     template <class T>

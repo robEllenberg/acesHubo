@@ -31,8 +31,7 @@ namespace ACES {
 /*!
  * The Protocol virtual class 
  */
-    template <class HW, class P>    //A hardware-word based class & protocol
-                                    //specific one.
+    template <class HW, class P>    
     class Protocol : protected taskCfg, 
                      public RTT::TaskContext
     {
@@ -44,25 +43,18 @@ namespace ACES {
             virtual void rxUpStream(HWord<HW>*);
 
             virtual Message<HW>* processDSQueue();
-            //Goal* getDSQelement();
-            //std::deque<Goal*> dsQueue;
-            //RTT::OS::Mutex dsqGuard; 
-
             virtual PDWord<P>* processUSQueue();
-            //Word<w> getUSQelement();
-            //std::deque< Word<W> > usQueue;
-            //RTT::OS::Mutex usqGuard; 
 
-            template<class S>
-            bool subscribeDevice(RTT::TaskContext* d);
             //'subscribe' used in the upstream direction, 'connect' used
             //for downstream direction
+            template<class S>
+            bool subscribeDevice(RTT::TaskContext* d);
             bool connectHardware(RTT::TaskContext* h);
         protected:
             RTT::Event<void(Message<HW>*)> txDownStream;
             RTT::Event< void(PDWord<P>*) > txUpStream;
             //T, read, write
-            RTT::Queue< HWord<HW>*, RTT::BlockingPolicy,
+            RTT::Queue< HWord<HW>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
             RTT::Queue<PDWord<P>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;

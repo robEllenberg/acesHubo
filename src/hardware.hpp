@@ -33,20 +33,13 @@ namespace ACES {
             virtual bool rxBus();
 
             virtual HWord<T>* processUSQueue();
-            //T, read, write
-            //Word<T> getUSQelement();
-            //std::deque< Word<T> > usQueue;
-            //RTT::OS::Mutex usqGuard; 
-
             virtual Message<T>* processDSQueue();
-            //Message<T>* getDSQelement();
-            //std::deque< Message<T>* > dsQueue;
-            //RTT::OS::Mutex dsqGuard; 
 
             virtual bool subscribeController(Controller* c) = 0;
         protected:
             RTT::Event<void( HWord<T>* )> txUpStream;
-            RTT::Queue< HWord<T>*, RTT::BlockingPolicy,
+            //T, read, write
+            RTT::Queue< HWord<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
             RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
