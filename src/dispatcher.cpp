@@ -6,24 +6,25 @@ namespace ACES{
           addHardwareMethod("addHardware", &Dispatcher::addHardware, this),
           addProtocolMethod("addProtocol", &Dispatcher::addProtocol, this),
           addStateMethod("addState", &Dispatcher::addState, this),
-          addControllerMethod("addController", &Dispatcher::addController, this),
+          addControllerMethod("addController", &Dispatcher::addController,
+                              this),
           addDeviceMethod("addDevice", &Dispatcher::addDevice, this),
           addLoggerMethod("addLogger", &Dispatcher::addLogger, this),
-
           startHWMethod("startHW", &Dispatcher::startHW, this),
-          startProtocolMethod("startProtocol", &Dispatcher::startProtocol, this),
+          startProtocolMethod("startProtocol", &Dispatcher::startProtocol,
+                              this),
           startDeviceMethod("startDevice", &Dispatcher::startDevice, this),
           startStateMethod("startState", &Dispatcher::startState, this),
-          startControllerMethod("startController", &Dispatcher::startController, this),
+          startControllerMethod("startController",
+                                &Dispatcher::startController, this),
           startLoggerMethod("startLogger", &Dispatcher::startLogger, this),
-
           stopHWMethod("stopHW", &Dispatcher::stopHW, this),
           stopProtocolMethod("stopProtocol", &Dispatcher::stopProtocol, this),
           stopDeviceMethod("stopDevice", &Dispatcher::stopDevice, this),
           stopStateMethod("stopState", &Dispatcher::stopState, this),
-          stopControllerMethod("stopController", &Dispatcher::stopController, this),
+          stopControllerMethod("stopController", &Dispatcher::stopController,
+                               this),
           stopLoggerMethod("stopLogger", &Dispatcher::stopLogger, this),
-
           linkPDMethod("linkPD", &Dispatcher::linkPD, this),
           linkDSMethod("linkDS", &Dispatcher::linkDS, this),
           linkHPMethod("linkHP", &Dispatcher::linkHP, this),
@@ -89,27 +90,26 @@ namespace ACES{
         this->methods()->addMethod(linkLSMethod, "linkLS",
                                    "logger", "logger",
                                    "state", "state");
-    
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,
                                  std::string args)
     {
-        Hardware* h = NULL;
+        RTT::TaskContext* h = NULL;
         
         #ifdef WEBOTS        
         if (type == "Webots") {
-            h = (Hardware*) new Webots::Hardware(cfg, args);
+            h = (RTT::TaskContext*) new Webots::Hardware(cfg, args);
         }
         #endif 
         #ifdef ROBOTIS
         if (type == "CharDev") {
-            h = (Hardware*) new CharDev::Hardware(cfg, args);
+            h = (RTT::TaskContext*) new CharDev::Hardware(cfg, args);
         }
         #endif
         #ifdef TESTSUITE
         if (type == "TestSuite") {
-            h = (Hardware*) new TestSuite::Hardware(cfg, args);
+            h = (RTT::TaskContext*) new TestSuite::Hardware<float>(cfg, args);
         }
         #endif
         if(h){
@@ -135,7 +135,8 @@ namespace ACES{
         #endif
         #ifdef TESTSUITE
         if ( type == "TestSuite"){
-            p = (RTT::TaskContext*) new TestSuite::Protocol(cfg, args);
+            p = (RTT::TaskContext*) new
+                TestSuite::Protocol<float, float>(cfg, args);
         } 
         #endif
         if(p){
@@ -148,7 +149,7 @@ namespace ACES{
     bool Dispatcher::addDevice(std::string cfg, std::string type,
                                std::string args)
     {
-        Device *d = NULL;
+        RTT::TaskContext *d = NULL;
         #ifdef WEBOTS 
         std::istringstream s(type);
         std::string type1, type2;
@@ -179,7 +180,8 @@ namespace ACES{
         #endif
         #ifdef TESTSUITE
         if ( type1 == "TestSuite"){
-            d = (Device*) new TestSuite::Device(cfg, args);
+            d = (RTT::TaskContext*) new
+                    TestSuite::Device<float,float>(cfg, args);
         } 
         #endif
         if(d){

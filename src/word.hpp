@@ -8,10 +8,13 @@ namespace ACES{
     enum MODES { REFRESH=1, SET};
 
     template <class T>
-    class Word : Word<T> {
+    class Message;
+
+    template <class T>
+    class Word {
         public:
             Word();
-            Word(Word* w);
+            Word(const Word& w);
             Word(T d, int nID=0, int dID=0, int m=0, Credentials* c=NULL);
 
             virtual void printme();
@@ -20,6 +23,7 @@ namespace ACES{
             int getDevID();
             int getMode();
             Credentials* getCred();
+            bool setCred(Credentials* c);
         protected:
             T data;
             int nodeID; //!Identify the type of node on the Device
@@ -47,16 +51,8 @@ namespace ACES{
     }
 
     template <class T>
-    T HWord<T>::getData(){
+    T Word<T>::getData(){
         return data;
-    }
-
-    template <class T>
-    void PDWord<T>::printme(){
-        RTT::Logger::log() << "PDWord N(" << nodeID << "), "
-                              "D(" << devID << "): "
-                           << this->data << RTT::endlog();
-        cred->printme();
     }
 
     template <class T>

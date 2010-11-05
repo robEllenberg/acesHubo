@@ -51,19 +51,19 @@ namespace ACES {
     {
         public:
             State(std::string config, int nID);
-            void (*asgnfunct)(SWord<T>, void*);
+            void (*asgnfunct)(Word<T>*, void*);
 
             virtual void updateHook();  
             virtual void sample();
             virtual std::string logVal();
 
-            RTT::Event<void(SWord<T>)> txDownStream;
+            RTT::Event<void(Word<T>*)> txDownStream;
             void rxDownStream(std::map<std::string, void*>*);
-            void rxUpStream(SWord<T>);
+            void rxUpStream(Word<T>*);
             void printme();
             void go(T sp);
             //static void assign(ProtoResult* meas, void* me);
-            static void assign(SWord<T> w, void* me);
+            static void assign(Word<T>* w, void* me);
 
             RTT::Attribute<T> value;
             RTT::Method<void(T)> goMethod;
@@ -72,9 +72,9 @@ namespace ACES {
             bool subscribeController(Controller* c);
 
         protected:
-            RTT::Queue< SWord<T>, RTT::BlockingPolicy,
+            RTT::Queue< Word<T>*, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue< SWord<T>, RTT::NonBlockingPolicy,
+            RTT::Queue< Word<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
     };
 }

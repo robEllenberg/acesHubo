@@ -12,44 +12,37 @@
 #include "word.hpp"
 
 namespace ACES{
-    template <class S, class P>
+    template <class S, class PD>
     class Device :  protected taskCfg,
                     public RTT::TaskContext
     {
         public:
             Device(std::string config);
             //Device(std::string name);
-            virtual void rxUpStream(PDWord<P>*);
-            virtual void rxDownStream(SWord<S>*);
+            virtual void rxUpStream(Word<PD>*);
+            virtual void rxDownStream(Word<S>*);
 
             void updateHook();
 
-            virtual SWord<S>* processDSQueue();
-            virtual std::deque< PDWord<P>* > processUSQueue();
-            //bool subscribeState(ProtoState* s);
+            virtual Word<PD>* processDSQueue();
+            virtual Word<S>* processUSQueue();
             bool subscribeState(RTT::TaskContext* s);
             bool printCred();
-/*
-            Goal* getDSQelement();
-            std::deque<Goal*> dsQueue;
-            RTT::OS::Mutex dsqGuard;
 
-            ProtoResult* getUSQelement();
-            std::deque<ProtoResult*> usQueue;
-            RTT::OS::Mutex usqGuard;
-*/
         protected:
-            RTT::Event<void(PDWord<P>*)> txDownStream;
-            RTT::Event<void(SWord<S>*)> txUpStream;
+            RTT::Event<void(Word<PD>*)> txDownStream;
+            RTT::Event<void(Word<S>*)> txUpStream;
             RTT::Method<bool()> credMethod;
 
-            RTT::Queue< SWord<S>*, RTT::BlockingPolicy,
+            RTT::Queue< Word<S>*, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue< SWord<S>*, RTT::NonBlockingPolicy,
+            RTT::Queue< Word<S>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
 
             Credentials* credentials;
     };
 }
+
+#include "device.cc"
 
 #endif

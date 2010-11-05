@@ -1,8 +1,8 @@
 #include "protocol.hpp"
 
 namespace ACES {
-    template <class HW, class P>    
-    Protocol<HW,P>::Protocol(std::string cfg, std::string args):
+    template <class HW, class PD>    
+    Protocol<HW,PD>::Protocol(std::string cfg, std::string args):
       taskCfg(cfg),
       RTT::TaskContext(name),
       txDownStream("txDownStream"),
@@ -27,43 +27,22 @@ namespace ACES {
         );
     }
 
-    template <class HW, class P>    
-    void Protocol<HW,P>::rxDownStream(PDWord<P>* g){
+    template <class HW, class PD>    
+    void Protocol<HW,PD>::rxDownStream(Word<PD>* g){
         dsQueue.enqueue(g);
-        //RTT::OS::MutexLock lock(dsqGuard);
-        //dsQueue.push_back(g);
     }
 
-    template <class HW, class P>    
-    void Protocol<HW,P>::rxUpStream(HWord<HW>* w){
+    template <class HW, class PD>    
+    void Protocol<HW,PD>::rxUpStream(Word<HW>* w){
         usQueue.enqueue(w);
-        //RTT::OS::MutexLock lock(usqGuard);
-        //usQueue.push_back(w);
-    }
-/*
-    template <class T>
-    Goal* Protocol<T>::getDSQelement(){
-        RTT::OS::MutexLock lock(dsqGuard);
-        Goal* g = dsQueue.front();
-        dsQueue.pop_front();
-        return g;
     }
 
-    template <class T>
-    Word<T> Protocol<T>::getUSQelement(){
-        RTT::OS::MutexLock lock(usqGuard);
-        Word<T> p = usQueue.front();
-        usQueue.pop_front();
-        return p;
-    }
-*/
-
-    template <class HW, class P>    
+    template <class HW, class PD>    
         template<class S>
-    bool Protocol<HW,P>::subscribeDevice(RTT::TaskContext* d){
+    bool Protocol<HW,PD>::subscribeDevice(RTT::TaskContext* d){
         this->connectPeers( (RTT::TaskContext*) d );
         RTT::Handle h = d->events()->setupConnection("txDownStream")
-            .callback( this, &Protocol<HW,P>::rxDownStream,
+            .callback( this, &Protocol<HW,PD>::rxDownStream,
                        d->engine()->events()
                      ).handle();
         if(!h.ready()){
@@ -75,7 +54,7 @@ namespace ACES {
         }
 
         h = this->events()->setupConnection("txUpStream")
-            .callback( d, &Device<S, P>::rxUpStream
+            .callback( d, &Device<S, PD>::rxUpStream
         //               ,this->engine()->events()
                      ).handle();
         if(!h.ready()){
@@ -88,8 +67,8 @@ namespace ACES {
         return true;
     }
 
-    template <class HW, class P>
-    bool Protocol<HW,P>::connectHardware(RTT::TaskContext* h){
+    template <class HW, class PD>
+    bool Protocol<HW,PD>::connectHardware(RTT::TaskContext* h){
         this->connectPeers(h);
         RTT::Handle hand = this->events()->setupConnection("txDownStream")
             .callback( h, &Hardware<HW>::rxDownStream
@@ -104,7 +83,7 @@ namespace ACES {
         }
 
         hand = h->events()->setupConnection("txUpStream")
-            .callback( this, &Protocol<HW,P>::rxUpStream
+            .callback( this, &Protocol<HW,PD>::rxUpStream
             //           ,this->engine()->events() ).handle();
             ).handle();
 

@@ -34,34 +34,22 @@ namespace ACES{
             sample();
         }
 
-        assert(dsQueue.size() < 100);
-        while (dsQueue.size() ){
-            SWord<T> h;
+        while (not dsQueue.isEmpty() ){
+            Word<T>* h = NULL;
             dsQueue.dequeue(h);
-
-            //{ RTT::OS::MutexLock lock(dsqGuard);
-            //  h = dsQueue.front();
-            //  dsQueue.pop_front();
-            //}
             txDownStream(h);
         }
         
-        assert(usQueue.size() < 100);
-        while( usQueue.size() ){
-            SWord<T> rx;
+        while(not usQueue.isEmpty() ){
+            Word<T>* rx;
             usQueue.dequeue(rx);
 
-            //ProtoResult* rx = NULL;
-            //{ RTT::OS::MutexLock lock(usqGuard);
-            //  rx = usQueue.front();
-            //  usQueue.pop_front();
-            //}
             RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS"
                                << RTT::endlog();
             //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
             //                     << nodeIDAttr.get() << RTT::endlog();
             
-            if(rx.getNodeID() == nodeID.get()){
+            if(rx->getNodeID() == nodeID.get()){
                 RTT::Logger::log() << RTT::Logger::Debug << "(state) assign"
                                    << RTT::endlog();
                 asgnfunct(rx, this);
@@ -98,19 +86,17 @@ namespace ACES{
 
     template <class T>
     void State<T>::go(T sp){
-        SWord<T> w(sp, nodeID, 0, NULL, SET);
+        Word<T>* w = new Word<T>(sp, nodeID.get(), 0, SET);
         dsQueue.enqueue(w);
     }
 
     template <class T>
-    void State<T>::assign(SWord<T> w, void* me){
+    void State<T>::assign(Word<T>* w, void* me){
+        //TODO - Find a better way to do this 'virtual function'
         State<T>* th = (State<T>*)me;
-        //t->value = *((T*)meas);
-        //T* newVal = ((Result<T*>*)meas)->result;
         RTT::Logger::log() << RTT::Logger::Debug
-                           << "(state) Value: " << w.getData();
-        //th->value.set(  *newVal  );
-        th->value.set( w.getData() );
+                           << "(state) Value: " << w->getData();
+        th->value.set( w->getData() );
     }
 
     template <class T>
@@ -121,16 +107,15 @@ namespace ACES{
         if(mypair != p->end() ){
             void* pval = (*mypair).second;
             T val = *((T*)pval);
-            SWord<T> w(val, nodeID, 0, NULL, SET);
+            Word<T>* w = new Word<T>(val, nodeID.get(), 0, SET);
             dsQueue.enqueue(w);
-            //{ RTT::OS::MutexLock lock(dsqGuard);
-            //  dsQueue.push_back(g);
-            //}
         }
     }
 
     template <class T>
     std::string State<T>::logVal(){
-        return std::string(this->value.get());
+        std::stringstream s;
+        s << this->value.get();
+        return s.str();
     }
 }

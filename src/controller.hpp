@@ -15,6 +15,7 @@
 
 #include "taskcfg.hpp"
 
+//TODO - Relocate this definition 
 enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 
 namespace ACES{

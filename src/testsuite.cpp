@@ -6,14 +6,9 @@ namespace TestSuite{
       : ACES::Hardware<T>(cfg, args)
     { }
    
-    template <class T>
-    bool Hardware<T>::subscribeController(ACES::Controller* c){
-        return true;
-    }
-
-    template <class S, class P>
-    Device<S,P>::Device(std::string name, std::string args)
-      : ACES::Device<S,P>(name)
+    template <class S, class PD>
+    Device<S,PD>::Device(std::string cfg, std::string args)
+      : ACES::Device<S,PD>(cfg)
     {
         this->credentials = new ACES::Credentials(args);
     }
@@ -41,10 +36,8 @@ namespace TestSuite{
 
         RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!"
                            << RTT::endlog();
-        ACES::Goal* g = new ACES::Goal(this->nodeID, ACES::REFRESH,
-                                       new float(val));
-        { RTT::OS::MutexLock lock(dsqGuard);
-          dsQueue.push_back(g);
-        }
+        ACES::Word<float> *g = new ACES::Word<float>(val, this->nodeID.get(),
+                                                     0, ACES::REFRESH);
+        dsQueue.enqueue(g);
     }
 };

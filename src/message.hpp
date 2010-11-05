@@ -8,7 +8,6 @@
 #include "word.hpp"
 
 namespace ACES{
-    
     template <class T>
     class Message {
         public:
@@ -17,7 +16,7 @@ namespace ACES{
             T* Pop();
             T* Push(T* item);
         protected:
-            std::deque< HWord<T>* > wordList;
+            std::deque< Word<T>* > wordList;
     };
 
     template <class T>
@@ -40,7 +39,7 @@ namespace ACES{
 
     template <class T>
     void Message<T>::printme(){
-        typename std::deque< HWord<T>* >::iterator it;
+        typename std::deque< Word<T>* >::iterator it;
         for(it = wordList.begin(); it != wordList.end(); it++){
                 //RTT::Logger::log() << "\t";
                 (*it)->printme();

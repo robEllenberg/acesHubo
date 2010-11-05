@@ -11,17 +11,23 @@
 #include <rtt/Activity.hpp>
 
 #include "message.hpp"
-#include "protocol.hpp"
+//#include "protocol.hpp"
 #include "taskcfg.hpp"
 #include "word.hpp"
+#include "controller.hpp"
 
 namespace ACES {
-    template <class HW, class P>
-    class Protocol;
+    //template <class HW, class P>
+    //class Protocol;
+
+    class ProtoHardware : protected taskCfg,
+                          public RTT::TaskContext {
+        public:
+            ProtoHardware::ProtoHardware(std::string cfg, std::string args); 
+    };
 
     template <class T>
-    class Hardware : protected taskCfg,
-                     public RTT::TaskContext {
+    class Hardware :  {
         public:
             Hardware(std::string cfg, std::string args);
             //Hardware(std::string name);
@@ -32,14 +38,14 @@ namespace ACES {
             virtual bool txBus(Message<T>* m);
             virtual bool rxBus();
 
-            virtual HWord<T>* processUSQueue();
+            virtual Word<T>* processUSQueue();
             virtual Message<T>* processDSQueue();
 
-            virtual bool subscribeController(Controller* c) = 0;
+            virtual bool subscribeController(Controller* c);
         protected:
-            RTT::Event<void( HWord<T>* )> txUpStream;
+            RTT::Event<void( Word<T>* )> txUpStream;
             //T, read, write
-            RTT::Queue< HWord<T>*, RTT::NonBlockingPolicy,
+            RTT::Queue< Word<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
             RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;

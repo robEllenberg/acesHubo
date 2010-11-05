@@ -22,17 +22,12 @@ namespace ACES {
     void State<T>::sample(){
         RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!"
                            << RTT::endlog();
-        SWord<T> s(0, nodeID, 0, NULL, REFRESH);
-        //Goal* g = new Goal(this->nodeID, REFRESH);
-
-        //{ RTT::OS::MutexLock lock(dsqGuard);
-        //  dsQueue.push_back(g);
-        //}
+        Word<T>* s = new Word<T>(0, nodeID, 0, REFRESH);
         dsQueue.enqueue(s);
     }
    
     template <class T>
-    void State<T>::rxUpStream(SWord<T> rx){
+    void State<T>::rxUpStream(Word<T>* rx){
         RTT::Logger::log() << "in:" << rx.getNodeID() << " my:"
                            << nodeID.get()
                            << " equiv: "

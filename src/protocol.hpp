@@ -31,7 +31,7 @@ namespace ACES {
 /*!
  * The Protocol virtual class 
  */
-    template <class HW, class P>    
+    template <class HW, class PD>    
     class Protocol : protected taskCfg, 
                      public RTT::TaskContext
     {
@@ -39,11 +39,11 @@ namespace ACES {
             Protocol(std::string cfg, std::string args);
             void updateHook();
 
-            virtual void rxDownStream(PDWord<P>*);
-            virtual void rxUpStream(HWord<HW>*);
+            virtual void rxDownStream(Word<PD>*);
+            virtual void rxUpStream(Word<HW>*);
 
             virtual Message<HW>* processDSQueue();
-            virtual PDWord<P>* processUSQueue();
+            virtual Word<PD>* processUSQueue();
 
             //'subscribe' used in the upstream direction, 'connect' used
             //for downstream direction
@@ -52,11 +52,11 @@ namespace ACES {
             bool connectHardware(RTT::TaskContext* h);
         protected:
             RTT::Event<void(Message<HW>*)> txDownStream;
-            RTT::Event< void(PDWord<P>*) > txUpStream;
+            RTT::Event< void(Word<PD>*) > txUpStream;
             //T, read, write
-            RTT::Queue< HWord<HW>*, RTT::NonBlockingPolicy,
+            RTT::Queue< Word<HW>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
-            RTT::Queue<PDWord<P>*, RTT::NonBlockingPolicy,
+            RTT::Queue<Word<PD>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
     };
 }

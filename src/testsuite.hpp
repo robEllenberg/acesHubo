@@ -8,6 +8,7 @@
 #include "device.hpp"
 #include "protocol.hpp"
 #include "state.hpp"
+#include "word.hpp"
 
 namespace TestSuite{
 
