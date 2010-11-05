@@ -8,84 +8,47 @@ namespace ACES{
     enum MODES { REFRESH=1, SET};
 
     template <class T>
-    class HWord {
+    class Word : Word<T> {
         public:
-            HWord();
-            HWord(T d);
-            HWord(PDWord*);
+            Word();
+            Word(Word* w);
+            Word(T d, int nID=0, int dID=0, int m=0, Credentials* c=NULL);
+
             virtual void printme();
             T getData();
-        protected:
-            T data;
-    };
-
-    template <class T>
-    class PDWord : HWord<T> {
-        public:
-            PDWord();
-            PDWord(T d, int nID=0, int dID=0, Credentials* c=NULL);
-            virtual void printme() = 0;
-
             int getNodeID();
             int getDevID();
+            int getMode();
             Credentials* getCred();
-            /*! The semiCred is a Credential containing whatever identifying
-             *  information the Protocol was able to extract about the device
-             *  from the packet */
         protected:
+            T data;
             int nodeID; //!Identify the type of node on the Device
             int devID;
             Credentials* cred;
-    };
-
-    template <class T>
-    class SWord : PDWord<T> {
-        public:
-            SWord();
-            SWord(T d, int nID=0, int dID=0, Credentials* c=NULL, int m=0);
-            virtual void printme();
-            int getMode();
-        protected:
             int mode; //!The objective of this Goal packet (Refresh, Set, etc)
     };
 
     template <class T>
-    HWord<T>::HWord(T d){
+    Word<T>::Word(T d, int nID, int dID, int m, Credentials* c){
         data = d;
+        nodeID = nID;
+        devID = dID;
+        cred = c;
+        mode = m;
     }
 
     template <class T>
-    HWord<T>::HWord(){
-        data = 0;
-    }
-
-    template <class T>
-    HWord<T>::HWord(PDWord* p){
-        data = p->getData();
-    }
-
-    template <class T>
-    void HWord<T>::printme(){
-        RTT::Logger::log() << "HWord: " << data << RTT::endlog();
+    Word<T>::Word(const Word& w){
+        data = w.getData();
+        nodeID = w.getNodeID();
+        devID = w.getDevID();
+        cred = w.getCred();
+        mode = w.getMode();
     }
 
     template <class T>
     T HWord<T>::getData(){
         return data;
-    }
-
-    template <class T>
-    PDWord<T>::PDWord(T d, int nID, int dID, Credentials* c) : HWord<T>(d){
-        nodeID = nID;
-        devID = dID;
-        cred = c;
-    }
-
-    template <class T>
-    PDWord<T>::PDWord() : HWord<T>() {
-        nodeID = 0;
-        devID = 0;
-        cred = 0;
     }
 
     template <class T>
@@ -97,44 +60,23 @@ namespace ACES{
     }
 
     template <class T>
-    SWord<T>::SWord() : PDWord<T>() {
-        mode = 0;
-    }
-    
-    template <class T>
-    SWord<T>::SWord(T d, int nID, int dID, Credentials* c, int m):
-      PDWord<T>(d, nID, dID, c)
-    {
-        mode = m;
-    }
+    void Word<T>::printme(){
+        RTT::Logger::log() << "Word ";
+        if(nodeID){
+            RTT::Logger::log() << "N(" << this->nodeID << "), ";
+        }
+        if(devID){
+            RTT::Logger::log() << "D(" << this->devID << "), ";
+        }
+        if(mode){
+            RTT::Logger::log() << "M(" << this->mode << "): ";
+        }
+        RTT::Logger::log() << "= " << this->data << RTT::endlog();
 
-    template <class T>
-    void SWord<T>::printme(){
-        RTT::Logger::log() << "SWord N(" << this->nodeID << "), "
-                              "D(" << this->devID << "), "
-                              "M(" << this->mode << "): "
-                           << this->data << RTT::endlog();
-        this->cred->printme();
+        if(cred){
+            cred->printme();
+        }
     }
-/*
-    template <class T>
-    class Result : public  ProtoResult{
-        public:
-            //Result(T r);
-            Result(T r, Credentials* c, int node=0);
-            //int id;
-            //int busid;
-            T result;
-    };
-
-    template <class T>
-    //Result<T>::Result(T r){
-    Result<T>::Result(T r, Credentials* c, int node)
-      : ProtoResult(node, c)
-    {
-        result = r;
-    }
-*/
 }
 
 #endif 
