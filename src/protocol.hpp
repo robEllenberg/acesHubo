@@ -27,6 +27,13 @@ namespace ACES {
 
     template <class H>
     class Hardware;
+
+    class ProtoProtocol
+    {
+        public:    
+            ProtoProtocol();
+    };
+
 //! Abstract class for describing a data protocol
 /*!
  * The Protocol virtual class 

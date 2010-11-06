@@ -7,25 +7,18 @@
 namespace ACES{
     enum MODES { REFRESH=1, SET};
 
-    template <class T>
-    class Message;
-
-    template <class T>
-    class Word {
+    class ProtoWord {
         public:
-            Word();
-            Word(const Word& w);
-            Word(T d, int nID=0, int dID=0, int m=0, Credentials* c=NULL);
+            ProtoWord();
+            ProtoWord(ProtoWord& w);
+            ProtoWord(int nID=0, int dID=0, int m=0, Credentials* c=NULL);
 
-            virtual void printme();
-            T getData();
             int getNodeID();
             int getDevID();
             int getMode();
             Credentials* getCred();
             bool setCred(Credentials* c);
         protected:
-            T data;
             int nodeID; //!Identify the type of node on the Device
             int devID;
             Credentials* cred;
@@ -33,21 +26,27 @@ namespace ACES{
     };
 
     template <class T>
-    Word<T>::Word(T d, int nID, int dID, int m, Credentials* c){
+    class Word : public ProtoWord {
+        public:
+            Word();
+            Word( Word& w);
+            Word(T d, int nID=0, int dID=0, int m=0, Credentials* c=NULL);
+
+            void printme();
+            T getData();
+        protected:
+            T data;
+    };
+
+    template <class T>
+    Word<T>::Word(T d, int nID, int dID, int m, Credentials* c)
+     : ProtoWord(nID, dID, m, c){
         data = d;
-        nodeID = nID;
-        devID = dID;
-        cred = c;
-        mode = m;
     }
 
     template <class T>
-    Word<T>::Word(const Word& w){
+    Word<T>::Word( Word &w) : ProtoWord(static_cast<ProtoWord&>(w) ) {
         data = w.getData();
-        nodeID = w.getNodeID();
-        devID = w.getDevID();
-        cred = w.getCred();
-        mode = w.getMode();
     }
 
     template <class T>

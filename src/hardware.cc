@@ -1,11 +1,18 @@
 namespace ACES {
-    template <class T>
+    template <typename T>
     Hardware<T>::Hardware(std::string cfg, std::string args) :
-        ProtoHardware(cfg, args){}
+        ProtoHardware(),
+        taskCfg(cfg),
+        RTT::TaskContext(name),
+        txUpStream("txUpStream"),
+        dsQueue(10),
+        usQueue(10)
+    {
+        this->events()->addEvent(&txUpStream, "txUpStream", "word",
+                                 "Recieved Data");
 
-    template <class T>
-    bool Hardware<T>::rxBus(){
-        return true;
+        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
+                                              name));
     }
 
     template <typename T>
@@ -59,9 +66,6 @@ namespace ACES {
         return true;
     }
 
-    template <class T>
-    bool Hardware<T>::subscribeController(Controller* c){
-        return true;
-    }
+
 
 }

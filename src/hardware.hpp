@@ -20,14 +20,18 @@ namespace ACES {
     //template <class HW, class P>
     //class Protocol;
 
-    class ProtoHardware : protected taskCfg,
-                          public RTT::TaskContext {
+    class ProtoHardware {
         public:
-            ProtoHardware::ProtoHardware(std::string cfg, std::string args); 
+            ProtoHardware();
+            virtual bool subscribeController(Controller* c);
+            virtual bool rxBus();
     };
 
     template <class T>
-    class Hardware :  {
+    class Hardware : public ProtoHardware,
+                     public RTT::TaskContext,
+                     protected taskCfg
+    {
         public:
             Hardware(std::string cfg, std::string args);
             //Hardware(std::string name);
@@ -36,12 +40,10 @@ namespace ACES {
             bool rxDownStream(Message<T>* m);
 
             virtual bool txBus(Message<T>* m);
-            virtual bool rxBus();
 
             virtual Word<T>* processUSQueue();
             virtual Message<T>* processDSQueue();
 
-            virtual bool subscribeController(Controller* c);
         protected:
             RTT::Event<void( Word<T>* )> txUpStream;
             //T, read, write
@@ -50,7 +52,7 @@ namespace ACES {
             RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
     };
-}    
+}
 
 #include "hardware.cc"
 #endif

@@ -1,23 +1,33 @@
 #include "word.hpp"
 
 namespace ACES{
-    template <class T>
-    int Word<T>::getNodeID(){
+    ProtoWord::ProtoWord(int nID, int dID, int m, Credentials* c){
+        nodeID = nID;
+        devID = dID;
+        cred = c;
+        mode = m;
+    }
+
+    ProtoWord::ProtoWord(ProtoWord& w){
+        nodeID = w.getNodeID();
+        devID = w.getDevID();
+        cred = w.getCred();
+        mode = w.getMode();
+    }
+
+    int ProtoWord::getNodeID(){
         return nodeID;
     }
 
-    template <class T>
-    int Word<T>::getDevID(){
+    int ProtoWord::getDevID(){
         return devID;
     }
 
-    template <class T>
-    Credentials* Word<T>::getCred(){
+    Credentials* ProtoWord::getCred(){
         return cred;
     }
 
-    template <class T>
-    bool Word<T>::setCred(Credentials* c){
+    bool ProtoWord::setCred(Credentials* c){
         //TODO - Add some kind of typecheck here
         if(c != NULL){
             cred = c;
@@ -25,8 +35,8 @@ namespace ACES{
         return true;
     }
 
-    template <class T>
-    int Word<T>::getMode(){
+    int ProtoWord::getMode(){
         return mode;
     }
+    
 }
