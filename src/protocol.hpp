@@ -56,7 +56,6 @@ namespace ACES {
             //for downstream direction
             template<class S>
             bool subscribeDevice(RTT::TaskContext* d);
-            bool connectHardware(RTT::TaskContext* h);
         protected:
             //RTT::Event<void(Message<HW>*)> txDownStream;
             //RTT::Event< void(Word<PD>*) > txUpStream;

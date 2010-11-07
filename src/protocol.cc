@@ -79,64 +79,37 @@ namespace ACES{
     }
 
     template <class HW, class PD>    
-        template<class S>
     bool Protocol<HW,PD>::subscribeDevice(RTT::TaskContext* d){
         this->connectPeers( (RTT::TaskContext*) d );
-        RTT::Handle h = d->events()->setupConnection("txDownStream")
-            .callback( this, &Protocol<HW,PD>::rxDownStream,
-                       d->engine()->events()
-                     ).handle();
-        if(!h.ready()){
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
-            return false;
-        }
 
-        h = this->events()->setupConnection("txUpStream")
-            .callback( d, &Device<S, PD>::rxUpStream
-        //               ,this->engine()->events()
-                     ).handle();
-        if(!h.ready()){
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
-            return false;
-        }
-        return true;
-    }
-
-    template <class HW, class PD>
-    bool Protocol<HW,PD>::connectHardware(RTT::TaskContext* h){
-        this->connectPeers(h);
-       /* RTT::Handle hand = this->events()->setupConnection("txDownStream")
-            .callback( h, &Hardware<HW>::rxDownStream
-            //           ,p->engine()->events() ).handle();
-            ).handle(); */
-        //RTT::base
-        RTT::PortInterface* p = NULL;
+        RTT::PortInterface* port = NULL;
         bool success;
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
-
-        p = (RTT::PortInterface*)h->ports()->getPort("RxDS");
-        success = this->txDownStream.connectTo(p, policy);
-        if(not success){
-            return false;
-        }
         
-        p = (RTT::PortInterface*)h->ports()->getPort("TxUS");
-        success = p->connectTo(this->rxUpStream, policy);
+        port = (RTT::PortInterface*)d->ports()->getPort("RxUS");
+        success = this->txUpStream.connectTo(port, policy);
         if(not success){
             return false;
         }
-                                  
-        /*hand = h->events()->setupConnection("txUpStream")
-            .callback( this, &Protocol<HW,PD>::rxUpStream
-            //           ,this->engine()->events() ).handle();
-            ).handle();*/
+
+        port = (RTT::PortInterface*)d->ports()->getPort("TxDS");
+        success = port->connectTo(this->rxDownStream, policy);
+        if(not success){
+            return false;
+        }
+
+        /*RTT::Handle h = d->events()->setupConnection("txDownStream")
+            .callback( this, &Protocol<HW,PD>::rxDownStream,
+                       d->engine()->events()
+                     ).handle();*/
+        
+        /*h = this->events()->setupConnection("txUpStream")
+            .callback( d, &Device<S, PD>::rxUpStream
+        //               ,this->engine()->events()
+                     ).handle();*/
+ 
         return true;
     }
+
 
 }

@@ -44,6 +44,7 @@ namespace ACES {
 
             virtual Word<T>* processUSQueue();
             virtual Message<T>* processDSQueue();
+            bool subscribeProtocol(RTT::TaskContext* p);
 
         protected:
             //RTT::Event<void( Word<T>* )> txUpStream;

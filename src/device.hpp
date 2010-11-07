@@ -19,25 +19,29 @@ namespace ACES{
         public:
             Device(std::string config);
             //Device(std::string name);
-            virtual void rxUpStream(Word<PD>*);
-            virtual void rxDownStream(Word<S>*);
+            //virtual void rxUpStream(Word<PD>*);
+            //virtual void rxDownStream(Word<S>*);
 
             void updateHook();
 
-            virtual Word<PD>* processDSQueue();
-            virtual Word<S>* processUSQueue();
+            virtual Word<PD>* processDS(Word<S>*);
+            virtual Word<S>* processUS(Word<PD>*);
             bool subscribeState(RTT::TaskContext* s);
             bool printCred();
 
         protected:
             //RTT::Event<void(Word<PD>*)> txDownStream;
             //RTT::Event<void(Word<S>*)> txUpStream;
-            RTT::Method<bool()> credMethod;
+            //RTT::Queue< Word<S>*, RTT::BlockingPolicy,
+            //           RTT::BlockingPolicy> usQueue;
+            //RTT::Queue< Word<S>*, RTT::NonBlockingPolicy,
+            //           RTT::BlockingPolicy> dsQueue;
 
-            RTT::Queue< Word<S>*, RTT::BlockingPolicy,
-                       RTT::BlockingPolicy> usQueue;
-            RTT::Queue< Word<S>*, RTT::NonBlockingPolicy,
-                       RTT::BlockingPolicy> dsQueue;
+            RTT::Method<bool()> credMethod;
+            InputPort< Word<S>* > rxDownStream;
+            InputPort< Word<PD>* > rxUpStream;
+            OutputPort< Word<PD>* > txDownStream;
+            OutputPort< Word<S>* > txUpStream;
 
             Credentials* credentials;
     };

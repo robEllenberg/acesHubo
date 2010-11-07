@@ -1,5 +1,4 @@
 namespace ACES{
-
     template <class S, class PD>
     void Device<S,PD>::updateHook(){
         Word<PD>* g = NULL;
@@ -27,9 +26,8 @@ namespace ACES{
         }
     }
 
-
     template <class S, class PD>
-    Word<S>* Device<S,PD>::processUSQueue(){
+    Word<S>* Device<S,PD>::processUS(Word<PD>*){
         Word<PD>* p = NULL;
         usQueue.dequeue(p);
         //Only works on equiv types
@@ -37,7 +35,7 @@ namespace ACES{
     }
 
     template <class S, class PD>
-    Word<PD>* Device<S,PD>::processDSQueue(){
+    Word<PD>* Device<S,PD>::processDS(Word<S>*){
         Word<S>* s = NULL;
         dsQueue.dequeue(s);
         //Only works on equiv types

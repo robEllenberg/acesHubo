@@ -76,5 +76,35 @@ namespace ACES {
         return true;
     }
     */
+    template <class T>
+    bool Hardware<T>::subscribeProtocol(RTT::TaskContext* p){
+        this->connectPeers(p);
+       /* RTT::Handle hand = this->events()->setupConnection("txDownStream")
+            .callback( h, &Hardware<HW>::rxDownStream
+            //           ,p->engine()->events() ).handle();
+            ).handle(); */
+        //RTT::base
+        RTT::PortInterface* port = NULL;
+        bool success;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
+
+        port = (RTT::PortInterface*)p->ports()->getPort("RxUS");
+        success = this->txUpStream.connectTo(port, policy);
+        if(not success){
+            return false;
+        }
+        
+        port = (RTT::PortInterface*)p->ports()->getPort("TxDS");
+        success = port->connectTo(this->rxDownStream, policy);
+        if(not success){
+            return false;
+        }
+                                  
+        /*hand = h->events()->setupConnection("txUpStream")
+            .callback( this, &Protocol<HW,PD>::rxUpStream
+            //           ,this->engine()->events() ).handle();
+            ).handle();*/
+        return true;
+    }
 
 }
