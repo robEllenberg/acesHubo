@@ -2,8 +2,10 @@
 #define ACES_DEVICE_HPP
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/Event.hpp>
-#include <rtt/Buffer.hpp>
+#include <rtt/Operation.hpp>
+#include <rtt/base/PortInterface.hpp>
+#include <rtt/OutputPort.hpp>
+#include <rtt/InputPort.hpp>
 
 #include "goal.hpp"
 #include "taskcfg.hpp"
@@ -27,7 +29,7 @@ namespace ACES{
             virtual Word<PD>* processDS(Word<S>*);
             virtual Word<S>* processUS(Word<PD>*);
             bool subscribeState(RTT::TaskContext* s);
-            bool printCred();
+            void printCred();
 
         protected:
             //RTT::Event<void(Word<PD>*)> txDownStream;
@@ -37,11 +39,11 @@ namespace ACES{
             //RTT::Queue< Word<S>*, RTT::NonBlockingPolicy,
             //           RTT::BlockingPolicy> dsQueue;
 
-            RTT::Method<bool()> credMethod;
-            InputPort< Word<S>* > rxDownStream;
-            InputPort< Word<PD>* > rxUpStream;
-            OutputPort< Word<PD>* > txDownStream;
-            OutputPort< Word<S>* > txUpStream;
+            //RTT::Method<bool()> credMethod;
+            RTT::InputPort< Word<S>* > rxDownStream;
+            RTT::InputPort< Word<PD>* > rxUpStream;
+            RTT::OutputPort< Word<PD>* > txDownStream;
+            RTT::OutputPort< Word<S>* > txUpStream;
 
             Credentials* credentials;
     };

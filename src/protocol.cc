@@ -36,23 +36,23 @@ namespace ACES{
 
     template <class HW, class PD>    
     void Protocol<HW,PD>::updateHook(){
-        Word<PD>* p = NULL;
-        Message<HW>* h = NULL;
-        while( rxDownStream.read(p) == RTT::NewData ){
-            if( h = processDS(p) ){
+        Word<PD>* dsIn = NULL;
+        Message<HW>* dsOut = NULL;
+        while( rxDownStream.read(dsIn) == RTT::NewData ){
+            if( dsOut = processDS(dsIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol) got DS" << RTT::endlog();
-                txDownStream.write(m);
+                txDownStream.write(dsOut);
             }
         }
 
-        Word<HW>* h2 = NULL;
-        Word<PD>* p2 = NULL;
-        while( rxUpStream.read(h2) == RTT::NewData ){
-            if( p2 = processUS(h2) ){
+        Word<HW>* usIn = NULL;
+        Word<PD>* usOut = NULL;
+        while( rxUpStream.read(usIn) == RTT::NewData ){
+            if( usOut = processUS(usIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol) got US" << RTT::endlog();
-                txUpStream.write(p2);
+                txUpStream.write(usOut);
             }
         }
     }
@@ -82,17 +82,17 @@ namespace ACES{
     bool Protocol<HW,PD>::subscribeDevice(RTT::TaskContext* d){
         this->connectPeers( (RTT::TaskContext*) d );
 
-        RTT::PortInterface* port = NULL;
+        RTT::base::PortInterface* port = NULL;
         bool success;
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
         
-        port = (RTT::PortInterface*)d->ports()->getPort("RxUS");
+        port = (RTT::base::PortInterface*)d->ports()->getPort("RxUS");
         success = this->txUpStream.connectTo(port, policy);
         if(not success){
             return false;
         }
 
-        port = (RTT::PortInterface*)d->ports()->getPort("TxDS");
+        port = (RTT::base::PortInterface*)d->ports()->getPort("TxDS");
         success = port->connectTo(this->rxDownStream, policy);
         if(not success){
             return false;

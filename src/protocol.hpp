@@ -6,11 +6,11 @@
 #include <string>
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/Ports.hpp>
-#include <rtt/PortInterface.hpp>
+#include <rtt/base/PortInterface.hpp>
+#include <rtt/InputPort.hpp>
+#include <rtt/OutputPort.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/Activity.hpp>
-#include <rtt/Buffer.hpp>
 
 #include "message.hpp"
 #include "state.hpp"
@@ -54,16 +54,15 @@ namespace ACES {
 
             //'subscribe' used in the upstream direction, 'connect' used
             //for downstream direction
-            template<class S>
             bool subscribeDevice(RTT::TaskContext* d);
         protected:
             //RTT::Event<void(Message<HW>*)> txDownStream;
             //RTT::Event< void(Word<PD>*) > txUpStream;
             //T, read, write
-            InputPort< Word<PD>* > rxDownStream;
-            InputPort< Word<HW>* > rxUpStream;
-            OutputPort< Message<HW>* > txDownStream;
-            OutputPort< Word<PD>* > txUpStream;
+            RTT::InputPort< Word<PD>* > rxDownStream;
+            RTT::InputPort< Word<HW>* > rxUpStream;
+            RTT::OutputPort< Message<HW>* > txDownStream;
+            RTT::OutputPort< Word<PD>* > txUpStream;
             /*
             RTT::Queue< Word<HW>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;

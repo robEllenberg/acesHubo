@@ -9,8 +9,6 @@
 #include <string>
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/Event.hpp>
-#include <rtt/Method.hpp>
 #include <rtt/Activity.hpp>
 
 #include "taskcfg.hpp"
@@ -27,8 +25,9 @@ namespace ACES{
             virtual std::map<std::string, void*>* 
                     getStateVector(bool echo=0) = 0;
 
-            RTT::Event<void(std::map<std::string, void*>*)>
-                applyStateVector;
+            //RTT::Event<void(std::map<std::string, void*>*)>
+            //    applyStateVector;
+            RTT::OutputPort< std::map<std::string, void*>* > applyStateVector;
     };
 
     class ScriptCtrl : public Controller
@@ -46,10 +45,10 @@ namespace ACES{
             //std::map<std::string, void*>* stateVect;
             int simState;
 
-            RTT::Method<void(void)> stepMethod;
-            RTT::Method<bool(void)> runMethod;
-            RTT::Method<void(void)> haltMethod;
-            RTT::Method<bool(std::string)> openScriptMethod;
+            //RTT::Method<void(void)> stepMethod;
+            //RTT::Method<bool(void)> runMethod;
+            //RTT::Method<void(void)> haltMethod;
+            //RTT::Method<bool(std::string)> openScriptMethod;
     };
 
     class NullCtrl : public Controller 

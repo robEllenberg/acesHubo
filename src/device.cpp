@@ -4,18 +4,18 @@ namespace ACES{
     template <class S, class PD>
     Device<S,PD>::Device(std::string config) :
       taskCfg(config),
-      RTT::TaskContext(name),
+      RTT::TaskContext(name)
       //txDownStream("txDownStream"),
       //txUpStream("txUpStream"),
       //dsQueue(10),
       //usQueue(10),
-      credMethod("credentials", &Device::printCred, this)
     {
         /*this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
         this->events()->addEvent(&txUpStream, "txUpStream", "data",
                                  "Interperted data going to states");*/
-        this->methods()->addMethod(credMethod, "credentials");
+        this->addOperation("credentials", &Device<S,PD>::printCred, this,
+                           RTT::OwnThread).doc("Print the Credentials");
         this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from State) Reception");
         this->ports()->addPort("RxUS", rxUpStream).doc(
@@ -54,11 +54,11 @@ namespace ACES{
         //TODO - Figure out how calling this reception function
         //in a non-periodic thread affects RT characteristic
 
-        RTT::PortInterface* port = NULL;
+        RTT::base::PortInterface* port = NULL;
         bool success;
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
 
-        port = (RTT::PortInterface*)s->ports()->getPort("RxUS");
+        port = (RTT::base::PortInterface*)s->ports()->getPort("RxUS");
         success = this->txUpStream.connectTo(port, policy);
         if(not success){
             return false;
@@ -68,7 +68,7 @@ namespace ACES{
                      ,  s->engine()->events()
                      ).handle();*/
 
-        port = (RTT::PortInterface*)s->ports()->getPort("TxDS");
+        port = (RTT::base::PortInterface*)s->ports()->getPort("TxDS");
         success = port->connectTo(this->rxDownStream, policy);
         if(not success){
             return false;

@@ -3,60 +3,59 @@ namespace ACES{
     template <class T>
     State<T>::State(std::string cfg, int nID) :
       ProtoState(cfg, nID),
-      goMethod("go", &State<T>::go, this),
-      value("value"),
-      txDownStream("txDownStream"),
-      dsQueue(10),
-      usQueue(10),
-      sampleMethod("sample", &State<T>::sample, this)
+      //goMethod("go", &State<T>::go, this),
+      value(0)
+      //txDownStream("txDownStream"),
+      //dsQueue(10),
+      //usQueue(10),
+      //sampleMethod("sample", &State<T>::sample, this)
     {
-        this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
-            "credentials associated w/the goal");
-        this->methods()->addMethod(sampleMethod, "sample");
+        //this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
+        //    "credentials associated w/the goal");
+        this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
+                          ).doc("Sample the State");
 
+        this->addOperation("go", &State<T>::go, this, RTT::OwnThread).doc(
+                           "Go to a specified Setpoint").arg("SP", "Set Point");
         //dsQueue = new RTT::Buffer< std::map<std::string, void*>* >(50);
         //dsQueue = new RTT::Buffer< Goal* >(50);
         //dsQueue = new RTT::Buffer< Goal* >(50);
 
-        this->setActivity(
-                new RTT::Activity( priority, 1.0/freq, 0, name)
-        );
-        bool one = this->methods()->addMethod(goMethod, "go",
-                                   "SP",
-                                   "Set Point");
-        this->attributes()->addAttribute(&value);
+        this->addAttribute("value", value);
         asgnfunct = assign;
+
+        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
     }
 
     template <class T>
     void State<T>::updateHook(){
-        if( samplingAttr.get() ){
+        if( samplingAttr ){
             sample();
         }
-
-        while (not dsQueue.isEmpty() ){
-            Word<T>* h = NULL;
-            dsQueue.dequeue(h);
-            txDownStream(h);
+        std::map<std::string, void*>* dsIn = NULL;
+        Word<T>* dsOut = NULL;
+        while ( rxDownStream.read(dsIn) == RTT::NewData ){
+            if( dsOut = processDS(dsIn) ){
+                txDownStream.write(dsOut);
+            }
         }
         
-        while(not usQueue.isEmpty() ){
-            Word<T>* rx;
-            usQueue.dequeue(rx);
-
+        Word<T>* usIn = NULL;
+        while( rxUpStream.read(usIn) == RTT::NewData ){
             RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS"
                                << RTT::endlog();
             //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
             //                     << nodeIDAttr.get() << RTT::endlog();
             
-            if(rx->getNodeID() == nodeID.get()){
+            if(usIn->getNodeID() == nodeID){
                 RTT::Logger::log() << RTT::Logger::Debug << "(state) assign"
                                    << RTT::endlog();
-                asgnfunct(rx, this);
+                asgnfunct(usIn, this);
             }
         }
     }
 
+/*
     template <class T>
     bool State<T>::subscribeController(Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
@@ -75,7 +74,7 @@ namespace ACES{
         }
         return true;
     }
-
+*/
     template <class T>
     void State<T>::printme(){
         RTT::Logger::log() << "State: " << name
@@ -86,8 +85,8 @@ namespace ACES{
 
     template <class T>
     void State<T>::go(T sp){
-        Word<T>* w = new Word<T>(sp, nodeID.get(), 0, SET);
-        dsQueue.enqueue(w);
+        Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
+        txDownStream.write(w);
     }
 
     template <class T>
@@ -96,26 +95,27 @@ namespace ACES{
         State<T>* th = (State<T>*)me;
         RTT::Logger::log() << RTT::Logger::Debug
                            << "(state) Value: " << w->getData();
-        th->value.set( w->getData() );
+        th->value = w->getData();
     }
 
     template <class T>
-    void State<T>::rxDownStream(std::map<std::string, void*>* p){
+    Word<T>* State<T>::processDS( std::map<std::string, void*>* p ){
        //RTT::Logger::log() << "trigger " + name << RTT::endlog();
        std::map<std::string, void* >::iterator mypair;
         mypair = p->find( name );
         if(mypair != p->end() ){
             void* pval = (*mypair).second;
             T val = *((T*)pval);
-            Word<T>* w = new Word<T>(val, nodeID.get(), 0, SET);
-            dsQueue.enqueue(w);
+            Word<T>* w = new Word<T>(val, nodeID, 0, SET);
+            return w; 
         }
+        return NULL;
     }
 
     template <class T>
     std::string State<T>::logVal(){
         std::stringstream s;
-        s << this->value.get();
+        s << this->value;
         return s.str();
     }
 }

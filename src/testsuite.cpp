@@ -36,8 +36,8 @@ namespace TestSuite{
 
         RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!"
                            << RTT::endlog();
-        ACES::Word<float> *g = new ACES::Word<float>(val, this->nodeID.get(),
+        ACES::Word<float> *g = new ACES::Word<float>(val, this->nodeID,
                                                      0, ACES::REFRESH);
-        dsQueue.enqueue(g);
+        txDownStream.write(g);
     }
 };

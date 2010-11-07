@@ -6,9 +6,8 @@ namespace ACES{
         RTT::TaskContext(name),
         applyStateVector("applyStateVector")
     {
-        this->events()->addEvent(&applyStateVector, "applyStateVector",
-            "SVmap", "map of state vect info");
-
+        //this->events()->addEvent(&applyStateVector, "applyStateVector",
+        //    "SVmap", "map of state vect info");
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
@@ -17,10 +16,10 @@ namespace ACES{
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
         walkScript((const char*)args.c_str(), std::ifstream::in),
-        stepMethod("step", &ScriptCtrl::step, this),
-        runMethod("run", &ScriptCtrl::run, this),
-        haltMethod("halt", &ScriptCtrl::halt, this),
-        openScriptMethod("openScript", &ScriptCtrl::openScript, this)
+        //stepMethod("step", &ScriptCtrl::step, this),
+        //runMethod("run", &ScriptCtrl::run, this),
+        //haltMethod("halt", &ScriptCtrl::halt, this),
+        //openScriptMethod("openScript", &ScriptCtrl::openScript, this)
     {
         //Set the current state of the simulation to stopped
         simState = WB_CTRL_HALT;
@@ -28,14 +27,24 @@ namespace ACES{
         //Make sure we have an existant script file
         assert(walkScript.is_open());
 
-        this->methods()->addMethod(stepMethod,
-            "Advance the simulation one time step.");
-        this->methods()->addMethod(runMethod,
-            "Start the simulation (free running).");
-        this->methods()->addMethod(haltMethod,
-            "Halt the simulation.");
-        this->methods()->addMethod(openScriptMethod,
-            "Open a new trajectory file", "sfile", "Script file path");
+        this->addOperation("step", &ScriptCtrl::step, this, RTT::OwnThread).doc(
+                           "Advance the simulation one time step.");
+        this->addOperation("run", &ScriptCtrl::run, this, RTT::OwnThread).doc(
+                           "Start the simulation (free running).");
+        this->addOperation("halt",  &ScriptCtrl::halt, this, RTT::OwnThread).doc(
+                           "Halt the simulation.");
+        this->addOperation("openScript", &ScriptCtrl::openScript, this,
+                          RTT::OwnThread).doc("Open a new trajectory file").arg(
+                          "sfile", "Script file path");           
+
+        //this->methods()->addMethod(stepMethod,
+        //    "Advance the simulation one time step.");
+        //this->methods()->addMethod(runMethod,
+        //    "Start the simulation (free running).");
+        //this->methods()->addMethod(haltMethod,
+        //    "Halt the simulation.");
+        //this->methods()->addMethod(openScriptMethod,
+        //    "Open a new trajectory file", "sfile", "Script file path");
     }
 
     void ScriptCtrl::updateHook(){

@@ -3,17 +3,15 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/Event.hpp>
-#include <rtt/Ports.hpp>
+#include <rtt/InputPort.hpp>
+#include <rtt/OutputPort.hpp>
 #include <rtt/Activity.hpp>
 #include <rtt/Logger.hpp>
-#include <rtt/Method.hpp>
-#include <rtt/Command.hpp>
-#include <rtt/Queue.hpp>
-#include <rtt/Buffer.hpp>
-#include <rtt/BufferPolicy.hpp>
+#include <rtt/Operation.hpp>
+#include <rtt/Attribute.hpp>
 
 #include "credentials.hpp"
 #include "controller.hpp"
@@ -30,10 +28,12 @@ namespace ACES {
     {
         public:
             ProtoState(std::string config, int nID) ;
-            std::string getName();
+            //std::string getName();
             virtual std::string logVal() = 0;
-            RTT::Attribute<int> nodeID;
-            RTT::Attribute<bool> samplingAttr;
+            int nodeID;
+            bool samplingAttr;
+            //RTT::Attribute<int> nodeID;
+            //RTT::Attribute<bool> samplingAttr;
  
             //RTT::OS::Mutex dsqGuard;
             //RTT::Buffer< Goal* > *dsQueue;
@@ -44,7 +44,6 @@ namespace ACES {
             //TODO - Remove nodeID entirely in favor of nodeIDAttr
             //int nodeID;
     };
-
 
     template <class T>
     class State : public ProtoState
@@ -57,25 +56,30 @@ namespace ACES {
             virtual void sample();
             virtual std::string logVal();
 
-            RTT::Event<void(Word<T>*)> txDownStream;
-            void rxDownStream(std::map<std::string, void*>*);
-            void rxUpStream(Word<T>*);
+            //RTT::Event<void(Word<T>*)> txDownStream;
+            //void rxDownStream(std::map<std::string, void*>*);
+            //void rxUpStream(Word<T>*);
             void printme();
             void go(T sp);
             //static void assign(ProtoResult* meas, void* me);
             static void assign(Word<T>* w, void* me);
+            Word<T>* processDS( std::map<std::string, void*>* p );
 
-            RTT::Attribute<T> value;
-            RTT::Method<void(T)> goMethod;
-            RTT::Method<void()> sampleMethod;
+            //RTT::Attribute<T> value;
+            T value;
+            //RTT::Method<void(T)> goMethod;
+            //RTT::Method<void()> sampleMethod;
 
-            bool subscribeController(Controller* c);
+            //bool subscribeController(Controller* c);
 
         protected:
-            RTT::Queue< Word<T>*, RTT::BlockingPolicy,
+            /*RTT::Queue< Word<T>*, RTT::BlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
             RTT::Queue< Word<T>*, RTT::NonBlockingPolicy,
-                       RTT::BlockingPolicy> dsQueue;
+                       RTT::BlockingPolicy> dsQueue;*/
+            RTT::OutputPort< Word<T>* > txDownStream;
+            RTT::InputPort< Word<T>* > rxUpStream;
+            RTT::InputPort< std::map<std::string, void*>* > rxDownStream;
     };
 }
     

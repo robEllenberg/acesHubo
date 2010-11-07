@@ -20,35 +20,34 @@ namespace ACES {
     }
 
     template <typename T>
-    Word<T>* Hardware<T>::processUSQueue(){
-        Word<T>* w = NULL; 
-        usQueue.dequeue(w);
-        return w;
+    bool Hardware<T>::processUS(Word<T>* usIn){
+        return true;
     }
 
     template <class T>
-    bool Hardware<T>::processDSQueue(Message<T>* m){
-        //Message<T>* m = NULL;
-        //dsQueue.dequeue(m);
+    bool Hardware<T>::processDS(Message<T>* m){
         return true;
     }
 
     template <class T>
     void Hardware<T>::updateHook(){
-        Message<T>* m = NULL;
-        while( rxDownStream.read(m) == RTT::NewData ){
-            processDSQueue(m){
-            RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
-                               << RTT::endlog();
-            txBus(m);
+        Message<T>* dsIn = NULL;
+        while( rxDownStream.read(dsIn) == RTT::NewData ){
+            if( processDS(dsIn) ){
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
+                                   << RTT::endlog();
+                txBus(dsIn);
+            }
         }
         rxBus();
-        Word<T>* p = NULL;
-        while( not usQueue.isEmpty()){
-            if(p = processUSQueue()){
+        Word<T>* usIn = NULL;
+        //while( rxUpStream.read(usIn) == RTT::NewData ){
+        while(not usQueue.isEmpty() ){
+            usQueue.dequeue(usIn);
+            if( processUS(usIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US"
                                    << RTT::endlog();
-                txUpStream(p);
+                txUpStream.write(usIn);
             }
         }
     }
@@ -57,7 +56,7 @@ namespace ACES {
     bool Hardware<T>::txBus(Message<T>* m){
         while( m->size() ){
             Word<T>* w = m->Pop();
-            TxUS.write(w);
+            txUpStream.write(w);
             //usQueue.enqueue(w);
             //TODO - Delete the word
         }
@@ -84,17 +83,17 @@ namespace ACES {
             //           ,p->engine()->events() ).handle();
             ).handle(); */
         //RTT::base
-        RTT::PortInterface* port = NULL;
+        RTT::base::PortInterface* port = NULL;
         bool success;
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
 
-        port = (RTT::PortInterface*)p->ports()->getPort("RxUS");
+        port = (RTT::base::PortInterface*)p->ports()->getPort("RxUS");
         success = this->txUpStream.connectTo(port, policy);
         if(not success){
             return false;
         }
         
-        port = (RTT::PortInterface*)p->ports()->getPort("TxDS");
+        port = (RTT::base::PortInterface*)p->ports()->getPort("TxDS");
         success = port->connectTo(this->rxDownStream, policy);
         if(not success){
             return false;

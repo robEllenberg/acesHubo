@@ -366,7 +366,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startHW(){
-        for(std::list<Hardware*>::iterator it = hwList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = hwList.begin();
             it != hwList.end(); it++){
             (*it)->start();
         }
@@ -374,7 +374,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startProtocol(){
-        for(std::list<Protocol*>::iterator it = pList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = pList.begin();
             it != pList.end(); it++){
             (*it)->start();
         }
@@ -382,7 +382,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startDevice(){
-        for(std::list<Device*>::iterator it = dList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = dList.begin();
             it != dList.end(); it++){
             (*it)->start();
         }
@@ -390,7 +390,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startState(){
-        for(std::list<ProtoState*>::iterator it = stateList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
             RTT::TaskContext *p = (RTT::TaskContext*)(*it);
             p->start();
@@ -399,7 +399,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startController(){
-        for(std::list<Controller*>::iterator it = cList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->start();
         }
@@ -407,7 +407,7 @@ namespace ACES{
     }
 
     bool Dispatcher::startLogger(){
-        for(std::list<Logger*>::iterator it = logList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = logList.begin();
             it != logList.end(); it++){
             (*it)->start();
         }

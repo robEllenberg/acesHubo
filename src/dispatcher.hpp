@@ -102,10 +102,10 @@ namespace ACES{
 
             std::list<RTT::TaskContext*> stateList;
             std::list<RTT::TaskContext*> pList;
-            std::list<Controller*> cList;
+            std::list<RTT::TaskContext*> cList;
             std::list<RTT::TaskContext*> dList;
             std::list<RTT::TaskContext*> hwList;
-            std::list<Logger*> logList;
+            std::list<RTT::TaskContext*> logList;
             
             bool startHook();
             void stopHook();
