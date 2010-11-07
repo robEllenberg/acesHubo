@@ -2,11 +2,11 @@ namespace ACES{
     template <class HW, class PD>    
     Protocol<HW,PD>::Protocol(std::string cfg, std::string args) :
       taskCfg(cfg),
-      RTT::TaskContext(name),
-      txDownStream("txDownStream"),
-      txUpStream("txUpStream"),
-      dsQueue(10),
-      usQueue(10)
+      RTT::TaskContext(name)
+      //txDownStream("txDownStream"),
+      //txUpStream("txUpStream"),
+      //dsQueue(10),
+      //usQueue(10)
     {
         //requestBuf = new std::deque<Message*>;
 
@@ -15,11 +15,20 @@ namespace ACES{
         //returnBuf = new RTT::Buffer<ProtoResult*>(250);
         //returnQueue = new std::deque<ProtoResult*>(250);
         //requestQueue = new std::deque<Goal*>(250);
-        
+        /*
         this->events()->addEvent(&txDownStream, "txDownStream", "msg",
                                  "The message to be transmitted");
         this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
+        */
+        this->ports()->addPort("RxDS", rxDownStream).doc(
+                               "DownStream (from Device) Reception");
+        this->ports()->addPort("RxUS", rxUpStream).doc(
+                               "UpStream (from Hardware) Reception");
+        this->ports()->addPort("TxDS", txDownStream).doc(
+                               "DownStream (to Hardware) Transmission");
+        this->ports()->addPort("TxUS", txUpStream).doc(
+                               "UpStream (to Device) Transmission");
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
@@ -27,55 +36,44 @@ namespace ACES{
 
     template <class HW, class PD>    
     void Protocol<HW,PD>::updateHook(){
-        Message<HW>* m = NULL;
-        while( not dsQueue.isEmpty()){
-            if( m = processDSQueue() ){
+        Word<PD>* p = NULL;
+        Message<HW>* h = NULL;
+        while( rxDownStream.read(p) == RTT::NewData ){
+            if( h = processDS(p) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol) got DS" << RTT::endlog();
-                txDownStream(m);
+                txDownStream.write(m);
             }
         }
 
-        Word<PD>* r = NULL;
-        while( not usQueue.isEmpty() ){
-            if(r = processUSQueue()){
+        Word<HW>* h2 = NULL;
+        Word<PD>* p2 = NULL;
+        while( rxUpStream.read(h2) == RTT::NewData ){
+            if( p2 = processUS(h2) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol) got US" << RTT::endlog();
-                txUpStream(r);
+                txUpStream.write(p2);
             }
         }
     }
 
     template <class HW, class PD>    
-    void Protocol<HW,PD>::rxDownStream(Word<PD>* g){
-        dsQueue.enqueue(g);
-    }
-
-    template <class HW, class PD>    
-    void Protocol<HW,PD>::rxUpStream(Word<HW>* w){
-        usQueue.enqueue(w);
-    }
-
-    template <class HW, class PD>    
-    Message<HW>* Protocol<HW, PD>::processDSQueue(){
-        //Goal* g = getDSQelement();
-        Word<PD>* w = NULL;
-        dsQueue.dequeue(w);
-        Message<HW>* m = new Message<HW>();
-        m->Push(w);
+    Message<HW>* Protocol<HW, PD>::processDS(Word<PD>* p){
+        Message<HW>* m = NULL;
+        m = new Message<HW>();
+        m->Push(p);
         return m;
     }
 
     template <class HW, class PD>    
-    Word<PD>* Protocol<HW, PD>::processUSQueue(){
-        Word<HW>* h = NULL;
-        usQueue.dequeue(h);
+    Word<PD>* Protocol<HW, PD>::processUS(Word<HW>* h){
+        Word<PD>* p = NULL;
 
         //TODO - Specialized processing function from HWord->PDWord
         //If we're going to implement some kind of state machine or whatever
-        //it needs to be done here. This default is only meaningful for type-same
-        //protocols & hardware (not many at all)
-        Word<PD>* p = h;
+        //it needs to be done here. This default is only meaningful for 
+        //type-same protocols & hardware (not many at all)
+        p = h;
 
         return p;
     }
@@ -113,31 +111,31 @@ namespace ACES{
     template <class HW, class PD>
     bool Protocol<HW,PD>::connectHardware(RTT::TaskContext* h){
         this->connectPeers(h);
-        RTT::Handle hand = this->events()->setupConnection("txDownStream")
+       /* RTT::Handle hand = this->events()->setupConnection("txDownStream")
             .callback( h, &Hardware<HW>::rxDownStream
             //           ,p->engine()->events() ).handle();
-            ).handle();
-        if(! hand.ready() ){
-            return false;
-        }
-        hand.connect();
-        if(!hand.connected() ){
-            return false;
-        }
+            ).handle(); */
+        //RTT::base
+        RTT::PortInterface* p = NULL;
+        bool success;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
 
-        hand = h->events()->setupConnection("txUpStream")
+        p = (RTT::PortInterface*)h->ports()->getPort("RxDS");
+        success = this->txDownStream.connectTo(p, policy);
+        if(not success){
+            return false;
+        }
+        
+        p = (RTT::PortInterface*)h->ports()->getPort("TxUS");
+        success = p->connectTo(this->rxUpStream, policy);
+        if(not success){
+            return false;
+        }
+                                  
+        /*hand = h->events()->setupConnection("txUpStream")
             .callback( this, &Protocol<HW,PD>::rxUpStream
             //           ,this->engine()->events() ).handle();
-            ).handle();
-
-        if(! hand.ready() ){
-            return false;
-        }
-        hand.connect();
-        if(!hand.connected() ){
-            return false;
-        }
- 
+            ).handle();*/
         return true;
     }
 

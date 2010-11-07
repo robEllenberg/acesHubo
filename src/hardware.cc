@@ -4,12 +4,16 @@ namespace ACES {
         ProtoHardware(),
         taskCfg(cfg),
         RTT::TaskContext(name),
-        txUpStream("txUpStream"),
-        dsQueue(10),
+        //txUpStream("txUpStream"),
+        //dsQueue(10),
         usQueue(10)
     {
-        this->events()->addEvent(&txUpStream, "txUpStream", "word",
-                                 "Recieved Data");
+        //this->events()->addEvent(&txUpStream, "txUpStream", "word",
+        //                         "Recieved Data");
+        this->ports()->addPort("TxUS", txUpStream).doc(
+                               "UpStream (to Protocol) Transmission");
+        this->ports()->addPort("RxDS", rxDownStream).doc(
+                               "DownStream (from Protocol) Reception");
 
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0,
                                               name));
@@ -23,21 +27,20 @@ namespace ACES {
     }
 
     template <class T>
-    Message<T>* Hardware<T>::processDSQueue(){
-        Message<T>* m = NULL;
-        dsQueue.dequeue(m);
-        return m;
+    bool Hardware<T>::processDSQueue(Message<T>* m){
+        //Message<T>* m = NULL;
+        //dsQueue.dequeue(m);
+        return true;
     }
 
     template <class T>
     void Hardware<T>::updateHook(){
         Message<T>* m = NULL;
-        while( not dsQueue.isEmpty()){
-            if(m = processDSQueue()){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
-                                   << RTT::endlog();
-                txBus(m);
-            }
+        while( rxDownStream.read(m) == RTT::NewData ){
+            processDSQueue(m){
+            RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
+                               << RTT::endlog();
+            txBus(m);
         }
         rxBus();
         Word<T>* p = NULL;
@@ -54,18 +57,24 @@ namespace ACES {
     bool Hardware<T>::txBus(Message<T>* m){
         while( m->size() ){
             Word<T>* w = m->Pop();
-            usQueue.enqueue(w);
+            TxUS.write(w);
+            //usQueue.enqueue(w);
             //TODO - Delete the word
         }
         return true;
     }
 
     template <class T>
+    void Hardware<T>::rxBus(){
+        return 0;
+    }
+
+    /*
+    template <class T>
     bool Hardware<T>::rxDownStream(Message<T>* m){
         dsQueue.enqueue(m);
         return true;
     }
-
-
+    */
 
 }

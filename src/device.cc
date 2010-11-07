@@ -27,22 +27,7 @@ namespace ACES{
         }
     }
 
-/*
-    template <class S, class P>
-    std::deque< PDWord<P>* > Device<S,P>::processUSQueue(){
-        SWord<S>* s = NULL;
-        usQueue.dequeue(s);
-        PDWord<P>* p = new PDWord<P>(s.getData(), s.getNodeID(),
-                                     s.getDevID(), s.getCred);
-        
-        return std::deque< PDWord<P>* >(1, p);
-        //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
-        //Goal* g = ( (Result<Goal*>*) p)->result;
-        //Result<void*>* r = new Result<void*>(g->data, g->cred, p->nodeID);
-        //std::list<ProtoResult*> pr_list(1, (ProtoResult*)r);
-        //return pr_list;
-    }
-*/
+
     template <class S, class PD>
     Word<S>* Device<S,PD>::processUSQueue(){
         Word<PD>* p = NULL;

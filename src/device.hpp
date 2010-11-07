@@ -30,8 +30,8 @@ namespace ACES{
             bool printCred();
 
         protected:
-            RTT::Event<void(Word<PD>*)> txDownStream;
-            RTT::Event<void(Word<S>*)> txUpStream;
+            //RTT::Event<void(Word<PD>*)> txDownStream;
+            //RTT::Event<void(Word<S>*)> txUpStream;
             RTT::Method<bool()> credMethod;
 
             RTT::Queue< Word<S>*, RTT::BlockingPolicy,

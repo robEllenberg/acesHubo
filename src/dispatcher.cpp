@@ -150,11 +150,12 @@ namespace ACES{
                                std::string args)
     {
         RTT::TaskContext *d = NULL;
-        #ifdef WEBOTS 
         std::istringstream s(type);
         std::string type1, type2;
         s >> type1;
         s >> type2;
+
+        #ifdef WEBOTS 
         if (type1 == "Webots"){
             if(type2 == "Joint"){
                 d = (Device*) new Webots::JointDevice(cfg, args);
@@ -299,6 +300,7 @@ namespace ACES{
         RTT::TaskContext* p = this->getPeer(pcol);
         RTT::TaskContext* d = this->getPeer(device);
 
+        typeof(*p) 
         if(p && d){
             return ((Protocol*)p)->subscribeDevice((Device*)d);
         }

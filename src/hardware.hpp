@@ -6,7 +6,7 @@
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Event.hpp>
-#include <rtt/Ports.hpp>
+#include <rtt/Port.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/Activity.hpp>
 
@@ -24,7 +24,6 @@ namespace ACES {
         public:
             ProtoHardware();
             virtual bool subscribeController(Controller* c);
-            virtual bool rxBus();
     };
 
     template <class T>
@@ -37,20 +36,26 @@ namespace ACES {
             //Hardware(std::string name);
             void updateHook();
 
-            bool rxDownStream(Message<T>* m);
+            //bool rxDownStream(Message<T>* m);
 
             virtual bool txBus(Message<T>* m);
+            virtual void rxBus();
+            //void txUpStream( Word<T>* );
 
             virtual Word<T>* processUSQueue();
             virtual Message<T>* processDSQueue();
 
         protected:
-            RTT::Event<void( Word<T>* )> txUpStream;
+            //RTT::Event<void( Word<T>* )> txUpStream;
             //T, read, write
             RTT::Queue< Word<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> usQueue;
+            /*
             RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
                        RTT::BlockingPolicy> dsQueue;
+            */
+            OutputPort< typename Word<T>* > txUpStream;
+            InputPort< Message<T>* > rxDownStream;
     };
 }
 
