@@ -58,13 +58,17 @@ namespace ACES{
     template <class S, class PD>
     Word<S>* Device<S,PD>::processUS(Word<PD>* usIn){
         Word<S>* usOut = NULL;
-        //Only works on equiv types
-        return usIn; 
+        if(*(usIn->getCred()) == *credentials){
+            //Only works on equiv types
+            return usIn; 
+        }
+        return NULL;
     }
 
     template <class S, class PD>
     Word<PD>* Device<S,PD>::processDS(Word<S>* dsIn){
         Word<PD>* dsOut = NULL;
+        dsIn->setCred(credentials);
         //Only works on equiv types
         return dsIn; 
     }
