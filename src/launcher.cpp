@@ -5,13 +5,18 @@
 #include <ocl/FileReporting.hpp>
 #include <rtt/os/main.h>
 #include <rtt/Logger.hpp>
+#include <rtt/TaskContext.hpp>
+#include <rtt/Activity.hpp>
+#include <rtt/scripting/Scripting.hpp>
+//#include <rtt/scripting/ScriptingService.hpp>
+//#include <rtt/plugin/PluginLoader.hpp>
 
-#include "credentials.hpp"
-#include "controller.hpp"
-#include "message.hpp"
-#include "hardware.hpp"
-#include "webots.hpp"
+//#include "credentials.hpp"
+//#include "controller.hpp"
+//#include "message.hpp"
+//#include "hardware.hpp"
 #include "dispatcher.hpp"
+//#include "webots.hpp"
 
 int ORO_main(int a, char** b){
     RTT::Logger* logger = RTT::Logger::Instance();
@@ -123,8 +128,11 @@ int ORO_main(int a, char** b){
     //d->start();
     //d->engine()->programs()->getProgram("TestProgram")->start();
 
-    d->scripting()->loadPrograms("testprog.ops");
-    d->start();
+    //d->scripting()->loadPrograms("testprog.ops");
+    //RTT::plugin::PluginLoader::Instance()->loadService("scripting",d);
+    ((RTT::TaskContext*)d)->getProvider<RTT::Scripting>("scripting")
+                     ->loadPrograms("testprog.ops");
+    //d->start();
     //d->engine()->programs()->getProgram("TestProgram")->start();
     
     Orocos::TaskBrowser tbrowser(d);

@@ -1,8 +1,7 @@
 namespace ACES{
     template <class HW, class PD>    
     Protocol<HW,PD>::Protocol(std::string cfg, std::string args) :
-      taskCfg(cfg),
-      RTT::TaskContext(name)
+      ProtoProtocol(cfg,args) 
       //txDownStream("txDownStream"),
       //txUpStream("txUpStream"),
       //dsQueue(10),
@@ -30,7 +29,8 @@ namespace ACES{
         this->ports()->addPort("TxUS", txUpStream).doc(
                                "UpStream (to Device) Transmission");
         this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name )
+            new RTT::Activity(this->priority, 1.0/(this->freq), 0,
+                              this->name )
         );
     }
 
@@ -77,39 +77,4 @@ namespace ACES{
 
         return p;
     }
-
-    template <class HW, class PD>    
-    bool Protocol<HW,PD>::subscribeDevice(RTT::TaskContext* d){
-        this->connectPeers( (RTT::TaskContext*) d );
-
-        RTT::base::PortInterface* port = NULL;
-        bool success;
-        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
-        
-        port = (RTT::base::PortInterface*)d->ports()->getPort("RxUS");
-        success = this->txUpStream.connectTo(port, policy);
-        if(not success){
-            return false;
-        }
-
-        port = (RTT::base::PortInterface*)d->ports()->getPort("TxDS");
-        success = port->connectTo(this->rxDownStream, policy);
-        if(not success){
-            return false;
-        }
-
-        /*RTT::Handle h = d->events()->setupConnection("txDownStream")
-            .callback( this, &Protocol<HW,PD>::rxDownStream,
-                       d->engine()->events()
-                     ).handle();*/
-        
-        /*h = this->events()->setupConnection("txUpStream")
-            .callback( d, &Device<S, PD>::rxUpStream
-        //               ,this->engine()->events()
-                     ).handle();*/
- 
-        return true;
-    }
-
-
 }

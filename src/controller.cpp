@@ -3,11 +3,14 @@ namespace ACES{
 
     Controller::Controller(std::string cfg, std::string args)
       : taskCfg(cfg),
-        RTT::TaskContext(name),
-        applyStateVector("applyStateVector")
+        RTT::TaskContext(name)
     {
         //this->events()->addEvent(&applyStateVector, "applyStateVector",
         //    "SVmap", "map of state vect info");
+
+        this->ports()->addPort("TxDS", txDownStream).doc(
+                               "DownStream (to State) Transmission");
+
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
         );
@@ -15,7 +18,7 @@ namespace ACES{
 
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
-        walkScript((const char*)args.c_str(), std::ifstream::in),
+        walkScript((const char*)args.c_str(), std::ifstream::in)
         //stepMethod("step", &ScriptCtrl::step, this),
         //runMethod("run", &ScriptCtrl::run, this),
         //haltMethod("halt", &ScriptCtrl::halt, this),
@@ -57,7 +60,7 @@ namespace ACES{
                  //delete stateVect;
                 std::map<std::string, void*>* sv;
                 sv = getStateVector();
-                applyStateVector(sv);
+                txDownStream.write(sv);
                 
                 //delete sv;       
                 if(simState == WB_CTRL_STEP){
@@ -101,7 +104,7 @@ namespace ACES{
     {
         std::map<std::string, void*>* sv;
         sv = getStateVector();
-        applyStateVector(sv);
+        txDownStream.write(sv);
     }
 
     std::map<std::string, void*>*

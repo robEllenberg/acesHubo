@@ -40,4 +40,12 @@ namespace TestSuite{
                                                      0, ACES::REFRESH);
         txDownStream.write(g);
     }
+
+    //TODO - Total Kludge, there's got to be a 'proper' way to get the compiler
+    //to generate the specializations we want and throw them into the library
+    void forcegenerate(){
+        Device<float, float> d("a", "b");
+        Hardware<float> h("a", "b");
+        Protocol<float, float> p("e", "f");
+    }
 };

@@ -22,16 +22,17 @@ namespace ACES {
     //template <class HW, class P>
     //class Protocol;
 
-    class ProtoHardware {
+    class ProtoHardware : protected taskCfg,
+                          public RTT::TaskContext
+    {
         public:
-            ProtoHardware();
-            virtual bool subscribeController(Controller* c);
+            ProtoHardware(std::string cfg, std::string args);
+            bool subscribeProtocol(RTT::TaskContext* p);
+            virtual bool subscribeController(RTT::TaskContext* c);
     };
 
     template <class T>
-    class Hardware : public ProtoHardware,
-                     public RTT::TaskContext,
-                     protected taskCfg
+    class Hardware : public ProtoHardware
     {
         public:
             Hardware(std::string cfg, std::string args);

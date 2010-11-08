@@ -28,10 +28,12 @@ namespace ACES {
     template <class H>
     class Hardware;
 
-    class ProtoProtocol
+    class ProtoProtocol : protected taskCfg, 
+                          public RTT::TaskContext
     {
-        public:    
-            ProtoProtocol();
+        public:   
+            ProtoProtocol(std::string cfg, std::string args);
+            bool subscribeDevice(RTT::TaskContext* d);
     };
 
 //! Abstract class for describing a data protocol
@@ -39,8 +41,7 @@ namespace ACES {
  * The Protocol virtual class 
  */
     template <class HW, class PD>    
-    class Protocol : protected taskCfg, 
-                     public RTT::TaskContext
+    class Protocol : public ProtoProtocol
     {
         public:
             Protocol(std::string cfg, std::string args);
@@ -52,9 +53,6 @@ namespace ACES {
             virtual Message<HW>* processDS(Word<PD>*);
             virtual Word<PD>* processUS(Word<HW>*);
 
-            //'subscribe' used in the upstream direction, 'connect' used
-            //for downstream direction
-            bool subscribeDevice(RTT::TaskContext* d);
         protected:
             //RTT::Event<void(Message<HW>*)> txDownStream;
             //RTT::Event< void(Word<PD>*) > txUpStream;

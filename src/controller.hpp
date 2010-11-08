@@ -10,6 +10,8 @@
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
+#include <rtt/InputPort.hpp>
+#include <rtt/OutputPort.hpp>
 
 #include "taskcfg.hpp"
 
@@ -27,7 +29,7 @@ namespace ACES{
 
             //RTT::Event<void(std::map<std::string, void*>*)>
             //    applyStateVector;
-            RTT::OutputPort< std::map<std::string, void*>* > applyStateVector;
+            RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
     };
 
     class ScriptCtrl : public Controller

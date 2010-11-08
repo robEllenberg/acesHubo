@@ -24,6 +24,13 @@ namespace ACES{
         this->addAttribute("value", value);
         asgnfunct = assign;
 
+        this->ports()->addPort("RxDS", rxDownStream).doc(
+                               "DownStream (from Controller) Reception");
+        this->ports()->addPort("RxUS", rxUpStream).doc(
+                               "UpStream (from Device) Reception");
+        this->ports()->addPort("TxDS", txDownStream).doc(
+                               "DownStream (to Device) Transmission");
+
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
     }
 
@@ -55,26 +62,14 @@ namespace ACES{
         }
     }
 
-/*
     template <class T>
-    bool State<T>::subscribeController(Controller* c){
-        this->connectPeers( (RTT::TaskContext*) c);
-        RTT::Handle h = c->events()->setupConnection("applyStateVector")
-                .callback( this, &State<T>::rxDownStream
-                          , c->engine()->events()
-                        ).handle();
-        if(!h.ready() ){
-            assert(false);
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
-            assert(false);
-            return false;
-        }
-        return true;
+    void State<T>::sample(){
+        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!"
+                           << RTT::endlog();
+        Word<T>* s = new Word<T>(0, nodeID, 0, REFRESH);
+        txDownStream.write(s);
     }
-*/
+
     template <class T>
     void State<T>::printme(){
         RTT::Logger::log() << "State: " << name

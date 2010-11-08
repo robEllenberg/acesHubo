@@ -6,8 +6,8 @@
 #include <sstream>
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/TimeService.hpp>
-#include <rtt/Time.hpp>
+#include <rtt/os/TimeService.hpp>
+//#include <rtt/Time.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "state.hpp"
@@ -44,7 +44,7 @@ namespace ACES{
 
             std::string filename;
             std::ofstream outFile;
-            RTT::TimeService::ticks beginning;
+            RTT::os::TimeService::ticks beginning;
             bool sample();
             //store();
     };

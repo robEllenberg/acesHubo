@@ -14,16 +14,25 @@ namespace ACES {
         this->addAttribute("sampling", samplingAttr);
     }
 
-    //std::string ProtoState::getName(){
-    //    return name;
-    //}
+    bool ProtoState::subscribeController(RTT::TaskContext* c){
+        this->connectPeers( (RTT::TaskContext*) c);
 
-    template <class T>
-    void State<T>::sample(){
-        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!"
-                           << RTT::endlog();
-        Word<T>* s = new Word<T>(0, nodeID, 0, REFRESH);
-        txDownStream.write(s);
+        RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
+        bool success;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
+        
+        theirPort = (RTT::base::PortInterface*)c->ports()->getPort("TxDS");
+        myPort = (RTT::base::PortInterface*)this->ports()->getPort("RxDS");
+        success = theirPort->connectTo(myPort, policy);
+        if(not success){
+            return false;
+        }
+
+        /*RTT::Handle h = c->events()->setupConnection("applyStateVector")
+                .callback( this, &State<T>::rxDownStream
+                          , c->engine()->events()
+                        ).handle();*/
+        return true;
     }
    
 /*

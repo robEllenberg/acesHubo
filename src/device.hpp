@@ -14,9 +14,16 @@
 #include "word.hpp"
 
 namespace ACES{
+    class ProtoDevice : protected taskCfg,
+                        public RTT::TaskContext 
+    {
+        public:
+            ProtoDevice(std::string config);
+            bool subscribeState(RTT::TaskContext* s);
+    };
+
     template <class S, class PD>
-    class Device :  protected taskCfg,
-                    public RTT::TaskContext
+    class Device : public ProtoDevice 
     {
         public:
             Device(std::string config);

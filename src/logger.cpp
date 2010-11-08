@@ -72,7 +72,7 @@ namespace ACES {
     
     bool FileLog::startHook(){
         outFile.open((const char*)filename.c_str());
-        beginning = RTT::TimeService::Instance()->getTicks();
+        beginning = RTT::os::TimeService::Instance()->getTicks();
         outFile << "0 ";
         for(std::list<ProtoState*>::iterator it = trackList.begin();
              it != trackList.end(); it++)
@@ -89,7 +89,7 @@ namespace ACES {
 
     bool FileLog::sample(){
         RTT::Seconds sampleTime =
-            RTT::TimeService::Instance()->secondsSince(beginning);
+            RTT::os::TimeService::Instance()->secondsSince(beginning);
 
         outFile << sampleTime << " ";
         for(std::list<ProtoState*>::iterator it = trackList.begin();
@@ -97,7 +97,7 @@ namespace ACES {
         {
             RTT::TaskContext* t = (TaskContext*)(*it);
             RTT::Attribute<float> a =
-                t->attributes()->getAttribute<float>("value");
+                t->attributes()->getAttribute("value");
             outFile << a.get() << " ";
         }
         outFile << std::endl;

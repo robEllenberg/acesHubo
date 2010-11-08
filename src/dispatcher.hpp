@@ -65,7 +65,7 @@ namespace ACES{
             bool linkSC(std::string state, std::string ctrl);
             bool linkHC(std::string hw, std::string ctrl);
             bool linkLS(std::string logger, std::string state);
-
+            /*
             RTT::Method<bool(std::string, std::string, std::string)>
                         addHardwareMethod;
             RTT::Method<bool(std::string, std::string, std::string)>
@@ -99,7 +99,7 @@ namespace ACES{
             RTT::Method<bool(std::string, std::string)> linkSCMethod;
             RTT::Method<bool(std::string, std::string)> linkHCMethod;
             RTT::Method<bool(std::string, std::string)> linkLSMethod;
-
+            */
             std::list<RTT::TaskContext*> stateList;
             std::list<RTT::TaskContext*> pList;
             std::list<RTT::TaskContext*> cList;

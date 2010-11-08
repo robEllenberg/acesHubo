@@ -2,94 +2,91 @@
 
 namespace ACES{
     Dispatcher::Dispatcher(std::string name)
-        : RTT::TaskContext(name),
-          addHardwareMethod("addHardware", &Dispatcher::addHardware, this),
-          addProtocolMethod("addProtocol", &Dispatcher::addProtocol, this),
-          addStateMethod("addState", &Dispatcher::addState, this),
-          addControllerMethod("addController", &Dispatcher::addController,
-                              this),
-          addDeviceMethod("addDevice", &Dispatcher::addDevice, this),
-          addLoggerMethod("addLogger", &Dispatcher::addLogger, this),
-          startHWMethod("startHW", &Dispatcher::startHW, this),
-          startProtocolMethod("startProtocol", &Dispatcher::startProtocol,
-                              this),
-          startDeviceMethod("startDevice", &Dispatcher::startDevice, this),
-          startStateMethod("startState", &Dispatcher::startState, this),
-          startControllerMethod("startController",
-                                &Dispatcher::startController, this),
-          startLoggerMethod("startLogger", &Dispatcher::startLogger, this),
-          stopHWMethod("stopHW", &Dispatcher::stopHW, this),
-          stopProtocolMethod("stopProtocol", &Dispatcher::stopProtocol, this),
-          stopDeviceMethod("stopDevice", &Dispatcher::stopDevice, this),
-          stopStateMethod("stopState", &Dispatcher::stopState, this),
-          stopControllerMethod("stopController", &Dispatcher::stopController,
-                               this),
-          stopLoggerMethod("stopLogger", &Dispatcher::stopLogger, this),
-          linkPDMethod("linkPD", &Dispatcher::linkPD, this),
-          linkDSMethod("linkDS", &Dispatcher::linkDS, this),
-          linkHPMethod("linkHP", &Dispatcher::linkHP, this),
-          linkSCMethod("linkSC", &Dispatcher::linkSC, this),
-          linkHCMethod("linkHC", &Dispatcher::linkHC, this),
-          linkLSMethod("linkLS", &Dispatcher::linkLS, this)
+        : RTT::TaskContext(name)
     {
         //this->setActivity( new RTT::Activity(5, 1.0/10.0, 0, name) );
-        this->methods()->addMethod(addHardwareMethod, "addHardware",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-        this->methods()->addMethod(addProtocolMethod, "addProtocol",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-        this->methods()->addMethod(addStateMethod, "addState",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-        this->methods()->addMethod(addControllerMethod, "addController",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-        this->methods()->addMethod(addDeviceMethod, "addDevice",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-        this->methods()->addMethod(addLoggerMethod, "addLogger",
-                                   "config", "_name_ _priority_ _freq_",
-                                   "type", "_mainType_ _subType_",
-                                   "args", "arguments specific to the type");
-
-        this->methods()->addMethod(startHWMethod, "startHW");
-        this->methods()->addMethod(startProtocolMethod, "startProtocol");
-        this->methods()->addMethod(startDeviceMethod, "startDevice");
-        this->methods()->addMethod(startStateMethod, "startState");
-        this->methods()->addMethod(startControllerMethod, "startController");
-        this->methods()->addMethod(startLoggerMethod, "startLogger");
-
-        this->methods()->addMethod(stopHWMethod, "stopHW");
-        this->methods()->addMethod(stopProtocolMethod, "stopProtocol");
-        this->methods()->addMethod(stopDeviceMethod, "stopDevice");
-        this->methods()->addMethod(stopStateMethod, "stopState");
-        this->methods()->addMethod(stopControllerMethod, "stopController");
-        this->methods()->addMethod(stopLoggerMethod, "stopLogger");
+        this->addOperation("addHardware", &Dispatcher::addHardware, this,
+                           RTT::OwnThread).doc("add new hardware")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")
+                           .arg("args", "arguments specific to the type");        
                                    
-        this->methods()->addMethod(linkPDMethod, "linkPD",
-                                   "protocol", "protocol",
-                                   "device", "device");
-        this->methods()->addMethod(linkDSMethod, "linkDS",
-                                   "device", "device",
-                                   "state", "state");
-        this->methods()->addMethod(linkHPMethod, "linkHP",
-                                   "hardware", "hardware",
-                                   "protocol", "protocol");
-        this->methods()->addMethod(linkSCMethod, "linkSC",
-                                   "state", "state",
-                                   "controller", "controller");
-        this->methods()->addMethod(linkHCMethod, "linkHC",
-                                   "hardware", "hardware",
-                                   "controller", "controller");
-        this->methods()->addMethod(linkLSMethod, "linkLS",
-                                   "logger", "logger",
-                                   "state", "state");
+        this->addOperation("addProtocol", &Dispatcher::addProtocol, this,
+                           RTT::OwnThread).doc("add new Protocol")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")
+                           .arg("args", "arguments specific to the type");
+        this->addOperation("addState", &Dispatcher::addState, this,
+                           RTT::OwnThread).doc("add new State")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")        
+                           .arg("args", "arguments specific to the type");        
+        this->addOperation("addController", &Dispatcher::addController,
+                           this, RTT::OwnThread).doc("add new Controller")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")        
+                           .arg("args", "arguments specific to the type");        
+        this->addOperation("addDevice", &Dispatcher::addDevice, this,
+                           RTT::OwnThread).doc("add new Device")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")
+                           .arg("args", "arguments specific to the type");
+        this->addOperation("addLogger", &Dispatcher::addLogger, this,
+                           RTT::OwnThread).doc("add new Logger")
+                           .arg("config", "_name_ _priority_ _freq_")
+                           .arg("type", "_mainType_ _subType_")
+                           .arg("args", "arguments specific to the type");
+
+        this->addOperation("startHW", &Dispatcher::startHW, this,
+                           RTT::OwnThread).doc("Start Hardware");
+        this->addOperation("startProtocol", &Dispatcher::startProtocol,
+                           this, RTT::OwnThread).doc("Start Protocol");
+        this->addOperation("startDevice", &Dispatcher::startDevice, this,
+                           RTT::OwnThread).doc("Start Device");
+        this->addOperation("startState", &Dispatcher::startState, this,
+                           RTT::OwnThread).doc("Start State");
+        this->addOperation("startController", &Dispatcher::startController,
+                           this, RTT::OwnThread).doc("Start Controller");
+        this->addOperation("startLogger", &Dispatcher::startLogger, this,
+                           RTT::OwnThread).doc("Start Logger");
+
+        this->addOperation("stopHW", &Dispatcher::stopHW, this,
+                           RTT::OwnThread).doc("Stop Hardware");
+        this->addOperation("stopProtocol", &Dispatcher::stopProtocol, this,
+                           RTT::OwnThread).doc("Stop Protocol");
+        this->addOperation("stopDevice", &Dispatcher::stopDevice, this,
+                           RTT::OwnThread).doc("Stop Device");
+        this->addOperation("stopState", &Dispatcher::stopState, this,
+                           RTT::OwnThread).doc("Stop State");
+        this->addOperation("stopController", &Dispatcher::stopController,
+                           this, RTT::OwnThread).doc("Stop Controller");
+        this->addOperation("stopLogger", &Dispatcher::stopLogger, this,
+                           RTT::OwnThread).doc("Stop Logger");
+                                   
+        this->addOperation("linkPD", &Dispatcher::linkPD, this, RTT::OwnThread)
+                           .doc("Link Protocol to Device")
+                           .arg("protocol", "protocol")
+                           .arg("device", "device");
+        this->addOperation("linkDS", &Dispatcher::linkDS, this, RTT::OwnThread)
+                           .doc("Link Device to State")
+                           .arg("device", "device")
+                           .arg("state", "state");
+        this->addOperation("linkHP", &Dispatcher::linkHP, this, RTT::OwnThread)
+                           .doc("Link Hardware to Protocol")
+                           .arg("hardware", "hardware")
+                           .arg("protocol", "protocol");
+        this->addOperation("linkSC", &Dispatcher::linkSC, this, RTT::OwnThread)
+                           .doc("Link State to Controller")
+                           .arg("state", "state")
+                           .arg("controller", "controller");
+        this->addOperation("linkHC", &Dispatcher::linkHC, this, RTT::OwnThread)
+                           .doc("Link Hardware to Controller")
+                           .arg("hardware", "hardware")
+                           .arg("controller", "controller");
+        this->addOperation("linkLS", &Dispatcher::linkLS, this, RTT::OwnThread)
+                           .doc("Link Logger to State")
+                           .arg("logger", "logger")
+                           .arg("state", "state");
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,
@@ -300,9 +297,8 @@ namespace ACES{
         RTT::TaskContext* p = this->getPeer(pcol);
         RTT::TaskContext* d = this->getPeer(device);
 
-        typeof(*p) 
         if(p && d){
-            return ((Protocol*)p)->subscribeDevice((Device*)d);
+            return ((ProtoProtocol*)p)->subscribeDevice(d);
         }
         else{
             return false;
@@ -314,7 +310,7 @@ namespace ACES{
         RTT::TaskContext* s = getPeer(state);
         
         if(s && d){
-            return ((Device*)d)->subscribeState((ProtoState*)s);
+            return ((ProtoDevice*)d)->subscribeState(s);
         }
         else{
             return false;
@@ -326,7 +322,7 @@ namespace ACES{
         RTT::TaskContext* p = this->getPeer(pcol);
 
         if (h && p){
-            return ((Hardware*)h)->subscribeProtocol((Protocol*)p);
+            return ((ProtoHardware*)h)->subscribeProtocol(p);
         }
         else{
             return false;
@@ -338,7 +334,7 @@ namespace ACES{
         RTT::TaskContext* c = this->getPeer(ctrl);
 
         if (s && c){
-            return ((ProtoState*)s)->subscribeController((Controller*)c);
+            return ((ProtoState*)s)->subscribeController(c);
         }
         else{
             return false;
@@ -347,10 +343,10 @@ namespace ACES{
 
     bool Dispatcher::linkHC(std::string hw, std::string ctrl){
         //Webots::Hardware* h = (Webots::Hardware*)this->getPeer(hw);
-		Hardware* h = (Hardware*)this->getPeer(hw);
+		RTT::TaskContext* h = this->getPeer(hw);
         RTT::TaskContext* c = this->getPeer(ctrl);
         if (h && c){
-            return h->subscribeController((Controller*) c);
+            return ((ProtoHardware*)h)->subscribeController( c);
         }
         else{
             return false;
@@ -358,11 +354,12 @@ namespace ACES{
     }
 
     bool Dispatcher::linkLS(std::string logger, std::string state){
-        Logger* l = (Logger*)this->getPeer(logger);
-        ProtoState* s  = (ProtoState*)this->getPeer(state);
+        RTT::TaskContext* l = this->getPeer(logger);
+        RTT::TaskContext* s  = this->getPeer(state);
         if(l && s){
-            return l->addTrack(s);
+            return ((Logger*)l)->addTrack((ProtoState*)s);
         }
+        return false;
     }
 
     bool Dispatcher::startHW(){
@@ -431,7 +428,7 @@ namespace ACES{
     }
 
     bool Dispatcher::stopLogger(){
-        for(std::list<Logger*>::iterator it = logList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = logList.begin();
             it != logList.end(); it++){
             (*it)->stop();
         }
@@ -439,7 +436,7 @@ namespace ACES{
     }
     
     bool Dispatcher::stopController(){
-        for(std::list<Controller*>::iterator it = cList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = cList.begin();
             it != cList.end(); it++){
             (*it)->stop();
         }
@@ -447,16 +444,16 @@ namespace ACES{
     }
 
     bool Dispatcher::stopState(){
-        for(std::list<ProtoState*>::iterator it = stateList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = stateList.begin();
             it != stateList.end(); it++){
-            RTT::TaskContext *p = (RTT::TaskContext*)(*it);
+            RTT::TaskContext *p = (*it);
             p->stop();
         }
         return true;
     }
 
     bool Dispatcher::stopDevice(){
-        for(std::list<Device*>::iterator it = dList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = dList.begin();
             it != dList.end(); it++){
             (*it)->stop();
         }
@@ -464,7 +461,7 @@ namespace ACES{
     }
 
     bool Dispatcher::stopProtocol(){
-        for(std::list<Protocol*>::iterator it = pList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = pList.begin();
             it != pList.end(); it++){
             (*it)->stop();
         }
@@ -472,7 +469,7 @@ namespace ACES{
     }
 
     bool Dispatcher::stopHW(){
-        for(std::list<Hardware*>::iterator it = hwList.begin();
+        for(std::list<RTT::TaskContext*>::iterator it = hwList.begin();
             it != hwList.end(); it++){
             (*it)->stop();
         }

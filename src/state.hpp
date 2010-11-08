@@ -32,6 +32,7 @@ namespace ACES {
             virtual std::string logVal() = 0;
             int nodeID;
             bool samplingAttr;
+            bool subscribeController(RTT::TaskContext* c);
             //RTT::Attribute<int> nodeID;
             //RTT::Attribute<bool> samplingAttr;
  
@@ -70,7 +71,6 @@ namespace ACES {
             //RTT::Method<void(T)> goMethod;
             //RTT::Method<void()> sampleMethod;
 
-            //bool subscribeController(Controller* c);
 
         protected:
             /*RTT::Queue< Word<T>*, RTT::BlockingPolicy,
