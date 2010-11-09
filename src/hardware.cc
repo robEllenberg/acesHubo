@@ -17,14 +17,13 @@ namespace ACES {
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name ) );
     }
 
-
     template <typename T>
     bool Hardware<T>::processUS(Word<T>* usIn){
         return true;
     }
 
     template <class T>
-    bool Hardware<T>::processDS(Message<T>* m){
+    bool Hardware<T>::processDS(Message<T>* dsIn){
         return true;
     }
 

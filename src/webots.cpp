@@ -4,53 +4,48 @@ namespace Webots {
 
     int JointCredentials::idCount = 0;
 
-    template <class T>
-    Hardware<T>::Hardware(std::string cfg, std::string args)
-                      : ACES::Hardware<T>(cfg, args)
+    Hardware::Hardware(std::string cfg, std::string args)
+                      : ACES::Hardware<float>(cfg, args)
     {
-        RTT::Method<void(int)> *stepMethod = new RTT::Method<void(int)>
-            ("step", &Hardware::step, this);
-        this->methods()->addMethod(stepMethod,
-                                   "Advance the system time",
-                                   "TStep", "Lenght of step to advance(ms)");
+        this->addOperation("step", &Hardware::step, this, RTT::OwnThread)
+                          .doc("Advance the system time")
+                          .arg("TStep", "Lenght of step to advance(ms)");
+        this->ports()->addPort("stepRequest", stepRequest).doc(
+                               "Advance the timestep of the simulation");
     }
 
-    template <class T>
-    bool Hardware<T>::startHook(){
+    bool Hardware::startHook(){
         wb_robot_init();
         return true;
     }
 
-    template <class T>
-    void Hardware<T>::updateHook(){
+    void Hardware::updateHook(){
         //We want a null action on the tick, so we override this to nothing
         //and use step(), to manually advance the clock.
     }
 
-    template <class T>
-    void Hardware<T>::step(int time){
-        ACES::Hardware<T>::updateHook();
+    void Hardware::step(int time){
+        ACES::Hardware<float>::updateHook();
         wb_robot_step(time);
     }
 
-    template <class T>
-    bool Hardware<T>::txBus(ACES::Message<T>* m){
-        for(std::list<ACES::Goal*>::iterator it = m->goalList.begin();
-            it != m->goalList.end(); it++)
-        {
-            ACES::Goal* g = *it;
+    bool Hardware::txBus(ACES::Message<float>* dsIn){
+        while( dsIn->size() ){
+            ACES::Word<float> *dsInEl = dsIn->Pop(), *w = NULL;
             float result;
-            Credentials* c = (Credentials*)(g->cred);
+            std::vector<float>* floVect;
+            Credentials* c = (Credentials*)dsInEl->getCred();
 
-            switch( c->devID ){
+            switch( c->getDevID() ){
                 case(JOINT):{
-                    switch(g->mode){
+                    switch( dsInEl->getMode() ){
                         case(ACES::REFRESH):
-                            result = JointDevice::
-                                        refresh((JointCredentials*)c);
+                            result = refreshJoint((JointCredentials*)c);
+                            w = new ACES::Word<float>(result, *dsInEl);
+                            txUpStream.write(w);
                             break;
                         case(ACES::SET):
-                            JointDevice::set((JointCredentials*)c, g);
+                            setJoint( (JointCredentials*)c, dsInEl);
                             break; 
                         default:
                             break;
@@ -62,10 +57,13 @@ namespace Webots {
                 case(ACCELEROMETER):
                 case(FORCE):
                 case(GYRO):{
-                    switch(g->mode){
+                    switch(dsInEl->getMode()){
                         case(ACES::REFRESH):
-                            result = TripletDevice::
-                                        refresh((Credentials*)c);
+                            floVect = refreshTriplet( c );
+                            for(int i=0; i<3; i++){
+                                w = new ACES::Word<float>((*floVect)[i], *dsInEl);
+                                txUpStream.write(w);
+                            }
                             break;
                         default:
                             break;
@@ -75,50 +73,38 @@ namespace Webots {
                 default:
                     break;
             }
-        
-            //Place the result on the container & send it back if appropriate
-            if(g->mode == ACES::REFRESH){
-                //TODO - This kind of bypasses the physical HW Rx
-                //structure, perhaps we should change that somehow
-                assert(result); //Make sure we're actually sending
-                                //something
-                g->data = result;
-                //ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
-                ACES::Word<T> w = ACES::Word<ACES::Goal*>(g);
-
-                this->usQueue.enqueue(w);
-                //{ RTT::OS::MutexLock lock(usqGuard);
-                //  usQueue.push_back(w);
-                //}
-            }
         }
+        return true;
     }
 
-
-
-    template <class T>
-    bool Hardware<T>::subscribeController(ACES::Controller* c){
+    bool Hardware::subscribeController(ACES::Controller* c){
         this->connectPeers( (RTT::TaskContext*) c);
-        RTT::Handle h = c->events()->setupConnection("applyStateVector")
+
+        RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
+        bool success;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
+
+        theirPort = (RTT::base::PortInterface*)c->ports()->getPort("TxDS");
+        myPort = (RTT::base::PortInterface*)this->ports()->getPort("stepRequest");
+        success = theirPort->connectTo(myPort, policy);
+        
+        /*RTT::Handle h = c->events()->setupConnection("applyStateVector")
                 .callback( this, &Hardware::stepRequest,
-                           this->engine()->events() ).handle();
-        if(!h.ready() ){
-            return false;
-        }
-        h.connect();
-        if(!h.connected() ){
+                           this->engine()->events() ).handle();*/
+        if(not success){
             return false;
         }
         return true;
     }
 
+/*
     template <class T>
     void Hardware<T>::stepRequest( std::map<std::string, void*>* ){
         //TODO - This will advance the simulation before the 
         //new state information is processed
         step();
     }
-
+*/
     Credentials::Credentials(COMP_TYPE id, std::string wb_id)
     : ACES::Credentials((int)id)
     {
@@ -185,26 +171,27 @@ namespace Webots {
     }
 
     JointDevice::JointDevice(std::string cfg, std::string args)
-      : ACES::Device(cfg)
+      : ACES::Device<float,float>(cfg)
     {
-        credentials = (Credentials*) JointCredentials::makeJointCredentials(args);
+        credentials = (Credentials*)
+                         JointCredentials::makeJointCredentials(args);
     }
 
-    void* JointDevice::refresh(JointCredentials* j){
-        float* res  = new float;
+    float refreshJoint(JointCredentials* j){
+        float res;
         WbDeviceTag tag =
                 wb_robot_get_device( (j->wb_device_id).c_str() );
 
-        *res = wb_servo_get_position(tag);
+        res = wb_servo_get_position(tag);
 
         //Apply the appropriate sign to the result, so it is
         //consistant w/convention
-        *res = (*res) * (j->direction);
+        res = res * (j->direction);
     
-        return (void*)res;
+        return res;
      }
 
-     bool setJoint(JointCredentials* j, HWord<float> s){
+     bool setJoint(JointCredentials* j, ACES::Word<float>* s){
                    //ACES::Goal* g){
         std::string jid = j->wb_device_id;
         WbDeviceTag joint = wb_robot_get_device(jid.c_str());
@@ -212,7 +199,7 @@ namespace Webots {
         //Pull the seek value out of the credentials 
         //float* tp = (float*)(g->data);
         //float target = *tp;
-        float target = s.getData();
+        float target = s->getData();
         float angle = j->direction * (target - j->zero);
 
         //wb_servo_set_position(joint, 3.14159/180.*angle);
@@ -235,10 +222,12 @@ namespace Webots {
         wb_servo_disable_position(tag); 
     }
 
-    TripletDevice::TripletDevice(std::string config, std::string args, COMP_TYPE devID)
-     :ACES::Device(config)
+    TripletDevice::TripletDevice(std::string config, std::string args,
+                                 COMP_TYPE devID)
+      :ACES::Device<float,float>(config)
     {
-        credentials = (ACES::Credentials*)Credentials::makeCredentials(devID, args);
+        credentials = (ACES::Credentials*)
+            Credentials::makeCredentials(devID, args);
     }
 
     bool TripletDevice::startHook(){
@@ -256,15 +245,15 @@ namespace Webots {
         wb_stop_fun(tag); 
     }
 
-    void* TripletDevice::refresh(Credentials* c){
+    std::vector<float>* refreshTriplet(Credentials* c){
         WbDeviceTag tag =
                 wb_robot_get_device( (c->wb_device_id).c_str() );
 
         const double *triplet = NULL; 
-        switch(c->devID){
-        //devID is statically determined because doing so dynamically would require
-        //placing a reference to a specific Device within the credential (so the compiler
-        //can do the virtual function resolution)
+        switch(c->getDevID()){
+        //devID is statically determined because doing so dynamically would
+        //require placing a reference to a specific Device within the
+        //credential (so the compiler can do the virtual function resolution)
             case(GPS):
                 triplet = GPSDevice::getTriplet(tag);
                 break;
@@ -285,18 +274,19 @@ namespace Webots {
         //We must clone the vector because Webots owns the memory
         //and will yank the values out from under us at the next
         //timestep
-        std::vector<double>* res = new std::vector<double>(3);
-        (*res)[0] = triplet[0];
-        (*res)[1] = triplet[1];
-        (*res)[2] = triplet[2];
+        std::vector<float>* res = new std::vector<float>(3);
+        (*res)[0] = (float)triplet[0];
+        (*res)[1] = (float)triplet[1];
+        (*res)[2] = (float)triplet[2];
         //RTT::Logger::log() << (*res)[0] << " " << (*res)[1]
         //                   << " " << (*res)[2] << RTT::endlog();
-        return (void*)res;
+        return res;
     }
 
     //!Override the default USQueue processor in order to split the
     //!three data elements out of the node's return packet
-    std::list<ACES::ProtoResult*> TripletDevice::processUSQueue(){
+    /*
+    std::list<ACES::ProtoResult*> TripletDevice::processUSQueue(Word<PD>* usIn){
         //TODO - Provide an implementation that doesn't triple up the
         //requests into webots
         //RTT::Logger::log() << "Triplet  Dev US override" << RTT::endlog();
@@ -317,6 +307,7 @@ namespace Webots {
         }
         return pr_list;
     }
+    */
 
     GPSDevice::GPSDevice(std::string config, std::string args) 
     : TripletDevice(config, args, GPS)
@@ -329,7 +320,8 @@ namespace Webots {
         return wb_gps_get_values(tag);
     }
 
-    AccelerometerDevice::AccelerometerDevice(std::string config, std::string args)
+    AccelerometerDevice::AccelerometerDevice(std::string config,
+                                             std::string args)
     : TripletDevice(config, args, ACCELEROMETER)
     {
         wb_start_fun = wb_accelerometer_enable;
@@ -362,11 +354,8 @@ namespace Webots {
         return wb_touch_sensor_get_values(tag);
     }
 
-    template <class T>
-    Protocol<T>::Protocol(std::string cfg, std::string args) 
-      : ACES::Protocol<T>(cfg, args){}
-
-
+    Protocol::Protocol(std::string cfg, std::string args) 
+      : ACES::Protocol<float, float>(cfg, args){}
 }
 
 /*

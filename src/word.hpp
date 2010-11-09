@@ -30,6 +30,7 @@ namespace ACES{
         public:
             Word();
             Word( Word& w);
+            Word(T d, Word& w);
             Word(T d, int nID=0, int dID=0, int m=0, Credentials* c=NULL);
 
             void printme();
@@ -47,6 +48,11 @@ namespace ACES{
     template <class T>
     Word<T>::Word( Word &w) : ProtoWord(static_cast<ProtoWord&>(w) ) {
         data = w.getData();
+    }
+
+    template <class T>
+    Word<T>::Word(T d, Word& w) : ProtoWord(static_cast<ProtoWord&>(w) ) {
+        data = d;
     }
 
     template <class T>

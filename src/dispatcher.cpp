@@ -155,19 +155,21 @@ namespace ACES{
         #ifdef WEBOTS 
         if (type1 == "Webots"){
             if(type2 == "Joint"){
-                d = (Device*) new Webots::JointDevice(cfg, args);
+                d = (RTT::TaskContext*) new Webots::JointDevice(cfg, args);
             }
             if(type2 == "GPS"){
-                d = (Device*) new Webots::GPSDevice(cfg, args);
+                d = (RTT::TaskContext*) new Webots::GPSDevice(cfg, args);
             }
             if(type2 == "Accelerometer"){
-                d = (Device*) new Webots::AccelerometerDevice(cfg, args);
+                d = (RTT::TaskContext*) new
+                    Webots::AccelerometerDevice(cfg, args);
             }
             if(type2 == "Gyro"){
-                d = (Device*) new Webots::GyroscopeDevice(cfg, args);
+                d = (RTT::TaskContext*) new
+                    Webots::GyroscopeDevice(cfg, args);
             }
             if(type2 == "Force"){
-                d = (Device*) new Webots::ForceDevice(cfg, args);
+                d = (RTT::TaskContext*) new Webots::ForceDevice(cfg, args);
             }
         }
         #endif

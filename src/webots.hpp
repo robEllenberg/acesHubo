@@ -7,9 +7,7 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/Activity.hpp>
-#include <rtt/Ports.hpp>
-#include <rtt/Event.hpp>
-#include <rtt/Buffer.hpp>
+#include <rtt/Port.hpp>
 
 #include "protocol.hpp"
 #include "state.hpp"
@@ -32,20 +30,20 @@ extern "C"{
 }
 
 namespace Webots{
-    template <class T>
-    class Hardware : public ACES::Hardware<T> {
+    class Hardware : public ACES::Hardware<float> {
         public:
             Hardware(std::string cfg, std::string args);
             bool startHook();
             void updateHook();
-            virtual bool txBus(ACES::Message<T>* m);
+            virtual bool txBus(ACES::Message<float>* m);
 
             void step(int time=32);
-            void stepRequest( std::map<std::string, void*>* );
-            bool subscribeController(ACES::Controller* c);
+            //void stepRequest( std::map<std::string, void*>* );
+            virtual bool subscribeController(ACES::Controller* c);
 
             //std::deque< ACES::Word<T> > usQueue;
             //RTT::OS::Mutex usqGuard; 
+            RTT::InputPort< std::map<std::string, void*>* >stepRequest;
     };
 
     class Credentials : public ACES::Credentials {
@@ -53,7 +51,8 @@ namespace Webots{
     //is created, saves lots of lookup processing.
         public:
             Credentials(COMP_TYPE devID, std::string wb_id);
-            static Credentials* makeCredentials(COMP_TYPE devID, std::string name);
+            static Credentials* makeCredentials(COMP_TYPE devID,
+                                                std::string name);
             std::string wb_device_id;
             virtual void printme();
             virtual bool operator==(ACES::Credentials& other);
@@ -74,8 +73,8 @@ namespace Webots{
             static int idCount;
     };
 
-    template<class P> 
-    class JointDevice : public ACES::Device<float, P> {
+    //template<class P> 
+    class JointDevice : public ACES::Device<float, float> {
         public:
             JointDevice(std::string config, std::string args);
             //!Used by the HW to interact w/Webots for the refresh
@@ -84,22 +83,23 @@ namespace Webots{
             void stopHook();
     };
 
-    bool setJoint(JointCredentials* j, HWord<float> s);
-    static void* refresh(JointCredentials* j);
+    bool setJoint(JointCredentials* j, ACES::Word<float>* s);
+    float refreshJoint(JointCredentials* j);
 
-    template<class P> 
-    class TripletDevice : public ACES::Device<float, P> {
+    class TripletDevice : public ACES::Device<float, float> {
         public:
             TripletDevice(std::string config, std::string args,
                           COMP_TYPE devID);
-            static void* refresh(Credentials* c);
             //virtual const double* getTriplet(WbDeviceTag tag) = 0;
-            virtual std::list<ACES::ProtoResult*> processUSQueue();
+            //virtual std::list<ACES::ProtoResult*> processUSQueue(
+            //    ACES::Word< list<float> >* usIn);
             void (*wb_start_fun)(WbDeviceTag tag, int ms);
             void (*wb_stop_fun)(WbDeviceTag tag);
             bool startHook();
             void stopHook();
     };
+
+    std::vector<float>* refreshTriplet(Credentials* c);
 
     class GPSDevice : public TripletDevice {
         public:
@@ -126,8 +126,7 @@ namespace Webots{
     };
 
     //Probably no point in having this - as it does not make any extensions yet
-    template <class T>
-    class Protocol : public ACES::Protocol<T> {
+    class Protocol : public ACES::Protocol<float,float> {
         public:
             Protocol(std::string cfg, std::string args);
     };
