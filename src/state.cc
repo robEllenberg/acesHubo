@@ -24,7 +24,7 @@ namespace ACES{
         this->addAttribute("value", value);
         asgnfunct = assign;
 
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
         this->ports()->addPort("RxUS", rxUpStream).doc(
                                "UpStream (from Device) Reception");
@@ -49,13 +49,15 @@ namespace ACES{
         
         Word<T>* usIn = NULL;
         while( rxUpStream.read(usIn) == RTT::NewData ){
-            RTT::Logger::log() << RTT::Logger::Debug << "(state) rxUS"
+            RTT::Logger::log() << RTT::Logger::Debug << "(state: " 
+                               << name << ") rxUS"
                                << RTT::endlog();
             //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
             //                     << nodeIDAttr.get() << RTT::endlog();
             
             if(usIn->getNodeID() == nodeID){
-                RTT::Logger::log() << RTT::Logger::Debug << "(state) assign"
+                RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+                                   << name << ") assign"
                                    << RTT::endlog();
                 asgnfunct(usIn, this);
             }
@@ -64,7 +66,8 @@ namespace ACES{
 
     template <class T>
     void State<T>::sample(){
-        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (ori)!"
+        RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+                           << name << ") sample"
                            << RTT::endlog();
         Word<T>* s = new Word<T>(0, nodeID, 0, REFRESH);
         txDownStream.write(s);
@@ -89,7 +92,8 @@ namespace ACES{
         //TODO - Find a better way to do this 'virtual function'
         State<T>* th = (State<T>*)me;
         RTT::Logger::log() << RTT::Logger::Debug
-                           << "(state) Value: " << w->getData();
+                           << "(state: "
+                           << th->name << ") Value: " << w->getData();
         th->value = w->getData();
     }
 

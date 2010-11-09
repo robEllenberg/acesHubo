@@ -154,9 +154,9 @@ int ORO_main(int a, char** b){
 
     d->addLogger("flog 10 5", "File", "tfile.txt");
     
-    //d->linkLS("flog", "centerX");
-    //d->linkLS("flog", "centerY");
-    //d->linkLS("flog", "centerZ");
+    d->linkLS("flog", "centerX");
+    d->linkLS("flog", "centerY");
+    d->linkLS("flog", "centerZ");
     //d->linkLS("flog", "imuaccX");
     //d->linkLS("flog", "imuaccY");
     //d->linkLS("flog", "imuaccZ");
@@ -164,12 +164,13 @@ int ORO_main(int a, char** b){
     //d->linkLS("flog", "imugyroY");
     //d->linkLS("flog", "imugyroZ");
     
-    d->linkLS("flog", "rffX");
-    d->linkLS("flog", "rffY");
-    d->linkLS("flog", "rffZ");
-    d->linkLS("flog", "lffX");
-    d->linkLS("flog", "lffY");
-    d->linkLS("flog", "lffZ");
+    
+    //d->linkLS("flog", "rffX");
+    //d->linkLS("flog", "rffY");
+    //d->linkLS("flog", "rffZ");
+    //d->linkLS("flog", "lffX");
+    //d->linkLS("flog", "lffY");
+    //d->linkLS("flog", "lffZ");
 
     //d->linkLS("flog", "LSP");
     //d->linkLS("flog", "LSR");

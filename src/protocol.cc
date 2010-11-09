@@ -20,9 +20,9 @@ namespace ACES{
         this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
         */
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Device) Reception");
-        this->ports()->addPort("RxUS", rxUpStream).doc(
+        this->ports()->addEventPort("RxUS", rxUpStream).doc(
                                "UpStream (from Hardware) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Hardware) Transmission");
@@ -41,7 +41,8 @@ namespace ACES{
         while( rxDownStream.read(dsIn) == RTT::NewData ){
             if( dsOut = processDS(dsIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug
-                                   << "(Protocol) got DS" << RTT::endlog();
+                                   << "(Protocol: " << name << ") got DS"
+                                   << RTT::endlog();
                 txDownStream.write(dsOut);
             }
         }
@@ -51,7 +52,8 @@ namespace ACES{
         while( rxUpStream.read(usIn) == RTT::NewData ){
             if( usOut = processUS(usIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug
-                                   << "(Protocol) got US" << RTT::endlog();
+                                   << "(Protocol: "
+                                   << name << ") got US" << RTT::endlog();
                 txUpStream.write(usOut);
             }
         }

@@ -13,9 +13,9 @@ namespace ACES{
                                  "Interperted data going to states");*/
         this->addOperation("credentials", &Device<S,PD>::printCred, this,
                            RTT::OwnThread).doc("Print the Credentials");
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from State) Reception");
-        this->ports()->addPort("RxUS", rxUpStream).doc(
+        this->ports()->addEventPort("RxUS", rxUpStream).doc(
                                "UpStream (from Protocol) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Protocol) Transmission");
@@ -32,7 +32,8 @@ namespace ACES{
         Word<PD>* dsOut = NULL;
         while( rxDownStream.read(dsIn) == RTT::NewData ){
             if( dsOut = processDS(dsIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got DS"
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev: " 
+                                   << name << ") got DS"
                                    << RTT::endlog();
                 txDownStream.write(dsOut);
             }
@@ -42,7 +43,8 @@ namespace ACES{
         Word<S>* usOut = NULL;
         while( rxUpStream.read(usIn) == RTT::NewData ){
             if( usOut = processUS(usIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev) got US"
+                RTT::Logger::log() << RTT::Logger::Debug << "(dev: "
+                                   << name << ") got US"
                                    << RTT::endlog();
             //typename std::deque< PDWord<P>* >::iterator it;
             //for(it = p.begin();

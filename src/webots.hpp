@@ -39,7 +39,7 @@ namespace Webots{
 
             void step(int time=32);
             //void stepRequest( std::map<std::string, void*>* );
-            virtual bool subscribeController(ACES::Controller* c);
+            virtual bool subscribeController(RTT::TaskContext* c);
 
             //std::deque< ACES::Word<T> > usQueue;
             //RTT::OS::Mutex usqGuard; 

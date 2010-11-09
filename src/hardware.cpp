@@ -20,7 +20,7 @@ namespace ACES {
         //RTT::base
         RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
         bool success;
-        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(10);
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
 
         theirPort = (RTT::base::PortInterface*)p->ports()->getPort("RxUS");
         myPort = (RTT::base::PortInterface*)this->ports()->getPort("TxUS");

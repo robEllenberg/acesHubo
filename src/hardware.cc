@@ -11,7 +11,7 @@ namespace ACES {
 
         this->ports()->addPort("TxUS", txUpStream).doc(
                                "UpStream (to Protocol) Transmission");
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Protocol) Reception");
 
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name ) );
@@ -33,7 +33,8 @@ namespace ACES {
         Message<T>* dsIn = NULL;
         while( rxDownStream.read(dsIn) == RTT::NewData ){
             if( processDS(dsIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got DS"
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW: " << name 
+                                   << ") got DS"
                                    << RTT::endlog();
                 txBus(dsIn);
             }
@@ -45,7 +46,8 @@ namespace ACES {
         while(not usQueue.isEmpty() ){
             usQueue.dequeue(usIn);
             if( processUS(usIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW) got US"
+                RTT::Logger::log() << RTT::Logger::Debug << "(HW: " 
+                                   << name << ") got US"
                                    << RTT::endlog();
                 txUpStream.write(usIn);
             }

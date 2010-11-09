@@ -22,6 +22,11 @@ namespace Webots {
     void Hardware::updateHook(){
         //We want a null action on the tick, so we override this to nothing
         //and use step(), to manually advance the clock.
+        //RTT::Logger::log() << "WB HW tick" << RTT::endlog();
+        std::map<std::string, void*>* req = NULL;
+        while( stepRequest.read(req) == RTT::NewData ){
+            step(32); //TODO - Magic numbers (32ms)
+        }
     }
 
     void Hardware::step(int time){
@@ -61,7 +66,11 @@ namespace Webots {
                         case(ACES::REFRESH):
                             floVect = refreshTriplet( c );
                             for(int i=0; i<3; i++){
-                                w = new ACES::Word<float>((*floVect)[i], *dsInEl);
+                                w = new ACES::Word<float>(
+                                        (*floVect)[i], i+1,
+                                        dsInEl->getDevID(),
+                                        dsInEl->getMode(),
+                                        dsInEl->getCred());
                                 txUpStream.write(w);
                             }
                             break;
@@ -77,7 +86,7 @@ namespace Webots {
         return true;
     }
 
-    bool Hardware::subscribeController(ACES::Controller* c){
+    bool Hardware::subscribeController(RTT::TaskContext* c){
         this->connectPeers( (RTT::TaskContext*) c);
 
         RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
@@ -275,11 +284,11 @@ namespace Webots {
         //and will yank the values out from under us at the next
         //timestep
         std::vector<float>* res = new std::vector<float>(3);
-        (*res)[0] = (float)triplet[0];
-        (*res)[1] = (float)triplet[1];
-        (*res)[2] = (float)triplet[2];
-        //RTT::Logger::log() << (*res)[0] << " " << (*res)[1]
-        //                   << " " << (*res)[2] << RTT::endlog();
+        (*res)[0] = (float)(triplet[0]);
+        (*res)[1] = (float)(triplet[1]);
+        (*res)[2] = (float)(triplet[2]);
+        RTT::Logger::log() << (*res)[0] << " " << (*res)[1]
+                           << " " << (*res)[2] << RTT::endlog();
         return res;
     }
 
