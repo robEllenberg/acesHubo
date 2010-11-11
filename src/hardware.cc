@@ -58,7 +58,7 @@ namespace ACES {
     template <class T>
     bool Hardware<T>::txBus(Message<T>* m){
         while( m->size() ){
-            Word<T>* w = m->Pop();
+            Word<T>* w = m->pop();
             txUpStream.write(w);
             //usQueue.enqueue(w);
             //TODO - Delete the word

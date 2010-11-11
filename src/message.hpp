@@ -13,8 +13,8 @@ namespace ACES{
         public:
             void printme();
             int size();
-            Word<T>* Pop();
-            Word<T>* Push(Word<T>* item);
+            Word<T>* pop();
+            Word<T>* push(Word<T>* item);
         protected:
             std::deque< Word<T>* > wordList;
     };
@@ -25,14 +25,14 @@ namespace ACES{
     }
 
     template <class T>
-    Word<T>* Message<T>::Pop(){
+    Word<T>* Message<T>::pop(){
         Word<T>* item = wordList.front();
         wordList.pop_front();
         return item;
     }
 
     template <class T>
-    Word<T>* Message<T>::Push(Word<T>* item){
+    Word<T>* Message<T>::push(Word<T>* item){
         wordList.push_back(item);
         return item;
     }

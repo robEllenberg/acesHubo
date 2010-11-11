@@ -42,7 +42,7 @@ namespace ACES{
         std::map<std::string, void*>* dsIn = NULL;
         Word<T>* dsOut = NULL;
         while ( rxDownStream.read(dsIn) == RTT::NewData ){
-            if( dsOut = processDS(dsIn) ){
+            if( (dsOut = processDS(dsIn)) ){
                 txDownStream.write(dsOut);
             }
         }

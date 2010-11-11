@@ -2,12 +2,12 @@
 
 namespace Robotis {
     RobotisPacket::RobotisPacket(){
-        counter = 0;
+        //counter = 0;
         id = 0;
         len = 0;
         error = 0;
         checksum = 0;
-        parameters = new std::vector<unsigned char>();
+        parameters = new std::deque<unsigned char>();
     }
 
     RobotisPacket::~RobotisPacket(){
@@ -16,7 +16,7 @@ namespace Robotis {
 
 
     Protocol::Protocol(std::string cfg, std::string args)
-     : ACES::Protocol(cfg, args){}
+     : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
 
     bool Protocol::startHook(){
         yylex_init ( &scanner ) ;
@@ -30,148 +30,133 @@ namespace Robotis {
         yylex_destroy(scanner);
     }
 
-    ACES::ProtoResult* Protocol::processUSQueue()
+    ACES::Word<RobotisPacket>*
+      Protocol::processUS(ACES::Word<unsigned char>* usIn)
     {
-        ACES::ProtoWord* p = NULL;
-        { RTT::OS::MutexLock lock(usqGuard);
-          p = usQueue.front();
-          usQueue.pop_front();
-        }
-        ACES::Word<char*>* w = (ACES::Word<char*>*)p;
-        yy_scan_bytes((const char*)(w->data), 1, this->scanner);
+        ACES::Word<RobotisPacket>* pw = NULL;
+        unsigned char c = 0;
+        c = usIn->getData();
+        yy_scan_bytes( (const char*)(&c), 1, this->scanner);
         //If yylex returns 1 we have matched a full packet
         //if return is 0 we have only eaten a character
         if( yylex(this->scanner) ){ 
             RobotisPacket* p  = curPacket;
             curPacket = new RobotisPacket();
             yyset_extra(curPacket, scanner) ;
-            ACES::Result<RobotisPacket>* r =
-                new ACES::Result<RobotisPacket>(*p,
-                (ACES::Credentials*)credFromPacket(p),
-                0);
-            return (ACES::ProtoResult*)r;
+
+            pw = new ACES::Word<RobotisPacket>(*p, 0, 0, 0,
+                (ACES::Credentials*)credFromPacket(p));
+            return pw;
         }
-        else{
-            return 0;
-        }
+        return NULL;
     }
 
-    ACES::Message* Protocol::processDSQueue()
+    ACES::Message<unsigned char>*
+        Protocol::processDS(ACES::Word<RobotisPacket>* w)
     {
-        Goal* e = NULL, g = getDSQelement();
-        RobotisPacket* p = (RobotisPacket*)g->data;
-
-        ACES::Message* m = new ACES::Message();
-
-        unsigned char* c = new unsigned char;
-        e = new ACES::Goal(g->nodeID, g->mode, (void*)
-        m->goalList.push_back(e);
-    }
-
-    /*
-    ACES::Message* Protocol::buildMessage(
-      ACES::Credentials* cred){
-        std::list<unsigned char> id (1, cred->id);
-        std::list<unsigned char> head (2, 0xFF);
-        std::list<unsigned char> body;
-        body.push_back(0x2);
-        body.push_back(0x0);
-        body.push_back(0x32);
-        std::list<unsigned char> len (1, 0x4);
-        
-        std::list<unsigned char> s;
-        s.splice(s.end(), id);
-        s.splice(s.end(), len);
-        s.splice(s.end(), body);
-        
-        unsigned char check = checksum(s);
-        s.push_back(check);
-        
-        head.splice(head.end(), s);
-        
-        ACES::Message* m = new ACES::Message(head);
+        RobotisPacket p = w->getData();
+        /*
+        switch(p->instruct){
+            case PING:
+                break;
+            case READ:
+                break;
+            case WRITE:
+                break;
+            case REG_WRITE:
+                break;
+            case ACTION:
+                break;
+            case RESET:
+                break;
+            case SYNC_WRITE:
+                break;
+            default:
+                return NULL;
+        }
+        */
+        ACES::Message<unsigned char>* m = messageFromPacket(&p);
         return m;
+
+        //unsigned char* c = new unsigned char;
+        //e = new ACES::Goal(g->nodeID, g->mode, (void*)
+        //m->goalList.push_back(e));
     }
-    */
 
     Device::Device(std::string cfg, std::string args)
-     :ACES::Device(cfg)
+     :ACES::Device<float, RobotisPacket>(cfg)
     {
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
     }
 
-    bool Device::startHook(){
-        lockout = false;
-    }
+    //bool Device::startHook(){
+        //lockout = false;
+        //return true;
+    //}
 
-    void Device::stopHook(){
-    }
+    //void Device::stopHook(){
+    //}
 
-    Goal* Device::processDSQueue(){
-        if(not lockout){
-            Goal* g = getDSQelement();
-            float* sp;
-            RobotisPacket* p = new RobotisPacket();
-            p->id = credentials->motorNum;
-            p->parameters = new std::vector<unsigned char>;
-
-            switch(g->mode){
-                case(REFRESH):
-                    requestPos = g->nodeID;
+    ACES::Word<RobotisPacket>* Device::processDS(ACES::Word<float>* w){
+            RobotisPacket p;
+            p.id = credentials->getDevID();
+            p.parameters = new std::deque<unsigned char>;
+            float sp = 0.;
+        if(w){
+            switch( w->getMode() ){
+                case(ACES::REFRESH):
+                    //requestion Position in the motor control table
+                    requestPos = w->getNodeID();
+                    //length of the request - # bytes
                     requestLen = PARAM_LEN[requestPos];
-                    lockout = true;
+                    //lockout = true;
 
-                    p->instruct = READ;
-                    p->parameters->push_back((unsigned char) g->nodeID);
-                    p->parameters->push_back(
-                        (unsigned char) PARAM_LEN[g->nodeID] );
+                    p.instruct = READ;
+                    p.parameters->push_back((unsigned char) w->getNodeID());
+                    p.parameters->push_back(
+                        (unsigned char) PARAM_LEN[w->getNodeID()] );
                     break;
 
-                case(SET):
-                    p->instruct = WRITE;
-                    p->parameters->push_back((unsigned char) g->nodeID);
+                case(ACES::SET):
+                    p.instruct = WRITE;
+                    p.parameters->push_back((unsigned char) w->getNodeID());
                     
-                    sp = (float*)(g->data);     //Grab set-point from goal
+                    sp = w->getData();     //Grab set-point from goal
                     //Scale the set-point
-                    unsigned short ssp = DSScale(*sp, g->nodeID); 
+                    unsigned short ssp = DSScale(sp, w->getNodeID()); 
                     //Byte-chop the scaled point and add it to the param list
-                    appendParams( p->parameters, ssp, PARAM_LEN[g->nodeID] );
+                    appendParams(p.parameters, ssp,
+                                 PARAM_LEN[w->getNodeID()] );
                     break;
             }
-            //Goal *g2 = new Goal(g->nodeID, g->mode, (void*)p);
-            //Change the data contents of the goal and send it along
-            g->data = (void*)p;
-            return g;
+            ACES::Word<RobotisPacket> *pw = new ACES::Word<RobotisPacket>(p);
+            return pw;
         }
-        else{
-            return NULL;
-        }
+        return NULL;
     }
 
-    std::list<ACES::ProtoResult*> Device::processUSQueue(){
-        ACES::ProtoResult* p = getUSQelement();
-        std::list<ACES::ProtoResult*> pr_list;
-        //RTT::Logger::log() << "(dev) got US" << RTT::endlog();
-        RobotisPacket r = ( (ACES::Result<RobotisPacket>*) p)->result;
+    ACES::Word<float>* Device::processUS(ACES::Word<RobotisPacket>* w){
+        RobotisPacket* p = &(w->getData());
 
-        //requestPos, requestLen
+        int requestPos = w->getNodeID();
+        
         //map [nID]->tentry
-        for(int i = 0, j = 0; i < requestLen; j = i){
+        for(int i = 0; i < requestLen; ){
             unsigned short tentry = 0;
+            unsigned char low=0, high=0;
             switch(PARAM_LEN[requestPos+i]){
                 case 2:
-                    unsigned char low, high;
                     //Check the order here
-                    low = (*r.parameters)[i];
-                    high = (*r.parameters)[i+1];
+                    low = (*(p->parameters))[i];
+                    high = (*(p->parameters))[i+1];
                     tentry = high;
                     tentry <<= 8;
                     tentry |= low;
                     i+=2;
                     break;
                 case 1:
-                    tentry = (*r.parameters)[i];
+                    tentry = (*(p->parameters))[i];
                     i++;
                     break;
                 case 0:
@@ -181,18 +166,17 @@ namespace Robotis {
                     assert(0);
                     break;
             }
-            float* data = new float;
-            //*data = (float)tentry;
-            
             //The scaling function
-            *data = USScale(tentry, requestPos);
+            float data = USScale(tentry, requestPos+i);
 
-            ACES::Result<float*>* r =
-                new ACES::Result<float*>(data, p->semiCred, requestPos+j);
-            pr_list.push_back( (ACES::ProtoResult*)r );
+            ACES::Word<float> *res = new ACES::Word<float>(data, requestPos+i,
+                                                     credentials->getDevID(),
+                                                     ACES::REFRESH,
+                                                     credentials);
+            txUpStream.write(res);
         }
-        lockout = false;
-        return pr_list;
+        //lockout = false;
+        return NULL;
     }
 
     Credentials::Credentials(int motNum, float z, float dir)
@@ -242,10 +226,38 @@ namespace Robotis {
         return new Credentials(p->id, 0.0, 0.0);
     }
 
-    unsigned char checksum(std::list<unsigned char> l){
+    ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p){
+        ACES::Message<unsigned char> *m = new ACES::Message<unsigned char>();
+        p->len = p->parameters->size() + 2;
+        p->checksum = checksum(p);
+
+        //Build version for sending
+        //Header
+        m->push(new ACES::Word<unsigned char>(0xFF));
+        m->push(new ACES::Word<unsigned char>(0xFF));
+        m->push(new ACES::Word<unsigned char>(p->id));
+        m->push(new ACES::Word<unsigned char>(p->len));
+        m->push(new ACES::Word<unsigned char>((unsigned char)p->instruct));
+        //Body
+        for(std::deque<unsigned char>::iterator it = p->parameters->begin();
+            it != p->parameters->end(); it++)
+        {
+            m->push(new ACES::Word<unsigned char>(*it));
+        }
+        //Checksum
+        m->push(new ACES::Word<unsigned char>(p->checksum));
+
+        return m;
+    }
+
+    unsigned char checksum(RobotisPacket* p){
+        //Checksum must be generated using entire packet less the leading
+        // 0xFF bytes (x2), and the checksum (obviously)
         unsigned char sum = 0;
-        std::list<unsigned char>::iterator it;
-        for(it = l.begin(); it != l.end(); it++){
+        sum += p->id;
+        sum += p->len;
+        std::deque<unsigned char>::iterator it;
+        for(it = p->parameters->begin(); it != p->parameters->end(); it++){
             sum += (*it);
         }
         sum = ~sum;
@@ -289,20 +301,21 @@ namespace Robotis {
         return c;
     }
 
-    bool appendParams( std::vector<unsigned char>* params,
+    bool appendParams( std::deque<unsigned char>* params,
                        unsigned short data, int size )
     {
         //we are assuming that shorts are 16 bit
         unsigned char low = 0, high = 0;
-        low = data & 0x00FF;
-        high = data & 0xFF00;
+        //Figure out how to cast these properly
+        low = data & (unsigned short)0x00FF;
+        high = data & (unsigned short)0xFF00;
         switch(size){
             case(2):
                 params->push_back(low);
                 params->push_back(high);
             case(1):
                 params->push_back(low);
-            deafult:
+            default:
                 assert(0);
         }
         return true;

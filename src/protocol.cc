@@ -63,7 +63,8 @@ namespace ACES{
     Message<HW>* Protocol<HW, PD>::processDS(Word<PD>* p){
         Message<HW>* m = NULL;
         m = new Message<HW>();
-        m->Push(p);
+        //TODO - VERY VERY BAD
+        m->push((Word<HW>*)p);
         return m;
     }
 
@@ -75,7 +76,7 @@ namespace ACES{
         //If we're going to implement some kind of state machine or whatever
         //it needs to be done here. This default is only meaningful for 
         //type-same protocols & hardware (not many at all)
-        p = h;
+        p = (Word<PD>*)h;
 
         return p;
     }

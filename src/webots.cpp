@@ -36,7 +36,7 @@ namespace Webots {
 
     bool Hardware::txBus(ACES::Message<float>* dsIn){
         while( dsIn->size() ){
-            ACES::Word<float> *dsInEl = dsIn->Pop(), *w = NULL;
+            ACES::Word<float> *dsInEl = dsIn->pop(), *w = NULL;
             float result;
             std::vector<float>* floVect;
             Credentials* c = (Credentials*)dsInEl->getCred();

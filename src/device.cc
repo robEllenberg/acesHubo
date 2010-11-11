@@ -62,7 +62,8 @@ namespace ACES{
         Word<S>* usOut = NULL;
         if(*(usIn->getCred()) == *credentials){
             //Only works on equiv types
-            return usIn; 
+            //TODO - VERY VERY BAD
+            return (Word<S>*)usIn; 
         }
         return NULL;
     }
@@ -72,7 +73,8 @@ namespace ACES{
         Word<PD>* dsOut = NULL;
         dsIn->setCred(credentials);
         //Only works on equiv types
-        return dsIn; 
+        //TODO - VERY VERY BAD
+        return (Word<PD>*)dsIn; 
     }
 
     template <class S, class P>

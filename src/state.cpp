@@ -6,7 +6,7 @@ namespace ACES {
       nodeID(nID),
       //Switching this default to false prevents automatic
       //sampling from starting
-      samplingAttr(true)
+      samplingAttr(false)
     {
         //nodeID.set(nID);
         //samplingAttr.set(true);

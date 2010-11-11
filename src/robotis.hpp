@@ -1,8 +1,7 @@
 #ifndef ACES_ROBOTIS_HPP
 #define ACES_ROBOTIS_HPP
 
-#include <vector>
-#include <list>
+#include <deque>
 #include <string>
 #include <algorithm>
 #include <iostream>
@@ -15,7 +14,7 @@
 #include "protocol.hpp"
 #include "message.hpp"
 #include "state.hpp"
-//#include "dispatcher.hpp"
+#include "credentials.hpp"
 //Defs for the lexer
 //#define YY_BUFFER_STATE yy_buffer_state*
 //TODO - find out the actual return type of YY_BUFFER_STATE (hint: it's not char*)
@@ -96,23 +95,24 @@ namespace Robotis {
         public:
             RobotisPacket();
             ~RobotisPacket();
-            int counter;
+            //int counter;
             unsigned char id;
             unsigned char len;
             unsigned char error;
-            unsigned char instruct;
-            std::vector<unsigned char>* parameters;
+            INST instruct;
+            std::deque<unsigned char>* parameters;
             unsigned char checksum;
             void printme();
     };
 
-    class Protocol : public ACES::Protocol {
+    class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
         public:
             Protocol(std::string cfg, std::string args); 
             bool startHook();
             void stopHook();
-            ACES::ProtoResult* processUSQueue();
-            ACES::Message* processDSQueue();
+            ACES::Word<RobotisPacket>* processUS(ACES::Word<unsigned char>* w);
+            ACES::Message<unsigned char>*
+              processDS(ACES::Word<RobotisPacket>* w);
 
             //~Protocol();
             //ACES::Message* buildMessage(ACES::Credentials* cred);
@@ -123,13 +123,13 @@ namespace Robotis {
             unsigned char incoming_len;
     };
 
-    class Device : public ACES::Device {
+    class Device : public ACES::Device<float, RobotisPacket> {
         public:
             Device(std::string config, std::string args);
-            bool startHook();
-            void stopHook();
-            virtual ACES::Goal* Device::processDSQueue();
-            virtual std::list<ACES::ProtoResult*> processUSQueue();
+            //bool startHook();
+            //void stopHook();
+            virtual ACES::Word<RobotisPacket>* processDS(ACES::Word<float>*);
+            virtual ACES::Word<float>* processUS(ACES::Word<RobotisPacket>*);
         private:
             int requestPos; //!The memory table position of the last request issued
             int requestLen; //!The size of data from the last issued request
@@ -149,10 +149,13 @@ namespace Robotis {
     };
     
     Credentials* credFromPacket(RobotisPacket* p);
-    unsigned char checksum(std::string& str);
+    ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p);
+    unsigned char checksum(RobotisPacket* p);
     float USScale(int in, int nodeID);
     unsigned short DSScale(float in, int nodeID);
     float USlimit(float c, float low, float high);
+    bool appendParams( std::deque<unsigned char>* params,
+                       unsigned short data, int size );
 }    
 
  

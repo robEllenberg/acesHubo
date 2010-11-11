@@ -9,23 +9,25 @@ namespace ACES{
                            RTT::OwnThread).doc("add new hardware")
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")
-                           .arg("args", "arguments specific to the type");        
-                                   
+                           .arg("args", "arguments specific to the type");
         this->addOperation("addProtocol", &Dispatcher::addProtocol, this,
                            RTT::OwnThread).doc("add new Protocol")
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")
                            .arg("args", "arguments specific to the type");
+
         this->addOperation("addState", &Dispatcher::addState, this,
                            RTT::OwnThread).doc("add new State")
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")        
-                           .arg("args", "arguments specific to the type");        
+                           .arg("args", "arguments specific to the type");
+
         this->addOperation("addController", &Dispatcher::addController,
                            this, RTT::OwnThread).doc("add new Controller")
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")        
-                           .arg("args", "arguments specific to the type");        
+                           .arg("args", "arguments specific to the type");
+                           
         this->addOperation("addDevice", &Dispatcher::addDevice, this,
                            RTT::OwnThread).doc("add new Device")
                            .arg("config", "_name_ _priority_ _freq_")
@@ -100,8 +102,8 @@ namespace ACES{
         }
         #endif 
         #ifdef ROBOTIS
-        if (type == "CharDev") {
-            h = (RTT::TaskContext*) new CharDev::Hardware(cfg, args);
+        if (type == "Robotis") {
+            h = (RTT::TaskContext*) new Robotis::Hardware(cfg, args);
         }
         #endif
         #ifdef TESTSUITE
@@ -175,7 +177,7 @@ namespace ACES{
         #endif
         #ifdef ROBOTIS
         if (type1 == "Robotis"){
-            d = (Device*) new Robotis::Device(cfg, args);
+            d = (RTT::TaskContext*) new Robotis::Device(cfg, args);
         }
         #endif
         #ifdef TESTSUITE
@@ -217,7 +219,8 @@ namespace ACES{
 
         #ifdef ROBOTIS 
         if ( type == "Robotis"){
-            s = (ProtoState*) new ACES::State<float>(cfg, GOAL_POSITION);
+            s = (ProtoState*) new ACES::State<float>(cfg,
+                                                     ROBOTIS::GOAL_POSITION);
         } 
         #endif
 
