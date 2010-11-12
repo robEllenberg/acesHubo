@@ -240,7 +240,7 @@ namespace ACES{
         #ifdef ROBOTIS 
         if ( type == "Robotis"){
             s = (ProtoState*) new ACES::State<float>(cfg,
-                                                     ROBOTIS::GOAL_POSITION);
+                                                (int)Robotis::GOAL_POSITION);
         } 
         #endif
 

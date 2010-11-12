@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Logger.hpp>
@@ -14,6 +15,7 @@
 #include "protocol.hpp"
 #include "message.hpp"
 #include "state.hpp"
+#include "hardware.hpp"
 #include "credentials.hpp"
 //Defs for the lexer
 //#define YY_BUFFER_STATE yy_buffer_state*
@@ -105,6 +107,19 @@ namespace Robotis {
             void printme();
     };
 
+    class Hardware : public ACES::Hardware<unsigned char>{
+        public:
+            Hardware(std::string cfg, std::string args);
+            virtual bool txBus(ACES::Message<unsigned char>* m);
+            virtual void rxBus();
+
+            virtual bool processUS(ACES::Word<unsigned char>*);
+            virtual bool processDS(ACES::Message<unsigned char>*);
+        protected:
+            std::ofstream output;
+            std::ifstream input;
+    };
+
     class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
         public:
             Protocol(std::string cfg, std::string args); 
@@ -156,7 +171,7 @@ namespace Robotis {
     float USlimit(float c, float low, float high);
     bool appendParams( std::deque<unsigned char>* params,
                        unsigned short data, int size );
-}    
+};    
 
  
 //Function defs for the lexer

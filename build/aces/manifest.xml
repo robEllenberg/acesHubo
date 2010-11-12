@@ -1,0 +1,16 @@
+<package>
+  <description brief="aces">
+
+     aces
+
+  </description>
+  <author>Bob Sherbert</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/aces</url>
+  <depend package="rtt"/>
+  <depend package="ocl"/>
+
+</package>
+
+

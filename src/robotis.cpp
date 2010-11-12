@@ -14,6 +14,61 @@ namespace Robotis {
         delete parameters;
     }
 
+    Hardware::Hardware(std::string cfg, std::string args)
+     : ACES::Hardware<unsigned char>(cfg, args),
+        output((const char*)args.c_str())
+    {
+        /*
+        std::istringstream s1(args);
+        float z;
+        int id, d;
+        s1 >> id >> z >> d;
+        credentials = new Credentials(id, z, d);
+        */
+    }
+
+    bool Hardware::txBus(ACES::Message<unsigned char>* m){
+        if(m){
+            ACES::Word<unsigned char>* w = NULL;
+            std::vector<unsigned char> buf(m->size());
+            while(m->size()){
+                w = m->pop();
+                buf.push_back(w->getData());
+            }
+            for(std::vector<unsigned char>::iterator it = buf.begin();
+                it != buf.end(); it++)
+            {
+                output << *it;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    void Hardware::rxBus(){
+        unsigned char c;
+        ACES::Word<unsigned char> *w = NULL;
+        while(input.good()){
+            c = input.get();
+            w = new ACES::Word<unsigned char>(c);
+            txUpStream.write(w);
+        }
+    }
+
+    bool Hardware::processUS(ACES::Word<unsigned char>*){
+        return false;
+    }
+
+    bool Hardware::processDS(ACES::Message<unsigned char>* m){
+        ACES::Word<unsigned char> *w = NULL;
+        unsigned char c;
+        while(m->size()){
+            w = m->pop();
+            c = w->getData();
+            output << c;
+        }
+        return true;
+    }
 
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
