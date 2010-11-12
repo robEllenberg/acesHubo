@@ -96,6 +96,11 @@ namespace ACES{
     {
         RTT::TaskContext* h = NULL;
         
+        #ifdef HUBO        
+        if (type == "Hubo") {
+            h = (RTT::TaskContext*) new Hubo::Hardware(cfg, args);
+        }
+        #endif 
         #ifdef WEBOTS        
         if (type == "Webots") {
             h = (RTT::TaskContext*) new Webots::Hardware(cfg, args);
@@ -122,6 +127,11 @@ namespace ACES{
                                  std::string args)
     {
         RTT::TaskContext* p = NULL;
+        #ifdef HUBO 
+        if ( type == "Hubo"){
+            p = (RTT::TaskContext*) new Hubo::Protocol(cfg, args);
+        } 
+        #endif
         #ifdef WEBOTS
         if ( type == "Webots"){
             p = (RTT::TaskContext*) new Webots::Protocol(cfg, args);
@@ -154,6 +164,11 @@ namespace ACES{
         s >> type1;
         s >> type2;
 
+        #ifdef HUBO
+        if (type1 == "Hubo"){
+            d = (RTT::TaskContext*) new Hubo::Device(cfg, args);
+        }
+        #endif
         #ifdef WEBOTS 
         if (type1 == "Webots"){
             if(type2 == "Joint"){
@@ -199,6 +214,11 @@ namespace ACES{
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
+        #ifdef HUBO 
+        if ( type == "Hubo"){
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args);
+        } 
+        #endif
         #ifdef WEBOTS
         if( type == "Webots") {
             if ( args == "Joint" ){

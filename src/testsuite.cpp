@@ -34,7 +34,8 @@ namespace TestSuite{
         float val = amp*sin(t) + dc;
         t += freq;
 
-        RTT::Logger::log() << RTT::Logger::Debug << "SAMPLE (spin)!"
+        RTT::Logger::log() << RTT::Logger::Debug << "(State: " << name
+                           << ") sample: " << val 
                            << RTT::endlog();
         ACES::Word<float> *g = new ACES::Word<float>(val, this->nodeID,
                                                      0, ACES::REFRESH);

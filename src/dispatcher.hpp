@@ -16,6 +16,9 @@
 #include "taskcfg.hpp"
 #include "device.hpp"
 #include "logger.hpp"
+#ifdef HUBO 
+    #include "hubo/hubo.hpp"
+#endif
 #ifdef WEBOTS
     #include "webots.hpp"
 #endif
