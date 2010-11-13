@@ -59,7 +59,8 @@ namespace ACES{
                 RTT::Logger::log() << RTT::Logger::Debug << "(state: "
                                    << name << ") assign"
                                    << RTT::endlog();
-                asgnfunct(usIn, this);
+                assign(usIn);
+                //asgnfunct(usIn, this);
             }
         }
     }
@@ -88,13 +89,11 @@ namespace ACES{
     }
 
     template <class T>
-    void State<T>::assign(Word<T>* w, void* me){
-        //TODO - Find a better way to do this 'virtual function'
-        State<T>* th = (State<T>*)me;
+    void State<T>::assign(Word<T>* w){
         RTT::Logger::log() << RTT::Logger::Debug
                            << "(state: "
                            << th->name << ") Value: " << w->getData();
-        th->value = w->getData();
+        value = w->getData();
     }
 
     template <class T>
