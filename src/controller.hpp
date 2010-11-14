@@ -26,10 +26,12 @@ namespace ACES{
             Controller(std::string cfg, std::string args);
             virtual std::map<std::string, void*>* 
                     getStateVector(bool echo=0) = 0;
+            void addCtrl(std::string dest, float sp);
+            bool sendCtrl();
 
-            //RTT::Event<void(std::map<std::string, void*>*)>
-            //    applyStateVector;
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
+        private:
+            std::map<std::string, void*>* curMap;
     };
 
     class ScriptCtrl : public Controller
@@ -46,11 +48,6 @@ namespace ACES{
             std::ifstream walkScript;
             //std::map<std::string, void*>* stateVect;
             int simState;
-
-            //RTT::Method<void(void)> stepMethod;
-            //RTT::Method<bool(void)> runMethod;
-            //RTT::Method<void(void)> haltMethod;
-            //RTT::Method<bool(std::string)> openScriptMethod;
     };
 
     class NullCtrl : public Controller 
