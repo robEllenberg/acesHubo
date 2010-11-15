@@ -69,22 +69,9 @@ int ORO_main(int a, char** b){
     d->startController();
     d->startLogger();
 
-    //OCL::FileReporting r("Reporter");
-    //r.addPeer(d);
-
-    //RTT::TaskContext tc("progRun");
-    //tc.setActivity(new RTT::Activity(5, 0.01, 0, "progRun") );
-    //tc.scripting()->loadPrograms("testprog.ops");
-    //tc.connectPeers(d);
-    //d->start();
-    //d->engine()->programs()->getProgram("TestProgram")->start();
-
-    //d->scripting()->loadPrograms("testprog.ops");
-    //RTT::plugin::PluginLoader::Instance()->loadService("scripting",d);
     //((RTT::TaskContext*)d)->getProvider<RTT::Scripting>("scripting")
-    //                 ->loadPrograms("testprog.ops");
-    //d->engine()->programs()->getProgram("TestProgram")->start();
-    
+    //                 ->loadPrograms("testsuiteprog.ops");
+
     Orocos::TaskBrowser tbrowser(d);
     tbrowser.loop();
     return 0;

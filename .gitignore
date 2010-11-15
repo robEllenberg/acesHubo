@@ -1,2 +1,6 @@
 webots/worlds/
-build/
+build/aces/build
+build/aces/lib
+build/aces/bin
+build/aces/src
+

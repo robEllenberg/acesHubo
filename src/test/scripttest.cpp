@@ -20,14 +20,8 @@ int ORO_main(int a, char** b){
 
     ACES::Dispatcher* d = new ACES::Dispatcher("dispatch");
 
-
-    //RTT::TaskContext tc("progRun");
-    //tc.setActivity(new RTT::Activity(5, 0.01, 0, "progRun") );
-    //tc.scripting()->loadPrograms("testprog.ops");
-    //tc.connectPeers(d);
-
-    //d->engine()->programs()->getProgram("TestProgram")->start();
-    d->scripting()->loadPrograms("testprog.ops");
+    ((RTT::TaskContext*)d)->getProvider<RTT::Scripting>("scripting")
+                     ->loadPrograms("testprog.ops");
     d->start();
     
     Orocos::TaskBrowser tbrowser(d);
