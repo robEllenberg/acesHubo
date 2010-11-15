@@ -132,9 +132,14 @@ int ORO_main(int a, char** b){
     d->linkPD("wbPcol", "dRAR"); d->linkDS("dRAR", "RAR");
 
     d->linkSC("LSP", "wbArm");
+    d->linkSC("LSP", "wbctrl");
     d->linkSC("LSR", "wbArm");
+    d->linkSC("LSR", "wbctrl");
     d->linkSC("RSP", "wbArm");
+    d->linkSC("RSP", "wbctrl");
     d->linkSC("RSR", "wbArm");
+    d->linkSC("RSR", "wbctrl");
+
     d->linkSC("HY",  "wbctrl");
     d->linkSC("LHY", "wbctrl");
     d->linkSC("LHR", "wbctrl");
@@ -157,13 +162,12 @@ int ORO_main(int a, char** b){
     d->linkLS("flog", "centerX");
     d->linkLS("flog", "centerY");
     d->linkLS("flog", "centerZ");
-    //d->linkLS("flog", "imuaccX");
-    //d->linkLS("flog", "imuaccY");
-    //d->linkLS("flog", "imuaccZ");
-    //d->linkLS("flog", "imugyroX");
-    //d->linkLS("flog", "imugyroY");
-    //d->linkLS("flog", "imugyroZ");
-    
+    d->linkLS("flog", "imuaccX");
+    d->linkLS("flog", "imuaccY");
+    d->linkLS("flog", "imuaccZ");
+    d->linkLS("flog", "imugyroX");
+    d->linkLS("flog", "imugyroY");
+    d->linkLS("flog", "imugyroZ");
     
     //d->linkLS("flog", "rffX");
     //d->linkLS("flog", "rffY");
