@@ -27,7 +27,7 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Init" << RTT::endlog();
 
-    d->addHardware("hw 90 100","Robotis","");
+    d->addHardware("hw 90 100","Robotis","/dev/ttyUSB0");
     d->addProtocol("pro 80 100", "Robotis", "");
     d->linkHP("hw", "pro");
 
@@ -47,9 +47,9 @@ int ORO_main(int a, char** b){
     d->linkDS("dZ", "Z");
 
     //Tell the devices & protocol to pay attention to each other 
-    d->linkPD("tsPro", "dX");
-    d->linkPD("tsPro", "dY");
-    d->linkPD("tsPro", "dZ");
+    d->linkPD("pro", "dX");
+    d->linkPD("pro", "dY");
+    d->linkPD("pro", "dZ");
 
     //Setup Logging
     d->addLogger("log1 5 200", "File", "testlog.txt");

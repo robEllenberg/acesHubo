@@ -10,13 +10,72 @@ namespace Robotis {
         parameters = new std::deque<unsigned char>();
     }
 
-    RobotisPacket::~RobotisPacket(){
-        delete parameters;
+    void RobotisPacket::setID(unsigned char i){
+        id = i;
     }
+
+    void RobotisPacket::setLen(unsigned char l){
+        len = l;
+    }
+
+    void RobotisPacket::setError(unsigned char err){
+        error = err;
+    }
+
+    void RobotisPacket::setChecksum(unsigned char check){
+        checksum = check;
+    }
+
+    void RobotisPacket::setInst(INST inst){
+        instruct = inst;
+    }
+
+    unsigned char RobotisPacket::getID(){
+        return id;
+    }
+
+    unsigned char RobotisPacket::getLen(){
+        return len;
+    }
+
+    unsigned char RobotisPacket::getError(){
+        return error;
+    }
+
+    unsigned char RobotisPacket::getChecksum(){
+        return checksum;
+    }
+
+    INST RobotisPacket::getInst(){
+        return instruct;
+    }
+
+    void RobotisPacket::printme(){
+        RTT::Logger::log() << "ID: " << (int)id << ", Len: " << (int)len
+                           << ", Error: " << (int)error 
+                           << ", Check: " << (int)checksum;
+        RTT::Logger::log() << ", Parameters: ";
+        for(std::deque<unsigned char>::iterator it = parameters->begin();
+            it != parameters->end(); it++)
+        {
+            RTT::Logger::log() <<  (int)(*it) << ", ";
+        }
+        RTT::Logger::log() << RTT::endlog();
+    }
+
+    std::ostream &operator<<(std::ostream &out, RobotisPacket &p){
+        p.printme();
+        return out;
+    }
+
+    //RobotisPacket::~RobotisPacket(){
+    //    delete parameters;
+    //}
 
     Hardware::Hardware(std::string cfg, std::string args)
      : ACES::Hardware<unsigned char>(cfg, args),
-        output((const char*)args.c_str())
+        io_service(),
+        port(io_service, (const char*)args.c_str())
     {
         /*
         std::istringstream s1(args);
@@ -38,7 +97,11 @@ namespace Robotis {
             for(std::vector<unsigned char>::iterator it = buf.begin();
                 it != buf.end(); it++)
             {
-                output << *it;
+                //output << *it;
+                //boost::array<unsigned char, 1> buf;
+                //std::vector<unsigned char>buf;
+                buf[0] = *it;
+                port.write_some(boost::asio::buffer((void*)*it, 1));
             }
             return true;
         }
@@ -46,15 +109,20 @@ namespace Robotis {
     }
 
     void Hardware::rxBus(){
-        unsigned char c;
+        unsigned char c=0, count=1;
         ACES::Word<unsigned char> *w = NULL;
-        while(input.good()){
-            c = input.get();
+        while(count){
+            //c = input.get();
+            boost::array<unsigned char, 1> buf;
+            //count = boost::asio::read(port, buf);
+            count = port.read_some(boost::asio::buffer(buf, 1));
+            c = buf[0];
             w = new ACES::Word<unsigned char>(c);
             txUpStream.write(w);
         }
     }
 
+/*
     bool Hardware::processUS(ACES::Word<unsigned char>*){
         return false;
     }
@@ -69,7 +137,7 @@ namespace Robotis {
         }
         return true;
     }
-
+*/
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
 
@@ -110,6 +178,7 @@ namespace Robotis {
         Protocol::processDS(ACES::Word<RobotisPacket>* w)
     {
         RobotisPacket p = w->getData();
+        p.printme();
         /*
         switch(p->instruct){
             case PING:
@@ -131,6 +200,7 @@ namespace Robotis {
         }
         */
         ACES::Message<unsigned char>* m = messageFromPacket(&p);
+        m->printme();
         return m;
 
         //unsigned char* c = new unsigned char;
@@ -154,11 +224,11 @@ namespace Robotis {
     //}
 
     ACES::Word<RobotisPacket>* Device::processDS(ACES::Word<float>* w){
+        if(w){
             RobotisPacket p;
-            p.id = credentials->getDevID();
+            p.setID(credentials->getDevID());
             p.parameters = new std::deque<unsigned char>;
             float sp = 0.;
-        if(w){
             switch( w->getMode() ){
                 case(ACES::REFRESH):
                     //requestion Position in the motor control table
@@ -167,14 +237,14 @@ namespace Robotis {
                     requestLen = PARAM_LEN[requestPos];
                     //lockout = true;
 
-                    p.instruct = READ;
+                    p.setInst(READ);
                     p.parameters->push_back((unsigned char) w->getNodeID());
                     p.parameters->push_back(
                         (unsigned char) PARAM_LEN[w->getNodeID()] );
                     break;
 
                 case(ACES::SET):
-                    p.instruct = WRITE;
+                    p.setInst(WRITE);
                     p.parameters->push_back((unsigned char) w->getNodeID());
                     
                     sp = w->getData();     //Grab set-point from goal
@@ -235,14 +305,14 @@ namespace Robotis {
     }
 
     Credentials::Credentials(int motNum, float z, float dir)
-     :ACES::Credentials((int)JOINT)
+     :ACES::Credentials(motNum)
     {
         motorNum = motNum;
         zero = z;
         direction = dir;
     }
 
-    static Credentials* makeCredentials(std::string args){
+    Credentials* Credentials::makeCredentials(std::string args){
         //Format is "IDnum zero direction"
         std::istringstream s1(args);
         float z, d;
@@ -278,21 +348,21 @@ namespace Robotis {
         //We need to generate a packet which will pass through the
         //comparison operator on the motor of interest, the zero and direction
         //information don't matter
-        return new Credentials(p->id, 0.0, 0.0);
+        return new Credentials(p->getID(), 0.0, 0.0);
     }
 
     ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p){
         ACES::Message<unsigned char> *m = new ACES::Message<unsigned char>();
-        p->len = p->parameters->size() + 2;
-        p->checksum = checksum(p);
+        p->setLen( p->parameters->size() + 2 );
+        p->setChecksum( checksum(p) );
 
         //Build version for sending
         //Header
         m->push(new ACES::Word<unsigned char>(0xFF));
         m->push(new ACES::Word<unsigned char>(0xFF));
-        m->push(new ACES::Word<unsigned char>(p->id));
-        m->push(new ACES::Word<unsigned char>(p->len));
-        m->push(new ACES::Word<unsigned char>((unsigned char)p->instruct));
+        m->push(new ACES::Word<unsigned char>(p->getID()));
+        m->push(new ACES::Word<unsigned char>(p->getLen()));
+        m->push(new ACES::Word<unsigned char>((unsigned char)p->getInst()));
         //Body
         for(std::deque<unsigned char>::iterator it = p->parameters->begin();
             it != p->parameters->end(); it++)
@@ -300,7 +370,7 @@ namespace Robotis {
             m->push(new ACES::Word<unsigned char>(*it));
         }
         //Checksum
-        m->push(new ACES::Word<unsigned char>(p->checksum));
+        m->push(new ACES::Word<unsigned char>(p->getChecksum()) );
 
         return m;
     }
@@ -309,8 +379,8 @@ namespace Robotis {
         //Checksum must be generated using entire packet less the leading
         // 0xFF bytes (x2), and the checksum (obviously)
         unsigned char sum = 0;
-        sum += p->id;
-        sum += p->len;
+        sum += p->getID();
+        sum += p->getLen();
         std::deque<unsigned char>::iterator it;
         for(it = p->parameters->begin(); it != p->parameters->end(); it++){
             sum += (*it);
@@ -368,10 +438,13 @@ namespace Robotis {
             case(2):
                 params->push_back(low);
                 params->push_back(high);
+                break;
             case(1):
                 params->push_back(low);
+                break;
             default:
-                assert(0);
+                //assert(0);
+                break;
         }
         return true;
     }

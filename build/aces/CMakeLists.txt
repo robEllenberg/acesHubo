@@ -29,6 +29,19 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+# Create custom command for flex/lex (note the outputs)
+  ADD_CUSTOM_COMMAND(
+    SOURCE ${PROJECT_SOURCE_DIR}/src/robotis.l
+    COMMAND /usr/bin/flex 
+    ARGS --outfile=${PROJECT_SOURCE_DIR}/robotis.yy.cpp
+        --header-file=robotis.yy.h
+        ${PROJECT_SOURCE_DIR}/src/robotis.l
+    TARGET RobotisParser
+    OUTPUTS ${PROJECT_SOURCE_DIR}/robotis.yy.cpp)
+  SET_SOURCE_FILES_PROPERTIES(${PROJECT_SOURCE_DIR}/robotis.yy.cpp GENERATED)
+  #Create target for the parser
+  ADD_CUSTOM_TARGET(RobotisParser echo "Creating Robotis Parser")
+
 rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/credentials.cpp src/state.cpp
                      src/device.cpp src/protocol.cpp
@@ -36,33 +49,31 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      
 add_definitions(-DTESTSUITE)
 add_definitions(-DROBOTIS)
-add_definitions(-DHUBO)
+#add_definitions(-DHUBO)
 #add_definitions(-DWEBOTS)
 
-include_directories("/usr/local/webots/include/controller/c")
-link_directories("/usr/local/webots/lib")
+#include_directories("/usr/local/webots/include/controller/c")
+#link_directories("/usr/local/webots/lib")
 
 rosbuild_add_library(aces-testsuite src/testsuite.cpp)
 
 #rosbuild_add_library(aces-webots src/webots.cpp)
 #target_link_libraries(aces-webots Controller)
 
-rosbuild_add_library(aces-robotis src/robotis.cpp)
+rosbuild_add_library(aces-robotis src/robotis.cpp robotis.yy.cpp)
 
 rosbuild_add_library(aces-dispatcher src/dispatcher.cpp)
+target_link_libraries(aces-dispatcher aces-testsuite)
+target_link_libraries(aces-dispatcher aces-robotis)
+#target_link_libraries(aces-dispatcher aces-webots)
 
-rosbuild_add_library(aces-hubo src/hubo/hubo.cpp src/hubo/huboTxPacket.cpp)
+#rosbuild_add_library(aces-hubo src/hubo/hubo.cpp src/hubo/huboTxPacket.cpp)
 
-find_package(FLEX)
-FLEX_TARGET(Scanner robotis.l robotis.yy.c)
-rosbuild_add_library(robotis-flex ${FLEX_Scanner_OUTPUTS})
-
-#rosbuild_add_executable(testsuite src/test/testsuite.cpp)
-#target_link_libraries(testsuite aces-common)
-#target_link_libraries(testsuite aces-testsuite)
-#target_link_libraries(testsuite aces-webots)
-#target_link_libraries(testsuite aces-dispatcher)
-#target_link_libraries(testsuite orocos-taskbrowser-gnulinux)
+rosbuild_add_executable(testsuite src/test/testsuite.cpp)
+target_link_libraries(testsuite aces-common)
+target_link_libraries(testsuite aces-testsuite)
+target_link_libraries(testsuite aces-dispatcher)
+target_link_libraries(testsuite orocos-taskbrowser-gnulinux)
 
 #rosbuild_add_executable(wbtest src/test/wbtest.cpp)
 #target_link_libraries(wbtest aces-common)
@@ -74,15 +85,14 @@ rosbuild_add_library(robotis-flex ${FLEX_Scanner_OUTPUTS})
 rosbuild_add_executable(robotis src/test/robotistest.cpp)
 target_link_libraries(robotis aces-common)
 target_link_libraries(robotis aces-dispatcher)
-target_link_libraries(robotis aces-testsuite)
-#target_link_libraries(robotis aces-webots)
+#target_link_libraries(robotis aces-testsuite)
 target_link_libraries(robotis aces-robotis)
 target_link_libraries(robotis orocos-taskbrowser-gnulinux)
 
-rosbuild_add_executable(hubovia src/test/hubotest1.cpp)
-target_link_libraries(hubovia aces-common)
-target_link_libraries(hubovia aces-dispatcher)
-target_link_libraries(hubovia aces-testsuite)
-target_link_libraries(hubovia aces-hubo)
+#rosbuild_add_executable(hubovia src/test/hubotest1.cpp)
+#target_link_libraries(hubovia aces-common)
+#target_link_libraries(hubovia aces-dispatcher)
+#target_link_libraries(hubovia aces-testsuite)
+#target_link_libraries(hubovia aces-hubo)
 #target_link_libraries(robotis aces-robotis)
-target_link_libraries(hubovia orocos-taskbrowser-gnulinux)
+#target_link_libraries(hubovia orocos-taskbrowser-gnulinux)

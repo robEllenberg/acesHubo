@@ -1,6 +1,6 @@
 %{
 #include <iostream>
-#include "robotis.hpp"
+#include "src/robotis.hpp"
 
 %}
 
@@ -27,20 +27,20 @@
                   return 0;}
 
 <id_frame>[\x00-\xFF]   {  MAKEP
-                          (*p).id = *yytext;
+                          p->setID(*yytext);
                           //std::cout << "got id" << std::endl;
                           BEGIN(len_frame);
                           return 0;}
 
 <len_frame>[\x00-\xFF]    { MAKEP
-                            (*p).len = *yytext;
-                            ((*p).counter) = (*p).len - 2; 
+                            p->setLen(*yytext);
+                            ((*p).counter) = p->getLen() - 2; 
                             //std::cout << "got len" << std::endl;
                             BEGIN(error_frame);
                             return 0;}
 
 <error_frame>[\x00-\xFF]    { MAKEP
-                              (*p).error = *yytext; 
+                              p->setError(*yytext); 
                               //std::cout << "got error" << std::endl;
                               BEGIN(param_frame);
                               return 0;}
@@ -57,7 +57,7 @@
                              }
 
 <check_frame>[\x00-\xFF]       { MAKEP
-                          (*p).checksum = *yytext;
+                          p->setChecksum(*yytext);
                           //std::cout << "got check" << std::endl;
                           //(*p).printme();
                           yyset_extra( p, yyscanner );

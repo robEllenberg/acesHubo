@@ -12,6 +12,8 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/Logger.hpp>
 
+#include <boost/asio.hpp>
+
 #include "protocol.hpp"
 #include "message.hpp"
 #include "state.hpp"
@@ -96,16 +98,31 @@ namespace Robotis {
     class RobotisPacket {
         public:
             RobotisPacket();
-            ~RobotisPacket();
-            //int counter;
+            void printme();
+            //~RobotisPacket();
+            void setID(unsigned char id);
+            void setLen(unsigned char l);
+            void setError(unsigned char err);
+            void setChecksum(unsigned char check);
+            void setInst(INST inst);
+
+            unsigned char getID();
+            unsigned char getLen();
+            unsigned char getError();
+            unsigned char getChecksum();
+            INST getInst();
+
+            int counter;
+            std::deque<unsigned char>* parameters;
+        private:
             unsigned char id;
             unsigned char len;
             unsigned char error;
-            INST instruct;
-            std::deque<unsigned char>* parameters;
             unsigned char checksum;
-            void printme();
+            INST instruct;
     };
+
+    std::ostream &operator<<(std::ostream &out, const RobotisPacket &p);
 
     class Hardware : public ACES::Hardware<unsigned char>{
         public:
@@ -113,11 +130,13 @@ namespace Robotis {
             virtual bool txBus(ACES::Message<unsigned char>* m);
             virtual void rxBus();
 
-            virtual bool processUS(ACES::Word<unsigned char>*);
-            virtual bool processDS(ACES::Message<unsigned char>*);
+            //virtual bool processUS(ACES::Word<unsigned char>*);
+            //virtual bool processDS(ACES::Message<unsigned char>*);
         protected:
-            std::ofstream output;
-            std::ifstream input;
+            //std::ofstream output;
+            //std::ifstream input;
+            boost::asio::io_service io_service;
+            boost::asio::serial_port port;
     };
 
     class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
@@ -166,7 +185,7 @@ namespace Robotis {
     Credentials* credFromPacket(RobotisPacket* p);
     ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p);
     unsigned char checksum(RobotisPacket* p);
-    float USScale(int in, int nodeID);
+    float USScale(unsigned short in, int nodeID);
     unsigned short DSScale(float in, int nodeID);
     float USlimit(float c, float low, float high);
     bool appendParams( std::deque<unsigned char>* params,
