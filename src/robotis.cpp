@@ -89,7 +89,7 @@ namespace Robotis {
     bool Hardware::txBus(ACES::Message<unsigned char>* m){
         if(m){
             ACES::Word<unsigned char>* w = NULL;
-            std::vector<unsigned char> buf(m->size());
+            std::vector<unsigned char> buf;
             while(m->size()){
                 w = m->pop();
                 buf.push_back(w->getData());
@@ -100,8 +100,8 @@ namespace Robotis {
                 //output << *it;
                 //boost::array<unsigned char, 1> buf;
                 //std::vector<unsigned char>buf;
-                buf[0] = *it;
-                port.write_some(boost::asio::buffer((void*)*it, 1));
+                port.write_some(boost::asio::buffer((void*)(&(*it)), 1));
+                RTT::Logger::log() << (int) *it  << RTT::endlog();
             }
             return true;
         }
@@ -111,6 +111,7 @@ namespace Robotis {
     void Hardware::rxBus(){
         unsigned char c=0, count=1;
         ACES::Word<unsigned char> *w = NULL;
+        /*
         while(count){
             //c = input.get();
             boost::array<unsigned char, 1> buf;
@@ -120,6 +121,7 @@ namespace Robotis {
             w = new ACES::Word<unsigned char>(c);
             txUpStream.write(w);
         }
+        */
     }
 
 /*
@@ -178,7 +180,7 @@ namespace Robotis {
         Protocol::processDS(ACES::Word<RobotisPacket>* w)
     {
         RobotisPacket p = w->getData();
-        p.printme();
+        //p.printme();
         /*
         switch(p->instruct){
             case PING:
@@ -200,7 +202,7 @@ namespace Robotis {
         }
         */
         ACES::Message<unsigned char>* m = messageFromPacket(&p);
-        m->printme();
+        //m->printme();
         return m;
 
         //unsigned char* c = new unsigned char;
@@ -238,9 +240,8 @@ namespace Robotis {
                     //lockout = true;
 
                     p.setInst(READ);
-                    p.parameters->push_back((unsigned char) w->getNodeID());
-                    p.parameters->push_back(
-                        (unsigned char) PARAM_LEN[w->getNodeID()] );
+                    p.parameters->push_back((unsigned char) requestPos);
+                    p.parameters->push_back((unsigned char) requestLen);
                     break;
 
                 case(ACES::SET):
@@ -250,9 +251,10 @@ namespace Robotis {
                     sp = w->getData();     //Grab set-point from goal
                     //Scale the set-point
                     unsigned short ssp = DSScale(sp, w->getNodeID()); 
+                    RTT::Logger::log() << "setpoint " << ssp << RTT::endlog();
                     //Byte-chop the scaled point and add it to the param list
                     appendParams(p.parameters, ssp,
-                                 PARAM_LEN[w->getNodeID()] );
+                                 PARAM_LEN[ w->getNodeID() ] );
                     break;
             }
             ACES::Word<RobotisPacket> *pw = new ACES::Word<RobotisPacket>(p);
@@ -381,6 +383,7 @@ namespace Robotis {
         unsigned char sum = 0;
         sum += p->getID();
         sum += p->getLen();
+        sum += (unsigned char)p->getInst();
         std::deque<unsigned char>::iterator it;
         for(it = p->parameters->begin(); it != p->parameters->end(); it++){
             sum += (*it);
@@ -394,7 +397,7 @@ namespace Robotis {
         switch(nodeID){
             case GOAL_POSITION:
                 result = (in*300./1024.);
-                result = USlimit(result, 0., 300.);
+                result = limit<float>(result, 0., 300.);
                 break;
             default:        //case of no scaling function
                 result = (float)in;
@@ -408,7 +411,9 @@ namespace Robotis {
         switch(nodeID){
             case GOAL_POSITION:
                 //TODO - needs proper rounding
-                result = (unsigned short)(in*1024./300.);
+                result = (unsigned short)(in*1023./300.);
+                result = limit<unsigned short>(result, 0, 1023);
+                break;
             default:        //case of no scaling function
                 result = (unsigned short)in;
                 break;
@@ -416,14 +421,15 @@ namespace Robotis {
         return result;
     }
 
-    float USlimit(float c, float low, float high){
+    template <class T>
+    T limit(float c, T low, T high){
         if(c < low){
             return low;
         }
         if(c > high){
             return high;
         }
-        return c;
+        return (T)c;
     }
 
     bool appendParams( std::deque<unsigned char>* params,
@@ -431,9 +437,11 @@ namespace Robotis {
     {
         //we are assuming that shorts are 16 bit
         unsigned char low = 0, high = 0;
+        int temp = 0;
         //Figure out how to cast these properly
-        low = data & (unsigned short)0x00FF;
-        high = data & (unsigned short)0xFF00;
+        low = (unsigned short)(data & 0x00FF);
+        temp = (unsigned short)(data & 0xFF00);
+        high = temp >> 8;
         switch(size){
             case(2):
                 params->push_back(low);
@@ -443,7 +451,7 @@ namespace Robotis {
                 params->push_back(low);
                 break;
             default:
-                //assert(0);
+                assert(0);
                 break;
         }
         return true;

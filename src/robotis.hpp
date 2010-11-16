@@ -69,7 +69,7 @@ namespace Robotis {
             1,              //HIGHEST_LIMIT_TEMPERATURE = 0xB
             1,              //LOWEST_LIMIT_VOLTAGE = 0xC
             1,              //HIGHEST_LIMIT_VOLTAGE = 0xD
-            2,              //MAX_TORQUE = 0xE
+            2, 0,           //MAX_TORQUE = 0xE
             1,              //STATUS_RETURN_LEVEL = 0x10
             1,              //ALARM_LED = 0x11
             1,              //ALARM_SHUTDOWN = 0x12
@@ -187,7 +187,9 @@ namespace Robotis {
     unsigned char checksum(RobotisPacket* p);
     float USScale(unsigned short in, int nodeID);
     unsigned short DSScale(float in, int nodeID);
-    float USlimit(float c, float low, float high);
+    template <class T>
+    T limit(float c, T low, T high);
+    unsigned short DSlimit(float d, unsigned short low, unsigned short high);
     bool appendParams( std::deque<unsigned char>* params,
                        unsigned short data, int size );
 };    
