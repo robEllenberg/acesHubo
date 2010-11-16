@@ -35,6 +35,31 @@ namespace ACES {
     };
 
     template <class T>
+    class History {
+        public:
+            History(int size, Sample<T> ic);
+            History(int size);
+            Sample<T> getSample(int sampleNum);
+            Sample<T> getSampleSec(float sec);
+            Sample<T> getSampleTicks(RTT::os::TimeSerivce::ticks t);
+        private:
+            int size;
+            int lastValid;
+            std::vector< Sample<T> > hist;
+    };
+
+    template <class T>
+    class Sample {
+        public:
+            T getVal();
+            RTT::os::TimeService::ticks getTick();
+            float getSec();
+        private:
+            T value;
+            RTT::os::TimeService::ticks t;
+    };
+
+    template <class T>
     class State : public ProtoState
     {
         public:
@@ -43,15 +68,16 @@ namespace ACES {
             virtual void updateHook();  
             virtual void sample();
             virtual std::string logVal();
-
             void printme();
             virtual void go(T sp);
             void assign(Word<T>* w);
+            T getVal();
+
             Word<T>* processDS( std::map<std::string, void*>* p );
 
-            T value;
-
         protected:
+            T value;
+            History<T> hist;
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
             RTT::InputPort< std::map<std::string, void*>* > rxDownStream;

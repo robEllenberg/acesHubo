@@ -1,6 +1,33 @@
 namespace ACES{
 
     template <class T>
+    History<T>::History(int s)
+     :hist(s)
+    {
+        size = s;
+        lastValid = -1;
+    }
+
+    template <class T>
+    History<T>::History(int s, Sample<T> ic)
+     :hist(s)
+    {
+        size = s;
+        hist[0] = ic;
+        lastValid = 0;
+    }
+
+    Sample<T> History<T>::getSample(int sampleNum){
+    //need a way to return on invalid sample
+    }
+
+    Sample<T> History<T>::getSampleSec(float sec){
+    }
+
+    Sample<T> History<T>::getSampleTicks(RTT::os::TimeSerivce::ticks t){
+    }
+
+    template <class T>
     State<T>::State(std::string cfg, int nID) :
       ProtoState(cfg, nID),
       //goMethod("go", &State<T>::go, this),
@@ -86,6 +113,10 @@ namespace ACES{
     void State<T>::go(T sp){
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
         txDownStream.write(w);
+    }
+
+    State<T>::diff(){
+        
     }
 
     template <class T>
