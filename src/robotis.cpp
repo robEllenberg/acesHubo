@@ -124,22 +124,6 @@ namespace Robotis {
         */
     }
 
-/*
-    bool Hardware::processUS(ACES::Word<unsigned char>*){
-        return false;
-    }
-
-    bool Hardware::processDS(ACES::Message<unsigned char>* m){
-        ACES::Word<unsigned char> *w = NULL;
-        unsigned char c;
-        while(m->size()){
-            w = m->pop();
-            c = w->getData();
-            output << c;
-        }
-        return true;
-    }
-*/
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
 
@@ -168,6 +152,7 @@ namespace Robotis {
             RobotisPacket* p  = curPacket;
             curPacket = new RobotisPacket();
             yyset_extra(curPacket, scanner) ;
+
 
             pw = new ACES::Word<RobotisPacket>(*p, 0, 0, 0,
                 (ACES::Credentials*)credFromPacket(p));
@@ -211,19 +196,12 @@ namespace Robotis {
     }
 
     Device::Device(std::string cfg, std::string args)
-     :ACES::Device<float, RobotisPacket>(cfg)
+     :ACES::Device<float, RobotisPacket>(cfg),
+     requestPos(-1), requestLen(-1)
     {
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
     }
-
-    //bool Device::startHook(){
-        //lockout = false;
-        //return true;
-    //}
-
-    //void Device::stopHook(){
-    //}
 
     ACES::Word<RobotisPacket>* Device::processDS(ACES::Word<float>* w){
         if(w){
@@ -233,11 +211,11 @@ namespace Robotis {
             float sp = 0.;
             switch( w->getMode() ){
                 case(ACES::REFRESH):
-                    //requestion Position in the motor control table
+                    //Indicate that the Device has sent a request, others must
+                    //wait
                     requestPos = w->getNodeID();
-                    //length of the request - # bytes
                     requestLen = PARAM_LEN[requestPos];
-                    //lockout = true;
+                    DSlockout = true;
 
                     p.setInst(READ);
                     p.parameters->push_back((unsigned char) requestPos);
@@ -264,45 +242,42 @@ namespace Robotis {
     }
 
     ACES::Word<float>* Device::processUS(ACES::Word<RobotisPacket>* w){
-        RobotisPacket* p = &(w->getData());
+        if(*(w->getCred()) == *credentials){
+            RobotisPacket* p = &(w->getData());
 
-        int requestPos = w->getNodeID();
-        
-        //map [nID]->tentry
-        for(int i = 0; i < requestLen; ){
-            unsigned short tentry = 0;
-            unsigned char low=0, high=0;
-            switch(PARAM_LEN[requestPos+i]){
-                case 2:
-                    //Check the order here
-                    low = (*(p->parameters))[i];
-                    high = (*(p->parameters))[i+1];
-                    tentry = high;
-                    tentry <<= 8;
-                    tentry |= low;
-                    i+=2;
-                    break;
-                case 1:
-                    tentry = (*(p->parameters))[i];
-                    i++;
-                    break;
-                case 0:
-                    assert(0);
-                    break;
-                default:
-                    assert(0);
-                    break;
+            for(int i = 0, j=0; i < requestLen; j=i ){
+                unsigned short tentry = 0;
+                unsigned char low=0, high=0;
+                switch(PARAM_LEN[requestPos+i]){
+                    case 2:
+                        //Check the order here
+                        low = (*(p->parameters))[i];
+                        high = (*(p->parameters))[i+1];
+                        tentry = high;
+                        tentry <<= 8;
+                        tentry |= low;
+                        i+=2;
+                        break;
+                    case 1:
+                        tentry = (*(p->parameters))[i];
+                        i++;
+                        break;
+                    default:
+                        assert(false);
+                        break;
+                }
+                //The scaling function
+                float data = USScale(tentry, requestPos+j);
+                
+                int node = findTrueNodeID(requestPos+j);
+                ACES::Word<float> *res = new ACES::Word<float>(data, requestPos+j,
+                                                         credentials->getDevID(),
+                                                         ACES::REFRESH,
+                                                         credentials);
+                txUpStream.write(res);
             }
-            //The scaling function
-            float data = USScale(tentry, requestPos+i);
-
-            ACES::Word<float> *res = new ACES::Word<float>(data, requestPos+i,
-                                                     credentials->getDevID(),
-                                                     ACES::REFRESH,
-                                                     credentials);
-            txUpStream.write(res);
         }
-        //lockout = false;
+        DSlockout = false;
         return NULL;
     }
 

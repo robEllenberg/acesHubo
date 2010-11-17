@@ -167,7 +167,6 @@ namespace Robotis {
         private:
             int requestPos; //!The memory table position of the last request issued
             int requestLen; //!The size of data from the last issued request
-            bool lockout;
     };
 
     class Credentials : public ACES::Credentials {
