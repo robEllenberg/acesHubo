@@ -6,12 +6,16 @@ namespace ACES {
       nodeID(nID),
       //Switching this default to false prevents automatic
       //sampling from starting
-      samplingAttr(false)
+      samplingAttr(false),
+      intEnable(false),
+      diffEnable(false)
     {
         //nodeID.set(nID);
         //samplingAttr.set(true);
         this->addAttribute("Node ID", nodeID);
         this->addAttribute("sampling", samplingAttr);
+        this->addAttribute("intEnable", intEnable);
+        this->addAttribute("diffEnable", diffEnable);
     }
 
     bool ProtoState::subscribeController(RTT::TaskContext* c){

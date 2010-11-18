@@ -16,37 +16,74 @@ namespace ACES{
         hist[0] = ic;
         lastValid = 0;
     }
+    
+    template <class T>
+    History<T>::update(T value)
+    {
+        Sample s(value, RTT::os::TimeService::Instance()->getTicks());
+        hist.push_back(s);
+        hist.pop_front();
+    }
 
     Sample<T> History<T>::getSample(int sampleNum){
     //need a way to return on invalid sample
+        return hist[sampleNum];
     }
 
     Sample<T> History<T>::getSampleSec(float sec){
+        TODO
+        return 0.;
     }
 
     Sample<T> History<T>::getSampleTicks(RTT::os::TimeSerivce::ticks t){
+        TODO
+        return Sample<T>();
+    }
+    
+    template <class T>
+    Sample<T>::Sample(){
+        valid = false;
+    }
+
+    template <class T>
+    Sample<T>::Sample(T val, RTT::os::TimeService::ticks time){
+        value = val;
+        t = time;
+        valid = true;
+    }
+
+    template <class T>
+    bool Sample<T>::isValid(){
+        return valid;
+    }
+
+    template <class T>
+    T Sample<T>::getVal(){
+        return value;
+    }
+
+    template <class T>
+    RTT::os::TimeService::ticks Sample<T>::getTick(){
+        return t;
+    }
+
+    template <class T>
+    float Sample<T>::getSec(){
+        return getSeconds(t);
     }
 
     template <class T>
     State<T>::State(std::string cfg, int nID) :
       ProtoState(cfg, nID),
-      //goMethod("go", &State<T>::go, this),
       value(0)
-      //txDownStream("txDownStream"),
-      //dsQueue(10),
-      //usQueue(10),
-      //sampleMethod("sample", &State<T>::sample, this)
     {
-        //this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
-        //    "credentials associated w/the goal");
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
-
         this->addOperation("go", &State<T>::go, this, RTT::OwnThread).doc(
                            "Go to a specified Setpoint").arg("SP", "Set Point");
-        //dsQueue = new RTT::Buffer< std::map<std::string, void*>* >(50);
-        //dsQueue = new RTT::Buffer< Goal* >(50);
-        //dsQueue = new RTT::Buffer< Goal* >(50);
+        this->addOperation("hist", &State<T>::getHist, this, RTT::OwnThread).doc(
+                           "Get a historical sample").arg("sample#",
+                           "Number of sample in sequence");
 
         this->addAttribute("value", value);
         asgnfunct = assign;
@@ -87,9 +124,31 @@ namespace ACES{
                                    << name << ") assign"
                                    << RTT::endlog();
                 assign(usIn);
-                //asgnfunct(usIn, this);
             }
         }
+        if(intEnable){
+            Sample<T> cur = hist.getSample(0);
+            Sample<T> last = hist.getSample(1);
+            newArea = 1./2.*(double)( cur.getValue()+last.getValue()
+            )*(double)(last.getSampleSec() - cur.getSampleSec())
+            integral += newArea;
+        }
+        if(diffEnable){
+            Sample<T> cur = hist.getSample(0).getVal();
+            Sample<T> last = hist.getSample(1).getVal();
+            diff = (double)(cur.getValue()-last.getValue())
+                   /(cur.getSampleSec()-lastgetSampleSec());
+        }
+    }
+
+    template <class T>
+    float State<T>::getInt(){
+        return integral;
+    }
+
+    template <class T>
+    float State<T>::getDiff(){
+        return diff;
     }
 
     template <class T>
@@ -115,6 +174,11 @@ namespace ACES{
         txDownStream.write(w);
     }
 
+    template <class T>
+    State<T>::getHist(){
+    }
+
+    template <class T>
     State<T>::diff(){
         
     }
@@ -124,6 +188,7 @@ namespace ACES{
         RTT::Logger::log() << RTT::Logger::Debug
                            << "(state: "
                            << th->name << ") Value: " << w->getData();
+        hist.update( w->getData() );
         value = w->getData();
     }
 

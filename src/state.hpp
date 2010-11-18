@@ -31,6 +31,8 @@ namespace ACES {
             virtual std::string logVal() = 0;
             int nodeID;
             bool samplingAttr;
+            bool intEnable;
+            bool diffEnable;
             bool subscribeController(RTT::TaskContext* c);
     };
 
@@ -42,19 +44,24 @@ namespace ACES {
             Sample<T> getSample(int sampleNum);
             Sample<T> getSampleSec(float sec);
             Sample<T> getSampleTicks(RTT::os::TimeSerivce::ticks t);
+            void update(T value);
         private:
             int size;
             int lastValid;
-            std::vector< Sample<T> > hist;
+            std::deque< Sample<T> > hist;
     };
 
     template <class T>
     class Sample {
         public:
+            Sample();
+            Sample(T val, RTT::os::TimeService::ticks time);
             T getVal();
             RTT::os::TimeService::ticks getTick();
             float getSec();
+            bool isValid();
         private:
+            bool valid;
             T value;
             RTT::os::TimeService::ticks t;
     };
@@ -72,18 +79,21 @@ namespace ACES {
             virtual void go(T sp);
             void assign(Word<T>* w);
             T getVal();
+            float getInt();
+            float getDiff();
 
             Word<T>* processDS( std::map<std::string, void*>* p );
 
         protected:
             T value;
+            double integral;
+            double diff;
             History<T> hist;
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
             RTT::InputPort< std::map<std::string, void*>* > rxDownStream;
     };
 
-    class DerrivedState : public State
 }
     
 #include "state.cc"
