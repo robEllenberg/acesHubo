@@ -12,6 +12,7 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Operation.hpp>
 #include <rtt/Attribute.hpp>
+#include <rtt/os/TimeService.hpp>
 
 #include "credentials.hpp"
 #include "controller.hpp"
@@ -37,21 +38,6 @@ namespace ACES {
     };
 
     template <class T>
-    class History {
-        public:
-            History(int size, Sample<T> ic);
-            History(int size);
-            Sample<T> getSample(int sampleNum);
-            Sample<T> getSampleSec(float sec);
-            Sample<T> getSampleTicks(RTT::os::TimeSerivce::ticks t);
-            void update(T value);
-        private:
-            int size;
-            int lastValid;
-            std::deque< Sample<T> > hist;
-    };
-
-    template <class T>
     class Sample {
         public:
             Sample();
@@ -67,6 +53,21 @@ namespace ACES {
     };
 
     template <class T>
+    class History {
+        public:
+            History(int size, Sample<T> ic);
+            History(int size);
+            Sample<T> getSample(int sampleNum);
+            Sample<T> getSampleSec(float sec);
+            Sample<T> getSampleTicks(RTT::os::TimeService::ticks t);
+            void update(T value);
+        private:
+            int size;
+            int lastValid;
+            std::deque< Sample<T> > hist;
+    };
+
+    template <class T>
     class State : public ProtoState
     {
         public:
@@ -79,8 +80,8 @@ namespace ACES {
             virtual void go(T sp);
             void assign(Word<T>* w);
             T getVal();
-            float getInt();
-            float getDiff();
+            double getInt();
+            double getDiff();
 
             Word<T>* processDS( std::map<std::string, void*>* p );
 

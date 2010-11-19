@@ -18,25 +18,28 @@ namespace ACES{
     }
     
     template <class T>
-    History<T>::update(T value)
+    void History<T>::update(T value)
     {
-        Sample s(value, RTT::os::TimeService::Instance()->getTicks());
+        Sample<T> s(value, RTT::os::TimeService::Instance()->getTicks());
         hist.push_back(s);
         hist.pop_front();
     }
 
+    template <class T>
     Sample<T> History<T>::getSample(int sampleNum){
     //need a way to return on invalid sample
         return hist[sampleNum];
     }
 
+    template <class T>
     Sample<T> History<T>::getSampleSec(float sec){
-        TODO
+        //TODO
         return 0.;
     }
 
-    Sample<T> History<T>::getSampleTicks(RTT::os::TimeSerivce::ticks t){
-        TODO
+    template <class T>
+    Sample<T> History<T>::getSampleTicks(RTT::os::TimeService::ticks t){
+        //TODO
         return Sample<T>();
     }
     
@@ -69,24 +72,27 @@ namespace ACES{
 
     template <class T>
     float Sample<T>::getSec(){
-        return getSeconds(t);
+        return RTT::os::TimeService::Instance()->getSeconds(t);
     }
 
     template <class T>
     State<T>::State(std::string cfg, int nID) :
       ProtoState(cfg, nID),
+      hist(10),
       value(0)
     {
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
         this->addOperation("go", &State<T>::go, this, RTT::OwnThread).doc(
                            "Go to a specified Setpoint").arg("SP", "Set Point");
-        this->addOperation("hist", &State<T>::getHist, this, RTT::OwnThread).doc(
-                           "Get a historical sample").arg("sample#",
-                           "Number of sample in sequence");
+        //TODO - Function to print out the current history
+        //this->addOperation("hist", &State<T>::getHist, this, RTT::OwnThread).doc(
+        //                   "Get a historical sample").arg("sample#",
+        //                   "Number of sample in sequence");
 
         this->addAttribute("value", value);
-        asgnfunct = assign;
+        this->addAttribute("integral", integral);
+        this->addAttribute("diff", diff);
 
         this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
@@ -126,28 +132,16 @@ namespace ACES{
                 assign(usIn);
             }
         }
-        if(intEnable){
-            Sample<T> cur = hist.getSample(0);
-            Sample<T> last = hist.getSample(1);
-            newArea = 1./2.*(double)( cur.getValue()+last.getValue()
-            )*(double)(last.getSampleSec() - cur.getSampleSec())
-            integral += newArea;
-        }
-        if(diffEnable){
-            Sample<T> cur = hist.getSample(0).getVal();
-            Sample<T> last = hist.getSample(1).getVal();
-            diff = (double)(cur.getValue()-last.getValue())
-                   /(cur.getSampleSec()-lastgetSampleSec());
-        }
+
     }
 
     template <class T>
-    float State<T>::getInt(){
+    double State<T>::getInt(){
         return integral;
     }
 
     template <class T>
-    float State<T>::getDiff(){
+    double State<T>::getDiff(){
         return diff;
     }
 
@@ -175,21 +169,31 @@ namespace ACES{
     }
 
     template <class T>
-    State<T>::getHist(){
-    }
-
-    template <class T>
-    State<T>::diff(){
-        
-    }
-
-    template <class T>
     void State<T>::assign(Word<T>* w){
         RTT::Logger::log() << RTT::Logger::Debug
                            << "(state: "
-                           << th->name << ") Value: " << w->getData();
+                           << this->name << ") Value: " << w->getData();
         hist.update( w->getData() );
         value = w->getData();
+
+        if(intEnable){
+            Sample<T> cur = hist.getSample(0);
+            Sample<T> last = hist.getSample(1);
+            if(cur.isValid() and last.isValid()){
+                double newArea = 1./2.*(double)( cur.getVal()+last.getVal()
+                )*(double)(last.getSec() - cur.getSec());
+                integral += newArea;
+            }
+        }
+
+        if(diffEnable){
+            Sample<T> cur = hist.getSample(0);
+            Sample<T> last = hist.getSample(1);
+            if(cur.isValid() and last.isValid()){
+                diff = (double)(cur.getVal()-last.getVal())
+                       /(cur.getSec()-last.getSec());
+            }
+        }
     }
 
     template <class T>
