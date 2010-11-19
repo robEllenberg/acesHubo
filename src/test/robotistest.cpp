@@ -27,7 +27,7 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Init" << RTT::endlog();
 
-    d->addHardware("hw 90 100","Robotis","/dev/ttyUSB0");
+    d->addHardware("hw 90 100","Robotis", "/dev/ttyUSB0"); //"/dev/ttyUSB0");
     d->addProtocol("pro 80 100", "Robotis", "");
     d->linkHP("hw", "pro");
 

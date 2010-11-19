@@ -68,7 +68,7 @@ namespace ACES {
     }
 
     template <class T>
-    void Hardware<T>::rxBus(){
+    void Hardware<T>::rxBus(int size){
     }
 
     /*

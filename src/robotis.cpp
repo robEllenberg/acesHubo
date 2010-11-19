@@ -72,11 +72,38 @@ namespace Robotis {
     //    delete parameters;
     //}
 
+    Reader::Reader(boost::asio::serial_port* p)
+     : RTT::base::RunnableInterface()
+    {
+        port = p;
+    }
+
+    bool Reader::initialize(){
+        return true;
+    }
+
+    void Reader::step(){
+    }
+
+    void Reader::loop(){
+        while(true){
+            boost::asio::read(*port, boost::asio::buffer((void*)&rxBuf, 1));
+            out.write(rxBuf);
+        }
+    }
+
+    void Reader::finalize(){
+    }
+
     Hardware::Hardware(std::string cfg, std::string args)
      : ACES::Hardware<unsigned char>(cfg, args),
         io_service(),
-        port(io_service, (const char*)args.c_str())
+        port(io_service, (const char*)args.c_str()),
+        rxReader(&port),
+        rxActivity(priority, &rxReader)
     {
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
+        rxReader.out.connectTo(&rxBuf, policy);
         /*
         std::istringstream s1(args);
         float z;
@@ -84,6 +111,15 @@ namespace Robotis {
         s1 >> id >> z >> d;
         credentials = new Credentials(id, z, d);
         */
+    }
+    
+    bool Hardware::startHook(){
+        rxActivity.start();
+        return true;
+    }
+
+    void Hardware::stopHook(){
+        rxActivity.stop();
     }
 
     bool Hardware::txBus(ACES::Message<unsigned char>* m){
@@ -97,9 +133,6 @@ namespace Robotis {
             for(std::vector<unsigned char>::iterator it = buf.begin();
                 it != buf.end(); it++)
             {
-                //output << *it;
-                //boost::array<unsigned char, 1> buf;
-                //std::vector<unsigned char>buf;
                 port.write_some(boost::asio::buffer((void*)(&(*it)), 1));
                 RTT::Logger::log() << (int) *it  << RTT::endlog();
             }
@@ -108,21 +141,49 @@ namespace Robotis {
         return false;
     }
 
-    void Hardware::rxBus(){
-        unsigned char c=0, count=1;
-        ACES::Word<unsigned char> *w = NULL;
-        /*
-        while(count){
-            //c = input.get();
-            boost::array<unsigned char, 1> buf;
-            //count = boost::asio::read(port, buf);
-            count = port.read_some(boost::asio::buffer(buf, 1));
-            c = buf[0];
-            w = new ACES::Word<unsigned char>(c);
-            txUpStream.write(w);
+    void Hardware::rxBus(int size){
+        //io_service.poll();
+        //io_service.run();
+        //std::iostream* i = (std::iostream*)port.native();
+        //i->read(&rxBuf, 1);
+        //RTT::Logger::log() << "Handler " << (int) rxBuf << RTT::endlog();
+        unsigned char c;
+        while(rxBuf.read(c) == RTT::NewData){
+            //rxBuf = new boost::asio::buffer((void*)(new unsigned char c[size]), size) b1;
+            RTT::Logger::log() << "Got Something!" <<RTT::endlog();
+            txUpStream.write(new ACES::Word<unsigned char>(c));
+
+            //port.async_read_some(boost::asio::buffer((void*)&rxBuf, 1),
+            //                     Hardware::rxHandle);
+            //boost::asio::async_read(port, boost::asio::buffer((void*)&rxBuf,
+            //1), Hardware::rxHandle);
+            //port.read_some(boost::asio::buffer( (void*)&rxBuf, 1) );
+            //RTT::Logger::log() << "Handler " << (int) rxBuf << RTT::endlog();
+            /*port.async_read_some(boost::asio::buffer((void*)&rxBuf, 1),
+                               boost::bind(&Hardware::rxHandle, this,
+                               boost::asio::placeholders::error,
+                               boost::asio::placeholders::bytes_transferred
+                               ));
+            */
         }
-        */
     }
+
+/*
+    void Hardware::rxHandle(//Hardware* This,
+                            const boost::system::error_code& error,
+                            int numBytes)
+    {
+        RTT::Logger::log() << "Handler" << RTT::endlog();
+        for(int i=0; i< numBytes; i++){
+            ACES::Word<unsigned char> *w = NULL;
+            w = new ACES::Word<unsigned char>(This->rxBuf);
+            RTT::Logger::log() << "Got " << (int) This->rxBuf <<
+            RTT::endlog();
+            This->txUpStream.write(w);
+        }
+        This->rxBus(1);
+    }
+*/     
 
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
@@ -213,7 +274,7 @@ namespace Robotis {
                 case(ACES::REFRESH):
                     //Indicate that the Device has sent a request, others must
                     //wait
-                    requestPos = w->getNodeID();
+                    requestPos = findTrueNodeID(w->getNodeID(), DOWN);
                     requestLen = PARAM_LEN[requestPos];
                     DSlockout = true;
 
@@ -269,7 +330,7 @@ namespace Robotis {
                 //The scaling function
                 float data = USScale(tentry, requestPos+j);
                 
-                int node = findTrueNodeID(requestPos+j);
+                int node = findTrueNodeID(requestPos+j, UP);
                 ACES::Word<float> *res = new ACES::Word<float>(data, requestPos+j,
                                                          credentials->getDevID(),
                                                          ACES::REFRESH,
@@ -430,5 +491,26 @@ namespace Robotis {
                 break;
         }
         return true;
+    }
+
+    int findTrueNodeID(int id, DIRECTION d){
+        //We want to be able to deal with position as though it were one node,
+        //but get and set operations deal with two different positions in the
+        //table, adjust pres_posit so they're the same.
+        if(d == UP){
+            switch(id){
+                case PRESENT_POSITION:
+                    return GOAL_POSITION;
+                    break;
+            }
+        }
+        if(d == DOWN){
+            switch(id){
+                case GOAL_POSITION:
+                    return PRESENT_POSITION;
+                    break;
+            }
+        }
+        return id;
     }
 };

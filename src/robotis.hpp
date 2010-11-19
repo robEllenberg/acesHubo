@@ -11,6 +11,8 @@
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Logger.hpp>
+#include <rtt/base/RunnableInterface.hpp>
+#include <rtt/Activity.hpp>
 
 #include <boost/asio.hpp>
 
@@ -34,6 +36,7 @@ extern "C"{
 
 namespace Robotis {
     enum COMP_TYPE { JOINT=3 };
+    enum DIRECTION { UP=1, DOWN };
 
     enum INST { PING=1, READ, WRITE, REG_WRITE, ACTION, RESET, SYNC_WRITE=0x83 };
 
@@ -122,21 +125,41 @@ namespace Robotis {
             INST instruct;
     };
 
+    class Reader : public RTT::base::RunnableInterface {
+        public:
+            Reader(boost::asio::serial_port* p);
+            bool initialize();
+            void step();
+            void loop();
+            void finalize();
+        //private:
+            unsigned char rxBuf;
+            boost::asio::serial_port* port;
+            RTT::OutputPort< unsigned char > out;
+    };
+
     std::ostream &operator<<(std::ostream &out, const RobotisPacket &p);
 
     class Hardware : public ACES::Hardware<unsigned char>{
         public:
             Hardware(std::string cfg, std::string args);
             virtual bool txBus(ACES::Message<unsigned char>* m);
-            virtual void rxBus();
+            virtual void rxBus(int size=0);
+            bool startHook();
+            void stopHook();
+            //static void rxHandle(//Hardware* This,
+            //              const boost::system::error_code& error,
+            //              int numBytes);
 
             //virtual bool processUS(ACES::Word<unsigned char>*);
             //virtual bool processDS(ACES::Message<unsigned char>*);
         protected:
-            //std::ofstream output;
-            //std::ifstream input;
             boost::asio::io_service io_service;
             boost::asio::serial_port port;
+            //boost::asio::socket_base::bytes_readable hasData;
+            RTT::InputPort<unsigned char> rxBuf;
+            Reader rxReader;
+            RTT::Activity rxActivity;
     };
 
     class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
@@ -164,9 +187,12 @@ namespace Robotis {
             //void stopHook();
             virtual ACES::Word<RobotisPacket>* processDS(ACES::Word<float>*);
             virtual ACES::Word<float>* processUS(ACES::Word<RobotisPacket>*);
+            //getTable()
         private:
-            int requestPos; //!The memory table position of the last request issued
+            //!The memory table position of the last request issued
+            int requestPos; 
             int requestLen; //!The size of data from the last issued request
+            unsigned char memTable[50];
     };
 
     class Credentials : public ACES::Credentials {
@@ -191,7 +217,8 @@ namespace Robotis {
     unsigned short DSlimit(float d, unsigned short low, unsigned short high);
     bool appendParams( std::deque<unsigned char>* params,
                        unsigned short data, int size );
-};    
+    int findTrueNodeID(int id, DIRECTION d);
+};
 
  
 //Function defs for the lexer

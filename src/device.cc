@@ -1,12 +1,7 @@
 namespace ACES{
     template <class S, class PD>
     Device<S,PD>::Device(std::string config) :
-      ProtoDevice(config),
-      DSlockout(false),  USlockout(false)
-      //txDownStream("txDownStream"),
-      //txUpStream("txUpStream"),
-      //dsQueue(10),
-      //usQueue(10),
+      ProtoDevice(config)
     {
         /*this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
