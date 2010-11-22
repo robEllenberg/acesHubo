@@ -53,9 +53,11 @@ int ORO_main(int a, char** b){
 
     //Setup Logging
     d->addLogger("log1 5 200", "File", "testlog.txt");
-    d->linkLS("log1", "X");
-    d->linkLS("log1", "Y");
-    d->linkLS("log1", "Z");
+    d->linkLS("log1", "X", "value");
+    //d->linkLS("log1", "Y", "value");
+    //d->linkLS("log1", "Z", "value");
+    //d->linkLS("log1", "X", "integral");
+    //d->linkLS("log1", "X", "diff");
     
     /* END CONFIG SECTION */
 

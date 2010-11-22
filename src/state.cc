@@ -21,8 +21,8 @@ namespace ACES{
     void History<T>::update(T value)
     {
         Sample<T> s(value, RTT::os::TimeService::Instance()->getTicks());
-        hist.push_back(s);
-        hist.pop_front();
+        hist.push_front(s);
+        hist.pop_back();
     }
 
     template <class T>
@@ -177,23 +177,33 @@ namespace ACES{
         value = w->getData();
 
         if(intEnable){
-            Sample<T> cur = hist.getSample(0);
-            Sample<T> last = hist.getSample(1);
-            if(cur.isValid() and last.isValid()){
-                double newArea = 1./2.*(double)( cur.getVal()+last.getVal()
-                )*(double)(last.getSec() - cur.getSec());
-                integral += newArea;
-            }
+            updateInt(hist.getSample(0), hist.getSample(1));
         }
 
         if(diffEnable){
-            Sample<T> cur = hist.getSample(0);
-            Sample<T> last = hist.getSample(1);
-            if(cur.isValid() and last.isValid()){
-                diff = (double)(cur.getVal()-last.getVal())
-                       /(cur.getSec()-last.getSec());
-            }
+            updateDiff(hist.getSample(0), hist.getSample(1));
         }
+    }
+
+    template <class T>
+    bool State<T>::updateInt(Sample<T> cur, Sample<T> last){
+        if(cur.isValid() and last.isValid()){
+            double newArea = 1./2.*(double)( cur.getVal()+last.getVal()) *
+            (double)(last.getSec() - cur.getSec());
+            integral += newArea;
+            return true;
+        }
+        return false;
+    }
+
+    template <class T>
+    bool State<T>::updateDiff(Sample<T> cur, Sample<T> last){
+        if(cur.isValid() and last.isValid()){
+            diff = (double)(cur.getVal()-last.getVal())
+                   /(cur.getSec()-last.getSec());
+            return true;
+        }
+        return false;
     }
 
     template <class T>

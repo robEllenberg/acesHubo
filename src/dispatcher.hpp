@@ -67,42 +67,9 @@ namespace ACES{
             bool linkHP(std::string hw, std::string pcol);
             bool linkSC(std::string state, std::string ctrl);
             bool linkHC(std::string hw, std::string ctrl);
-            bool linkLS(std::string logger, std::string state);
-            /*
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addHardwareMethod;
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addProtocolMethod;            
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addStateMethod;            
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addControllerMethod;            
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addDeviceMethod;            
-            RTT::Method<bool(std::string, std::string, std::string)>
-                        addLoggerMethod;            
+            bool linkLS(std::string logger, std::string state,
+                        std::string attr);
 
-            RTT::Method<bool(void)> startHWMethod;
-            RTT::Method<bool(void)> startProtocolMethod;
-            RTT::Method<bool(void)> startDeviceMethod;
-            RTT::Method<bool(void)> startStateMethod;
-            RTT::Method<bool(void)> startControllerMethod;
-            RTT::Method<bool(void)> startLoggerMethod;
-
-            RTT::Method<bool(void)> stopHWMethod;
-            RTT::Method<bool(void)> stopProtocolMethod;
-            RTT::Method<bool(void)> stopDeviceMethod;
-            RTT::Method<bool(void)> stopStateMethod;
-            RTT::Method<bool(void)> stopControllerMethod;
-            RTT::Method<bool(void)> stopLoggerMethod;
-
-            RTT::Method<bool(std::string, std::string)> linkPDMethod;
-            RTT::Method<bool(std::string, std::string)> linkDSMethod;
-            RTT::Method<bool(std::string, std::string)> linkHPMethod;
-            RTT::Method<bool(std::string, std::string)> linkSCMethod;
-            RTT::Method<bool(std::string, std::string)> linkHCMethod;
-            RTT::Method<bool(std::string, std::string)> linkLSMethod;
-            */
             std::list<RTT::TaskContext*> stateList;
             std::list<RTT::TaskContext*> pList;
             std::list<RTT::TaskContext*> cList;

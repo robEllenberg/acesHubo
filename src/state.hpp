@@ -82,6 +82,8 @@ namespace ACES {
             T getVal();
             double getInt();
             double getDiff();
+            bool updateInt(Sample<T> cur, Sample<T> last);
+            bool updateDiff(Sample<T> cur, Sample<T> last);
 
             Word<T>* processDS( std::map<std::string, void*>* p );
 
