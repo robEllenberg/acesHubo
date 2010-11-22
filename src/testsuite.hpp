@@ -36,7 +36,8 @@ namespace TestSuite{
             Spinner(std::string cfg, std::string args);
             virtual void sample();
             //virtual void updateHook();
-            float amp, dc, t;
+            float amp, dc;
+            RTT::os::TimeService::ticks t0;
     };
     
 }

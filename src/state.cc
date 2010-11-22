@@ -42,6 +42,16 @@ namespace ACES{
         //TODO
         return Sample<T>();
     }
+
+    template <class T>
+    void History<T>::printme(){
+        RTT::Logger::log() << "Sample [n]: t, val" << RTT::endlog();
+        for(int i=0; i < hist.size(); i++){
+            Sample<T> s = hist[i];
+            RTT::Logger::log() << i << ": " << s.getSec() << ", "
+                               << s.getVal() << RTT::endlog();
+        }
+    }
     
     template <class T>
     Sample<T>::Sample(){
@@ -85,6 +95,8 @@ namespace ACES{
                           ).doc("Sample the State");
         this->addOperation("go", &State<T>::go, this, RTT::OwnThread).doc(
                            "Go to a specified Setpoint").arg("SP", "Set Point");
+        this->addOperation("printHist", &State<T>::printHistory, this,
+                           RTT::OwnThread).doc("Print the history");
         //TODO - Function to print out the current history
         //this->addOperation("hist", &State<T>::getHist, this, RTT::OwnThread).doc(
         //                   "Get a historical sample").arg("sample#",
@@ -132,16 +144,15 @@ namespace ACES{
                 assign(usIn);
             }
         }
-
     }
 
     template <class T>
-    double State<T>::getInt(){
+    float State<T>::getInt(){
         return integral;
     }
 
     template <class T>
-    double State<T>::getDiff(){
+    float State<T>::getDiff(){
         return diff;
     }
 
@@ -163,6 +174,11 @@ namespace ACES{
     }
 
     template <class T>
+    void State<T>::printHistory(){
+        hist.printme();
+    }
+
+    template <class T>
     void State<T>::go(T sp){
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
         txDownStream.write(w);
@@ -179,17 +195,17 @@ namespace ACES{
         if(intEnable){
             updateInt(hist.getSample(0), hist.getSample(1));
         }
-
         if(diffEnable){
             updateDiff(hist.getSample(0), hist.getSample(1));
         }
+
     }
 
     template <class T>
     bool State<T>::updateInt(Sample<T> cur, Sample<T> last){
         if(cur.isValid() and last.isValid()){
             double newArea = 1./2.*(double)( cur.getVal()+last.getVal()) *
-            (double)(last.getSec() - cur.getSec());
+            (double)( last.getSec() - cur.getSec() );
             integral += newArea;
             return true;
         }
@@ -199,8 +215,15 @@ namespace ACES{
     template <class T>
     bool State<T>::updateDiff(Sample<T> cur, Sample<T> last){
         if(cur.isValid() and last.isValid()){
-            diff = (double)(cur.getVal()-last.getVal())
-                   /(cur.getSec()-last.getSec());
+            double t = last.getSec() - cur.getSec();
+            if(t < diffThreshold){
+                //deal w/the possibility of floating point error in time
+                //acquisition
+                diff = 0;
+            }
+            else{
+                diff = (double)(cur.getVal()-last.getVal())/t;
+            }
             return true;
         }
         return false;

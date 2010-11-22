@@ -27,12 +27,12 @@ namespace TestSuite{
         dc = (high + low) / 2.0;
         this->amp = amp;
         this->dc = dc;
-        t = 0;
+        t0 = RTT::os::TimeService::Instance()->getTicks();
     }
     
     void Spinner::sample(){
+        float t = RTT::os::TimeService::Instance()->secondsSince(t0);
         float val = amp*sin(t) + dc;
-        t += freq;
 
         RTT::Logger::log() << RTT::Logger::Debug << "(State: " << name
                            << ") sample: " << val 

@@ -90,7 +90,7 @@ namespace ACES {
         for(std::list<Track>::iterator it = trackList.begin();
              it != trackList.end(); it++)
         {
-            outFile << ((*it).getState())->Name() << " ("
+            outFile << ((*it).getState())->Name() << "("
                     << (*it).getAttribute() << ") ";
         }
         outFile << std::endl;

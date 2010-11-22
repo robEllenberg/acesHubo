@@ -34,6 +34,7 @@ namespace ACES {
             bool samplingAttr;
             bool intEnable;
             bool diffEnable;
+            float diffThreshold;
             bool subscribeController(RTT::TaskContext* c);
     };
 
@@ -61,6 +62,7 @@ namespace ACES {
             Sample<T> getSampleSec(float sec);
             Sample<T> getSampleTicks(RTT::os::TimeService::ticks t);
             void update(T value);
+            void printme();
         private:
             int size;
             int lastValid;
@@ -77,11 +79,12 @@ namespace ACES {
             virtual void sample();
             virtual std::string logVal();
             void printme();
+            void printHistory();
             virtual void go(T sp);
             void assign(Word<T>* w);
             T getVal();
-            double getInt();
-            double getDiff();
+            float getInt();
+            float getDiff();
             bool updateInt(Sample<T> cur, Sample<T> last);
             bool updateDiff(Sample<T> cur, Sample<T> last);
 
@@ -89,8 +92,8 @@ namespace ACES {
 
         protected:
             T value;
-            double integral;
-            double diff;
+            float integral;
+            float diff;
             History<T> hist;
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
