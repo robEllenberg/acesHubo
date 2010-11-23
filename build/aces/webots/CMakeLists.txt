@@ -8,6 +8,7 @@ rosbuild_add_executable(wbtest ../src/test/wbtest.cpp)
 target_link_libraries(wbtest aces-common)
 target_link_libraries(wbtest aces-dispatcher)
 target_link_libraries(wbtest aces-webots)
+target_link_libraries(wbtest aces-hubo)
 target_link_libraries(wbtest orocos-taskbrowser-gnulinux)
 
 #needs to be removed

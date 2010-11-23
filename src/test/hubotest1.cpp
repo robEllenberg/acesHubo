@@ -45,7 +45,7 @@ int ORO_main(int a, char** b){
 
     //Setup Logging
     d->addLogger("log1 5 200", "File", "testlog.txt");
-    d->linkLS("log1", "RSP");
+    d->linkLS("log1", "RSP", "value");
     
     /* END CONFIG SECTION */
 

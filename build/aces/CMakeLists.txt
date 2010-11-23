@@ -34,6 +34,9 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/device.cpp src/protocol.cpp
                      src/hardware.cpp src/controller.cpp src/logger.cpp)
 
+include_directories("/usr/local/webots/include/controller/c")
+link_directories("/usr/local/webots/lib")
+
 add_subdirectory(ip)
 add_subdirectory(webots)
 #add_subdirectory(robotis)
@@ -42,10 +45,8 @@ add_subdirectory(hubo)
                      
 add_definitions(-DTESTSUITE)
 #add_definitions(-DROBOTIS)
-#add_definitions(-DHUBO)
-#add_definitions(-DWEBOTS)
-
+add_definitions(-DHUBO)
+add_definitions(-DWEBOTS)
 
 rosbuild_add_library(aces-dispatcher src/dispatcher.cpp)
-
 
