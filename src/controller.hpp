@@ -46,7 +46,6 @@ namespace ACES{
             bool openScript(std::string scriptPath);
 
             std::ifstream walkScript;
-            //std::map<std::string, void*>* stateVect;
             int simState;
     };
 
@@ -55,7 +54,6 @@ namespace ACES{
         public:
             NullCtrl(std::string config, std::string args);
             void updateHook();
-            //std::map<std::string, void*>* stateVect;
 
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);

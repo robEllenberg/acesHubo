@@ -159,15 +159,15 @@ int ORO_main(int a, char** b){
 
     d->addLogger("flog 10 5", "File", "tfile.txt");
     
-    d->linkLS("flog", "centerX");
-    d->linkLS("flog", "centerY");
-    d->linkLS("flog", "centerZ");
-    d->linkLS("flog", "imuaccX");
-    d->linkLS("flog", "imuaccY");
-    d->linkLS("flog", "imuaccZ");
-    d->linkLS("flog", "imugyroX");
-    d->linkLS("flog", "imugyroY");
-    d->linkLS("flog", "imugyroZ");
+    d->linkLS("flog", "centerX", "value");
+    d->linkLS("flog", "centerY", "value");
+    d->linkLS("flog", "centerZ", "value");
+    //d->linkLS("flog", "imuaccX");
+    //d->linkLS("flog", "imuaccY");
+    //d->linkLS("flog", "imuaccZ");
+    //d->linkLS("flog", "imugyroX");
+    //d->linkLS("flog", "imugyroY");
+    //d->linkLS("flog", "imugyroZ");
     
     //d->linkLS("flog", "rffX");
     //d->linkLS("flog", "rffY");

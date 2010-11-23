@@ -1,28 +1,110 @@
 namespace ACES{
 
     template <class T>
+    History<T>::History(int s)
+     :hist(s)
+    {
+        size = s;
+        lastValid = -1;
+    }
+
+    template <class T>
+    History<T>::History(int s, Sample<T> ic)
+     :hist(s)
+    {
+        size = s;
+        hist[0] = ic;
+        lastValid = 0;
+    }
+    
+    template <class T>
+    void History<T>::update(T value)
+    {
+        Sample<T> s(value, RTT::os::TimeService::Instance()->getTicks());
+        hist.push_front(s);
+        hist.pop_back();
+    }
+
+    template <class T>
+    Sample<T> History<T>::getSample(int sampleNum){
+    //need a way to return on invalid sample
+        return hist[sampleNum];
+    }
+
+    template <class T>
+    Sample<T> History<T>::getSampleSec(float sec){
+        //TODO
+        return 0.;
+    }
+
+    template <class T>
+    Sample<T> History<T>::getSampleTicks(RTT::os::TimeService::ticks t){
+        //TODO
+        return Sample<T>();
+    }
+
+    template <class T>
+    void History<T>::printme(){
+        RTT::Logger::log() << "Sample [n]: t, val" << RTT::endlog();
+        for(int i=0; i < hist.size(); i++){
+            Sample<T> s = hist[i];
+            RTT::Logger::log() << i << ": " << s.getSec() << ", "
+                               << s.getVal() << RTT::endlog();
+        }
+    }
+    
+    template <class T>
+    Sample<T>::Sample(){
+        valid = false;
+    }
+
+    template <class T>
+    Sample<T>::Sample(T val, RTT::os::TimeService::ticks time){
+        value = val;
+        t = time;
+        valid = true;
+    }
+
+    template <class T>
+    bool Sample<T>::isValid(){
+        return valid;
+    }
+
+    template <class T>
+    T Sample<T>::getVal(){
+        return value;
+    }
+
+    template <class T>
+    RTT::os::TimeService::ticks Sample<T>::getTick(){
+        return t;
+    }
+
+    template <class T>
+    float Sample<T>::getSec(){
+        return RTT::os::TimeService::Instance()->getSeconds(t);
+    }
+
+    template <class T>
     State<T>::State(std::string cfg, int nID) :
       ProtoState(cfg, nID),
-      //goMethod("go", &State<T>::go, this),
+      hist(10),
       value(0)
-      //txDownStream("txDownStream"),
-      //dsQueue(10),
-      //usQueue(10),
-      //sampleMethod("sample", &State<T>::sample, this)
     {
-        //this->events()->addEvent(&txDownStream, "txDownStream", "credentials",
-        //    "credentials associated w/the goal");
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
-
         this->addOperation("go", &State<T>::go, this, RTT::OwnThread).doc(
                            "Go to a specified Setpoint").arg("SP", "Set Point");
-        //dsQueue = new RTT::Buffer< std::map<std::string, void*>* >(50);
-        //dsQueue = new RTT::Buffer< Goal* >(50);
-        //dsQueue = new RTT::Buffer< Goal* >(50);
+        this->addOperation("printHist", &State<T>::printHistory, this,
+                           RTT::OwnThread).doc("Print the history");
+        //TODO - Function to print out the current history
+        //this->addOperation("hist", &State<T>::getHist, this, RTT::OwnThread).doc(
+        //                   "Get a historical sample").arg("sample#",
+        //                   "Number of sample in sequence");
 
         this->addAttribute("value", value);
-        asgnfunct = assign;
+        this->addAttribute("integral", integral);
+        this->addAttribute("diff", diff);
 
         this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
@@ -59,9 +141,19 @@ namespace ACES{
                 RTT::Logger::log() << RTT::Logger::Debug << "(state: "
                                    << name << ") assign"
                                    << RTT::endlog();
-                asgnfunct(usIn, this);
+                assign(usIn);
             }
         }
+    }
+
+    template <class T>
+    float State<T>::getInt(){
+        return integral;
+    }
+
+    template <class T>
+    float State<T>::getDiff(){
+        return diff;
     }
 
     template <class T>
@@ -82,19 +174,59 @@ namespace ACES{
     }
 
     template <class T>
+    void State<T>::printHistory(){
+        hist.printme();
+    }
+
+    template <class T>
     void State<T>::go(T sp){
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
         txDownStream.write(w);
     }
 
     template <class T>
-    void State<T>::assign(Word<T>* w, void* me){
-        //TODO - Find a better way to do this 'virtual function'
-        State<T>* th = (State<T>*)me;
+    void State<T>::assign(Word<T>* w){
         RTT::Logger::log() << RTT::Logger::Debug
                            << "(state: "
-                           << th->name << ") Value: " << w->getData();
-        th->value = w->getData();
+                           << this->name << ") Value: " << w->getData();
+        hist.update( w->getData() );
+        value = w->getData();
+
+        if(intEnable){
+            updateInt(hist.getSample(0), hist.getSample(1));
+        }
+        if(diffEnable){
+            updateDiff(hist.getSample(0), hist.getSample(1));
+        }
+
+    }
+
+    template <class T>
+    bool State<T>::updateInt(Sample<T> cur, Sample<T> last){
+        if(cur.isValid() and last.isValid()){
+            double newArea = 1./2.*(double)( cur.getVal()+last.getVal()) *
+            (double)( last.getSec() - cur.getSec() );
+            integral += newArea;
+            return true;
+        }
+        return false;
+    }
+
+    template <class T>
+    bool State<T>::updateDiff(Sample<T> cur, Sample<T> last){
+        if(cur.isValid() and last.isValid()){
+            double t = last.getSec() - cur.getSec();
+            if(t < diffThreshold){
+                //deal w/the possibility of floating point error in time
+                //acquisition
+                diff = 0;
+            }
+            else{
+                diff = (double)(cur.getVal()-last.getVal())/t;
+            }
+            return true;
+        }
+        return false;
     }
 
     template <class T>

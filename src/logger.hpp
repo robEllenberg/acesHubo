@@ -16,6 +16,17 @@
 
 namespace ACES{
     class Dispatcher;
+
+    class Track {
+        public:
+            Track(ProtoState* s, std::string att);
+            ProtoState* getState();
+            std::string getAttribute();
+        private:
+            ProtoState* state;
+            std::string attribute;
+    };
+
     class Logger : protected taskCfg,
                    public    RTT::TaskContext
     {
@@ -25,12 +36,12 @@ namespace ACES{
             void updateHook();
 
             bool subscribeDispatcher(Dispatcher* d);
-            bool addTrack(ProtoState* s);
+            bool addTrack(ProtoState* s, std::string attribute);
             //bool addTracks(std::string tracks);
             virtual bool sample() = 0;
             //virtual bool store() = 0;
 
-            std::list<ProtoState*> trackList;
+            std::list<Track> trackList;
             Dispatcher* dispatch;
     };
 

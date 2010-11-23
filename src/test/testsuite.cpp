@@ -27,17 +27,17 @@ int ORO_main(int a, char** b){
 
     RTT::Logger::log() << "Begin Init" << RTT::endlog();
 
-    d->addHardware("tsHW 90 100","TestSuite","");
-    d->addProtocol("tsPro 80 100", "TestSuite", "");
+    d->addHardware("tsHW 90 500","TestSuite","");
+    d->addProtocol("tsPro 80 500", "TestSuite", "");
     d->linkHP("tsHW", "tsPro");
 
     //Create devices, representing physical nodes on the bus
-    d->addDevice("dX 20 50", "TestSuite", "1");
-    d->addDevice("dY 20 50", "TestSuite", "2");
-    d->addDevice("dZ 20 50", "TestSuite", "3");
+    d->addDevice("dX 20 500", "TestSuite", "1");
+    d->addDevice("dY 20 500", "TestSuite", "2");
+    d->addDevice("dZ 20 500", "TestSuite", "3");
 
     //Add states, each represents 1 property of the device
-    d->addState("X 10 50", "TestSuite", "1.0 2.0");
+    d->addState("X 10 50", "TestSuite", "-1.0 1.0");
     d->addState("Y 10 50", "TestSuite", "3.0 4.0");
     d->addState("Z 10 50", "TestSuite", "5.0 6.0");
 
@@ -53,9 +53,11 @@ int ORO_main(int a, char** b){
 
     //Setup Logging
     d->addLogger("log1 5 200", "File", "testlog.txt");
-    d->linkLS("log1", "X");
-    d->linkLS("log1", "Y");
-    d->linkLS("log1", "Z");
+    d->linkLS("log1", "X", "value");
+    //d->linkLS("log1", "Y", "value");
+    //d->linkLS("log1", "Z", "value");
+    d->linkLS("log1", "X", "integral");
+    d->linkLS("log1", "X", "diff");
     
     /* END CONFIG SECTION */
 

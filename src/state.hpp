@@ -12,6 +12,7 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Operation.hpp>
 #include <rtt/Attribute.hpp>
+#include <rtt/os/TimeService.hpp>
 
 #include "credentials.hpp"
 #include "controller.hpp"
@@ -28,22 +29,44 @@ namespace ACES {
     {
         public:
             ProtoState(std::string config, int nID) ;
-            //std::string getName();
             virtual std::string logVal() = 0;
             int nodeID;
             bool samplingAttr;
+            bool intEnable;
+            bool diffEnable;
+            float diffThreshold;
             bool subscribeController(RTT::TaskContext* c);
-            //RTT::Attribute<int> nodeID;
-            //RTT::Attribute<bool> samplingAttr;
- 
-            //RTT::OS::Mutex dsqGuard;
-            //RTT::Buffer< Goal* > *dsQueue;
-            //std::deque<Goal*> dsQueue;
-            //std::deque<ProtoResult*> usQueue;
-            //RTT::OS::Mutex usqGuard;
+    };
 
-            //TODO - Remove nodeID entirely in favor of nodeIDAttr
-            //int nodeID;
+    template <class T>
+    class Sample {
+        public:
+            Sample();
+            Sample(T val, RTT::os::TimeService::ticks time);
+            T getVal();
+            RTT::os::TimeService::ticks getTick();
+            float getSec();
+            bool isValid();
+        private:
+            bool valid;
+            T value;
+            RTT::os::TimeService::ticks t;
+    };
+
+    template <class T>
+    class History {
+        public:
+            History(int size, Sample<T> ic);
+            History(int size);
+            Sample<T> getSample(int sampleNum);
+            Sample<T> getSampleSec(float sec);
+            Sample<T> getSampleTicks(RTT::os::TimeService::ticks t);
+            void update(T value);
+            void printme();
+        private:
+            int size;
+            int lastValid;
+            std::deque< Sample<T> > hist;
     };
 
     template <class T>
@@ -51,36 +74,32 @@ namespace ACES {
     {
         public:
             State(std::string config, int nID);
-            void (*asgnfunct)(Word<T>*, void*);
 
             virtual void updateHook();  
             virtual void sample();
             virtual std::string logVal();
-
-            //RTT::Event<void(Word<T>*)> txDownStream;
-            //void rxDownStream(std::map<std::string, void*>*);
-            //void rxUpStream(Word<T>*);
             void printme();
-            void go(T sp);
-            //static void assign(ProtoResult* meas, void* me);
-            static void assign(Word<T>* w, void* me);
+            void printHistory();
+            virtual void go(T sp);
+            void assign(Word<T>* w);
+            T getVal();
+            float getInt();
+            float getDiff();
+            bool updateInt(Sample<T> cur, Sample<T> last);
+            bool updateDiff(Sample<T> cur, Sample<T> last);
+
             Word<T>* processDS( std::map<std::string, void*>* p );
 
-            //RTT::Attribute<T> value;
-            T value;
-            //RTT::Method<void(T)> goMethod;
-            //RTT::Method<void()> sampleMethod;
-
-
         protected:
-            /*RTT::Queue< Word<T>*, RTT::BlockingPolicy,
-                       RTT::BlockingPolicy> usQueue;
-            RTT::Queue< Word<T>*, RTT::NonBlockingPolicy,
-                       RTT::BlockingPolicy> dsQueue;*/
+            T value;
+            float integral;
+            float diff;
+            History<T> hist;
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
             RTT::InputPort< std::map<std::string, void*>* > rxDownStream;
     };
+
 }
     
 #include "state.cc"

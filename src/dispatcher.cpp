@@ -378,11 +378,13 @@ namespace ACES{
         }
     }
 
-    bool Dispatcher::linkLS(std::string logger, std::string state){
+    bool Dispatcher::linkLS(std::string logger, std::string state, std::string
+                            attr)
+    {
         RTT::TaskContext* l = this->getPeer(logger);
         RTT::TaskContext* s  = this->getPeer(state);
         if(l && s){
-            return ((Logger*)l)->addTrack((ProtoState*)s);
+            return ((Logger*)l)->addTrack((ProtoState*)s, attr);
         }
         return false;
     }
