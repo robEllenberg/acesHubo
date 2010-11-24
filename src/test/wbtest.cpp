@@ -26,8 +26,12 @@ int ORO_main(int a, char** b){
     d->addProtocol("wbPcol 2 600", "Webots", "");
 
     d->addController("wbNull 10 15", "Mini Null", "");
-    d->addController("wbctrl 10 15", "Mini Leg", "IKscript1.txt");
-    d->addController("wbArm 10 15", "Mini Arm", "sins.txt");
+    //d->addController("wbArm 10 15", "Mini Arm", "sins.txt");
+
+    //Pick one of these three controllers
+    //d->addController("wbctrl 10 15", "Mini Leg", "IKscript1.txt");
+    d->addController("wbctrl 10 15", "User Program", "miniProg.ops main");
+    //d->addController("wbctrl 10 15", "User StateMachine", "miniSM.osd main");
 
     d->addDevice("dHY 5 31", "Webots Joint",  "HY  0.0 -1.0");
     d->addDevice("dLSP 5 31", "Webots Joint", "LSP 0.0  1.0");
@@ -131,15 +135,10 @@ int ORO_main(int a, char** b){
     d->linkPD("wbPcol", "dRAP"); d->linkDS("dRAP", "RAP");
     d->linkPD("wbPcol", "dRAR"); d->linkDS("dRAR", "RAR");
 
-    d->linkSC("LSP", "wbArm");
     d->linkSC("LSP", "wbctrl");
-    d->linkSC("LSR", "wbArm");
     d->linkSC("LSR", "wbctrl");
-    d->linkSC("RSP", "wbArm");
     d->linkSC("RSP", "wbctrl");
-    d->linkSC("RSR", "wbArm");
     d->linkSC("RSR", "wbctrl");
-
     d->linkSC("HY",  "wbctrl");
     d->linkSC("LHY", "wbctrl");
     d->linkSC("LHR", "wbctrl");
@@ -162,37 +161,37 @@ int ORO_main(int a, char** b){
     d->linkLS("flog", "centerX", "value");
     d->linkLS("flog", "centerY", "value");
     d->linkLS("flog", "centerZ", "value");
-    //d->linkLS("flog", "imuaccX");
-    //d->linkLS("flog", "imuaccY");
-    //d->linkLS("flog", "imuaccZ");
-    //d->linkLS("flog", "imugyroX");
-    //d->linkLS("flog", "imugyroY");
-    //d->linkLS("flog", "imugyroZ");
+    //d->linkLS("flog", "imuaccX", "value");
+    //d->linkLS("flog", "imuaccY", "value");
+    //d->linkLS("flog", "imuaccZ", "value");
+    //d->linkLS("flog", "imugyroX", "value");
+    //d->linkLS("flog", "imugyroY", "value");
+    //d->linkLS("flog", "imugyroZ", "value");
     
-    //d->linkLS("flog", "rffX");
-    //d->linkLS("flog", "rffY");
-    //d->linkLS("flog", "rffZ");
-    //d->linkLS("flog", "lffX");
-    //d->linkLS("flog", "lffY");
-    //d->linkLS("flog", "lffZ");
+    //d->linkLS("flog", "rffX", "value");
+    //d->linkLS("flog", "rffY", "value");
+    //d->linkLS("flog", "rffZ", "value");
+    //d->linkLS("flog", "lffX", "value");
+    //d->linkLS("flog", "lffY", "value");
+    //d->linkLS("flog", "lffZ", "value");
 
-    //d->linkLS("flog", "LSP");
-    //d->linkLS("flog", "LSR");
-    //d->linkLS("flog", "RSP");
-    //d->linkLS("flog", "RSR");
-    //d->linkLS("flog", "HY");
-    //d->linkLS("flog", "LHY");
-    //d->linkLS("flog", "LHR");
-    //d->linkLS("flog", "LHP");
-    //d->linkLS("flog", "LKP");
-    //d->linkLS("flog", "LAP");
-    //d->linkLS("flog", "LAR");
-    //d->linkLS("flog", "RHY");
-    //d->linkLS("flog", "RHR");
-    //d->linkLS("flog", "RHP");
-    //d->linkLS("flog", "RKP");
-    //d->linkLS("flog", "RAP");
-    //d->linkLS("flog", "RAR");
+    //d->linkLS("flog", "LSP", "value");
+    //d->linkLS("flog", "LSR", "value");
+    //d->linkLS("flog", "RSP", "value");
+    //d->linkLS("flog", "RSR", "value");
+    //d->linkLS("flog", "HY", "value");
+    //d->linkLS("flog", "LHY", "value");
+    //d->linkLS("flog", "LHR", "value");
+    //d->linkLS("flog", "LHP", "value");
+    //d->linkLS("flog", "LKP", "value");
+    //d->linkLS("flog", "LAP", "value");
+    //d->linkLS("flog", "LAR", "value");
+    //d->linkLS("flog", "RHY", "value");
+    //d->linkLS("flog", "RHR", "value");
+    //d->linkLS("flog", "RHP", "value");
+    //d->linkLS("flog", "RKP", "value");
+    //d->linkLS("flog", "RAP", "value");
+    //d->linkLS("flog", "RAR", "value");
 
     // END CONFIG SECTION 
 

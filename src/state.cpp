@@ -6,7 +6,7 @@ namespace ACES {
       nodeID(nID),
       //Switching this default to false prevents automatic
       //sampling from starting
-      samplingAttr(false),
+      samplingAttr(true),
       intEnable(true),
       diffEnable(true),
       diffThreshold(10e-6)

@@ -15,6 +15,10 @@ namespace ACES{
         this->addOperation("sendCtrl", &Controller::sendCtrl, this,
                            RTT::OwnThread)
                            .doc("Send the accumulated controls");
+        this->addOperation("getSurface", &Controller::getSurface, this,
+                           RTT::OwnThread).doc("Grab the value of a state")
+                           .arg("state", "State to grab value from")
+                           .arg("attribute", "Quantity on state to grab");
 
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name ));
@@ -28,9 +32,23 @@ namespace ACES{
     }
 
     bool Controller::sendCtrl(){
+        if(not curMap){
+            curMap = new std::map<std::string, void*>;
+        }
         txDownStream.write(curMap);
         curMap = NULL;
         return true;
+    }
+
+    float Controller::getSurface(std::string state, std::string attr){
+        RTT::TaskContext* t = (TaskContext*)(getPeer(state));
+        RTT::Attribute<float> a =
+            t->attributes()->getAttribute(attr);
+        return a.get();
+    }
+
+    void Controller::updateHook(){
+        txDownStream.write(getStateVector());
     }
 
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
@@ -227,4 +245,64 @@ namespace ACES{
         return sv;
     }
 
+    PID::PID(std::string config, std::string args)
+      :Controller(config, args)
+    {
+        std::istringstream s1(args);
+        s1 >> inputSurface >> outputSurface  >> Kp >> Ki >> Kd;
+        addAttribute("Kp", Kp);
+        addAttribute("Ki", Ki);
+        addAttribute("Kd", Kd);
+        addAttribute("Kd", val);
+        addAttribute("Input", inputSurface);
+        addAttribute("Output", outputSurface);
+    }
+
+    std::map<std::string, void*>* PID::getStateVector(bool echo){
+        std::map<std::string, void*> *sv = new std::map<std::string, void*>;
+        float p = getSurface(inputSurface, "value");
+        float i = getSurface(inputSurface, "integral");
+        float d = getSurface(inputSurface, "diff");
+        val = Kp*p + Ki*i + Kd*d;
+
+        (*sv)[outputSurface] = (void*) new float(val);
+        return sv;
+    }
+
+    UserProg::UserProg(std::string config, std::string args)
+     :Controller(config, args)
+    {
+        std::istringstream s1(args);
+        s1 >> filename >> progname;
+        getProvider<RTT::Scripting>("scripting")->loadPrograms(filename);
+    }
+
+    bool UserProg::startHook(){
+        getProvider<RTT::Scripting>("scripting")->startProgram(progname);
+        return true;
+    }
+
+    std::map<std::string, void*>* UserProg::getStateVector(bool echo){
+        return new std::map<std::string, void*>; 
+    }
+
+    UserSM::UserSM(std::string config, std::string args)
+     :Controller(config, args)
+    {
+        std::istringstream s1(args);
+        s1 >> filename >> progname;
+        getProvider<RTT::Scripting>("scripting")->loadStateMachines(filename);
+    }
+
+    std::map<std::string, void*>* UserSM::getStateVector(bool echo){
+        return new std::map<std::string, void*>; 
+    }
+
+    bool UserSM::startHook(){
+        getProvider<RTT::Scripting>("scripting")->
+                                   activateStateMachine(progname);
+        getProvider<RTT::Scripting>("scripting")->
+                                   startStateMachine(progname);
+        return true;
+    }
 }

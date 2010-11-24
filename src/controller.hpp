@@ -12,6 +12,7 @@
 #include <rtt/Activity.hpp>
 #include <rtt/InputPort.hpp>
 #include <rtt/OutputPort.hpp>
+#include <rtt/scripting/Scripting.hpp>
 
 #include "taskcfg.hpp"
 
@@ -24,10 +25,12 @@ namespace ACES{
     {
         public:
             Controller(std::string cfg, std::string args);
+            virtual void updateHook(); 
             virtual std::map<std::string, void*>* 
                     getStateVector(bool echo=0) = 0;
             void addCtrl(std::string dest, float sp);
             bool sendCtrl();
+            float getSurface(std::string state, std::string attr);
 
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
         private:
@@ -57,7 +60,6 @@ namespace ACES{
 
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);
-
     };
 
     class LegCtrl : public ScriptCtrl
@@ -75,6 +77,35 @@ namespace ACES{
             ArmCtrl(std::string config, std::string args);
             std::map<std::string, void*>* 
                     getStateVector(bool echo=0);
+    };
+
+    class PID : public Controller{
+        public:
+            PID(std::string config, std::string args);
+            std::map<std::string, void*>* getStateVector(bool echo=0);
+                    
+        private:
+            std::string inputSurface, outputSurface;
+            float Kp, Ki, Kd, val;
+    };
+
+    class UserProg : public Controller{
+        public:
+            UserProg(std::string config, std::string args);
+            virtual std::map<std::string, void*>* getStateVector(bool echo=0);
+            bool startHook();
+        private:
+            std::string filename;
+            std::string progname;
+    };
+    class UserSM : public Controller{
+        public:
+            UserSM(std::string config, std::string args);
+            virtual std::map<std::string, void*>* getStateVector(bool echo=0);
+            bool startHook();
+        private:
+            std::string filename;
+            std::string progname;
     };
 }
 

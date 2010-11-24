@@ -267,6 +267,17 @@ namespace ACES{
         s1 >> t1 >> t2;
 
         Controller* ctrl = NULL;
+        if (t1 == "User"){
+            if (t2 == "Program"){
+                ctrl = (Controller*) new UserProg(cfg, args);
+            }
+            if (t2 == "StateMachine"){
+                ctrl = (Controller*) new UserSM(cfg, args);
+            }
+        }
+        if (t1 == "PID"){
+            ctrl = (Controller*) new PID(cfg, args);
+        }
         #ifdef WEBOTS 
         if ( t1 == "Mini"){
             if (t2 == "Leg"){

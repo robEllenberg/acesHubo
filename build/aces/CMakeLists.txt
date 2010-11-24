@@ -38,6 +38,7 @@ include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
 
 add_subdirectory(ip)
+add_subdirectory(user)
 add_subdirectory(webots)
 #add_subdirectory(robotis)
 add_subdirectory(testsuite)

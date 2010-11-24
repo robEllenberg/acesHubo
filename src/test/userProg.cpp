@@ -29,8 +29,7 @@ int ORO_main(int a, char** b){
     d->addState("hzs 5 31",  "Webots", "Joint");
 
     d->addController("wbNull 10 15", "Mini Null", "");
-    d->addController("pid 10 30", "PID", "hip hzs 50.0 500.0 0.0");
-    //d->addController("wbArm 10 15", "Mini Arm", "sins.txt");
+    d->addController("user 10 30", "User Program", "userscript.ops main");
 
     d->addLogger("flog 10 5", "File", "tfile.txt");
 
@@ -40,8 +39,8 @@ int ORO_main(int a, char** b){
     d->linkDS("dHIP", "hip");
     d->linkDS("dhzs", "hzs");
 
-    d->linkSC("hip", "pid");
-    d->linkSC("hzs", "pid");
+    d->linkSC("hip", "user");
+    d->linkSC("hzs", "user");
     d->linkHC("wbHW", "wbNull");
 
     d->linkLS("flog", "hip", "value");

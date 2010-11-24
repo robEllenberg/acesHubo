@@ -43,40 +43,7 @@ namespace ACES {
         }
         return false;
     }
-/*
-    bool Logger::addTracks(std::string tracks){
-        std::istringstream s1(tracks, std::istringstream::in);
 
-        s1.peek();
-        while( ! s1.eof() ){
-            std::string stringTemp;
-            s1 >> stringTemp;
-            addTrack(stringTemp);
-        }
-        return true;
-    }
-*/
-/*
-    bool Logger::sample(){
-        for( std::list<ProtoState*>::iterator it = trackList.begin();
-             it != trackList.end(); it++)
-        {
-            //Need some kind of variable/dynamic type container
-            //or determination.
-            //Do we want to be presenting state information back to
-            //nodes on the OS? (probably)
-            ProtoState* p = *it;
-
-            //Downcasting our ProtoState to the specific State<T> type
-            __typeof__(p) s = ( __typeof__(p) ) p;
-            //Recover the appropriate attribute from the state
-            __typeof__(s->value) v =
-                s->attributes()->
-                getAttribute< __typeof__(s->value.get()) >("value");
-        }
-        RTT::Seconds sampleTime = RTT::TimeService::Instance()->secondsSince(0);
-    }
-*/
     FileLog::FileLog(std::string cfg, std::string args) 
       : Logger(cfg, args)
     {
