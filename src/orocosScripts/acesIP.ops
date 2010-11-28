@@ -1,0 +1,37 @@
+program main {
+    addHardware("wbHW 1 600", "Webots", "");
+    addProtocol("wbPcol 2 600", "Webots", "");
+
+    addDevice("dHIP 5 31", "Webots Joint",  "hip 0.0 1.0");
+    addDevice("dhzs 5 31", "Webots Joint", "horizontal_servo 0.0 1.0");
+ 
+    addState("hip 5 31",  "Webots", "Joint");
+    addState("hzs 5 31",  "Webots", "Joint");
+
+    addController("wbNull 10 15", "Mini Null", "");
+    addController("pid 10 30", "PID", "hip hzs 50.0 500.0 0.0");
+    //addController("wbArm 10 15", "Mini Arm", "sins.txt");
+
+    addLogger("flog 10 5", "File", "tfile.txt");
+
+    linkHP("wbHW", "wbPcol");
+    linkPD("wbPcol", "dHIP");
+    linkPD("wbPcol", "dhzs");
+    linkDS("dHIP", "hip");
+    linkDS("dhzs", "hzs");
+
+    linkSC("hip", "pid");
+    linkSC("hzs", "pid");
+    linkHC("wbHW", "wbNull");
+
+    linkLS("flog", "hip", "value");
+    linkLS("flog", "hzs", "value");
+
+    //Start the threads
+    startHW();
+    startProtocol();
+    startDevice();
+    startState();
+    startLogger();
+    startController();
+}

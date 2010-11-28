@@ -1,8 +1,0 @@
-rosbuild_add_executable(launcher ../src/launcher.cpp)
-target_link_libraries(launcher aces-common)
-target_link_libraries(launcher aces-dispatcher)
-target_link_libraries(launcher aces-testsuite)
-target_link_libraries(launcher aces-hubo)
-target_link_libraries(launcher aces-webots)
-#target_link_libraries(robotis aces-robotis)
-target_link_libraries(launcher orocos-taskbrowser-gnulinux)

@@ -37,14 +37,9 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
 include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
 
-add_subdirectory(ip)
-add_subdirectory(user)
-add_subdirectory(webots)
+#add_subdirectory(webots)
 #add_subdirectory(robotis)
-add_subdirectory(testsuite)
-add_subdirectory(hubo)
-add_subdirectory(launcher)
-                     
+                    
 add_definitions(-DTESTSUITE)
 #add_definitions(-DROBOTIS)
 add_definitions(-DHUBO)
@@ -52,3 +47,20 @@ add_definitions(-DWEBOTS)
 
 rosbuild_add_library(aces-dispatcher src/dispatcher.cpp)
 
+rosbuild_add_library(aces-testsuite ../src/testsuite.cpp)
+rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
+                               ../src/hubo/huboTxPacket.cpp)
+
+include_directories("/usr/local/webots/include/controller/c")
+link_directories("/usr/local/webots/lib")
+rosbuild_add_library(aces-webots ../src/webots.cpp)
+target_link_libraries(aces-webots Controller)
+
+rosbuild_add_executable(aces-launcher ../src/launcher.cpp)
+target_link_libraries(aces-launcher aces-common)
+target_link_libraries(aces-launcher aces-dispatcher)
+target_link_libraries(aces-launcher aces-testsuite)
+target_link_libraries(aces-launcher aces-hubo)
+target_link_libraries(aces-launcher aces-webots)
+#target_link_libraries(aces-launcher aces-robotis)
+target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)
