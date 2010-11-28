@@ -1,50 +1,43 @@
-program testprog {
-    dispatch.addHardware("tsHW 90 100","TestSuite","");
-    
-    /* BEGIN CONFIG SECTION */
-    //Add a hardware node (usually and electrical bus)
-    //Add a protocol node (interpreter for data on the bus)
-    addProtocol("tsPro 80 100", "TestSuite", "");
+program main {
+    addHardware("tsHW 90 500","TestSuite",""); 
+    addProtocol("tsPro 80 500", "TestSuite", ""); 
+    linkHP("tsHW", "tsPro"); 
 
-    //Tell the hardware & protocol to pay attention to each other
-    linkHP("tsHW", "tsPro");
-
-    /*
     //Create devices, representing physical nodes on the bus
-    addDevice("dX 20 50", "TestSuite", "1");
-    addDevice("dY 20 50", "TestSuite", "2");
-    addDevice("dZ 20 50", "TestSuite", "3");
+    addDevice("dX 20 500", "TestSuite", "1"); 
+    addDevice("dY 20 500", "TestSuite", "2"); 
+    addDevice("dZ 20 500", "TestSuite", "3"); 
 
     //Add states, each represents 1 property of the device
-    addState("X 10 50", "TestSuite", "1.0 2.0");
-    addState("Y 10 50", "TestSuite", "3.0 4.0");
-    addState("Z 10 50", "TestSuite", "5.0 6.0");
+    addState("X 10 50", "TestSuite", "-1.0 1.0"); 
+    addState("Y 10 50", "TestSuite", "3.0 4.0"); 
+    addState("Z 10 50", "TestSuite", "5.0 6.0"); 
 
     //Tell the states and devices to pay attention to each other
-    linkDS("dX", "X");
-    linkDS("dY", "Y");
-    linkDS("dZ", "Z");
+    linkDS("dX", "X"); 
+    linkDS("dY", "Y"); 
+    linkDS("dZ", "Z"); 
 
     //Tell the devices & protocol to pay attention to each other 
-    linkPD("tsPro", "dX");
-    linkPD("tsPro", "dY");
-    linkPD("tsPro", "dZ");
+    linkPD("tsPro", "dX"); 
+    linkPD("tsPro", "dY"); 
+    linkPD("tsPro", "dZ"); 
 
     //Setup Logging
-    //addLogger("log1 5 200", "File", "testlog.txt");
-    //linkLS("log1", "X");
-    //linkLS("log1", "Y");
-    //linkLS("log1", "Z");
-    */
-    /* END CONFIG SECTION */
+    addLogger("log1 5 200", "File", "testlog.txt"); 
+    linkLS("log1", "X", "value"); 
+    //linkLS("log1", "Y", "value"); 
+    //linkLS("log1", "Z", "value"); 
+    linkLS("log1", "X", "integral"); 
+    linkLS("log1", "X", "diff"); 
+    
+    // END CONFIG SECTION 
 
     //Start the threads
-    startHW();
-    startProtocol();
-    startDevice();
-    startState();
-    startController();
-    startLogger();
-
-    /* IMPORTANT STUFF HERE */
+    startHW(); 
+    startProtocol(); 
+    startDevice(); 
+    startState(); 
+    startController(); 
+    startLogger(); 
 }

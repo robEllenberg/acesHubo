@@ -7,7 +7,6 @@
 #include <rtt/OutputPort.hpp>
 #include <rtt/InputPort.hpp>
 
-#include "goal.hpp"
 #include "taskcfg.hpp"
 #include "credentials.hpp"
 #include "state.hpp"

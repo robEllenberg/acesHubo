@@ -17,7 +17,6 @@
 #include "credentials.hpp"
 #include "controller.hpp"
 #include "taskcfg.hpp"
-#include "goal.hpp"
 #include "word.hpp"
 
 namespace ACES {

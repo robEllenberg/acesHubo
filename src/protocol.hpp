@@ -15,7 +15,6 @@
 #include "message.hpp"
 #include "state.hpp"
 #include "taskcfg.hpp"
-#include "goal.hpp"
 #include "device.hpp"
 #include "word.hpp"
 

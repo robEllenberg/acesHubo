@@ -4,7 +4,9 @@ namespace ACES{
     Dispatcher::Dispatcher(std::string name)
         : RTT::TaskContext(name)
     {
-        //this->setActivity( new RTT::Activity(5, 1.0/10.0, 0, name) );
+        //Dispatcher must have an activity of some sort or scripts won't run
+        //properly
+        this->setActivity( new RTT::Activity(5, 1.0/10.0, 0, name) );
         this->addOperation("addHardware", &Dispatcher::addHardware, this,
                            RTT::OwnThread).doc("add new hardware")
                            .arg("config", "_name_ _priority_ _freq_")
@@ -451,12 +453,13 @@ namespace ACES{
 
 
     bool Dispatcher::startHook(){
-        startHW();
-        startProtocol();
-        startDevice();
-        startState();
-        startController();
-        startLogger();
+        //startHW();
+        //startProtocol();
+        //startDevice();
+        //startState();
+        //startController();
+        //startLogger();
+
         //RTT::Logger::log() << "Finished HW" << RTT::endlog();
         //RTT::Logger::log() << "Finished Pcol" << RTT::endlog();
         //RTT::Logger::log() << "Finished States" << RTT::endlog();
@@ -515,12 +518,12 @@ namespace ACES{
     }
 
     void Dispatcher::stopHook(){
-        stopLogger();
-        stopController();
-        stopState();
-        stopDevice();
-        stopProtocol();
-        stopHW();
+        //stopLogger();
+        //stopController();
+        //stopState();
+        //stopDevice();
+        //stopProtocol();
+        //stopHW();
     }
 
 } 

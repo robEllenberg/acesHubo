@@ -4,7 +4,6 @@
 #include <deque>
 #include <rtt/Logger.hpp>
 //#include "credentials.hpp"
-//#include "goal.hpp"
 #include "word.hpp"
 
 namespace ACES{

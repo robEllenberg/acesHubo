@@ -7,7 +7,6 @@
 //#include "state.hpp" //If you need to derrive the state (try to avoid this)
 #include "credentials.hpp"
 //#include "word.hpp" // Word/Result
-//#include "goal.hpp"
 //#include "message.hpp"
 
 /* If you need to implement your own logging functions. (you shouldn't) */

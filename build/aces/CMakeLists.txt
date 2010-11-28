@@ -43,6 +43,7 @@ add_subdirectory(webots)
 #add_subdirectory(robotis)
 add_subdirectory(testsuite)
 add_subdirectory(hubo)
+add_subdirectory(launcher)
                      
 add_definitions(-DTESTSUITE)
 #add_definitions(-DROBOTIS)
