@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstring>
 #include <sstream>
@@ -51,7 +52,7 @@ namespace Robotis {
 
             TORQUE_ENABLE = 0x18,              LED = 0x19,
             CW_COMPLIANCE_MARGIN = 0x1A,       CCW_COMPLIANCE_MARGIN = 0x1B,
-            CW_COMPLIANCE_SCOPE = 0x1C,        CCW_COMPLIANCE_SCOPE = 0x1D,
+            CW_COMPLIANCE_SLOPE = 0x1C,        CCW_COMPLIANCE_SLOPE = 0x1D,
             GOAL_POSITION = 0x1E,              MOVING_SPEED = 0x20,
             TORQUE_LIMIT = 0x22,               PRESENT_POSITION = 0x24,
             PRESENT_SPEED = 0x26,              PRESENT_LOAD = 0x28,
@@ -68,7 +69,7 @@ namespace Robotis {
             1,              //RETURN_DELAY_TIME = 0x5
             2, 0,           //CW_ANGLE_LIMIT = 0x6
             2, 0,           //CCW_ANGLE_LIMIT = 0x8
-            0,
+            1,              //Deadspace = 0xA
             1,              //HIGHEST_LIMIT_TEMPERATURE = 0xB
             1,              //LOWEST_LIMIT_VOLTAGE = 0xC
             1,              //HIGHEST_LIMIT_VOLTAGE = 0xD
@@ -76,7 +77,7 @@ namespace Robotis {
             1,              //STATUS_RETURN_LEVEL = 0x10
             1,              //ALARM_LED = 0x11
             1,              //ALARM_SHUTDOWN = 0x12
-            0, 0, 0, 0, 0,
+            1, 1, 1, 1, 1,  //Deadspace
             1,              //TORQUE_ENABLE = 0x18
             1,              //LED = 0x19
             1,              //CW_COMPLIANCE_MARGIN = 0x1A
@@ -92,7 +93,7 @@ namespace Robotis {
             1,              //PRESENT_VOLTAGE = 0x2A
             1,              //PRESENT_TEMPERATURE = 0x2B
             1,              //REGISTERED_INSTRUCTION = 0x2C
-            0, 0,
+            1,              //Deadspace
             1,              //MOVING = 0x2E
             1,              //LOCK = 0x2F
             2, 0            //PUNCH = 0x30
@@ -170,6 +171,7 @@ namespace Robotis {
             ACES::Word<RobotisPacket>* processUS(ACES::Word<unsigned char>* w);
             ACES::Message<unsigned char>*
               processDS(ACES::Word<RobotisPacket>* w);
+            void txDSPending();
 
             //~Protocol();
             //ACES::Message* buildMessage(ACES::Credentials* cred);
@@ -178,6 +180,7 @@ namespace Robotis {
             RobotisPacket* curPacket;
             unsigned char incoming_id;
             unsigned char incoming_len;
+            std::map<PARAM_TABLE, std::deque<RobotisPacket> > dsQueue;
     };
 
     class Device : public ACES::Device<float, RobotisPacket> {
@@ -187,11 +190,13 @@ namespace Robotis {
             //void stopHook();
             virtual ACES::Word<RobotisPacket>* processDS(ACES::Word<float>*);
             virtual ACES::Word<float>* processUS(ACES::Word<RobotisPacket>*);
-            //getTable()
+            bool getTable();
+            bool setTable(int position, float val);
         private:
             //!The memory table position of the last request issued
             int requestPos; 
             int requestLen; //!The size of data from the last issued request
+            void printTable();
             unsigned char memTable[50];
     };
 

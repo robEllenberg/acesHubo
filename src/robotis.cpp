@@ -150,7 +150,7 @@ namespace Robotis {
         unsigned char c;
         while(rxBuf.read(c) == RTT::NewData){
             //rxBuf = new boost::asio::buffer((void*)(new unsigned char c[size]), size) b1;
-            RTT::Logger::log() << "Got Something!" <<RTT::endlog();
+            RTT::Logger::log() << "Got Something! - " << (int)c << RTT::endlog();
             txUpStream.write(new ACES::Word<unsigned char>(c));
 
             //port.async_read_some(boost::asio::buffer((void*)&rxBuf, 1),
@@ -206,6 +206,7 @@ namespace Robotis {
         ACES::Word<RobotisPacket>* pw = NULL;
         unsigned char c = 0;
         c = usIn->getData();
+        //RTT::Logger::log() << "Got Something! - " << (int)c << RTT::endlog();
         yy_scan_bytes( (const char*)(&c), 1, this->scanner);
         //If yylex returns 1 we have matched a full packet
         //if return is 0 we have only eaten a character
@@ -214,9 +215,9 @@ namespace Robotis {
             curPacket = new RobotisPacket();
             yyset_extra(curPacket, scanner) ;
 
-
             pw = new ACES::Word<RobotisPacket>(*p, 0, 0, 0,
                 (ACES::Credentials*)credFromPacket(p));
+            p->printme();
             return pw;
         }
         return NULL;
@@ -225,6 +226,7 @@ namespace Robotis {
     ACES::Message<unsigned char>*
         Protocol::processDS(ACES::Word<RobotisPacket>* w)
     {
+        rxDownStream.size
         RobotisPacket p = w->getData();
         //p.printme();
         /*
@@ -256,12 +258,25 @@ namespace Robotis {
         //m->goalList.push_back(e));
     }
 
+    void Protocol::txDSPending(){
+        
+    }
+
     Device::Device(std::string cfg, std::string args)
      :ACES::Device<float, RobotisPacket>(cfg),
      requestPos(-1), requestLen(-1)
     {
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
+        this->addOperation("getTable", &Device::getTable, this,
+                        RTT::OwnThread).doc("Copy the motor parameter table");
+        this->addOperation("printTable", &Device::printTable, this,
+                        RTT::OwnThread).doc("Print the motor parameter table");
+        this->addOperation("setTable", &Device::setTable, this,
+              RTT::OwnThread).doc("Set a value in the motor parameter table")
+                             .arg("position", "Position to change")
+                             .arg("value", "Value to assign at this position");
+
     }
 
     ACES::Word<RobotisPacket>* Device::processDS(ACES::Word<float>* w){
@@ -317,29 +332,85 @@ namespace Robotis {
                         tentry = high;
                         tentry <<= 8;
                         tentry |= low;
+                        memTable[requestPos+i] = low;
+                        memTable[requestPos+i+1] = high;
                         i+=2;
                         break;
                     case 1:
                         tentry = (*(p->parameters))[i];
+                        memTable[requestPos+i] = (*(p->parameters))[i];
                         i++;
                         break;
                     default:
                         assert(false);
                         break;
                 }
-                //The scaling function
-                float data = USScale(tentry, requestPos+j);
-                
                 int node = findTrueNodeID(requestPos+j, UP);
-                ACES::Word<float> *res = new ACES::Word<float>(data, requestPos+j,
-                                                         credentials->getDevID(),
-                                                         ACES::REFRESH,
-                                                         credentials);
+                //The scaling function
+                float data = USScale(tentry, node);
+                ACES::Word<float> *res = new ACES::Word<float>(data, node,
+                                                     credentials->getDevID(),
+                                                     ACES::REFRESH,
+                                                     credentials);
+                res->printme();
                 txUpStream.write(res);
             }
         }
         DSlockout = false;
         return NULL;
+    }
+
+    bool Device::getTable(){
+        RobotisPacket p;
+        p.setID(credentials->getDevID());
+        p.parameters = new std::deque<unsigned char>;
+        float sp = 0.;
+
+        //Indicate that the Device has sent a request, others must
+        //wait
+        requestPos = 0;
+        requestLen = 50;
+        DSlockout = true;
+        p.setInst(READ);
+        p.parameters->push_back((unsigned char) requestPos);
+        p.parameters->push_back((unsigned char) requestLen);
+
+        ACES::Word<RobotisPacket> *pw = new ACES::Word<RobotisPacket>(p);
+        txDownStream.write(pw);
+        return true;
+    }       
+
+    void Device::printTable(){
+        RTT::Logger::log(RTT::Logger::Info) << "Memory Table: "
+                                            << RTT::endlog();
+            for(int i=0; i < 10; i++){
+                for(int j=0; j<5; j++){
+                   RTT::Logger::log(RTT::Logger::Info) << std::setw(3) 
+                           << (int)memTable[i*5+j] << ", ";
+                }
+                    RTT::Logger::log(RTT::Logger::Info) << RTT::endlog();
+            }
+    }
+
+    bool Device::setTable(int position, float val){
+        RobotisPacket p;
+        p.setID(credentials->getDevID());
+        p.parameters = new std::deque<unsigned char>;
+
+        p.setInst(WRITE);
+        p.parameters->push_back(position);
+        
+        //Scale the set-point
+        unsigned short ssp = DSScale(val, position); 
+        RTT::Logger::log() << "setpoint " << ssp << RTT::endlog();
+        //Byte-chop the scaled point and add it to the param list
+        appendParams(p.parameters, ssp,
+                     PARAM_LEN[ position ] );
+
+        ACES::Word<RobotisPacket> *pw = new ACES::Word<RobotisPacket>(p);
+        txDownStream.write(pw);
+
+        return true;
     }
 
     Credentials::Credentials(int motNum, float z, float dir)
@@ -445,10 +516,30 @@ namespace Robotis {
     unsigned short DSScale(float in, int nodeID){
         unsigned short result = 0;
         switch(nodeID){
+            case LED:
+                result = (unsigned short)in;
+                result = limit<unsigned short>(result, 0, 1);
+                break;
+            case CW_COMPLIANCE_MARGIN:
+                //Intentional fall through
+            case CCW_COMPLIANCE_MARGIN:
+                result = (unsigned short)in;
+                result = limit<unsigned short>(result, 0, 254);
+                break;
+            case CW_COMPLIANCE_SLOPE:
+                //Intentional fall through
+            case CCW_COMPLIANCE_SLOPE:
+                result = (unsigned short)in;
+                result = limit<unsigned short>(result, 1, 254);
+                break;
             case GOAL_POSITION:
                 //TODO - needs proper rounding
                 result = (unsigned short)(in*1023./300.);
                 result = limit<unsigned short>(result, 0, 1023);
+                break;
+            case PUNCH:
+                result = (unsigned short)in;
+                result = limit<unsigned short>(result, 32, 1023);
                 break;
             default:        //case of no scaling function
                 result = (unsigned short)in;

@@ -34,23 +34,28 @@
 
 <len_frame>[\x00-\xFF]    { MAKEP
                             p->setLen(*yytext);
-                            ((*p).counter) = p->getLen() - 2; 
+                            p->counter = 0; //p->getLen() - 2; 
                             //std::cout << "got len" << std::endl;
                             BEGIN(error_frame);
                             return 0;}
 
 <error_frame>[\x00-\xFF]    { MAKEP
                               p->setError(*yytext); 
+                              p->counter += 1;
                               //std::cout << "got error" << std::endl;
+                             if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
+                              BEGIN(check_frame);
+                             }
+                             else{
                               BEGIN(param_frame);
+                             }
                               return 0;}
 
 <param_frame>[\x00-\xFF]     { MAKEP  
-                                 if( ((*p).counter) - 1 > 0){   //The length of n include the checksum
-                                  (*p).parameters->push_back(*yytext);
-                                  ((*p).counter)--;
-                                 } else{
                                   //std::cout << "got parms" << std::endl;
+                                  (*p).parameters->push_back(*yytext);
+                                  (p->counter)++;
+                                 if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
                                   BEGIN(check_frame); 
                                  }
                                  return 0;
