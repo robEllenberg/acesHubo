@@ -42,7 +42,7 @@ namespace ACES {
             //bool rxDownStream(Message<T>* m);
 
             virtual bool txBus(Message<T>* m);
-            virtual void rxBus();
+            virtual void rxBus(int size=0);
             //void txUpStream( Word<T>* );
 
             virtual bool processUS(Word<T>*);

@@ -20,9 +20,9 @@ namespace ACES{
         this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
         */
-        this->ports()->addEventPort("RxDS", rxDownStream).doc(
+        this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from Device) Reception");
-        this->ports()->addEventPort("RxUS", rxUpStream).doc(
+        this->ports()->addPort("RxUS", rxUpStream).doc(
                                "UpStream (from Hardware) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Hardware) Transmission");
@@ -46,6 +46,7 @@ namespace ACES{
                 txDownStream.write(dsOut);
             }
         }
+        txDSPending();
 
         Word<HW>* usIn = NULL;
         Word<PD>* usOut = NULL;
@@ -79,5 +80,9 @@ namespace ACES{
         p = (Word<PD>*)h;
 
         return p;
+    }
+
+    template <class HW, class PD>    
+    void Protocol<HW, PD>::txDSPending(){
     }
 }

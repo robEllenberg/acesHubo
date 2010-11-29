@@ -51,6 +51,7 @@ namespace ACES {
 
             virtual Message<HW>* processDS(Word<PD>*);
             virtual Word<PD>* processUS(Word<HW>*);
+            virtual void txDSPending();
 
         protected:
             //RTT::Event<void(Message<HW>*)> txDownStream;

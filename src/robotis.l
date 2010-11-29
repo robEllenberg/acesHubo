@@ -1,6 +1,6 @@
 %{
 #include <iostream>
-#include "robotis.hpp"
+#include "src/robotis.hpp"
 
 %}
 
@@ -27,37 +27,42 @@
                   return 0;}
 
 <id_frame>[\x00-\xFF]   {  MAKEP
-                          (*p).id = *yytext;
+                          p->setID(*yytext);
                           //std::cout << "got id" << std::endl;
                           BEGIN(len_frame);
                           return 0;}
 
 <len_frame>[\x00-\xFF]    { MAKEP
-                            (*p).len = *yytext;
-                            ((*p).counter) = (*p).len - 2; 
+                            p->setLen(*yytext);
+                            p->counter = 0; //p->getLen() - 2; 
                             //std::cout << "got len" << std::endl;
                             BEGIN(error_frame);
                             return 0;}
 
 <error_frame>[\x00-\xFF]    { MAKEP
-                              (*p).error = *yytext; 
+                              p->setError(*yytext); 
+                              p->counter += 1;
                               //std::cout << "got error" << std::endl;
+                             if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
+                              BEGIN(check_frame);
+                             }
+                             else{
                               BEGIN(param_frame);
+                             }
                               return 0;}
 
 <param_frame>[\x00-\xFF]     { MAKEP  
-                                 if( ((*p).counter) - 1 > 0){   //The length of n include the checksum
-                                  (*p).parameters->push_back(*yytext);
-                                  ((*p).counter)--;
-                                 } else{
                                   //std::cout << "got parms" << std::endl;
+                                  (*p).parameters->push_back(*yytext);
+                                  (p->counter)++;
+                                 if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
                                   BEGIN(check_frame); 
                                  }
                                  return 0;
                              }
 
 <check_frame>[\x00-\xFF]       { MAKEP
-                          (*p).checksum = *yytext;
+                          p->setChecksum(*yytext);
                           //std::cout << "got check" << std::endl;
                           //(*p).printme();
                           yyset_extra( p, yyscanner );

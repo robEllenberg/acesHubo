@@ -32,6 +32,7 @@ namespace ACES {
     
         Message<T>* dsIn = NULL;
         while( rxDownStream.read(dsIn) == RTT::NewData ){
+            dsIn->printme();
             if( processDS(dsIn) ){
                 RTT::Logger::log() << RTT::Logger::Debug << "(HW: " << name 
                                    << ") got DS"
@@ -67,7 +68,7 @@ namespace ACES {
     }
 
     template <class T>
-    void Hardware<T>::rxBus(){
+    void Hardware<T>::rxBus(int size){
     }
 
     /*

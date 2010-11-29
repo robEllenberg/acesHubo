@@ -3,7 +3,8 @@
 namespace ACES{
     ProtoDevice::ProtoDevice(std::string config) :
       taskCfg(config),
-      RTT::TaskContext(name)
+      RTT::TaskContext(name),
+      DSlockout(false),  USlockout(false)
         {}
 
     bool ProtoDevice::subscribeState(RTT::TaskContext* s){

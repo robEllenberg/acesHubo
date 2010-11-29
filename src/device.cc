@@ -2,10 +2,6 @@ namespace ACES{
     template <class S, class PD>
     Device<S,PD>::Device(std::string config) :
       ProtoDevice(config)
-      //txDownStream("txDownStream"),
-      //txUpStream("txUpStream"),
-      //dsQueue(10),
-      //usQueue(10),
     {
         /*this->events()->addEvent(&txDownStream, "txDownStream", "goal",
                                  "The Goal/SP Data");
@@ -30,29 +26,33 @@ namespace ACES{
     void Device<S,PD>::updateHook(){
         Word<S>* dsIn = NULL;
         Word<PD>* dsOut = NULL;
-        while( rxDownStream.read(dsIn) == RTT::NewData ){
-            if( dsOut = processDS(dsIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev: " 
-                                   << name << ") got DS"
-                                   << RTT::endlog();
-                txDownStream.write(dsOut);
+        if(not DSlockout){
+            while( rxDownStream.read(dsIn) == RTT::NewData ){
+                if( dsOut = processDS(dsIn) ){
+                    RTT::Logger::log() << RTT::Logger::Debug << "(dev: " 
+                                       << name << ") got DS"
+                                       << RTT::endlog();
+                    txDownStream.write(dsOut);
+                }
             }
         }
         
         Word<PD>* usIn = NULL;
         Word<S>* usOut = NULL;
-        while( rxUpStream.read(usIn) == RTT::NewData ){
-            if( usOut = processUS(usIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(dev: "
-                                   << name << ") got US"
-                                   << RTT::endlog();
-            //typename std::deque< PDWord<P>* >::iterator it;
-            //for(it = p.begin();
-            //    it != p.end();  it++){
-                //(*it)->printme();
-                txUpStream.write(usOut);
-                //RTT::Logger::log() << "(dev) nID:" << (*it)->nodeID
-                //                   << RTT::endlog();
+        if(not USlockout){
+            while( rxUpStream.read(usIn) == RTT::NewData ){
+                if( usOut = processUS(usIn) ){
+                    RTT::Logger::log() << RTT::Logger::Debug << "(dev: "
+                                       << name << ") got US"
+                                       << RTT::endlog();
+                //typename std::deque< PDWord<P>* >::iterator it;
+                //for(it = p.begin();
+                //    it != p.end();  it++){
+                    //(*it)->printme();
+                    txUpStream.write(usOut);
+                    //RTT::Logger::log() << "(dev) nID:" << (*it)->nodeID
+                    //                   << RTT::endlog();
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ namespace ACES {
     {
         //nodeID.set(nID);
         //samplingAttr.set(true);
-        this->addAttribute("Node ID", nodeID);
+        this->addAttribute("NodeID", nodeID);
         this->addAttribute("sampling", samplingAttr);
         this->addAttribute("intEnable", intEnable);
         this->addAttribute("diffEnable", diffEnable);

@@ -19,6 +19,9 @@ namespace ACES{
         public:
             ProtoDevice(std::string config);
             bool subscribeState(RTT::TaskContext* s);
+        protected:
+            bool DSlockout;
+            bool USlockout;
     };
 
     template <class S, class PD>

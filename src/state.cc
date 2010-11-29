@@ -161,7 +161,7 @@ namespace ACES{
         RTT::Logger::log() << RTT::Logger::Debug << "(state: "
                            << name << ") sample"
                            << RTT::endlog();
-        Word<T>* s = new Word<T>(0, nodeID, 0, REFRESH);
+        Word<T>* s = new Word<T>(0., nodeID, 0, REFRESH);
         txDownStream.write(s);
     }
 
@@ -180,6 +180,9 @@ namespace ACES{
 
     template <class T>
     void State<T>::go(T sp){
+        RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+                           << name << ") go: " << (float)sp
+                           << RTT::endlog();
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
         txDownStream.write(w);
     }
