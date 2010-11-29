@@ -72,6 +72,73 @@ namespace Robotis {
     //    delete parameters;
     //}
 
+    bool RobotisQueue::addPacket(RobotisPacket p){
+        PARAM_TABLE parameter = (PARAM_TABLE)(p.parameters->operator[](0) );
+        int motorID = p.getID();
+        queue[parameter][motorID] = p;
+        return true;
+    }
+
+    std::vector<ACES::Message<unsigned char>*>
+      RobotisQueue::renderAllMessages()
+    {
+        std::vector<ACES::Message<unsigned char>*> v;
+        for(std::map<PARAM_TABLE, std::map<unsigned char, RobotisPacket> >
+            ::iterator it = queue.begin(); it != queue.end(); it++)
+        {
+            v.push_back( renderMessageFromPackets((*it).second) );
+            queue.erase(it);
+        }
+        return v;
+    }
+
+    ACES::Message<unsigned char>* RobotisQueue::renderMessageFromQueue(
+                                                PARAM_TABLE param)
+    {
+        ACES::Message<unsigned char>* m = NULL;
+        if(queue.find(param) != queue.end()){
+            m = renderMessageFromPackets(queue[param]);
+            return m;
+        }
+        return NULL;
+    }
+
+    ACES::Message<unsigned char>* RobotisQueue::renderMessageFromPackets(
+                                    std::map<unsigned char, RobotisPacket>& p)
+    {
+        RobotisPacket rp;
+        rp.setID(0xFE);
+        rp.setInst(SYNC_WRITE);
+        rp.parameters = new std::deque<unsigned char>;
+        
+        //Assure that the map is not empty
+        unsigned char requestPos = 0, requestLen = 0; 
+        if(p.size()){
+            (*(p.begin())).second.printme();
+            requestPos = ( *(p.begin()) ).second.parameters->operator[](0);
+            requestLen = ( *(p.begin()) ).second.parameters->size() - 1;
+            //RTT::Logger::log() << "requestLen is " << (int)requestLen <<
+            //RTT::endlog();
+            rp.parameters->push_back(requestPos);
+            rp.parameters->push_back(requestLen);
+        }
+        else{
+            return NULL;
+        }
+        for(std::map<unsigned char, RobotisPacket>::iterator it = p.begin();
+            it != p.end(); it++)
+        {
+            rp.parameters->push_back( (*it).first );
+            for(int i=0; i < requestLen; i++){
+               rp.parameters->push_back( (*it).second.parameters
+                                         ->operator[](1+i) );
+            }
+        }
+
+        return messageFromPacket(&rp);
+    }
+                                        
+
     Reader::Reader(boost::asio::serial_port* p)
      : RTT::base::RunnableInterface()
     {
@@ -186,7 +253,11 @@ namespace Robotis {
 */     
 
     Protocol::Protocol(std::string cfg, std::string args)
-     : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args){}
+     : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args),
+       triggerDS(false)
+    {
+        this->addAttribute("triggerDS", triggerDS);
+    }
 
     bool Protocol::startHook(){
         yylex_init ( &scanner ) ;
@@ -226,30 +297,27 @@ namespace Robotis {
     ACES::Message<unsigned char>*
         Protocol::processDS(ACES::Word<RobotisPacket>* w)
     {
-        rxDownStream.size
         RobotisPacket p = w->getData();
+        ACES::Message<unsigned char>* m = NULL;
         //p.printme();
-        /*
-        switch(p->instruct){
+        switch(p.getInst()){
             case PING:
-                break;
+                //Intentional fallthrough
             case READ:
+                m = messageFromPacket(&p);
                 break;
             case WRITE:
+                //m = messageFromPacket(&p);
+                queue.addPacket(p);
                 break;
             case REG_WRITE:
-                break;
+                //Intentional Fallthrough
             case ACTION:
-                break;
             case RESET:
-                break;
             case SYNC_WRITE:
-                break;
             default:
                 return NULL;
         }
-        */
-        ACES::Message<unsigned char>* m = messageFromPacket(&p);
         //m->printme();
         return m;
 
@@ -259,7 +327,16 @@ namespace Robotis {
     }
 
     void Protocol::txDSPending(){
-        
+        if(triggerDS){
+            std::vector<ACES::Message<unsigned char>*> v =
+                queue.renderAllMessages();
+
+            for(std::vector<ACES::Message<unsigned char>*>::iterator it =
+                v.begin(); it != v.end(); it++)
+            {
+                txDownStream.write(*it);
+            }
+        }
     }
 
     Device::Device(std::string cfg, std::string args)
@@ -276,7 +353,6 @@ namespace Robotis {
               RTT::OwnThread).doc("Set a value in the motor parameter table")
                              .arg("position", "Position to change")
                              .arg("value", "Value to assign at this position");
-
     }
 
     ACES::Word<RobotisPacket>* Device::processDS(ACES::Word<float>* w){
@@ -465,7 +541,7 @@ namespace Robotis {
         p->setLen( p->parameters->size() + 2 );
         p->setChecksum( checksum(p) );
 
-        //Build version for sending
+        //Build packet for sending
         //Header
         m->push(new ACES::Word<unsigned char>(0xFF));
         m->push(new ACES::Word<unsigned char>(0xFF));

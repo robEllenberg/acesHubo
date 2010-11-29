@@ -126,6 +126,20 @@ namespace Robotis {
             INST instruct;
     };
 
+    class RobotisQueue {
+        public:
+            bool addPacket(RobotisPacket p);
+            std::vector<ACES::Message<unsigned char>*> renderAllMessages();
+            ACES::Message<unsigned char>*
+              renderMessageFromQueue(PARAM_TABLE param);
+            ACES::Message<unsigned char>*
+              renderMessageFromPackets(std::map<unsigned char,
+                                                RobotisPacket>& p);
+        private:
+            std::map<PARAM_TABLE, 
+                     std::map<unsigned char, RobotisPacket> > queue;
+    };
+
     class Reader : public RTT::base::RunnableInterface {
         public:
             Reader(boost::asio::serial_port* p);
@@ -180,7 +194,9 @@ namespace Robotis {
             RobotisPacket* curPacket;
             unsigned char incoming_id;
             unsigned char incoming_len;
-            std::map<PARAM_TABLE, std::deque<RobotisPacket> > dsQueue;
+        private:
+            bool triggerDS;
+            RobotisQueue queue;
     };
 
     class Device : public ACES::Device<float, RobotisPacket> {

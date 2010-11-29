@@ -83,6 +83,6 @@ namespace ACES{
     }
 
     template <class HW, class PD>    
-    void txDSPending(){
+    void Protocol<HW, PD>::txDSPending(){
     }
 }
