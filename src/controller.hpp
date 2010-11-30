@@ -26,14 +26,15 @@ namespace ACES{
         public:
             Controller(std::string cfg, std::string args);
             virtual void updateHook(); 
-            virtual std::map<std::string, void*>* 
-                    getStateVector(bool echo=0) = 0;
+            virtual bool getStateVector(bool echo=0) = 0;
+            virtual bool modStateVector();
             void addCtrl(std::string dest, float sp);
+            float checkCtrl(std::string ctrl);
             bool sendCtrl();
             float getSurface(std::string state, std::string attr);
 
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
-        private:
+        protected:
             std::map<std::string, void*>* curMap;
     };
 
@@ -56,34 +57,27 @@ namespace ACES{
     {
         public:
             NullCtrl(std::string config, std::string args);
-            void updateHook();
-
-            std::map<std::string, void*>* 
-                    getStateVector(bool echo=0);
+            virtual bool getStateVector(bool echo=0);
     };
 
     class LegCtrl : public ScriptCtrl
     {
         public:
             LegCtrl(std::string config, std::string args);
-
-            std::map<std::string, void*>* 
-                    getStateVector(bool echo=0);
+            virtual bool getStateVector(bool echo=0);
     };
 
     class ArmCtrl : public ScriptCtrl
     {
         public:
             ArmCtrl(std::string config, std::string args);
-            std::map<std::string, void*>* 
-                    getStateVector(bool echo=0);
+            virtual bool getStateVector(bool echo=0);
     };
 
     class PID : public Controller{
         public:
             PID(std::string config, std::string args);
-            std::map<std::string, void*>* getStateVector(bool echo=0);
-                    
+            virtual bool getStateVector(bool echo=0);
         private:
             std::string inputSurface, outputSurface;
             float Kp, Ki, Kd, val;
@@ -92,20 +86,27 @@ namespace ACES{
     class UserProg : public Controller{
         public:
             UserProg(std::string config, std::string args);
-            virtual std::map<std::string, void*>* getStateVector(bool echo=0);
+            virtual bool getStateVector(bool echo=0);
             bool startHook();
         private:
             std::string filename;
             std::string progname;
     };
+
     class UserSM : public Controller{
         public:
             UserSM(std::string config, std::string args);
-            virtual std::map<std::string, void*>* getStateVector(bool echo=0);
+            virtual bool getStateVector(bool echo=0);
             bool startHook();
         private:
             std::string filename;
             std::string progname;
+    };
+
+    class YJCtrl : public LegCtrl {
+        public:
+            YJCtrl(std::string config, std::string args);
+            virtual bool modStateVector();
     };
 }
 

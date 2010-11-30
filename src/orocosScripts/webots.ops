@@ -1,15 +1,20 @@
 program main {
+    var bool sample = true;
 
     addHardware("wbHW 1 600", "Webots", "");
     addProtocol("wbPcol 2 600", "Webots", "");
 
-    addController("wbNull 10 15", "Mini Null", "");
-    //addController("wbArm 10 15", "Mini Arm", "sins.txt");
+    //addController("wbNull 10 15", "Mini Null", "");
 
-    //Pick one of these three controllers
-    //addController("wbctrl 10 15", "Mini Leg", "IKscript1.txt");
-    addController("wbctrl 10 15", "User Program", "miniProg.ops main");
-    //addController("wbctrl 10 15", "User StateMachine", "miniSM.osd main");
+    //***Pick one of these controllers
+      //addController("wbctrl 10 15", "Mini Leg", "walkscripts/IKscript1.txt");
+      //addController("wbArm 10 15", "Mini Arm", "sins.txt");
+      //addController("wbctrl 10 15", "User Program", "miniProg.ops main");
+      //addController("wbctrl 10 15", "User StateMachine", "miniSM.osd main");
+      addController("wbctrl 10 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
+
+    linkHC("wbHW", "wbctrl");
+    linkHP("wbHW", "wbPcol");
 
     addDevice("dHY 5 31", "Webots Joint",  "HY  0.0 -1.0");
     addDevice("dLSP 5 31", "Webots Joint", "LSP 0.0  1.0");
@@ -30,9 +35,9 @@ program main {
     addDevice("dRAR 5 31", "Webots Joint", "RAR 0.0  1.0");
 
     addDevice("dGPS 5 31", "Webots GPS", "zero");
-    addState("centerX 5 5",  "Webots", "X");
-    addState("centerY 5 5",  "Webots", "Y");
-    addState("centerZ 5 5",  "Webots", "Z");
+    addState("centerX 5 5",  "Webots", "X", sample);
+    addState("centerY 5 5",  "Webots", "Y", sample);
+    addState("centerZ 5 5",  "Webots", "Z", sample);
 
     linkPD("wbPcol", "dGPS");
     linkDS("dGPS", "centerX");
@@ -40,9 +45,9 @@ program main {
     linkDS("dGPS", "centerZ");
 
     addDevice("dIMUAcc 5 31", "Webots Accelerometer", "imuacc");
-    addState("imuaccX 5 5",  "Webots", "X");
-    addState("imuaccY 5 5",  "Webots", "Y");
-    addState("imuaccZ 5 5",  "Webots", "Z");
+    addState("imuaccX 5 5",  "Webots", "X", sample);
+    addState("imuaccY 5 5",  "Webots", "Y", sample);
+    addState("imuaccZ 5 5",  "Webots", "Z", sample);
 
     linkPD("wbPcol", "dIMUAcc");
     linkDS("dIMUAcc", "imuaccX");
@@ -50,9 +55,9 @@ program main {
     linkDS("dIMUAcc", "imuaccZ");
 
     addDevice("dIMUGyro 5 31", "Webots Gyro", "imugyro");
-    addState("imugyroX 5 5",  "Webots", "X");
-    addState("imugyroY 5 5",  "Webots", "Y");
-    addState("imugyroZ 5 5",  "Webots", "Z");
+    addState("imugyroX 5 5",  "Webots", "X", sample);
+    addState("imugyroY 5 5",  "Webots", "Y", sample);
+    addState("imugyroZ 5 5",  "Webots", "Z", sample);
 
     linkPD("wbPcol", "dIMUGyro");
     linkDS("dIMUGyro", "imugyroX");
@@ -60,40 +65,40 @@ program main {
     linkDS("dIMUGyro", "imugyroZ");
 
     addDevice("dRFootForce 5 31", "Webots Force", "RFoot");
-    addState("rffX 5 5",  "Webots", "X");
-    addState("rffY 5 5",  "Webots", "Y");
-    addState("rffZ 5 5",  "Webots", "Z");
+    addState("rffX 5 5",  "Webots", "X", sample);
+    addState("rffY 5 5",  "Webots", "Y", sample);
+    addState("rffZ 5 5",  "Webots", "Z", sample);
     linkPD("wbPcol", "dRFootForce");
     linkDS("dRFootForce", "rffX");
     linkDS("dRFootForce", "rffY");
     linkDS("dRFootForce", "rffZ");
 
     addDevice("dLFootForce 5 31", "Webots Force", "LFoot");
-    addState("lffX 5 5",  "Webots", "X");
-    addState("lffY 5 5",  "Webots", "Y");
-    addState("lffZ 5 5",  "Webots", "Z");
+    addState("lffX 5 5",  "Webots", "X", sample);
+    addState("lffY 5 5",  "Webots", "Y", sample);
+    addState("lffZ 5 5",  "Webots", "Z", sample);
     linkPD("wbPcol", "dLFootForce");
     linkDS("dLFootForce", "lffX");
     linkDS("dLFootForce", "lffY");
     linkDS("dLFootForce", "lffZ");
 
-    addState("HY 5 31",  "Webots", "Joint");
-    addState("LSP 5 31", "Webots", "Joint");
-    addState("LSR 5 31", "Webots", "Joint");
-    addState("RSP 5 31", "Webots", "Joint");
-    addState("RSR 5 31", "Webots", "Joint");
-    addState("LHY 5 31", "Webots", "Joint");
-    addState("LHR 5 31", "Webots", "Joint");
-    addState("LHP 5 31", "Webots", "Joint");
-    addState("LKP 5 31", "Webots", "Joint");
-    addState("LAP 5 31", "Webots", "Joint");
-    addState("LAR 5 31", "Webots", "Joint");
-    addState("RHY 5 31", "Webots", "Joint");
-    addState("RHR 5 31", "Webots", "Joint");
-    addState("RHP 5 31", "Webots", "Joint");
-    addState("RKP 5 31", "Webots", "Joint");
-    addState("RAP 5 31", "Webots", "Joint");
-    addState("RAR 5 31", "Webots", "Joint");
+    addState("HY 5 31",  "Webots", "Joint", sample);
+    addState("LSP 5 31", "Webots", "Joint", sample);
+    addState("LSR 5 31", "Webots", "Joint", sample);
+    addState("RSP 5 31", "Webots", "Joint", sample);
+    addState("RSR 5 31", "Webots", "Joint", sample);
+    addState("LHY 5 31", "Webots", "Joint", sample);
+    addState("LHR 5 31", "Webots", "Joint", sample);
+    addState("LHP 5 31", "Webots", "Joint", sample);
+    addState("LKP 5 31", "Webots", "Joint", sample);
+    addState("LAP 5 31", "Webots", "Joint", sample);
+    addState("LAR 5 31", "Webots", "Joint", sample);
+    addState("RHY 5 31", "Webots", "Joint", sample);
+    addState("RHR 5 31", "Webots", "Joint", sample);
+    addState("RHP 5 31", "Webots", "Joint", sample);
+    addState("RKP 5 31", "Webots", "Joint", sample);
+    addState("RAP 5 31", "Webots", "Joint", sample);
+    addState("RAR 5 31", "Webots", "Joint", sample);
 
     linkDS("dHY",  "HY"); linkPD("wbPcol", "dHY");
     linkPD("wbPcol", "dLSP"); linkDS("dLSP", "LSP");
@@ -131,8 +136,21 @@ program main {
     linkSC("RAP", "wbctrl");
     linkSC("RAR", "wbctrl");
 
-    linkHC("wbHW", "wbNull");
-    linkHP("wbHW", "wbPcol");
+    linkSC("centerX", "wbctrl");
+    linkSC("centerY", "wbctrl");
+    linkSC("centerZ", "wbctrl");
+    linkSC("imuaccX", "wbctrl");
+    linkSC("imuaccY", "wbctrl");
+    linkSC("imuaccZ", "wbctrl");
+    linkSC("imugyroX", "wbctrl");
+    linkSC("imugyroY", "wbctrl");
+    linkSC("imugyroZ", "wbctrl");
+    linkSC("rffX", "wbctrl");
+    linkSC("rffY", "wbctrl");
+    linkSC("rffZ", "wbctrl");
+    linkSC("lffX", "wbctrl");
+    linkSC("lffY", "wbctrl");
+    linkSC("lffZ", "wbctrl");
 
     addLogger("flog 10 5", "File", "tfile.txt");
     

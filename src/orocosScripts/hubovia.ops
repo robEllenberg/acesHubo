@@ -6,7 +6,7 @@ program main {
     addDevice("dRSP 20 50", "Hubo", "30 0.0 1");
 
     //Add states, each represents 1 property of the device
-    addState("RSP 10 50", "Hubo", "-3.14 3.14");
+    addState("RSP 10 50", "Hubo", "-3.14 3.14", false);
 
     //Tell the states and devices to pay attention to each other
     linkDS("dRSP", "RSP");

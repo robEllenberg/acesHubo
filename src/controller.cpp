@@ -15,6 +15,10 @@ namespace ACES{
         this->addOperation("sendCtrl", &Controller::sendCtrl, this,
                            RTT::OwnThread)
                            .doc("Send the accumulated controls");
+        this->addOperation("checkCtrl", &Controller::checkCtrl, this,
+                           RTT::OwnThread)
+                           .doc("Check a control on the stack")
+                           .arg("control", "Control to check");
         this->addOperation("getSurface", &Controller::getSurface, this,
                            RTT::OwnThread).doc("Grab the value of a state")
                            .arg("state", "State to grab value from")
@@ -42,13 +46,35 @@ namespace ACES{
 
     float Controller::getSurface(std::string state, std::string attr){
         RTT::TaskContext* t = (TaskContext*)(getPeer(state));
+        if(not t){
+            return 0;
+        }
+        //TODO - We need to account for the case where this lookup fails
         RTT::Attribute<float> a =
             t->attributes()->getAttribute(attr);
+
         return a.get();
     }
 
     void Controller::updateHook(){
-        txDownStream.write(getStateVector());
+        if(getStateVector()){
+            modStateVector();
+            txDownStream.write(curMap);
+            curMap = NULL;
+        }
+    }
+
+    float Controller::checkCtrl(std::string ctrl){
+        std::map<std::string, void*>::iterator it = curMap->find(ctrl);
+        if(it != curMap->end()){
+            float* f = (float*)(*it).second;
+            return *f;
+        }
+        return 0.0;
+    }
+
+    bool Controller::modStateVector(){
+        return false;
     }
 
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
@@ -79,12 +105,11 @@ namespace ACES{
             case WB_CTRL_STEP:
                 //Fall through here is intentional
             case WB_CTRL_RUN:
-                 //delete stateVect;
-                std::map<std::string, void*>* sv;
-                sv = getStateVector();
-                txDownStream.write(sv);
-                
-                //delete sv;       
+                if( getStateVector() ){
+                    modStateVector();
+                    txDownStream.write(curMap);
+                    curMap = NULL;
+                }
                 if(simState == WB_CTRL_STEP){
                     simState = WB_CTRL_HALT;
                 }
@@ -122,33 +147,21 @@ namespace ACES{
       : Controller(cfg, args)
     {}
 
-    void NullCtrl::updateHook()
-    {
-        std::map<std::string, void*>* sv;
-        sv = getStateVector();
-        txDownStream.write(sv);
-    }
-
-    std::map<std::string, void*>*
-      NullCtrl::getStateVector(bool echo)
-    {
-        std::map<std::string, void*> *sv =
-            new std::map<std::string, void*>;
-        return sv; 
+    bool NullCtrl::getStateVector(bool echo){
+        curMap = new std::map<std::string, void*>;
+        return true; 
     }
 
     LegCtrl::LegCtrl(std::string cfg, std::string args)
       : ScriptCtrl(cfg, args)
     {}
 
-    std::map<std::string, void*>*
-      LegCtrl::getStateVector(bool echo)
+    bool LegCtrl::getStateVector(bool echo)
     {
         //The state vector is a lookup table by the name of the joint
-        std::map<std::string, void*> *sv =
-            new std::map<std::string, void*>;
 
         std::vector<float> angles;      //Temp container
+        curMap = new std::map<std::string, void*>;
         //Fill w/the script info if we have data left, 
         //otherwise zero fill the vector
         if(not walkScript.eof()){
@@ -172,7 +185,7 @@ namespace ACES{
             }
             //Issue an empty vector if we don't want to do anything
             //(picked up by HW to advance timestep in sim)
-            return sv;
+            return true;
         }
         if(echo){
             RTT::Logger::log() << RTT::endlog();
@@ -183,36 +196,33 @@ namespace ACES{
         walkScript.getline(a, 1000);
 
         //Populate the state vector
-        (*sv)["HY"] = new float(angles[0]);
-        (*sv)["LHY"] = new float(angles[1]);
-        (*sv)["LHR"] = new float(angles[2]);
-        (*sv)["LHP"] = new float(angles[3]);
-        (*sv)["LKP"] = new float(angles[4]);
-        (*sv)["LAP"] = new float(angles[5]);
-        (*sv)["LAR"] = new float(angles[6]);
-        (*sv)["RHY"] = new float(angles[7]);
-        (*sv)["RHR"] = new float(angles[8]);
-        (*sv)["RHP"] = new float(angles[9]);
-        (*sv)["RKP"] = new float(angles[10]);
-        (*sv)["RAP"] = new float(angles[11]);
-        (*sv)["RAR"] = new float(angles[12]);
-        //(*sv)["RSP"] = new float(1.2);
+        (*curMap)["HY"] = new float(angles[0]);
+        (*curMap)["LHY"] = new float(angles[1]);
+        (*curMap)["LHR"] = new float(angles[2]);
+        (*curMap)["LHP"] = new float(angles[3]);
+        (*curMap)["LKP"] = new float(angles[4]);
+        (*curMap)["LAP"] = new float(angles[5]);
+        (*curMap)["LAR"] = new float(angles[6]);
+        (*curMap)["RHY"] = new float(angles[7]);
+        (*curMap)["RHR"] = new float(angles[8]);
+        (*curMap)["RHP"] = new float(angles[9]);
+        (*curMap)["RKP"] = new float(angles[10]);
+        (*curMap)["RAP"] = new float(angles[11]);
+        (*curMap)["RAR"] = new float(angles[12]);
+        //(*curMap)["RSP"] = new float(1.2);
  
-        return sv;
+        return true;
     }
 
     ArmCtrl::ArmCtrl(std::string cfg, std::string args)
       : ScriptCtrl(cfg, args)
     {}
 
-    std::map<std::string, void*>*
-      ArmCtrl::getStateVector(bool echo)
+    bool ArmCtrl::getStateVector(bool echo)
     {
         //The state vector is a lookup table by the name of the joint
-        std::map<std::string, void*> *sv =
-            new std::map<std::string, void*>;
-
         std::vector<float> angles;      //Temp container
+        curMap = new std::map<std::string, void*>;
         //Fill w/the script info if we have data left, 
         //otherwise zero fill the vector
         if(not walkScript.eof()){
@@ -228,7 +238,7 @@ namespace ACES{
                }
             }
         }else{
-           return sv;
+           return true;
         }
         if(echo){
             RTT::Logger::log() << RTT::endlog();
@@ -239,10 +249,10 @@ namespace ACES{
         walkScript.getline(a, 1000);
 
         //Populate the state vector
-        (*sv)["RSP"] = new float(angles[0]);
-        (*sv)["LSP"] = new float(angles[1]);
+        (*curMap)["RSP"] = new float(angles[0]);
+        (*curMap)["LSP"] = new float(angles[1]);
 
-        return sv;
+        return true;
     }
 
     PID::PID(std::string config, std::string args)
@@ -258,15 +268,15 @@ namespace ACES{
         addAttribute("Output", outputSurface);
     }
 
-    std::map<std::string, void*>* PID::getStateVector(bool echo){
-        std::map<std::string, void*> *sv = new std::map<std::string, void*>;
+    bool PID::getStateVector(bool echo){
+        curMap = new std::map<std::string, void*>;
         float p = getSurface(inputSurface, "value");
         float i = getSurface(inputSurface, "integral");
         float d = getSurface(inputSurface, "diff");
         val = Kp*p + Ki*i + Kd*d;
 
-        (*sv)[outputSurface] = (void*) new float(val);
-        return sv;
+        (*curMap)[outputSurface] = (void*) new float(val);
+        return true;
     }
 
     UserProg::UserProg(std::string config, std::string args)
@@ -282,8 +292,8 @@ namespace ACES{
         return true;
     }
 
-    std::map<std::string, void*>* UserProg::getStateVector(bool echo){
-        return new std::map<std::string, void*>; 
+    bool UserProg::getStateVector(bool echo){
+        return false;
     }
 
     UserSM::UserSM(std::string config, std::string args)
@@ -294,8 +304,8 @@ namespace ACES{
         getProvider<RTT::Scripting>("scripting")->loadStateMachines(filename);
     }
 
-    std::map<std::string, void*>* UserSM::getStateVector(bool echo){
-        return new std::map<std::string, void*>; 
+    bool UserSM::getStateVector(bool echo){
+        return false;
     }
 
     bool UserSM::startHook(){
@@ -303,6 +313,19 @@ namespace ACES{
                                    activateStateMachine(progname);
         getProvider<RTT::Scripting>("scripting")->
                                    startStateMachine(progname);
+        return true;
+    }
+
+    YJCtrl::YJCtrl(std::string config, std::string args)
+     : LegCtrl(config, args){}
+
+    bool YJCtrl::modStateVector(){
+        float rap = checkCtrl("RAP");
+        float RftX = getSurface("rffX", "value");
+        float RftY = getSurface("rffY", "value");
+        float RftZ = getSurface("rffZ", "value");
+        float temp = rap*1.0/3.0*(RftX+RftY+RftZ);
+        addCtrl("RSP", temp);
         return true;
     }
 }

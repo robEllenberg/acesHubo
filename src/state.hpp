@@ -27,7 +27,7 @@ namespace ACES {
                        public RTT::TaskContext
     {
         public:
-            ProtoState(std::string config, int nID) ;
+            ProtoState(std::string config, int nID, bool sampling) ;
             virtual std::string logVal() = 0;
             int nodeID;
             bool samplingAttr;
@@ -72,7 +72,7 @@ namespace ACES {
     class State : public ProtoState
     {
         public:
-            State(std::string config, int nID);
+            State(std::string config, int nID, bool sampling);
 
             virtual void updateHook();  
             virtual void sample();

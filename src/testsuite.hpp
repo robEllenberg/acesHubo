@@ -33,7 +33,7 @@ namespace TestSuite{
 
     class Spinner : public ACES::State<float>{
         public:
-            Spinner(std::string cfg, std::string args);
+            Spinner(std::string cfg, std::string args, bool sampling);
             virtual void sample();
             //virtual void updateHook();
             float amp, dc;

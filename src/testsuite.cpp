@@ -18,8 +18,8 @@ namespace TestSuite{
       : ACES::Protocol<HW,P>(cfg, args)
     { }
 
-    Spinner::Spinner(std::string cfg, std::string args)
-     : ACES::State<float>(cfg, 1){
+    Spinner::Spinner(std::string cfg, std::string args, bool sampling)
+     : ACES::State<float>(cfg, 1, sampling){
         std::istringstream s1(args, std::istringstream::in);
         float high, low, amp, dc;
         s1 >> low >> high;

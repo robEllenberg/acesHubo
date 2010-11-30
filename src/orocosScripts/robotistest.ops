@@ -1,40 +1,39 @@
 program main{
-    d->addHardware("hw 90 100","Robotis","");
-    d->addProtocol("pro 80 100", "Robotis", "");
-    d->linkHP("hw", "pro");
+    addHardware("hw 1 500","Robotis","/dev/ttyUSB0");
+    addProtocol("pro 2 500", "Robotis", "");
+    linkHP("hw", "pro");
 
     //Create devices, representing physical nodes on the bus
-    d->addDevice("dX 20 50", "Robotis", "2 0.0 1.0");
-    d->addDevice("dY 20 50", "Robotis", "3 0.0 1.0");
-    d->addDevice("dZ 20 50", "Robotis", "58 0.0 1.0");
+    addDevice("dX 3 250", "Robotis", "2 0.0 1.0");
+    addDevice("dY 3 250", "Robotis", "3 0.0 1.0");
+    addDevice("dZ 3 250", "Robotis", "58 0.0 1.0");
 
     //Add states, each represents 1 property of the device
-    d->addState("X 10 50", "Robotis", "");
-    d->addState("Y 10 50", "Robotis", "");
-    d->addState("Z 10 50", "Robotis", "");
+    addState("X 5 10", "Robotis", "", false);
+    addState("Y 5 10", "Robotis", "", false);
+    addState("Z 5 10", "Robotis", "", false);
 
     //Tell the states and devices to pay attention to each other
-    d->linkDS("dX", "X");
-    d->linkDS("dY", "Y");
-    d->linkDS("dZ", "Z");
+    linkDS("dX", "X");
+    linkDS("dY", "Y");
+    linkDS("dZ", "Z");
 
     //Tell the devices & protocol to pay attention to each other 
-    d->linkPD("tsPro", "dX");
-    d->linkPD("tsPro", "dY");
-    d->linkPD("tsPro", "dZ");
+    linkPD("pro", "dX");
+    linkPD("pro", "dY");
+    linkPD("pro", "dZ");
 
     //Setup Logging
-    d->addLogger("log1 5 200", "File", "testlog.txt");
-    d->linkLS("log1", "X");
-    d->linkLS("log1", "Y");
-    d->linkLS("log1", "Z");
+    addLogger("log1 10 200", "File", "testlog.txt");
+    linkLS("log1", "X", "value");
+    linkLS("log1", "Y", "value");
+    linkLS("log1", "Z", "value");
     
     //Start the threads
-    d->start();
-    d->startHW();
-    d->startProtocol();
-    d->startDevice();
-    d->startState();
-    d->startController();
-    d->startLogger();
+    startHW();
+    startProtocol();
+    startDevice();
+    startState();
+    startController();
+    startLogger();
 }

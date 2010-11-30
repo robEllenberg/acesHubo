@@ -29,46 +29,31 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-# Create custom command for flex/lex (note the outputs)
-  ADD_CUSTOM_COMMAND(
-    SOURCE ${PROJECT_SOURCE_DIR}/src/robotis.l
-    COMMAND /usr/bin/flex 
-    ARGS --outfile=${PROJECT_SOURCE_DIR}/robotis.yy.cpp
-        --header-file=robotis.yy.h
-        ${PROJECT_SOURCE_DIR}/src/robotis.l
-    TARGET RobotisParser
-    OUTPUTS ${PROJECT_SOURCE_DIR}/robotis.yy.cpp)
-  SET_SOURCE_FILES_PROPERTIES(${PROJECT_SOURCE_DIR}/robotis.yy.cpp GENERATED)
-  #Create target for the parser
-  ADD_CUSTOM_TARGET(RobotisParser echo "Creating Robotis Parser")
+include_directories("/usr/local/webots/include/controller/c")
+link_directories("/usr/local/webots/lib")
 
 rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/credentials.cpp src/state.cpp
                      src/device.cpp src/protocol.cpp
                      src/hardware.cpp src/controller.cpp src/logger.cpp)
 
-#include_directories("/usr/local/webots/include/controller/c")
-#link_directories("/usr/local/webots/lib")
-
-#add_subdirectory(webots)
-#add_subdirectory(robotis)
+add_subdirectory(robotis)
+add_subdirectory(ik)
                     
 add_definitions(-DTESTSUITE)
-#add_definitions(-DROBOTIS)
+add_definitions(-DROBOTIS)
 add_definitions(-DHUBO)
 add_definitions(-DWEBOTS)
 
 rosbuild_add_library(aces-dispatcher src/dispatcher.cpp)
 target_link_libraries(aces-dispatcher aces-testsuite)
 target_link_libraries(aces-dispatcher aces-robotis)
-#target_link_libraries(aces-dispatcher aces-webots)
+target_link_libraries(aces-dispatcher aces-webots)
 
 rosbuild_add_library(aces-testsuite ../src/testsuite.cpp)
 rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
                                ../src/hubo/huboTxPacket.cpp)
 
-include_directories("/usr/local/webots/include/controller/c")
-link_directories("/usr/local/webots/lib")
 rosbuild_add_library(aces-webots ../src/webots.cpp)
 target_link_libraries(aces-webots Controller)
 
@@ -78,5 +63,5 @@ target_link_libraries(aces-launcher aces-dispatcher)
 target_link_libraries(aces-launcher aces-testsuite)
 target_link_libraries(aces-launcher aces-hubo)
 target_link_libraries(aces-launcher aces-webots)
-#target_link_libraries(aces-launcher aces-robotis)
+target_link_libraries(aces-launcher aces-robotis)
 target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)

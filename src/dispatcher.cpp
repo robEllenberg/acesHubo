@@ -22,7 +22,8 @@ namespace ACES{
                            RTT::OwnThread).doc("add new State")
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")        
-                           .arg("args", "arguments specific to the type");
+                           .arg("args", "arguments specific to the type")
+                           .arg("sampling", "Should the state default-sample");
 
         this->addOperation("addController", &Dispatcher::addController,
                            this, RTT::OwnThread).doc("add new Controller")
@@ -40,6 +41,11 @@ namespace ACES{
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")
                            .arg("args", "arguments specific to the type");
+
+        this->addOperation("startDebug", &Dispatcher::startDebug, this,
+                           RTT::OwnThread).doc("Start debugging statements");
+        this->addOperation("stopDebug", &Dispatcher::stopDebug, this,
+                           RTT::OwnThread).doc("Stop debugging statements");
 
         this->addOperation("startHW", &Dispatcher::startHW, this,
                            RTT::OwnThread).doc("Start Hardware");
@@ -211,29 +217,29 @@ namespace ACES{
     }
 
     bool Dispatcher::addState(std::string cfg, std::string type,
-                              std::string args)
+                              std::string args, bool sampling)
     {
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
         #ifdef HUBO 
         if ( type == "Hubo"){
-            s = (ProtoState*) new TestSuite::Spinner(cfg, args);
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling);
         } 
         #endif
         #ifdef WEBOTS
         if( type == "Webots") {
             if ( args == "Joint" ){
-                s = (ProtoState*) new ACES::State<float>(cfg, JOINT);
+                s = (ProtoState*) new ACES::State<float>(cfg, JOINT, sampling);
             }
             if ( args == "X" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, X);
+                s = (ProtoState*) new ACES::State<float>(cfg, X, sampling);
             }
             if ( args == "Y" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, Y);
+                s = (ProtoState*) new ACES::State<float>(cfg, Y, sampling);
             }
             if ( args == "Z" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, Z);
+                s = (ProtoState*) new ACES::State<float>(cfg, Z, sampling);
             }
             //((State<float>*)s)->printme();
         }
@@ -242,13 +248,14 @@ namespace ACES{
         #ifdef ROBOTIS 
         if ( type == "Robotis"){
             s = (ProtoState*) new ACES::State<float>(cfg,
-                                                (int)Robotis::GOAL_POSITION);
+                                                (int)Robotis::GOAL_POSITION,
+                                                sampling);
         } 
         #endif
 
         #ifdef TESTSUITE
         if( type == "TestSuite") {
-            s = (ProtoState*) new TestSuite::Spinner(cfg, args);
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling);
         }
         #endif
 		
@@ -290,6 +297,9 @@ namespace ACES{
             }
             if (t2 == "Arm"){
                 ctrl = (Controller*) new ArmCtrl(cfg, args);
+            }
+            if (t2 == "Youngbum"){
+                ctrl = (Controller*) new YJCtrl(cfg, args);
             }
         } 
         #endif
@@ -400,6 +410,16 @@ namespace ACES{
             return ((Logger*)l)->addTrack((ProtoState*)s, attr);
         }
         return false;
+    }
+
+    bool Dispatcher::startDebug(){
+        RTT::Logger::Instance()->setLogLevel(RTT::Logger::Debug);
+        return true;
+    }
+
+    bool Dispatcher::stopDebug(){
+        RTT::Logger::Instance()->setLogLevel(RTT::Logger::Info);
+        return true;
     }
 
     bool Dispatcher::startHW(){

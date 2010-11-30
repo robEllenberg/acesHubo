@@ -86,8 +86,8 @@ namespace ACES{
     }
 
     template <class T>
-    State<T>::State(std::string cfg, int nID) :
-      ProtoState(cfg, nID),
+    State<T>::State(std::string cfg, int nID, bool sampling) :
+      ProtoState(cfg, nID, sampling),
       hist(10),
       value(0)
     {

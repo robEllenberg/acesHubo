@@ -40,13 +40,16 @@ namespace ACES{
             bool addProtocol(std::string cfg, std::string type,
                              std::string args);
             bool addState(std::string cfg, std::string type,
-                          std::string args);
+                          std::string args, bool sampling);
             bool addController(std::string cfg, std::string type,
                                std::string args);
             bool addDevice(std::string cfg, std::string type,
                            std::string args);
             bool addLogger(std::string cfg, std::string type,
                            std::string args);
+
+            bool startDebug();
+            bool stopDebug();
 
             bool startHW();
             bool startProtocol();

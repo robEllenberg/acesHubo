@@ -1,3 +1,4 @@
+# Create custom command for flex/lex (note the outputs)
   ADD_CUSTOM_COMMAND(
     SOURCE ${PROJECT_SOURCE_DIR}/src/robotis.l
     COMMAND /usr/bin/flex 
@@ -10,14 +11,5 @@
   #Create target for the parser
   ADD_CUSTOM_TARGET(RobotisParser echo "Creating Robotis Parser")
 
-rosbuild_add_library(aces-robotis ../src/robotis.cpp)
-
-rosbuild_add_executable(robotis src/test/robotistest.cpp)
-target_link_libraries(robotis aces-common)
-target_link_libraries(robotis aces-dispatcher)
-target_link_libraries(robotis aces-testsuite)
-target_link_libraries(robotis aces-webots)
-target_link_libraries(robotis aces-robotis)
-target_link_libraries(robotis orocos-taskbrowser-gnulinux)
-
-
+rosbuild_add_library(aces-robotis ../src/robotis.cpp
+                                  ../robotis.yy.cpp)

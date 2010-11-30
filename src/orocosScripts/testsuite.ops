@@ -9,9 +9,9 @@ program main {
     addDevice("dZ 20 500", "TestSuite", "3"); 
 
     //Add states, each represents 1 property of the device
-    addState("X 10 50", "TestSuite", "-1.0 1.0"); 
-    addState("Y 10 50", "TestSuite", "3.0 4.0"); 
-    addState("Z 10 50", "TestSuite", "5.0 6.0"); 
+    addState("X 10 50", "TestSuite", "-1.0 1.0", true); 
+    addState("Y 10 50", "TestSuite", "3.0 4.0", true); 
+    addState("Z 10 50", "TestSuite", "5.0 6.0", true); 
 
     //Tell the states and devices to pay attention to each other
     linkDS("dX", "X"); 

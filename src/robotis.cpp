@@ -254,7 +254,7 @@ namespace Robotis {
 
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args),
-       triggerDS(false)
+       triggerDS(true)
     {
         this->addAttribute("triggerDS", triggerDS);
     }
