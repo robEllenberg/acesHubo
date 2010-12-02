@@ -11,7 +11,7 @@ namespace ACES {
 
         this->ports()->addPort("TxUS", txUpStream).doc(
                                "UpStream (to Protocol) Transmission");
-        this->ports()->addEventPort("RxDS", rxDownStream).doc(
+        this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from Protocol) Reception");
 
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name ) );

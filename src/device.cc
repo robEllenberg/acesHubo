@@ -9,9 +9,9 @@ namespace ACES{
                                  "Interperted data going to states");*/
         this->addOperation("credentials", &Device<S,PD>::printCred, this,
                            RTT::OwnThread).doc("Print the Credentials");
-        this->ports()->addEventPort("RxDS", rxDownStream).doc(
+        this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from State) Reception");
-        this->ports()->addEventPort("RxUS", rxUpStream).doc(
+        this->ports()->addPort("RxUS", rxUpStream).doc(
                                "UpStream (from Protocol) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Protocol) Transmission");

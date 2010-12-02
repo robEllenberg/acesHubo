@@ -106,7 +106,7 @@ namespace ACES{
         this->addAttribute("integral", integral);
         this->addAttribute("diff", diff);
 
-        this->ports()->addEventPort("RxDS", rxDownStream).doc(
+        this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
         this->ports()->addPort("RxUS", rxUpStream).doc(
                                "UpStream (from Device) Reception");
