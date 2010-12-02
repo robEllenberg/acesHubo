@@ -130,14 +130,15 @@ namespace Robotis {
         public:
             bool addPacket(RobotisPacket p);
             std::vector<ACES::Message<unsigned char>*> renderAllMessages();
-            ACES::Message<unsigned char>*
-              renderMessageFromQueue(PARAM_TABLE param);
+            //ACES::Message<unsigned char>*
+            //  renderMessageFromQueue(PARAM_TABLE param);
             ACES::Message<unsigned char>*
               renderMessageFromPackets(std::map<unsigned char,
                                                 RobotisPacket>& p);
         private:
             std::map<PARAM_TABLE, 
                      std::map<unsigned char, RobotisPacket> > queue;
+            RTT::os::Mutex qGuard;
     };
 
     class Reader : public RTT::base::RunnableInterface {

@@ -75,6 +75,7 @@ namespace Robotis {
     bool RobotisQueue::addPacket(RobotisPacket p){
         PARAM_TABLE parameter = (PARAM_TABLE)(p.parameters->operator[](0) );
         int motorID = p.getID();
+        RTT::os::MutexLock lock(qGuard);
         queue[parameter][motorID] = p;
         return true;
     }
@@ -83,6 +84,7 @@ namespace Robotis {
       RobotisQueue::renderAllMessages()
     {
         std::vector<ACES::Message<unsigned char>*> v;
+        RTT::os::MutexLock lock(qGuard);
         for(std::map<PARAM_TABLE, std::map<unsigned char, RobotisPacket> >
             ::iterator it = queue.begin(); it != queue.end(); it++)
         {
@@ -92,6 +94,7 @@ namespace Robotis {
         return v;
     }
 
+/*
     ACES::Message<unsigned char>* RobotisQueue::renderMessageFromQueue(
                                                 PARAM_TABLE param)
     {
@@ -102,7 +105,7 @@ namespace Robotis {
         }
         return NULL;
     }
-
+*/
     ACES::Message<unsigned char>* RobotisQueue::renderMessageFromPackets(
                                     std::map<unsigned char, RobotisPacket>& p)
     {
