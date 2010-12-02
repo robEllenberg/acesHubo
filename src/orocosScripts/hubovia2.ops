@@ -1,4 +1,6 @@
 program main {
+    var bool sampling = false;
+
     addHardware("hw 90 100","Hubo","");
     addProtocol("pro 80 100", "Hubo", "");
     linkHP("hw", "pro");
@@ -18,18 +20,18 @@ program main {
     addDevice("dLWY 20 50", "Hubo", "3 0.0 1");
 
     //Add states, each represents 1 property of the device
-    addState("RSP 10 50", "Hubo", "-3.14 3.14");
-    addState("RSR 10 50", "Hubo", "-3.14 3.14");
-    addState("RSY 10 50", "Hubo", "-3.14 3.14");
-    addState("LSP 10 50", "Hubo", "-3.14 3.14");
-    addState("LSR 10 50", "Hubo", "-3.14 3.14");
-    addState("LSY 10 50", "Hubo", "-3.14 3.14");
+    addState("RSP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("RSR 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling);
 
-    addState("REP 10 50", "Hubo", "-3.14 3.14");
-    addState("LEP 10 50", "Hubo", "-3.14 3.14");
+    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling);
 
-    addState("RWY 10 50", "Hubo", "-3.14 3.14");
-    addState("LWY 10 50", "Hubo", "-3.14 3.14");
+    addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling);
 
     //Tell the states and devices to pay attention to each other
     linkDS("dRSP", "RSP");
@@ -61,8 +63,8 @@ program main {
 
     //Setup Logging
     addLogger("log1 5 200", "File", "testlog.txt");
-    linkLS("log1", "RSP");
-    linkLS("log1", "LSP");
+    linkLS("log1", "RSP", "value");
+    linkLS("log1", "LSP", "value");
     
     /* END CONFIG SECTION */
 
