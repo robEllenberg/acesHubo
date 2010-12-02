@@ -1,34 +1,35 @@
 program main {
     var bool sample = false;
 
-    addHardware("hw 1 500", "Robotis", "/dev/ttyUSB0");
+    addHardware("hw 1 1000", "Robotis", "/dev/ttyUSB0");
     addProtocol("pcol 2 500", "Robotis", "");
 
     linkHP("hw", "pcol");
 
    //***Pick one of these controllers
    //addController("miniCtrl 10 15", "Mini Leg", "walkscripts/IKscript1.txt");
-   addController("miniCtrl 10 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
+   //addController("miniCtrl 10 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
 
-    //addDevice("dLSP 5 31", "Robotis", "55   150.0   1.0");
-    //addDevice("dLSR 5 31", "Robotis", "67   150.0   1.0");
-    //addDevice("dRSP 5 31", "Robotis", "54   150.0   1.0");
-    //addDevice("dRSR 5 31", "Robotis", "68   150.0   1.0");
+    //addDevice("dLSP 5 31", "Robotis", "55   0.0   1.0");
+    //addDevice("dLSR 5 31", "Robotis", "67   0.0   1.0");
+    //addDevice("dRSP 5 31", "Robotis", "54   0.0   1.0");
+    //addDevice("dRSR 5 31", "Robotis", "68   0.0   1.0");
     //REY - 59, RER - 61, LEY - 57, LER - 65
-    addDevice("dHY  5 31", "Robotis", "64   150.0   1.0");
-    addDevice("dLHY 5 31", "Robotis", "47   150.0   1.0");
-    addDevice("dLHR 5 31", "Robotis", "44   150.0   1.0");
-    addDevice("dLHP 5 31", "Robotis", "42   150.0   1.0");
-    addDevice("dLKP 5 31", "Robotis", "45   150.0   1.0");
+    //addDevice("dHY  5 31", "Robotis", "64   0.0   1.0");
+    addDevice("dLHY 5 31", "Robotis", "47   148.0   1.0");
+    addDevice("dLHR 5 31", "Robotis", "44   148.0   1.0");
+    addDevice("dLHP 5 31", "Robotis", "42   146.0   1.0");
+    addDevice("dLKP 5 31", "Robotis", "45   230.0   1.0");
     addDevice("dLAP 5 31", "Robotis", "41   150.0   1.0");
-    addDevice("dLAR 5 31", "Robotis", "43   150.0   1.0");
-    addDevice("dRHY 5 31", "Robotis", "48   150.0   1.0");
-    addDevice("dRHR 5 31", "Robotis", "51   150.0   1.0");
-    addDevice("dRHP 5 31", "Robotis", "49   150.0   1.0");
-    addDevice("dRKP 5 31", "Robotis", "52   150.0   1.0");
-    addDevice("dRAP 5 31", "Robotis", "40   150.0   1.0");
+    addDevice("dLAR 5 31", "Robotis", "43   151.0   1.0");
+    addDevice("dRHY 5 31", "Robotis", "48   148.0   1.0");
+    addDevice("dRHR 5 31", "Robotis", "51   148.0   1.0");
+    addDevice("dRHP 5 31", "Robotis", "49   151.0   -1.0");
+    addDevice("dRKP 5 31", "Robotis", "52   240.0   1.0");
+    addDevice("dRAP 5 31", "Robotis", "40   151.0   1.0");
     addDevice("dRAR 5 31", "Robotis", "46   150.0   1.0");
 
+/*
     addState("HY 5 31",  "Robotis", "Joint", sample);
     addState("LSP 5 31", "Robotis", "Joint", sample);
     addState("LSR 5 31", "Robotis", "Joint", sample);
@@ -46,7 +47,27 @@ program main {
     addState("RKP 5 31", "Robotis", "Joint", sample);
     addState("RAP 5 31", "Robotis", "Joint", sample);
     addState("RAR 5 31", "Robotis", "Joint", sample);
+*/
 
+    //addState("HY 5 31", "TestSuite", "-3 3", true); 
+    //addState("LSP 5 31", "TestSuite", "-3 3", true); 
+    //addState("LSR 5 31", "TestSuite", "-3 3", true); 
+    //addState("RSP 5 31", "TestSuite", "-3 3", true); 
+    //addState("RSR 5 31", "TestSuite", "-3 3", true); 
+    addState("LHY 5 50", "TestSuite", "-10 10", true); 
+    addState("RHY 5 50", "TestSuite", "-10 10", true); 
+    addState("LAP 5 50", "TestSuite", "-20 20", true); 
+    addState("RAP 5 50", "TestSuite", "-20 20", true); 
+    addState("LKP 5 50", "TestSuite", "-50 0", true); 
+    addState("RKP 5 50", "TestSuite", "-50 0", true); 
+    addState("LAR 5 50", "TestSuite", "-20 20", true); 
+    addState("RAR 5 50", "TestSuite", "-20 20", true); 
+    addState("RHP 5 50", "TestSuite", "-50 50", true); 
+    addState("LHP 5 50", "TestSuite", "-50 50", true);
+/*
+    addState("LHR 5 31", "TestSuite", "-3 3", true); 
+    addState("RHR 5 31", "TestSuite", "-3 3", true); 
+*/
     linkPD("pcol", "dHY"); linkDS("dHY",  "HY");
     //linkPD("pcol", "dLSP"); linkDS("dLSP", "LSP");
     //linkPD("pcol", "dLSR"); linkDS("dLSR", "LSR");
