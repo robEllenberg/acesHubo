@@ -17,3 +17,9 @@ export WEBOTS_STDIN=1
 
 MATLABPATH=$ACES_ROOT/utils:$MATLABPATH
 export MATLABPATH
+
+stty -F /dev/ttyUSB0 raw
+stty -F /dev/ttyUSB0 1000000
+stty -F /dev/ttyUSB1 raw
+stty -F /dev/ttyUSB1 1000000
+

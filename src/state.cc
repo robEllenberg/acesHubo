@@ -185,6 +185,9 @@ namespace ACES{
                            << RTT::endlog();
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
         txDownStream.write(w);
+        if(not samplingAttr){
+            value = sp;
+        }
     }
 
     template <class T>
@@ -240,8 +243,9 @@ namespace ACES{
         if(mypair != p->end() ){
             void* pval = (*mypair).second;
             T val = *((T*)pval);
-            Word<T>* w = new Word<T>(val, nodeID, 0, SET);
-            return w; 
+            go(val);
+            //Word<T>* w = new Word<T>(val, nodeID, 0, SET);
+            //return w; 
         }
         return NULL;
     }

@@ -1,17 +1,20 @@
 program main{
-    addHardware("hw 1 500","Robotis","/dev/ttyUSB0");
-    addProtocol("pro 2 500", "Robotis", "");
+    addHardware("hw 1 1000","Robotis","/dev/ttyUSB0");
+    addProtocol("pro 2 100", "Robotis", "");
     linkHP("hw", "pro");
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dX 3 250", "Robotis", "2 0.0 1.0");
-    addDevice("dY 3 250", "Robotis", "3 0.0 1.0");
-    addDevice("dZ 3 250", "Robotis", "58 0.0 1.0");
+    addDevice("dX 3 250", "Robotis", "2 150.0 1.0");
+    addDevice("dY 3 250", "Robotis", "3 150.0 -1.0");
+    addDevice("dZ 3 250", "Robotis", "58 150.0 1.0");
 
     //Add states, each represents 1 property of the device
-    addState("X 5 10", "Robotis", "", false);
-    addState("Y 5 10", "Robotis", "", false);
-    addState("Z 5 10", "Robotis", "", false);
+    //addState("X 5 10", "Robotis", "", false);
+    //addState("Y 5 10", "Robotis", "", false);
+    //addState("Z 5 10", "Robotis", "", false);
+    addState("X 10 50", "TestSuite", "-150 150", true); 
+    addState("Y 10 50", "TestSuite", "-150 150", true); 
+    addState("Z 10 50", "TestSuite", "-150 150", true); 
 
     //Tell the states and devices to pay attention to each other
     linkDS("dX", "X");
@@ -24,7 +27,7 @@ program main{
     linkPD("pro", "dZ");
 
     //Setup Logging
-    addLogger("log1 10 200", "File", "testlog.txt");
+    addLogger("log1 10 20", "File", "testlog.txt");
     linkLS("log1", "X", "value");
     linkLS("log1", "Y", "value");
     linkLS("log1", "Z", "value");

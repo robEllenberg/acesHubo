@@ -20,6 +20,7 @@ namespace TestSuite{
 
     Spinner::Spinner(std::string cfg, std::string args, bool sampling)
      : ACES::State<float>(cfg, 1, sampling){
+     //: ACES::State<float>(cfg, 30, sampling){
         std::istringstream s1(args, std::istringstream::in);
         float high, low, amp, dc;
         s1 >> low >> high;
@@ -39,10 +40,11 @@ namespace TestSuite{
                            << RTT::endlog();
         ACES::Word<float> *g = new ACES::Word<float>(val, this->nodeID,
                                                      0, ACES::REFRESH);
+        //                                             0, ACES::SET);
         txDownStream.write(g);
     }
 
-    //TODO - Total Kludge, there's got to be a 'proper' way to get the compiler
+    //TODO - Total Kludge, there's got to be a _proper_ way to get the compiler
     //to generate the specializations we want and throw them into the library
     void forcegenerate(){
         Device<float, float> d("a", "b");

@@ -510,7 +510,8 @@ namespace Robotis {
         ACES::Credentials::printme();
         RTT::Logger::log() << "(Robotis) Credentials: Motor Number="
                            << motorNum
-                           << " Zero=" << zero << RTT::endlog();
+                           << " Zero=" << zero
+                           << " Direction=" << direction << RTT::endlog();
     }
 
     bool Credentials::operator==(ACES::Credentials& other){
@@ -575,12 +576,16 @@ namespace Robotis {
         return sum;
     }
 
-    float USScale(unsigned short in, int nodeID){
+    float Device::USScale(unsigned short in, int nodeID){
         float result = 0.;
+        Credentials* c = (Credentials*)credentials;
         switch(nodeID){
             case GOAL_POSITION:
                 result = (in*300./1024.);
                 result = limit<float>(result, 0., 300.);
+                if(c->zero){
+                    result = (result-(c->zero))*(c->direction);
+                }
                 break;
             default:        //case of no scaling function
                 result = (float)in;
@@ -589,8 +594,9 @@ namespace Robotis {
         return result;
     }
 
-    unsigned short DSScale(float in, int nodeID){
+    unsigned short Device::DSScale(float in, int nodeID){
         unsigned short result = 0;
+        Credentials* c = (Credentials*)credentials;
         switch(nodeID){
             case LED:
                 result = (unsigned short)in;
@@ -610,7 +616,10 @@ namespace Robotis {
                 break;
             case GOAL_POSITION:
                 //TODO - needs proper rounding
-                result = (unsigned short)(in*1023./300.);
+                if(c->zero){
+                    result = ((c->direction)*in)+(c->zero);
+                }
+                result = (unsigned short)(result*1023./300.);
                 result = limit<unsigned short>(result, 0, 1023);
                 break;
             case PUNCH:

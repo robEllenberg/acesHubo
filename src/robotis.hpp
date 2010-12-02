@@ -208,6 +208,8 @@ namespace Robotis {
             virtual ACES::Word<float>* processUS(ACES::Word<RobotisPacket>*);
             bool getTable();
             bool setTable(int position, float val);
+            float USScale(unsigned short in, int nodeID);
+            unsigned short DSScale(float in, int nodeID);
         private:
             //!The memory table position of the last request issued
             int requestPos; 
@@ -231,8 +233,6 @@ namespace Robotis {
     Credentials* credFromPacket(RobotisPacket* p);
     ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p);
     unsigned char checksum(RobotisPacket* p);
-    float USScale(unsigned short in, int nodeID);
-    unsigned short DSScale(float in, int nodeID);
     template <class T>
     T limit(float c, T low, T high);
     unsigned short DSlimit(float d, unsigned short low, unsigned short high);
