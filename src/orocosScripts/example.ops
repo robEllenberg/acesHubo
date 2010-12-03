@@ -1,0 +1,14 @@
+program main{
+/*
+    //Grab the presently known value from a state
+    var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+
+    addCtrl("StateName", val) 		//Queue set point 'val' to StateName in buffer
+    sendCtrl()				//Apply set points in buffer to system
+*/
+}
