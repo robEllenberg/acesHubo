@@ -584,8 +584,8 @@ namespace Robotis {
         Credentials* c = (Credentials*)credentials;
         switch(nodeID){
             case GOAL_POSITION:
-                result = (in*300./1024.);
-                result = limit<float>(result, 0., 300.);
+                result = in*(300./1023.)*(3.14159/180.0);
+                result = limit<float>(result, 0., 5.2360);
                 if(c->zero){
                     result = (result-(c->zero))*(c->direction);
                 }
@@ -599,6 +599,7 @@ namespace Robotis {
 
     unsigned short Device::DSScale(float in, int nodeID){
         unsigned short result = 0;
+	float temp = 0;
         Credentials* c = (Credentials*)credentials;
         switch(nodeID){
             case LED:
@@ -620,9 +621,11 @@ namespace Robotis {
             case GOAL_POSITION:
                 //TODO - needs proper rounding
                 if(c->zero){
-                    result = ((c->direction)*in)+(c->zero);
-                }
-                result = (unsigned short)(result*1023./300.);
+                    temp = ((c->direction)*in)+(c->zero);
+                }else{
+                    temp = in;
+		}
+                result = (unsigned short)(temp*(1023./300.)*(180.0/3.14159));
                 result = limit<unsigned short>(result, 0, 1023);
                 break;
             case PUNCH:

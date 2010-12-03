@@ -1,24 +1,73 @@
 program main {
-    //Add and link the lower levels
+    var bool sampling = false;
+
     addHardware("hw 90 100","Hubo","");
     addProtocol("pro 80 100", "Hubo", "");
     linkHP("hw", "pro");
+
+    //Create devices, representing physical nodes on the bus
     addDevice("dRSP 20 50", "Hubo", "30 0.0 1");
+    addDevice("dRSR 20 50", "Hubo", "31 0.0 1");
+    addDevice("dRSY 20 50", "Hubo", "32 0.0 1");
+    addDevice("dLSP 20 50", "Hubo", "34 0.0 1");
+    addDevice("dLSR 20 50", "Hubo", "35 0.0 1");
+    addDevice("dLSY 20 50", "Hubo", "36 0.0 1");
+
+    addDevice("dREP 20 50", "Hubo", "33 0.0 1");
+    addDevice("dLEP 20 50", "Hubo", "37 0.0 1");
+
+    addDevice("dRWY 20 50", "Hubo", "0 0.0 1");
+    addDevice("dLWY 20 50", "Hubo", "3 0.0 1");
 
     //Add states, each represents 1 property of the device
-    addState("RSP 10 50", "Hubo", "-3.14 3.14", false);
+    addState("RSP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("RSR 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling);
+
+    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling);
+
+    addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling);
 
     //Tell the states and devices to pay attention to each other
     linkDS("dRSP", "RSP");
+    linkDS("dRSR", "RSR");
+    linkDS("dRSY", "RSY");
+    linkDS("dLSP", "LSP");
+    linkDS("dLSR", "LSR");
+    linkDS("dLSY", "LSY");
+
+    linkDS("dREP", "REP");
+    linkDS("dLEP", "LEP");
+
+    linkDS("dRWY", "RWY");
+    linkDS("dLWY", "LWY");
 
     //Tell the devices & protocol to pay attention to each other 
     linkPD("pro", "dRSP");
+    linkPD("pro", "dRSR");
+    linkPD("pro", "dRSY");
+    linkPD("pro", "dLSP");
+    linkPD("pro", "dLSR");
+    linkPD("pro", "dLSY");
+
+    linkPD("pro", "dREP");
+    linkPD("pro", "dLEP");
+
+    linkPD("pro", "dRWY");
+    linkPD("pro", "dLWY");
 
     //Setup Logging
     addLogger("log1 5 200", "File", "testlog.txt");
     linkLS("log1", "RSP", "value");
+    linkLS("log1", "LSP", "value");
     
-    //Start the threads
+    /* END CONFIG SECTION */
+
     startHW();
     startProtocol();
     startDevice();
