@@ -6,40 +6,40 @@ program main {
 
     linkHP("hw", "pcol");
 
-    addController("miniCtrl 10 50", "Mini Leg", "walkPatterns/test9.txt");
+    addController("miniCtrl 10 50", "Mini Leg", "walkPatterns/02_50_HA13.txt");
 
-    addDevice("dLSP 5 250", "Robotis", "55   0.0   1.0");
-    addDevice("dLSR 5 250", "Robotis", "67   0.0   1.0");
-    addDevice("dLSY 5 250", "Robotis", "57   0.0   1.0");
-    addDevice("dLWP 5 250", "Robotis", "65   0.0   1.0");
-    addDevice("dRSP 5 250", "Robotis", "54   0.0   1.0");
-    addDevice("dRSR 5 250", "Robotis", "68   0.0   1.0");
-    addDevice("dRSY 5 250", "Robotis", "59   0.0   1.0");
-    addDevice("dRWP 5 250", "Robotis", "61   0.0   1.0");
-   
-    addDevice("dLHP 5 250", "Robotis", "42   2.792 -1.0");
-    addDevice("dRHP 5 250", "Robotis", "49   2.477  1.0");
-    addDevice("dLKP 5 250", "Robotis", "45   4.258 -1.0");
-    addDevice("dRKP 5 250", "Robotis", "52   4.275 -1.0");
-    addDevice("dLAP 5 250", "Robotis", "41   2.556 -1.0");
-    addDevice("dRAP 5 250", "Robotis", "40   2.565 -1.0");
-    addDevice("dHY  5 250", "Robotis", "64   2.615 -1.0");
-    addDevice("dLHY 5 250", "Robotis", "47   2.618 -1.0");
-    addDevice("dLHR 5 250", "Robotis", "44   2.618  1.0");
-    addDevice("dLAR 5 250", "Robotis", "43   2.635 -1.0");
-    addDevice("dRHY 5 250", "Robotis", "48   2.572 -1.0");
-    addDevice("dRHR 5 250", "Robotis", "51   2.572 -1.0");
-    addDevice("dRAR 5 250", "Robotis", "46   2.618 -1.0");
+    addDevice("dLSP 5 250", "Robotis", "92   3.07  -1.0");
+    addDevice("dLSR 5 250", "Robotis", "68   2.57  -1.0");
+    addDevice("dLSY 5 250", "Robotis", "82   3.04   1.0");
+    addDevice("dLWP 5 250", "Robotis", "102  2.62   1.0");
+    addDevice("dRSP 5 250", "Robotis", "84   2.97   1.0");
+    addDevice("dRSR 5 250", "Robotis", "106  2.61   1.0");
+    addDevice("dRSY 5 250", "Robotis", "76   2.40  -1.0");
+    addDevice("dRWP 5 250", "Robotis", "104  2.61  -1.0");
 
-    addState("RSP 5 50", "Robotis", "Joint", sample);
-    addState("RSR 5 50", "Robotis", "Joint", sample);
-    addState("RSY 5 50", "Robotis", "Joint", sample);
-    addState("RWP 5 50", "Robotis", "Joint", sample);
+    addDevice("dHY  5 250", "Robotis", "113  2.6   -1.0");
+    addDevice("dLHY 5 250", "Robotis", "87   2.61  -1.0");
+    addDevice("dLHR 5 250", "Robotis", "97   2.6    1.0");
+    addDevice("dLHP 5 250", "Robotis", "91   2.57   1.0");
+    addDevice("dLKP 5 250", "Robotis", "75   1.04   1.0");
+    addDevice("dLAP 5 250", "Robotis", "65   2.57   1.0");
+    addDevice("dLAR 5 250", "Robotis", "66   2.56  -1.0");
+    addDevice("dRHY 5 250", "Robotis", "88   2.62  -1.0");
+    addDevice("dRHR 5 250", "Robotis", "93   2.38  -1.0");
+    addDevice("dRHP 5 250", "Robotis", "98   2.61  -1.0");
+    addDevice("dRKP 5 250", "Robotis", "69   4.12  -1.0");
+    addDevice("dRAP 5 250", "Robotis", "67   2.61  -1.0");
+    addDevice("dRAR 5 250", "Robotis", "74   2.56  -1.0");
+
     addState("LSP 5 50", "Robotis", "Joint", sample);
     addState("LSR 5 50", "Robotis", "Joint", sample);
     addState("LSY 5 50", "Robotis", "Joint", sample);
     addState("LWP 5 50", "Robotis", "Joint", sample);
-    addState("HY 5 50",  "Robotis", "Joint", sample);
+    addState("RSP 5 50", "Robotis", "Joint", sample);
+    addState("RSR 5 50", "Robotis", "Joint", sample);
+    addState("RSY 5 50", "Robotis", "Joint", sample);
+    addState("RWP 5 50", "Robotis", "Joint", sample);
+    addState("HY  5 50", "Robotis", "Joint", sample);
     addState("LHY 5 50", "Robotis", "Joint", sample);
     addState("LHR 5 50", "Robotis", "Joint", sample);
     addState("LHP 5 50", "Robotis", "Joint", sample);
@@ -53,14 +53,30 @@ program main {
     addState("RAP 5 50", "Robotis", "Joint", sample);
     addState("RAR 5 50", "Robotis", "Joint", sample);
 
+/*
+    addState("LHY 5 50", "TestSuite", "-10 10", true); 
+    addState("RHY 5 50", "TestSuite", "-10 10", true); 
+    addState("LAP 5 50", "TestSuite", "-20 20", true); 
+    addState("RAP 5 50", "TestSuite", "-20 20", true); 
+    addState("LKP 5 50", "TestSuite", "-50 0", true); 
+    addState("RKP 5 50", "TestSuite", "-50 0", true); 
+    addState("LAR 5 50", "TestSuite", "-20 20", true); 
+    addState("RAR 5 50", "TestSuite", "-20 20", true); 
+    addState("RHP 5 50", "TestSuite", "-50 50", true); 
+    addState("LHP 5 50", "TestSuite", "-50 50", true);
+    addState("LHR 5 31", "TestSuite", "-20 20", true); 
+    addState("RHR 5 31", "TestSuite", "-20 20", true); 
+*/
+
     linkPD("pcol", "dLSP"); linkDS("dLSP", "LSP");
     linkPD("pcol", "dLSR"); linkDS("dLSR", "LSR");
-    linkPD("pcol", "dLSY"); linkDS("dLSR", "LSY");
+    linkPD("pcol", "dLSY"); linkDS("dLSY", "LSY");
     linkPD("pcol", "dLWP"); linkDS("dLWP", "LWP");
     linkPD("pcol", "dRSP"); linkDS("dRSP", "RSP");
     linkPD("pcol", "dRSR"); linkDS("dRSR", "RSR");
     linkPD("pcol", "dRSY"); linkDS("dRSY", "RSY");
     linkPD("pcol", "dRWP"); linkDS("dRWP", "RWP");
+
     linkPD("pcol", "dHY"); linkDS("dHY",  "HY");
     linkPD("pcol", "dLHY"); linkDS("dLHY", "LHY");
     linkPD("pcol", "dLHR"); linkDS("dLHR", "LHR");
@@ -82,6 +98,7 @@ program main {
     linkSC("RSP", "miniCtrl");
     linkSC("RSR", "miniCtrl");
     linkSC("RSY", "miniCtrl");
+
     linkSC("RWP", "miniCtrl");
     linkSC("HY",  "miniCtrl");
     linkSC("LHY", "miniCtrl");
@@ -98,7 +115,6 @@ program main {
     linkSC("RAR", "miniCtrl");
 
     //addLogger("flog 10 5", "File", "tfile.txt");
-    
     //linkLS("flog", "LSP", "value");
     //linkLS("flog", "LSR", "value");
     //linkLS("flog", "RSP", "value");
