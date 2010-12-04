@@ -5,6 +5,8 @@ program main {
     addProtocol("pro 80 100", "Hubo", "");
     linkHP("hw", "pro");
 
+    addController("user 10 30", "User Program", "danscript.ops main");
+
     //Create devices, representing physical nodes on the bus
     addDevice("dRSP 20 50", "Hubo", "30 0.0 1");
     addDevice("dRSR 20 50", "Hubo", "31 0.0 1");
@@ -12,10 +14,8 @@ program main {
     addDevice("dLSP 20 50", "Hubo", "34 0.0 1");
     addDevice("dLSR 20 50", "Hubo", "35 0.0 1");
     addDevice("dLSY 20 50", "Hubo", "36 0.0 1");
-
     addDevice("dREP 20 50", "Hubo", "33 0.0 1");
     addDevice("dLEP 20 50", "Hubo", "37 0.0 1");
-
     addDevice("dRWY 20 50", "Hubo", "0 0.0 1");
     addDevice("dLWY 20 50", "Hubo", "3 0.0 1");
 
@@ -26,10 +26,8 @@ program main {
     addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling);
     addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling);
     addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling);
-
     addState("REP 10 50", "Hubo", "-3.14 3.14", sampling);
     addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling);
-
     addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling);
     addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling);
 
@@ -40,10 +38,8 @@ program main {
     linkDS("dLSP", "LSP");
     linkDS("dLSR", "LSR");
     linkDS("dLSY", "LSY");
-
     linkDS("dREP", "REP");
     linkDS("dLEP", "LEP");
-
     linkDS("dRWY", "RWY");
     linkDS("dLWY", "LWY");
 
@@ -54,17 +50,26 @@ program main {
     linkPD("pro", "dLSP");
     linkPD("pro", "dLSR");
     linkPD("pro", "dLSY");
-
     linkPD("pro", "dREP");
     linkPD("pro", "dLEP");
-
     linkPD("pro", "dRWY");
     linkPD("pro", "dLWY");
 
+    linkSC("RSP", "user");
+    linkSC("RSR", "user");
+    linkSC("RSY", "user");
+    linkSC("LSP", "user");
+    linkSC("LSR", "user");
+    linkSC("LSY", "user");
+    linkSC("REP", "user");
+    linkSC("LEP", "user");
+    linkSC("RWY", "user");
+    linkSC("LWY", "user");
+
     //Setup Logging
-    addLogger("log1 5 200", "File", "testlog.txt");
-    linkLS("log1", "RSP", "value");
-    linkLS("log1", "LSP", "value");
+    //addLogger("log1 5 200", "File", "testlog.txt");
+    //linkLS("log1", "RSP", "value");
+    //linkLS("log1", "LSP", "value");
     
     /* END CONFIG SECTION */
 
