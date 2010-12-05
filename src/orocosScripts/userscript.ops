@@ -16,7 +16,7 @@ program main {
     //To add a user defined state machine controller use this line
     //addController("user 10 30", "User StateMachine", "smscript.osd main");
 
-    addLogger("flog 10 5", "File", "tfile.txt");
+    addLogger("flog 10 5", "File", "log.txt");
 
     linkHP("wbHW", "wbPcol");
     linkPD("wbPcol", "dHIP");

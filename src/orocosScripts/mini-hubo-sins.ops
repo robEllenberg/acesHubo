@@ -107,7 +107,7 @@ program main {
     linkSC("RAP", "miniCtrl");
     linkSC("RAR", "miniCtrl");
 
-    addLogger("flog 10 5", "File", "tfile.txt");
+    addLogger("flog 10 5", "File", "log.txt");
     
     //linkLS("flog", "LSP", "value");
     //linkLS("flog", "LSR", "value");

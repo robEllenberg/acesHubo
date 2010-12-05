@@ -27,7 +27,7 @@ program main{
     linkPD("pro", "dZ");
 
     //Setup Logging
-    addLogger("log1 10 20", "File", "testlog.txt");
+    addLogger("log1 10 20", "File", "log.txt");
     linkLS("log1", "X", "value");
     linkLS("log1", "Y", "value");
     linkLS("log1", "Z", "value");

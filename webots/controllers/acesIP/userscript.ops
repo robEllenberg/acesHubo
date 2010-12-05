@@ -1,4 +1,0 @@
-program main {
-        addCtrl("hzs", 10)
-        sendCtrl()
-}

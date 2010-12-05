@@ -8,11 +8,14 @@ program main {
     addState("hip 5 31",  "Webots", "Joint", true);
     addState("hzs 5 31",  "Webots", "Joint", true);
 
-    addController("wbNull 10 15", "Mini Null", "");
-    addController("pid 10 30", "PID", "hip hzs 50.0 500.0 0.0");
-    //addController("wbArm 10 15", "Mini Arm", "sins.txt");
+    //Null Controller needed to advance timestep
+    addController("wbNull 10 30", "Mini Null", "");
 
-    addLogger("flog 10 5", "File", "tfile.txt");
+    //One other needed to actually do control 
+    //addController("pid 10 30", "PID", "hip hzs 50.0 500.0 0.0");
+    addController("pid 10 30", "User Program", "pid.ops main");
+
+    addLogger("flog 10 5", "File", "log.txt");
 
     linkHP("wbHW", "wbPcol");
     linkPD("wbPcol", "dHIP");
@@ -22,6 +25,7 @@ program main {
 
     linkSC("hip", "pid");
     linkSC("hzs", "pid");
+    linkHC("wbHW", "pid");
     linkHC("wbHW", "wbNull");
 
     linkLS("flog", "hip", "value");

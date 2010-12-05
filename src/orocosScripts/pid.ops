@@ -1,0 +1,29 @@
+program main{
+/*
+    //Grab the presently known value from a state
+    var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+
+    addCtrl("StateName", val) 		//Queue set point 'val' to StateName in buffer
+    sendCtrl()				//Apply set points in buffer to system
+*/
+    var float Kp = 50;
+    var float Ki = 500;
+    var float Kd = 0;
+
+
+    while(true){
+        var float theta = getSurface("hip", "value");
+        var float thetaDot = getSurface("hip", "diff");
+        var float intTheta = getSurface("hip", "integral");
+
+        var float ctrl = Kp*theta+Ki*intTheta+Kd*thetaDot;
+        addCtrl("hzs", ctrl);
+        sendCtrl();
+        yield;
+    }
+}

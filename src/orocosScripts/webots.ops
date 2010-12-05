@@ -152,7 +152,7 @@ program main {
     linkSC("lffY", "wbctrl");
     linkSC("lffZ", "wbctrl");
 
-    addLogger("flog 10 5", "File", "tfile.txt");
+    addLogger("flog 10 5", "File", "log.txt");
     
     linkLS("flog", "centerX", "value");
     linkLS("flog", "centerY", "value");

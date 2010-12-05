@@ -72,7 +72,7 @@ program main {
     linkSC("LWY", "user");
 
     //Setup Logging
-    //addLogger("log1 5 200", "File", "testlog.txt");
+    //addLogger("log1 5 200", "File", "log.txt");
     //linkLS("log1", "RSP", "value");
     //linkLS("log1", "LSP", "value");
     
