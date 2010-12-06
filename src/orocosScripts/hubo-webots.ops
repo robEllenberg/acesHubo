@@ -1,104 +1,106 @@
 program main {
-    var bool sample = true;
+    var bool sample1 = true;
+    var bool sample2 = false;
 
     addHardware("wbHW 1 600", "Webots", "");
     addProtocol("wbPcol 2 600", "Webots", "");
 
-    //addController("wbNull 10 15", "Mini Null", "");
+      //addController("wbNull 10 15", "Mini Null", "");
 
     //***Pick one of these controllers
-      //addController("wbctrl 10 15", "Mini Leg", "walkscripts/IKscript1.txt");
-      //addController("wbArm 10 15", "Mini Arm", "sins.txt");
-      //addController("wbctrl 10 15", "User Program", "miniProg.ops main");
+      //addController("wbctrl 10 31", "Mini Leg", "walkPatterns/test9.txt");
+      //addController("wbArm 11 15", "Mini Arm", "sins.txt");
+      addController("wbctrl 10 15", "User Program", "danscriptHandWave.ops main");
       //addController("wbctrl 10 15", "User StateMachine", "miniSM.osd main");
-      addController("wbctrl 10 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
+      //addController("wbctrl 12 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
 
     linkHC("wbHW", "wbctrl");
     linkHP("wbHW", "wbPcol");
 
-    addDevice("dHY 5 31", "Webots Joint",  "HY  0.0 -1.0");
-    addDevice("dLSP 5 31", "Webots Joint", "LSP 0.0  1.0");
-    addDevice("dLSR 5 31", "Webots Joint", "LSR 0.0  1.0");
-    addDevice("dRSP 5 31", "Webots Joint", "RSP 0.0  1.0");
-    addDevice("dRSR 5 31", "Webots Joint", "RSR 0.0  1.0");
-    addDevice("dLHY 5 31", "Webots Joint", "LHY 0.0  1.0");
-    addDevice("dLHR 5 31", "Webots Joint", "LHR 0.0  1.0");
-    addDevice("dLHP 5 31", "Webots Joint", "LHP 0.0 -1.0");
-    addDevice("dLKP 5 31", "Webots Joint", "LKP 0.0  1.0");
-    addDevice("dLAP 5 31", "Webots Joint", "LAP 0.0 -1.0");
-    addDevice("dLAR 5 31", "Webots Joint", "LAR 0.0  1.0");
-    addDevice("dRHY 5 31", "Webots Joint", "RHY 0.0  1.0");
-    addDevice("dRHR 5 31", "Webots Joint", "RHR 0.0 -1.0");
-    addDevice("dRHP 5 31", "Webots Joint", "RHP 0.0 -1.0");
-    addDevice("dRKP 5 31", "Webots Joint", "RKP 0.0  1.0");
-    addDevice("dRAP 5 31", "Webots Joint", "RAP 0.0 -1.0");
-    addDevice("dRAR 5 31", "Webots Joint", "RAR 0.0  1.0");
+    addDevice("dHY 5 250", "Webots Joint",  "HY  0.0 -1.0");
+    addDevice("dLSP 5 250", "Webots Joint", "LSP 0.0 -1.0");
+    addDevice("dLSR 5 250", "Webots Joint", "LSR 0.0  1.0");
+    addDevice("dRSP 5 250", "Webots Joint", "RSP 0.0  1.0");
+    addDevice("dRSR 5 250", "Webots Joint", "RSR 0.0  1.0");
+    addDevice("dLHY 5 250", "Webots Joint", "LHY 0.0  1.0");
+    addDevice("dLHR 5 250", "Webots Joint", "LHR 0.0  1.0");
+    addDevice("dLHP 5 250", "Webots Joint", "LHP 0.0 -1.0");
+    addDevice("dLKP 5 250", "Webots Joint", "LKP 0.0  1.0");
+    addDevice("dLAP 5 250", "Webots Joint", "LAP 0.0 -1.0");
+    addDevice("dLAR 5 250", "Webots Joint", "LAR 0.0  1.0");
+    addDevice("dRHY 5 250", "Webots Joint", "RHY 0.0  1.0");
+    addDevice("dRHR 5 250", "Webots Joint", "RHR 0.0 -1.0");
+    addDevice("dRHP 5 250", "Webots Joint", "RHP 0.0 -1.0");
+    addDevice("dRKP 5 250", "Webots Joint", "RKP 0.0  1.0");
+    addDevice("dRAP 5 250", "Webots Joint", "RAP 0.0 -1.0");
+    addDevice("dRAR 5 250", "Webots Joint", "RAR 0.0  1.0");
 
-    addDevice("dGPS 5 31", "Webots GPS", "zero");
-    addState("centerX 5 5",  "Webots", "X", sample);
-    addState("centerY 5 5",  "Webots", "Y", sample);
-    addState("centerZ 5 5",  "Webots", "Z", sample);
+    addDevice("dGPS 7 250", "Webots GPS", "zero");
+    addState("centerX 7 10",  "Webots", "X", sample1);
+    addState("centerY 7 10",  "Webots", "Y", sample1);
+    addState("centerZ 7 10",  "Webots", "Z", sample1);
 
     linkPD("wbPcol", "dGPS");
     linkDS("dGPS", "centerX");
     linkDS("dGPS", "centerY");
     linkDS("dGPS", "centerZ");
 
-    addDevice("dIMUAcc 5 31", "Webots Accelerometer", "imuacc");
-    addState("imuaccX 5 5",  "Webots", "X", sample);
-    addState("imuaccY 5 5",  "Webots", "Y", sample);
-    addState("imuaccZ 5 5",  "Webots", "Z", sample);
+    addDevice("dIMUAcc 7 250", "Webots Accelerometer", "imuacc");
+    addState("imuaccX 7 10",  "Webots", "X", sample1);
+    addState("imuaccY 7 10",  "Webots", "Y", sample1);
+    addState("imuaccZ 7 10",  "Webots", "Z", sample1);
 
     linkPD("wbPcol", "dIMUAcc");
     linkDS("dIMUAcc", "imuaccX");
     linkDS("dIMUAcc", "imuaccY");
     linkDS("dIMUAcc", "imuaccZ");
 
-    addDevice("dIMUGyro 5 31", "Webots Gyro", "imugyro");
-    addState("imugyroX 5 5",  "Webots", "X", sample);
-    addState("imugyroY 5 5",  "Webots", "Y", sample);
-    addState("imugyroZ 5 5",  "Webots", "Z", sample);
+    addDevice("dIMUGyro 7 250", "Webots Gyro", "imugyro");
+    addState("imugyroX 7 10",  "Webots", "X", sample1);
+    addState("imugyroY 7 10",  "Webots", "Y", sample1);
+    addState("imugyroZ 7 10",  "Webots", "Z", sample1);
 
     linkPD("wbPcol", "dIMUGyro");
     linkDS("dIMUGyro", "imugyroX");
     linkDS("dIMUGyro", "imugyroY");
     linkDS("dIMUGyro", "imugyroZ");
+    addDevice("dRFootForce 7 250", "Webots Force", "RFoot");
+    addState("rffX 7 10",  "Webots", "X", sample1);
+    addState("rffY 7 10",  "Webots", "Y", sample1);
+    addState("rffZ 7 10",  "Webots", "Z", sample1);
 
-    addDevice("dRFootForce 5 31", "Webots Force", "RFoot");
-    addState("rffX 5 5",  "Webots", "X", sample);
-    addState("rffY 5 5",  "Webots", "Y", sample);
-    addState("rffZ 5 5",  "Webots", "Z", sample);
     linkPD("wbPcol", "dRFootForce");
     linkDS("dRFootForce", "rffX");
     linkDS("dRFootForce", "rffY");
     linkDS("dRFootForce", "rffZ");
 
-    addDevice("dLFootForce 5 31", "Webots Force", "LFoot");
-    addState("lffX 5 5",  "Webots", "X", sample);
-    addState("lffY 5 5",  "Webots", "Y", sample);
-    addState("lffZ 5 5",  "Webots", "Z", sample);
+    addDevice("dLFootForce 7 250", "Webots Force", "LFoot");
+    addState("lffX 7 10",  "Webots", "X", sample1);
+    addState("lffY 7 10",  "Webots", "Y", sample1);
+    addState("lffZ 7 10",  "Webots", "Z", sample1);
+
     linkPD("wbPcol", "dLFootForce");
     linkDS("dLFootForce", "lffX");
     linkDS("dLFootForce", "lffY");
     linkDS("dLFootForce", "lffZ");
 
-    addState("HY 5 31",  "Webots", "Joint", sample);
-    addState("LSP 5 31", "Webots", "Joint", sample);
-    addState("LSR 5 31", "Webots", "Joint", sample);
-    addState("RSP 5 31", "Webots", "Joint", sample);
-    addState("RSR 5 31", "Webots", "Joint", sample);
-    addState("LHY 5 31", "Webots", "Joint", sample);
-    addState("LHR 5 31", "Webots", "Joint", sample);
-    addState("LHP 5 31", "Webots", "Joint", sample);
-    addState("LKP 5 31", "Webots", "Joint", sample);
-    addState("LAP 5 31", "Webots", "Joint", sample);
-    addState("LAR 5 31", "Webots", "Joint", sample);
-    addState("RHY 5 31", "Webots", "Joint", sample);
-    addState("RHR 5 31", "Webots", "Joint", sample);
-    addState("RHP 5 31", "Webots", "Joint", sample);
-    addState("RKP 5 31", "Webots", "Joint", sample);
-    addState("RAP 5 31", "Webots", "Joint", sample);
-    addState("RAR 5 31", "Webots", "Joint", sample);
+    addState("HY 5 31",  "Webots", "Joint", sample2);
+    addState("LSP 5 31", "Webots", "Joint", sample2);
+    addState("LSR 5 31", "Webots", "Joint", sample2);
+    addState("RSP 5 31", "Webots", "Joint", sample2);
+    addState("RSR 5 31", "Webots", "Joint", sample2);
+    addState("LHY 5 31", "Webots", "Joint", sample2);
+    addState("LHR 5 31", "Webots", "Joint", sample2);
+    addState("LHP 5 31", "Webots", "Joint", sample2);
+    addState("LKP 5 31", "Webots", "Joint", sample2);
+    addState("LAP 5 31", "Webots", "Joint", sample2);
+    addState("LAR 5 31", "Webots", "Joint", sample2);
+    addState("RHY 5 31", "Webots", "Joint", sample2);
+    addState("RHR 5 31", "Webots", "Joint", sample2);
+    addState("RHP 5 31", "Webots", "Joint", sample2);
+    addState("RKP 5 31", "Webots", "Joint", sample2);
+    addState("RAP 5 31", "Webots", "Joint", sample2);
+    addState("RAR 5 31", "Webots", "Joint", sample2);
 
     linkDS("dHY",  "HY"); linkPD("wbPcol", "dHY");
     linkPD("wbPcol", "dLSP"); linkDS("dLSP", "LSP");

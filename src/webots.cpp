@@ -16,6 +16,7 @@ namespace Webots {
 
     bool Hardware::startHook(){
         wb_robot_init();
+        lastStep = RTT::os::TimeService::Instance()->getTicks();
         return true;
     }
 
@@ -25,13 +26,21 @@ namespace Webots {
         //RTT::Logger::log() << "WB HW tick" << RTT::endlog();
         std::map<std::string, void*>* req = NULL;
         while( stepRequest.read(req) == RTT::NewData ){
-            step(32); //TODO - Magic numbers (32ms)
+            step(0); 
         }
     }
 
     void Hardware::step(int time){
         ACES::Hardware<float>::updateHook();
-        wb_robot_step(time);
+        if(time == 0){
+            wb_robot_step(32);  //TODO - Magic numbers (32ms)
+        }
+        else{
+            int ms =
+            (int)(1000*RTT::os::TimeService::Instance()->getSeconds(lastStep));
+            wb_robot_step(ms);
+        }
+        lastStep = RTT::os::TimeService::Instance()->getTicks();
     }
 
     bool Hardware::txBus(ACES::Message<float>* dsIn){

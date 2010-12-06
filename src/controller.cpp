@@ -288,7 +288,7 @@ namespace ACES{
     }
 
     bool UserProg::startHook(){
-        getProvider<RTT::Scripting>("scripting")->startProgram(progname);
+        //getProvider<RTT::Scripting>("scripting")->startProgram(progname);
         return true;
     }
 
@@ -311,8 +311,8 @@ namespace ACES{
     bool UserSM::startHook(){
         getProvider<RTT::Scripting>("scripting")->
                                    activateStateMachine(progname);
-        getProvider<RTT::Scripting>("scripting")->
-                                   startStateMachine(progname);
+        //getProvider<RTT::Scripting>("scripting")->
+        //                           startStateMachine(progname);
         return true;
     }
 

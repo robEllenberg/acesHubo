@@ -8,6 +8,7 @@
 #include <rtt/Logger.hpp>
 #include <rtt/Activity.hpp>
 #include <rtt/Port.hpp>
+#include <rtt/os/TimeService.hpp>
 
 #include "protocol.hpp"
 #include "state.hpp"
@@ -37,13 +38,15 @@ namespace Webots{
             void updateHook();
             virtual bool txBus(ACES::Message<float>* m);
 
-            void step(int time=32);
+            void step(int time=0);
             //void stepRequest( std::map<std::string, void*>* );
             virtual bool subscribeController(RTT::TaskContext* c);
 
             //std::deque< ACES::Word<T> > usQueue;
             //RTT::OS::Mutex usqGuard; 
             RTT::InputPort< std::map<std::string, void*>* >stepRequest;
+        private:
+            RTT::os::TimeService::ticks lastStep;
     };
 
     class Credentials : public ACES::Credentials {

@@ -1,4 +1,0 @@
-program main {
-        addCtrl("RSP", 1.2)
-        sendCtrl()
-}
