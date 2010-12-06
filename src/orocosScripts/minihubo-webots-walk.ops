@@ -18,26 +18,26 @@ program main {
     linkHC("wbHW", "wbNull");
     linkHP("wbHW", "wbPcol");
 
-    addDevice("dHY 5 250", "Webots Joint",  "HY  0.0 -1.0");
-    addDevice("dLSP 5 250", "Webots Joint", "LSP 0.0 -1.0");
+    addDevice("dHY 5 250", "Webots Joint",  "HY  0.0  1.0"); ////-
+    addDevice("dLSP 5 250", "Webots Joint", "LSP 0.0  1.0"); ////-
     addDevice("dLSR 5 250", "Webots Joint", "LSR 0.0  1.0");
-    addDevice("dLSY 5 250", "Webots Joint", "LSY 0.0 -1.0");
-    addDevice("dLEP 5 250", "Webots Joint", "LEP 0.0 -1.0");
-    addDevice("dRSP 5 250", "Webots Joint", "RSP 0.0 -1.0");
-    addDevice("dRSR 5 250", "Webots Joint", "RSR 0.0 -1.0");
+    addDevice("dLSY 5 250", "Webots Joint", "LSY 0.0  1.0"); ////-
+    addDevice("dLEP 5 250", "Webots Joint", "LEP 0.0  1.0"); ////-
+    addDevice("dRSP 5 250", "Webots Joint", "RSP 0.0  1.0"); ////-
+    addDevice("dRSR 5 250", "Webots Joint", "RSR 0.0  1.0"); ////-
     addDevice("dRSY 5 250", "Webots Joint", "RSY 0.0  1.0");
-    addDevice("dREP 5 250", "Webots Joint", "REP 0.0 -1.0");
+    addDevice("dREP 5 250", "Webots Joint", "REP 0.0  1.0"); ////-
     addDevice("dLHY 5 250", "Webots Joint", "LHY 0.0  1.0");
     addDevice("dLHR 5 250", "Webots Joint", "LHR 0.0  1.0");
-    addDevice("dLHP 5 250", "Webots Joint", "LHP 0.0 -1.0");
+    addDevice("dLHP 5 250", "Webots Joint", "LHP 0.0  1.0"); ////-
     addDevice("dLKP 5 250", "Webots Joint", "LKP 0.0  1.0");
-    addDevice("dLAP 5 250", "Webots Joint", "LAP 0.0 -1.0");
+    addDevice("dLAP 5 250", "Webots Joint", "LAP 0.0  1.0"); ////-
     addDevice("dLAR 5 250", "Webots Joint", "LAR 0.0  1.0");
     addDevice("dRHY 5 250", "Webots Joint", "RHY 0.0  1.0");
-    addDevice("dRHR 5 250", "Webots Joint", "RHR 0.0 -1.0");
-    addDevice("dRHP 5 250", "Webots Joint", "RHP 0.0 -1.0");
+    addDevice("dRHR 5 250", "Webots Joint", "RHR 0.0  1.0"); ////-
+    addDevice("dRHP 5 250", "Webots Joint", "RHP 0.0  1.0"); ////-
     addDevice("dRKP 5 250", "Webots Joint", "RKP 0.0  1.0");
-    addDevice("dRAP 5 250", "Webots Joint", "RAP 0.0 -1.0");
+    addDevice("dRAP 5 250", "Webots Joint", "RAP 0.0  1.0"); ////-
     addDevice("dRAR 5 250", "Webots Joint", "RAR 0.0  1.0");
 
     addDevice("dGPS 7 250", "Webots GPS", "zero");

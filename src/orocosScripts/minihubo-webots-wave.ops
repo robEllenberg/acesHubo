@@ -5,42 +5,36 @@ program main {
     addHardware("wbHW 1 600", "Webots", "");
     addProtocol("wbPcol 2 600", "Webots", "");
 
-      addController("wbNull 10 15", "Mini Null", "");
+    //addController("wbNull 10 15", "Mini Null", "");
 
     //***Pick one of these controllers
-      addController("wbctrl 10 31", "Mini Leg", "walkPatterns/test9.txt");
-      //addController("wbArm 11 15", "Mini Arm", "sins.txt");
-      //addController("wbctrl 10 15", "User Program", "danscriptHandWave.ops main");
+      //addController("wbctrl 10 50", "Mini Leg", "walkPatterns/test9.txt");
+      //addController("wbArm 10 15", "Mini Arm", "sins.txt");
+      addController("wbctrl 10 15", "User Program", "danscriptHandWave.ops main");
       //addController("wbctrl 10 15", "User StateMachine", "miniSM.osd main");
       //addController("wbctrl 12 15", "Mini Youngbum", "walkscripts/IKscript1.txt");
 
     linkHC("wbHW", "wbctrl");
-    linkHC("wbHW", "wbNull");
     linkHP("wbHW", "wbPcol");
 
-    addDevice("dHY 5 250", "Webots Joint",  "HY  0.0  1.0"); //-
-    addDevice("dLSP 5 250", "Webots Joint", "LSP 0.0  1.0"); //-
-    addDevice("dLSR 5 250", "Webots Joint", "LSR 0.0  1.0");        //#-
-    addDevice("dLSY 5 250", "Webots Joint", "LSY 0.0  1.0");        //#-     
-    addDevice("dLEP 5 250", "Webots Joint", "LEP 0.0  1.0");        //#-    
-    addDevice("dRSP 5 250", "Webots Joint", "RSP 0.0  1.0");        //#-
+    addDevice("dHY 5 250", "Webots Joint",  "HY  0.0 -1.0");
+    addDevice("dLSP 5 250", "Webots Joint", "LSP 0.0 -1.0");
+    addDevice("dLSR 5 250", "Webots Joint", "LSR 0.0 -1.0");
+    addDevice("dRSP 5 250", "Webots Joint", "RSP 0.0  1.0");
     addDevice("dRSR 5 250", "Webots Joint", "RSR 0.0  1.0");
-    addDevice("dRSY 5 250", "Webots Joint", "RSY 0.0  1.0");
-    addDevice("dREP 5 250", "Webots Joint", "REP 0.0  1.0");        //#-
     addDevice("dLHY 5 250", "Webots Joint", "LHY 0.0  1.0");
     addDevice("dLHR 5 250", "Webots Joint", "LHR 0.0  1.0");
-    addDevice("dLHP 5 250", "Webots Joint", "LHP 0.0  1.0"); //-
+    addDevice("dLHP 5 250", "Webots Joint", "LHP 0.0 -1.0");
     addDevice("dLKP 5 250", "Webots Joint", "LKP 0.0  1.0");
-    addDevice("dLAP 5 250", "Webots Joint", "LAP 0.0  1.0"); //-
+    addDevice("dLAP 5 250", "Webots Joint", "LAP 0.0 -1.0");
     addDevice("dLAR 5 250", "Webots Joint", "LAR 0.0  1.0");
     addDevice("dRHY 5 250", "Webots Joint", "RHY 0.0  1.0");
-    addDevice("dRHR 5 250", "Webots Joint", "RHR 0.0  1.0"); //-
-    addDevice("dRHP 5 250", "Webots Joint", "RHP 0.0  1.0"); //-
+    addDevice("dRHR 5 250", "Webots Joint", "RHR 0.0 -1.0");
+    addDevice("dRHP 5 250", "Webots Joint", "RHP 0.0 -1.0");
     addDevice("dRKP 5 250", "Webots Joint", "RKP 0.0  1.0");
-    addDevice("dRAP 5 250", "Webots Joint", "RAP 0.0  1.0"); //-
+    addDevice("dRAP 5 250", "Webots Joint", "RAP 0.0 -1.0");
     addDevice("dRAR 5 250", "Webots Joint", "RAR 0.0  1.0");
 
-/*
     addDevice("dGPS 7 250", "Webots GPS", "zero");
     addState("centerX 7 10",  "Webots", "X", sample1);
     addState("centerY 7 10",  "Webots", "Y", sample1);
@@ -70,6 +64,7 @@ program main {
     linkDS("dIMUGyro", "imugyroX");
     linkDS("dIMUGyro", "imugyroY");
     linkDS("dIMUGyro", "imugyroZ");
+
     addDevice("dRFootForce 7 250", "Webots Force", "RFoot");
     addState("rffX 7 10",  "Webots", "X", sample1);
     addState("rffY 7 10",  "Webots", "Y", sample1);
@@ -89,17 +84,12 @@ program main {
     linkDS("dLFootForce", "lffX");
     linkDS("dLFootForce", "lffY");
     linkDS("dLFootForce", "lffZ");
-*/
 
     addState("HY 5 31",  "Webots", "Joint", sample2);
     addState("LSP 5 31", "Webots", "Joint", sample2);
     addState("LSR 5 31", "Webots", "Joint", sample2);
-    addState("LSY 5 31", "Webots", "Joint", sample2);
-    addState("LEP 5 31", "Webots", "Joint", sample2);
     addState("RSP 5 31", "Webots", "Joint", sample2);
     addState("RSR 5 31", "Webots", "Joint", sample2);
-    addState("RSY 5 31", "Webots", "Joint", sample2);
-    addState("REP 5 31", "Webots", "Joint", sample2);
     addState("LHY 5 31", "Webots", "Joint", sample2);
     addState("LHR 5 31", "Webots", "Joint", sample2);
     addState("LHP 5 31", "Webots", "Joint", sample2);
@@ -116,12 +106,8 @@ program main {
     linkDS("dHY",  "HY"); linkPD("wbPcol", "dHY");
     linkPD("wbPcol", "dLSP"); linkDS("dLSP", "LSP");
     linkPD("wbPcol", "dLSR"); linkDS("dLSR", "LSR");
-    linkPD("wbPcol", "dLSY"); linkDS("dLSY", "LSY");
-    linkPD("wbPcol", "dLEP"); linkDS("dLEP", "LEP");
     linkPD("wbPcol", "dRSP"); linkDS("dRSP", "RSP");
     linkPD("wbPcol", "dRSR"); linkDS("dRSR", "RSR");
-    linkPD("wbPcol", "dRSY"); linkDS("dRSY", "RSY");
-    linkPD("wbPcol", "dREP"); linkDS("dREP", "REP");
     linkPD("wbPcol", "dLHY"); linkDS("dLHY", "LHY");
     linkPD("wbPcol", "dLHR"); linkDS("dLHR", "LHR");
     linkPD("wbPcol", "dLHP"); linkDS("dLHP", "LHP");
@@ -137,12 +123,8 @@ program main {
 
     linkSC("LSP", "wbctrl");
     linkSC("LSR", "wbctrl");
-    linkSC("LSY", "wbctrl");
-    linkSC("LEP", "wbctrl");
     linkSC("RSP", "wbctrl");
     linkSC("RSR", "wbctrl");
-    linkSC("RSY", "wbctrl");
-    linkSC("REP", "wbctrl");
     linkSC("HY",  "wbctrl");
     linkSC("LHY", "wbctrl");
     linkSC("LHR", "wbctrl");
@@ -157,7 +139,6 @@ program main {
     linkSC("RAP", "wbctrl");
     linkSC("RAR", "wbctrl");
 
-/*
     linkSC("centerX", "wbctrl");
     linkSC("centerY", "wbctrl");
     linkSC("centerZ", "wbctrl");
@@ -173,12 +154,12 @@ program main {
     linkSC("lffX", "wbctrl");
     linkSC("lffY", "wbctrl");
     linkSC("lffZ", "wbctrl");
-*/
-    //addLogger("flog 10 5", "File", "log.txt");
+
+    addLogger("flog 10 5", "File", "log.txt");
     
-    //linkLS("flog", "centerX", "value");
-    //linkLS("flog", "centerY", "value");
-    //linkLS("flog", "centerZ", "value");
+    linkLS("flog", "centerX", "value");
+    linkLS("flog", "centerY", "value");
+    linkLS("flog", "centerZ", "value");
     //linkLS("flog", "imuaccX", "value");
     //linkLS("flog", "imuaccY", "value");
     //linkLS("flog", "imuaccZ", "value");
@@ -197,7 +178,7 @@ program main {
     //linkLS("flog", "LSR", "value");
     //linkLS("flog", "RSP", "value");
     //linkLS("flog", "RSR", "value");
-    //linkLS("flog", "HY",  "value");
+    //linkLS("flog", "HY", "value");
     //linkLS("flog", "LHY", "value");
     //linkLS("flog", "LHR", "value");
     //linkLS("flog", "LHP", "value");
