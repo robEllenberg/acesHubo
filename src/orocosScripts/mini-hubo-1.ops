@@ -8,14 +8,14 @@ program main {
 
     addController("miniCtrl 10 50", "Mini Leg", "walkPatterns/test9.txt");
 
-    addDevice("dLSP 5 250", "Robotis", "55   0.0   1.0");
-    addDevice("dLSR 5 250", "Robotis", "67   0.0   1.0");
-    addDevice("dLSY 5 250", "Robotis", "57   0.0   1.0");
-    addDevice("dLWP 5 250", "Robotis", "65   0.0   1.0");
-    addDevice("dRSP 5 250", "Robotis", "54   0.0   1.0");
-    addDevice("dRSR 5 250", "Robotis", "68   0.0   1.0");
-    addDevice("dRSY 5 250", "Robotis", "59   0.0   1.0");
-    addDevice("dRWP 5 250", "Robotis", "61   0.0   1.0");
+    addDevice("dLSP 5 250", "Robotis", "55   3.070  -1.0");
+    addDevice("dLSR 5 250", "Robotis", "67   2.487  -1.0");
+    addDevice("dLSY 5 250", "Robotis", "57   2.600   1.0");
+    addDevice("dLEP 5 250", "Robotis", "65   2.64   -1.0");
+    addDevice("dRSP 5 250", "Robotis", "54   2.170   1.0");
+    addDevice("dRSR 5 250", "Robotis", "68   2.830   1.0");
+    addDevice("dRSY 5 250", "Robotis", "59   2.262  -1.0");
+    addDevice("dREP 5 250", "Robotis", "61   2.641  -1.0");
    
     addDevice("dLHP 5 250", "Robotis", "42   2.792 -1.0");
     addDevice("dRHP 5 250", "Robotis", "49   2.477  1.0");
@@ -34,11 +34,11 @@ program main {
     addState("RSP 5 50", "Robotis", "Joint", sample);
     addState("RSR 5 50", "Robotis", "Joint", sample);
     addState("RSY 5 50", "Robotis", "Joint", sample);
-    addState("RWP 5 50", "Robotis", "Joint", sample);
+    addState("REP 5 50", "Robotis", "Joint", sample);
     addState("LSP 5 50", "Robotis", "Joint", sample);
     addState("LSR 5 50", "Robotis", "Joint", sample);
     addState("LSY 5 50", "Robotis", "Joint", sample);
-    addState("LWP 5 50", "Robotis", "Joint", sample);
+    addState("LEP 5 50", "Robotis", "Joint", sample);
     addState("HY 5 50",  "Robotis", "Joint", sample);
     addState("LHY 5 50", "Robotis", "Joint", sample);
     addState("LHR 5 50", "Robotis", "Joint", sample);
@@ -55,12 +55,12 @@ program main {
 
     linkPD("pcol", "dLSP"); linkDS("dLSP", "LSP");
     linkPD("pcol", "dLSR"); linkDS("dLSR", "LSR");
-    linkPD("pcol", "dLSY"); linkDS("dLSR", "LSY");
-    linkPD("pcol", "dLWP"); linkDS("dLWP", "LWP");
+    linkPD("pcol", "dLSY"); linkDS("dLSY", "LSY");
+    linkPD("pcol", "dLEP"); linkDS("dLEP", "LEP");
     linkPD("pcol", "dRSP"); linkDS("dRSP", "RSP");
     linkPD("pcol", "dRSR"); linkDS("dRSR", "RSR");
     linkPD("pcol", "dRSY"); linkDS("dRSY", "RSY");
-    linkPD("pcol", "dRWP"); linkDS("dRWP", "RWP");
+    linkPD("pcol", "dREP"); linkDS("dREP", "REP");
     linkPD("pcol", "dHY"); linkDS("dHY",  "HY");
     linkPD("pcol", "dLHY"); linkDS("dLHY", "LHY");
     linkPD("pcol", "dLHR"); linkDS("dLHR", "LHR");
@@ -78,11 +78,11 @@ program main {
     linkSC("LSP", "miniCtrl");
     linkSC("LSR", "miniCtrl");
     linkSC("LSY", "miniCtrl");
-    linkSC("LWP", "miniCtrl");
+    linkSC("LEP", "miniCtrl");
     linkSC("RSP", "miniCtrl");
     linkSC("RSR", "miniCtrl");
     linkSC("RSY", "miniCtrl");
-    linkSC("RWP", "miniCtrl");
+    linkSC("REP", "miniCtrl");
     linkSC("HY",  "miniCtrl");
     linkSC("LHY", "miniCtrl");
     linkSC("LHR", "miniCtrl");
