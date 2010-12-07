@@ -8,17 +8,17 @@ program main {
     addController("user 10 10", "User Program", "danscriptHandWave.ops main");
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dHY  20 50", "Hubo", "38 0.0 1");
-    addDevice("dRSP 20 50", "Hubo", "30 0.0 1");
-    addDevice("dRSR 20 50", "Hubo", "31 0.0 1");
-    addDevice("dRSY 20 50", "Hubo", "32 0.0 1");
-    addDevice("dLSP 20 50", "Hubo", "34 0.0 1");
-    addDevice("dLSR 20 50", "Hubo", "35 0.0 1");
-    addDevice("dLSY 20 50", "Hubo", "36 0.0 1");
-    addDevice("dREP 20 50", "Hubo", "33 0.0 1");
-    addDevice("dLEP 20 50", "Hubo", "37 0.0 1");
-    addDevice("dRWY 20 50", "Hubo", "0 0.0 1");
-    addDevice("dLWY 20 50", "Hubo", "3 0.0 1");
+    addDevice("dHY  20 50", "Hubo", "38 0.0  1");
+    addDevice("dRSP 20 50", "Hubo", "30 0.0  1");
+    addDevice("dRSR 20 50", "Hubo", "31 0.0  1");
+    addDevice("dRSY 20 50", "Hubo", "32 0.0  1");
+    addDevice("dLSP 20 50", "Hubo", "34 0.0  1");
+    addDevice("dLSR 20 50", "Hubo", "35 0.0 -1");
+    addDevice("dLSY 20 50", "Hubo", "36 0.0  1");
+    addDevice("dREP 20 50", "Hubo", "33 0.0  1");
+    addDevice("dLEP 20 50", "Hubo", "37 0.0  1");
+    addDevice("dRWY 20 50", "Hubo", "0  0.0  1");
+    addDevice("dLWY 20 50", "Hubo", "3  0.0  1");
 
     //Add states, each represents 1 property of the device
     addState("HY  10 50", "Hubo", "-3.14 3.14", sampling);
