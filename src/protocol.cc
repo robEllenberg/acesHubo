@@ -61,7 +61,7 @@ namespace ACES{
         Word<PD>* dsIn = NULL;
         Message<HW>* dsOut = NULL;
         while( rxDownStream.read(dsIn) == RTT::NewData ){
-            if( dsOut = processDS(dsIn) ){
+            if( (dsOut = processDS(dsIn)) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol: " << name << ") got DS"
                                    << RTT::endlog();
@@ -73,7 +73,7 @@ namespace ACES{
         Word<HW>* usIn = NULL;
         Word<PD>* usOut = NULL;
         while( rxUpStream.read(usIn) == RTT::NewData ){
-            if( usOut = processUS(usIn) ){
+            if( (usOut = processUS(usIn)) ){
                 RTT::Logger::log() << RTT::Logger::Debug
                                    << "(Protocol: "
                                    << name << ") got US" << RTT::endlog();

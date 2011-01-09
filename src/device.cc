@@ -50,7 +50,7 @@ namespace ACES{
         Word<PD>* dsOut = NULL;
         if(not DSlockout){
             while( rxDownStream.read(dsIn) == RTT::NewData ){
-                if( dsOut = processDS(dsIn) ){
+                if( (dsOut = processDS(dsIn)) ){
                     RTT::Logger::log() << RTT::Logger::Debug << "(dev: " 
                                        << name << ") got DS"
                                        << RTT::endlog();
@@ -63,7 +63,7 @@ namespace ACES{
         Word<S>* usOut = NULL;
         if(not USlockout){
             while( rxUpStream.read(usIn) == RTT::NewData ){
-                if( usOut = processUS(usIn) ){
+                if( (usOut = processUS(usIn)) ){
                     RTT::Logger::log() << RTT::Logger::Debug << "(dev: "
                                        << name << ") got US"
                                        << RTT::endlog();
@@ -85,7 +85,8 @@ namespace ACES{
         if(*(usIn->getCred()) == *credentials){
             //Only works on equiv types
             //TODO - VERY VERY BAD
-            return (Word<S>*)usIn; 
+            usOut = (Word<S>*)usIn;
+            return usOut; 
         }
         return NULL;
     }
@@ -96,7 +97,8 @@ namespace ACES{
         dsIn->setCred(credentials);
         //Only works on equiv types
         //TODO - VERY VERY BAD
-        return (Word<PD>*)dsIn; 
+        dsOut = (Word<PD>*)dsIn;
+        return dsOut; 
     }
 
     template <class S, class P>

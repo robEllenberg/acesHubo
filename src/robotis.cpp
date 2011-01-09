@@ -420,7 +420,8 @@ namespace Robotis {
 
     ACES::Word<float>* Device::processUS(ACES::Word<RobotisPacket>* w){
         if(*(w->getCred()) == *credentials){
-            RobotisPacket* p = &(w->getData());
+            RobotisPacket* p = NULL;// = &(w->getData());
+            *p = w->getData();
 
             for(int i = 0, j=0; i < requestLen; j=i ){
                 unsigned short tentry = 0;
@@ -465,7 +466,6 @@ namespace Robotis {
         RobotisPacket p;
         p.setID(credentials->getDevID());
         p.parameters = new std::deque<unsigned char>;
-        float sp = 0.;
 
         //Indicate that the Device has sent a request, others must
         //wait

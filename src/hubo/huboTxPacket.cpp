@@ -48,9 +48,7 @@ int main()
         
         bool isNeg = false;		// negitive flag
         //unsigned char tx[8];
-        unsigned char md5 = 0;			// md5 
         
-        double degHold = deg;	// save deg
         int degInt	= std::floor(std::abs(deg));		// interger degree
         //degInt = abs(degInt);
         int degRem = (std::abs(deg) - degInt) * 100;		// degree remainder

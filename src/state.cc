@@ -68,7 +68,7 @@ namespace ACES{
     template <class T>
     void History<T>::printme(){
         RTT::Logger::log() << "Sample [n]: t, val" << RTT::endlog();
-        for(int i=0; i < hist.size(); i++){
+        for(unsigned int i=0; i < hist.size(); i++){
             Sample<T> s = hist[i];
             RTT::Logger::log() << i << ": " << s.getSec() << ", "
                                << s.getVal() << RTT::endlog();
@@ -110,8 +110,8 @@ namespace ACES{
     template <class T>
     State<T>::State(std::string cfg, int nID, bool sampling) :
       ProtoState(cfg, nID, sampling),
-      hist(10),
-      value(0)
+      value(0),
+      hist(10)
     {
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");

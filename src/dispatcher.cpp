@@ -337,7 +337,7 @@ namespace ACES{
     bool Dispatcher::addLogger(std::string cfg, std::string type,
                                std::string args)
     {
-        Logger* log;
+        Logger* log = NULL;
         if (type == "File"){
             log = (Logger*) new FileLog(cfg, args);
         }
@@ -345,22 +345,7 @@ namespace ACES{
             logList.push_back(log);
             return connectPeers(log);
         }
-        return false;
-
-        /*
-        Logger* log;
-        if( type == "File"){
-            log = (Logger*) new FileLog(cfg, args);
-        }
-
-        if(log){
-            logList.push_back(log);
-            log->subscribeDispatcher(this);
-            this->connectPeers(log);
-            return true;
-        }
-        return false;
-        */
+        return (bool)log;
     }
 
     bool Dispatcher::linkPD(std::string pcol, std::string device){

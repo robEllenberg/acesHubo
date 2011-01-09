@@ -94,7 +94,7 @@ namespace ACES{
         if(mode){
             RTT::Logger::log() << "M(" << this->mode << "): ";
         }
-        RTT::Logger::log() << "= " << (int)this->data << RTT::endlog();
+        RTT::Logger::log() << "= " << this->data << RTT::endlog();
 
         if(cred){
             cred->printme();
