@@ -111,7 +111,9 @@ namespace ACES{
     State<T>::State(std::string cfg, int nID, bool sampling) :
       ProtoState(cfg, nID, sampling),
       value(0),
-      hist(10)
+      hist(10),
+      io_service(),
+      socket(io_service, udp::endpoint(udp::v4(), port))
     {
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
@@ -136,6 +138,13 @@ namespace ACES{
                                "DownStream (to Device) Transmission");
 
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
+
+        socket.async_receive_from(
+          boost::asio::buffer(data_, max_length), sender_endpoint_,
+          boost::bind(&State<T>::rxHandle, this,
+          boost::asio::placeholders::error,
+          boost::asio::placeholders::bytes_transferred)
+        );
     }
 
     template <class T>
@@ -277,5 +286,27 @@ namespace ACES{
         std::stringstream s;
         s << this->value;
         return s.str();
+    }
+
+    template <class T>
+    void State<T>::rxHandle(const boost::system::error_code& error,
+                            size_t bytes_recvd)
+    {
+        if (!error && bytes_recvd > 0)
+        {
+          socket_.async_send_to(
+              boost::asio::buffer(data_, bytes_recvd), sender_endpoint_,
+              boost::bind(&server::handle_send_to, this,
+                boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred));
+        }
+        else
+        {
+          socket_.async_receive_from(
+              boost::asio::buffer(data_, max_length), sender_endpoint_,
+              boost::bind(&server::handle_receive_from, this,
+                boost::asio::placeholders::error,
+                boost::asio::placeholders::bytes_transferred));
+        }
     }
 }

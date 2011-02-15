@@ -119,6 +119,13 @@ namespace ACES {
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
             RTT::InputPort< std::map<std::string, void*>* > rxDownStream;
+
+            boost::asio::io_service io_service;
+            udp::socket socket;
+            udp::endpoint sender_endpoint_;
+            enum { max_length = 1024 };
+            char data_[max_length];
+
     };
 
 }
