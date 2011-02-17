@@ -1,23 +1,19 @@
 #ifndef __ADCPACKET_HPP_
 #define __ADCPACKET_HPP_
 
+#include <iostream>
+
 class adcPacket {
     public:
-        adcPacket(char channel, int value);
+        adcPacket(unsigned char channel, unsigned char high,
+                  unsigned char low);
+        adcPacket(unsigned char channel, int val);
         void printme();
-        char getChannel();
+        unsigned char getChannel();
         int  getValue();
     private:
         unsigned char channel;
-        float value;
-};
-
-class adcFlex : adcFlexLexer
-{
-    private:
-        int counter;
-        int yylex();
-        adcPacket* packet;
+        int value;
 };
 
 #endif
