@@ -21,27 +21,7 @@
 */
 
 %{
-#include <iostream>
-#include "adcDS.hpp"
-
-//must be done for each distinct type of lexer made with flex++
-//#undef yyFlexLexer
-//#define yyFlexLexer adcFlexLexer
-//#include <FlexLexer.h>
-
-class adcFlex : adcFlexLexer
-{
-    public:
-        adcFlex();
-        adcPacket* releasePacket();
-        int yylex();    //Flex provides an implemattion, but we must give the
-                        //declaration
-    private:
-        int counter;
-        adcPacket* packet;
-        unsigned char tempByte;
-};
-
+#include "adcFlex.hpp"
 %}
 
 %x head
@@ -100,17 +80,22 @@ class adcFlex : adcFlexLexer
 
 %%
 
-adcFlex::adcFlex() : yyFlexLexer(){
-    counter = 0;
-    packet = NULL;
-    tempByte = 0;
-}
+    adcFlex::adcFlex() : yyFlexLexer(){
+        counter = 0;
+        packet = NULL;
+        tempByte = 0;
+    }
 
-adcPacket* adcFlex::releasePacket(){
-    adcPacket* p = packet;
-    packet = NULL;
-    return p;
-}
+    adcPacket* adcFlex::releasePacket(){
+        adcPacket* p = packet;
+        packet = NULL;
+        return p;
+    }
+
+    int adcFlex::yylex( std::istream* new_in, std::ostream* new_out ){
+        switch_streams(new_in, new_out );
+        yylex(new_in, new_out);
+    }
 
 #ifdef __ADC_PARSE_TESTSUITE__
     //#undef yyFlexLexer

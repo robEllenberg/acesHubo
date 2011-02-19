@@ -52,44 +52,45 @@ namespace FlexScanner{
     }
 
     template <class USPacket, class FlexScanner>
-    Protocol::Protocol(std::string cfg, std::string args)
+    Protocol<USPacket, FlexScanner>::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, USPacket>(cfg, args)
     {
         scanner = NULL;
     }
 
     template <class USPacket, class FlexScanner>
-    bool Protocol::startHook(){
+    bool Protocol<USPacket, FlexScanner>::startHook(){
         scanner = new FlexScanner();
         return true;
     }
 
     template <class USPacket, class FlexScanner>
-    void Protocol::stopHook(){
+    void Protocol<USPacket, FlexScanner>::stopHook(){
         delete scanner;
         scanner = NULL;
     }
 
     template <class USPacket, class FlexScanner>
     ACES::Word<USPacket>*
-      Protocol::processUS(ACES::Word<unsigned char>* usIn)
+      Protocol<USPacket, FlexScanner>::processUS(ACES::Word<unsigned char>* usIn)
     {
         ACES::Word<USPacket>* pw = NULL;
         unsigned char c = 0;
         c = usIn->getData();
         //RTT::Logger::log() << "Got Something! - " << (int)c << RTT::endlog();
 
-        std::str temp(1, c);
-        istringstream in(temp);
+        std::string temp(1, c);
+        istringstream *in = new istringstream(temp);
         
         //If yylex returns 1 we have matched a full packet
         //if return is 0 we have only eaten a character
-        if( scanner->yylex( &(istream)in); ){ 
-            USPacket* p = scanner.releasePacket();
+        if( scanner->yylex((istream*)in) ){ 
+            USPacket* p = scanner->releasePacket();
 
-            word= new ACES::Word<USPacket>(*p, 0, 0, 0,
+            ACES::Word<USPacket>* word= new ACES::Word<USPacket>(*p, 0, 0, 0,
                 (ACES::Credentials*)credFromPacket(p));
             p->printme();
+            delete in;
             delete p;
             return word;
         }

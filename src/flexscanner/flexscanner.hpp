@@ -24,8 +24,16 @@
 #define ACES_FLEXPARSER_HPP
 
 #include <rtt/base/RunnableInterface.hpp>
+#include <rtt/OutputPort.hpp>
 
 #include <boost/asio.hpp>
+
+#include "../protocol.hpp"
+#include "../message.hpp"
+#include "../state.hpp"
+#include "../hardware.hpp"
+#include "../credentials.hpp"
+
 namespace FlexScanner {
     class Reader : public RTT::base::RunnableInterface {
         public:
@@ -56,12 +64,12 @@ namespace FlexScanner {
     };
 
     template <class USPacket, class FlexScanner>
-    class Protocol : public ACES::Protocol<unsigned char, T> {
+    class Protocol : public ACES::Protocol<unsigned char, USPacket> {
         public:
             Protocol(std::string cfg, std::string args); 
             bool startHook();
             void stopHook();
-            ACES::Word<T>* processUS(ACES::Word<unsigned char>* w);
+            ACES::Word<USPacket>* processUS(ACES::Word<unsigned char>* w);
             virtual ACES::Credentials* credFromPacket(USPacket* p) = 0;
 
             FlexScanner* scanner;
@@ -70,5 +78,5 @@ namespace FlexScanner {
     };
 }
 
-#include "flexscaner.cc"
+#include "flexscanner.cc"
 #endif

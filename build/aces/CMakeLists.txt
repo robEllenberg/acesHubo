@@ -39,6 +39,7 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
 
 add_subdirectory(robotis)
 add_subdirectory(ik)
+add_subdirectory(flexscanner)
                     
 add_definitions(-DTESTSUITE)
 add_definitions(-DROBOTIS)
@@ -57,6 +58,9 @@ rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
 rosbuild_add_library(aces-webots ../src/webots.cpp)
 target_link_libraries(aces-webots Controller)
 
+rosbuild_add_library(minihubo ../src/minihubo.cpp)
+target_link_libraries(minihubo aces-common minihubo-adc)
+
 rosbuild_add_executable(aces-launcher ../src/launcher.cpp)
 target_link_libraries(aces-launcher aces-common)
 target_link_libraries(aces-launcher aces-dispatcher)
@@ -64,4 +68,5 @@ target_link_libraries(aces-launcher aces-testsuite)
 target_link_libraries(aces-launcher aces-hubo)
 target_link_libraries(aces-launcher aces-webots)
 target_link_libraries(aces-launcher aces-robotis)
+target_link_libraries(aces-launcher minihubo)
 target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)
