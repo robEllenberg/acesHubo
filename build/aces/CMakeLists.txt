@@ -28,6 +28,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+#rosbuild_find_ros_package(rtt)
+#find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install)
+#rosbuild_include(rtt_ros_integration GenerateRTTtypekit) 
+
+rosbuild_find_ros_package(rtt )
+find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install )
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
