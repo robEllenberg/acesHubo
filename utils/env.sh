@@ -12,7 +12,7 @@ export ACES_PATH=$ACES_ROOT/build/aces/bin:$UTILS
 export PATH=$ACES_PATH:$PATH
 
 #LD_LIBRARY_PATH=$ACES_ROOT/support/lib:/usr/local/webots/lib/:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/usr/local/webots/lib/:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/webots/lib/:/opt/ros/cturtle/stacks/orocos_toolchain_ros/rtt/install/lib:/opt/ros/cturtle/stacks/orocos_toolchain_ros/rtt/install/lib/orocos/plugins:$LD_LIBRARY_PATH
 
 export WEBOTS_STDOUT=1
 export WEBOTS_STDERR=1
