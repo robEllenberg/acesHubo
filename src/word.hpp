@@ -63,8 +63,9 @@ namespace ACES{
 
     template <class T>
     Word<T>::Word(T d, int nID, int dID, int m, Credentials* c)
-     : ProtoWord(nID, dID, m, c){
-        data = d;
+     : ProtoWord(nID, dID, m, c),
+       data(d){
+        //data = d;
     }
 
     template <class T>

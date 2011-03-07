@@ -1,0 +1,69 @@
+StateMachine LaMachine
+    {
+        var float t;
+        var float angle;
+
+        initial state InitState
+        {
+            entry {
+                t = 0;
+                angle = 0;
+            }
+            run{
+                t = t + 1;
+            }
+            exit {
+                t = 0;
+            }
+
+           transition if (t > 15*5) then  //controller @15Hz, pause 5s   
+                select crouch
+        }
+
+        state crouch {
+                entry {
+                }
+                run{
+                    angle=angle+.02
+                    addCtrl("LHP",angle);addCtrl("LKP",angle*2); addCtrl("LAP",angle);
+                    addCtrl("RHP",angle);addCtrl("RKP",angle*2); addCtrl("RAP",angle);
+                    sendCtrl();
+                   }
+                exit {
+                }
+                transition if ( getSurface("LHP", "value") > 1.2) then
+                   select rise
+        }
+
+        state rise {
+                entry {
+                }
+                run{
+                    angle=angle-.02
+                    addCtrl("LHP",angle);addCtrl("LKP",angle*2); addCtrl("LAP",angle);
+                    addCtrl("RHP",angle);addCtrl("RKP",angle*2); addCtrl("RAP",angle);
+                    sendCtrl();
+                }
+                exit {
+                }
+                transition if ( getSurface("LHP", "value") < 0.01) then
+                   select crouch
+                transition if (getSurface("RSP", "value") > 0.0) then
+                   select exit
+        }
+
+        final state exit {
+               entry {
+               }
+               run {
+                    angle=0.0
+                    addCtrl("LHP",angle);addCtrl("LKP",angle*2); addCtrl("LAP",angle);
+                    addCtrl("RHP",angle);addCtrl("RKP",angle*2); addCtrl("RAP",angle);
+                    sendCtrl();
+               }
+               exit {
+               }
+        }
+  }  
+
+  RootMachine LaMachine main

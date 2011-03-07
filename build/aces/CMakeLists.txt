@@ -28,6 +28,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+#rosbuild_find_ros_package(rtt)
+#find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install)
+#rosbuild_include(rtt_ros_integration GenerateRTTtypekit) 
+
+rosbuild_find_ros_package(rtt )
+find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install )
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
@@ -39,6 +46,7 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
 
 add_subdirectory(robotis)
 add_subdirectory(ik)
+add_subdirectory(flexscanner)
                     
 add_definitions(-DTESTSUITE)
 add_definitions(-DROBOTIS)
@@ -57,6 +65,9 @@ rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
 rosbuild_add_library(aces-webots ../src/webots.cpp)
 target_link_libraries(aces-webots Controller)
 
+rosbuild_add_library(minihubo ../src/minihubo.cpp)
+target_link_libraries(minihubo aces-common minihubo-adc)
+
 rosbuild_add_executable(aces-launcher ../src/launcher.cpp)
 target_link_libraries(aces-launcher aces-common)
 target_link_libraries(aces-launcher aces-dispatcher)
@@ -64,4 +75,5 @@ target_link_libraries(aces-launcher aces-testsuite)
 target_link_libraries(aces-launcher aces-hubo)
 target_link_libraries(aces-launcher aces-webots)
 target_link_libraries(aces-launcher aces-robotis)
+target_link_libraries(aces-launcher minihubo)
 target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)

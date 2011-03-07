@@ -48,6 +48,7 @@ namespace ACES{
 
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name ));
+	curMap = NULL;
     }
 
     void Controller::addCtrl(std::string dest, float sp){
