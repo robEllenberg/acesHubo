@@ -108,12 +108,14 @@ namespace ACES{
     }
 
     template <class T>
-    State<T>::State(std::string cfg, int nID, bool sampling) :
+    State<T>::State(std::string cfg, int nID, bool sampling, unsigned int
+                    portnum) :
       ProtoState(cfg, nID, sampling),
       value(0),
       hist(10),
-      io_service(),
-      socket(io_service, udp::endpoint(udp::v4(), port))
+      port(portnum),
+      matio(this, port),
+      matActivity(priority, &matio)
     {
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
@@ -129,6 +131,7 @@ namespace ACES{
         this->addAttribute("value", value);
         this->addAttribute("integral", integral);
         this->addAttribute("diff", diff);
+        this->addAttribute("portnum", port);
 
         this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
@@ -137,14 +140,21 @@ namespace ACES{
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Device) Transmission");
 
-        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(25);
+        matio.DSmatio.connectTo(&rxDownStream, policy);
 
-        socket.async_receive_from(
-          boost::asio::buffer(data_, max_length), sender_endpoint_,
-          boost::bind(&State<T>::rxHandle, this,
-          boost::asio::placeholders::error,
-          boost::asio::placeholders::bytes_transferred)
-        );
+        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
+    }
+
+    template <class T>
+    bool State<T>::startHook(){
+        matActivity.start();
+        return true;
+    }
+
+    template <class T>
+    void State<T>::stopHook(){
+        matActivity.stop();
     }
 
     template <class T>
@@ -239,6 +249,11 @@ namespace ACES{
     }
 
     template <class T>
+    T State<T>::getVal(){
+        return value;
+    }
+
+    template <class T>
     bool State<T>::updateInt(Sample<T> cur, Sample<T> last){
         if(cur.isValid() and last.isValid()){
             double newArea = 1./2.*(double)( cur.getVal()+last.getVal()) *
@@ -286,27 +301,5 @@ namespace ACES{
         std::stringstream s;
         s << this->value;
         return s.str();
-    }
-
-    template <class T>
-    void State<T>::rxHandle(const boost::system::error_code& error,
-                            size_t bytes_recvd)
-    {
-        if (!error && bytes_recvd > 0)
-        {
-          socket_.async_send_to(
-              boost::asio::buffer(data_, bytes_recvd), sender_endpoint_,
-              boost::bind(&server::handle_send_to, this,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred));
-        }
-        else
-        {
-          socket_.async_receive_from(
-              boost::asio::buffer(data_, max_length), sender_endpoint_,
-              boost::bind(&server::handle_receive_from, this,
-                boost::asio::placeholders::error,
-                boost::asio::placeholders::bytes_transferred));
-        }
     }
 }

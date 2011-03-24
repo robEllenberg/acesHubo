@@ -9,9 +9,9 @@ program main {
     addDevice("dZ 20 500", "TestSuite", "3"); 
 
     //Add states, each represents 1 property of the device
-    addState("X 10 50", "TestSuite", "-1.0 1.0", true); 
-    addState("Y 10 50", "TestSuite", "3.0 4.0", true); 
-    addState("Z 10 50", "TestSuite", "5.0 6.0", true); 
+    addState("X 10 100", "TestSuite", "-1.0 1.0", false, 2827); 
+    addState("Y 10 100", "TestSuite", "3.0 4.0", true, 2828); 
+    addState("Z 10 100", "TestSuite", "5.0 6.0", true, 2829); 
 
     //Tell the states and devices to pay attention to each other
     linkDS("dX", "X"); 
@@ -26,8 +26,8 @@ program main {
     //Setup Logging
     addLogger("log1 5 200", "File", "log.txt"); 
     linkLS("log1", "X", "value"); 
-    //linkLS("log1", "Y", "value"); 
-    //linkLS("log1", "Z", "value"); 
+    linkLS("log1", "Y", "value"); 
+    linkLS("log1", "Z", "value"); 
     linkLS("log1", "X", "integral"); 
     linkLS("log1", "X", "diff"); 
     

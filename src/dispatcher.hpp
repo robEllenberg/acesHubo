@@ -61,8 +61,8 @@ namespace ACES{
                              std::string args);
             bool addProtocol(std::string cfg, std::string type,
                              std::string args);
-            bool addState(std::string cfg, std::string type,
-                          std::string args, bool sampling);
+            bool addState(std::string cfg, std::string type, std::string args,
+                          bool sampling, unsigned int portnum);
             bool addController(std::string cfg, std::string type,
                                std::string args);
             bool addDevice(std::string cfg, std::string type,

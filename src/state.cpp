@@ -62,6 +62,10 @@ namespace ACES {
                         ).handle();*/
         return true;
     }
+
+    const std::string& ProtoState::getName(){
+        return name;
+    }
    
 /*
     template <class T>

@@ -45,7 +45,8 @@ namespace ACES{
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")        
                            .arg("args", "arguments specific to the type")
-                           .arg("sampling", "Should the state default-sample");
+                           .arg("sampling", "Should the state default-sample")
+                           .arg("portnum", "UDP access port");
 
         this->addOperation("addController", &Dispatcher::addController,
                            this, RTT::OwnThread).doc("add new Controller")
@@ -239,29 +240,35 @@ namespace ACES{
     }
 
     bool Dispatcher::addState(std::string cfg, std::string type,
-                              std::string args, bool sampling)
+                              std::string args, bool sampling, unsigned int
+                              portnum)
     {
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
         #ifdef HUBO 
         if ( type == "Hubo"){
-            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling);
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
+                                                     portnum);
         } 
         #endif
         #ifdef WEBOTS
         if( type == "Webots") {
             if ( args == "Joint" ){
-                s = (ProtoState*) new ACES::State<float>(cfg, JOINT, sampling);
+                s = (ProtoState*) new ACES::State<float>(cfg, JOINT, sampling,
+                                                         portnum);
             }
             if ( args == "X" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, X, sampling);
+                s = (ProtoState*) new ACES::State<float>(cfg, X, sampling,
+                                                         portnum);
             }
             if ( args == "Y" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, Y, sampling);
+                s = (ProtoState*) new ACES::State<float>(cfg, Y, sampling,
+                                                         portnum);
             }
             if ( args == "Z" ) {
-                s = (ProtoState*) new ACES::State<float>(cfg, Z, sampling);
+                s = (ProtoState*) new ACES::State<float>(cfg, Z, sampling,
+                                                         portnum);
             }
             //((State<float>*)s)->printme();
         }
@@ -271,13 +278,14 @@ namespace ACES{
         if ( type == "Robotis"){
             s = (ProtoState*) new ACES::State<float>(cfg,
                                                 (int)Robotis::GOAL_POSITION,
-                                                sampling);
+                                                sampling, portnum);
         } 
         #endif
 
         #ifdef TESTSUITE
         if( type == "TestSuite") {
-            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling);
+            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
+                                                     portnum);
         }
         #endif
 		
