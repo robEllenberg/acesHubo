@@ -23,21 +23,18 @@
 #include "testsuite.hpp"
 
 namespace TestSuite{
-    template <class T>
-    Hardware<T>::Hardware(std::string cfg, std::string args)
-      : ACES::Hardware<T>(cfg, args)
+    Hardware::Hardware(std::string cfg, std::string args)
+      : ACES::Hardware<float>(cfg, args)
     { }
    
-    template <class S, class PD>
-    Device<S,PD>::Device(std::string cfg, std::string args)
-      : ACES::Device<S,PD>(cfg)
+    Device::Device(std::string cfg, std::string args)
+      : ACES::Device<float,float>(cfg)
     {
         this->credentials = new ACES::Credentials(args);
     }
     
-    template <class HW, class P>
-    Protocol<HW,P>::Protocol(std::string cfg, std::string args)
-      : ACES::Protocol<HW,P>(cfg, args)
+    Protocol::Protocol(std::string cfg, std::string args)
+      : ACES::Protocol<float,float>(cfg, args)
     { }
 
     Spinner::Spinner(std::string cfg, std::string args, bool sampling)
@@ -64,13 +61,5 @@ namespace TestSuite{
         //                                             0, ACES::REFRESH);
                                                      0, ACES::SET);
         txDownStream.write(g);
-    }
-
-    //TODO - Total Kludge, there's got to be a _proper_ way to get the compiler
-    //to generate the specializations we want and throw them into the library
-    void forcegenerate(){
-        Device<float, float> d("a", "b");
-        Hardware<float> h("a", "b");
-        Protocol<float, float> p("e", "f");
     }
 };

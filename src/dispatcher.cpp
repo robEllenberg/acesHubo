@@ -143,7 +143,7 @@ namespace ACES{
         #endif
         #ifdef TESTSUITE
         if (type == "TestSuite") {
-            h = (RTT::TaskContext*) new TestSuite::Hardware<float>(cfg, args);
+            h = (RTT::TaskContext*) new TestSuite::Hardware(cfg, args);
         }
         #endif
         if(h){
@@ -175,7 +175,7 @@ namespace ACES{
         #ifdef TESTSUITE
         if ( type == "TestSuite"){
             p = (RTT::TaskContext*) new
-                TestSuite::Protocol<float, float>(cfg, args);
+                TestSuite::Protocol(cfg, args);
         } 
         #endif
         if(p){
@@ -228,7 +228,7 @@ namespace ACES{
         #ifdef TESTSUITE
         if ( type1 == "TestSuite"){
             d = (RTT::TaskContext*) new
-                    TestSuite::Device<float,float>(cfg, args);
+                    TestSuite::Device(cfg, args);
         } 
         #endif
         if(d){

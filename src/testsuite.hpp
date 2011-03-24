@@ -34,21 +34,18 @@
 
 namespace TestSuite{
 
-    template <typename T>
-    class Hardware : public ACES::Hardware<T> {
+    class Hardware : public ACES::Hardware<float> {
         public:
             Hardware(std::string cfg, std::string args);
             bool subscribeController(ACES::Controller* c);
     };
     
-    template <class S, class P>
-    class Device : public ACES::Device<S,P> {
+    class Device : public ACES::Device<float, float> {
         public:
             Device(std::string cfg, std::string args);
     };
 
-    template <class HW, class P>
-    class Protocol : public ACES::Protocol<HW, P>{
+    class Protocol : public ACES::Protocol<float, float>{
         public:
             Protocol(std::string cfg, std::string args);
     };
