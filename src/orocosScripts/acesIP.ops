@@ -5,8 +5,8 @@ program main {
     addDevice("dHIP 5 31", "Webots Joint",  "hip 0.0 1.0");
     addDevice("dhzs 5 31", "Webots Joint", "horizontal_servo 0.0 1.0");
  
-    addState("hip 5 31",  "Webots", "Joint", true);
-    addState("hzs 5 31",  "Webots", "Joint", true);
+    addState("hip 5 31",  "Webots", "Joint", true, 2827);
+    addState("hzs 5 31",  "Webots", "Joint", true, 2828);
 
     //Null Controller needed to advance timestep
     //addController("wbNull 10 30", "Mini Null", "");

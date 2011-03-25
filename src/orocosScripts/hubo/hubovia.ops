@@ -1,5 +1,6 @@
 program main {
     var bool sampling = false;
+    var int baseport = 2827;
 
     addHardware("hw 90 100","Hubo","");
     addProtocol("pro 80 100", "Hubo", "");
@@ -21,17 +22,17 @@ program main {
     addDevice("dLWY 20 50", "Hubo", "3  0.0  1");
 
     //Add states, each represents 1 property of the device
-    addState("HY  10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("RSP 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("RSR 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling);
-    addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling);
+    addState("HY  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
+    addState("RSP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 1);
+    addState("RSR 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 2);
+    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 3);
+    addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 4);
+    addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 5);
+    addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 6);
+    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 7);
+    addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 8);
+    addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 9);
+    addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 10);
 
     //Tell the states and devices to pay attention to each other
     linkDS("dHY",  "HY");

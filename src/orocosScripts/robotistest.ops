@@ -12,9 +12,9 @@ program main{
     //addState("X 5 10", "Robotis", "", false);
     //addState("Y 5 10", "Robotis", "", false);
     //addState("Z 5 10", "Robotis", "", false);
-    addState("X 10 50", "TestSuite", "-150 150", true); 
-    addState("Y 10 50", "TestSuite", "-150 150", true); 
-    addState("Z 10 50", "TestSuite", "-150 150", true); 
+    addState("X 10 50", "TestSuite", "-150 150", true, 2827); 
+    addState("Y 10 50", "TestSuite", "-150 150", true, 2828); 
+    addState("Z 10 50", "TestSuite", "-150 150", true, 2829); 
 
     //Tell the states and devices to pay attention to each other
     linkDS("dX", "X");

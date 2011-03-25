@@ -1,5 +1,6 @@
 program main {
     var bool sample = false;
+    var int baseport = 2827;
 
     addHardware("hw 1 2000", "Robotis", "/dev/ttyUSB0");
     addProtocol("pcol 2 50", "Robotis", "");
@@ -31,42 +32,27 @@ program main {
     addDevice("dRAP 5 250", "Robotis", "67   2.61  -1.0");
     addDevice("dRAR 5 250", "Robotis", "74   2.56  -1.0");
 
-    addState("LSP 5 50", "Robotis", "Joint", sample);
-    addState("LSR 5 50", "Robotis", "Joint", sample);
-    addState("LSY 5 50", "Robotis", "Joint", sample);
-    addState("LEP 5 50", "Robotis", "Joint", sample);
-    addState("RSP 5 50", "Robotis", "Joint", sample);
-    addState("RSR 5 50", "Robotis", "Joint", sample);
-    addState("RSY 5 50", "Robotis", "Joint", sample);
-    addState("REP 5 50", "Robotis", "Joint", sample);
-    addState("HY  5 50", "Robotis", "Joint", sample);
-    addState("LHY 5 50", "Robotis", "Joint", sample);
-    addState("LHR 5 50", "Robotis", "Joint", sample);
-    addState("LHP 5 50", "Robotis", "Joint", sample);
-    addState("LKP 5 50", "Robotis", "Joint", sample);
-    addState("LAP 5 50", "Robotis", "Joint", sample);
-    addState("LAR 5 50", "Robotis", "Joint", sample);
-    addState("RHY 5 50", "Robotis", "Joint", sample);
-    addState("RHR 5 50", "Robotis", "Joint", sample);
-    addState("RHP 5 50", "Robotis", "Joint", sample);
-    addState("RKP 5 50", "Robotis", "Joint", sample);
-    addState("RAP 5 50", "Robotis", "Joint", sample);
-    addState("RAR 5 50", "Robotis", "Joint", sample);
-
-/*
-    addState("LHY 5 50", "TestSuite", "-10 10", true); 
-    addState("RHY 5 50", "TestSuite", "-10 10", true); 
-    addState("LAP 5 50", "TestSuite", "-20 20", true); 
-    addState("RAP 5 50", "TestSuite", "-20 20", true); 
-    addState("LKP 5 50", "TestSuite", "-50 0", true); 
-    addState("RKP 5 50", "TestSuite", "-50 0", true); 
-    addState("LAR 5 50", "TestSuite", "-20 20", true); 
-    addState("RAR 5 50", "TestSuite", "-20 20", true); 
-    addState("RHP 5 50", "TestSuite", "-50 50", true); 
-    addState("LHP 5 50", "TestSuite", "-50 50", true);
-    addState("LHR 5 31", "TestSuite", "-20 20", true); 
-    addState("RHR 5 31", "TestSuite", "-20 20", true); 
-*/
+    addState("RSP 5 50", "Robotis", "Joint", sample, baseport);
+    addState("RSR 5 50", "Robotis", "Joint", sample, baseport + 1);
+    addState("RSY 5 50", "Robotis", "Joint", sample, baseport + 2);
+    addState("REP 5 50", "Robotis", "Joint", sample, baseport + 3);
+    addState("LSP 5 50", "Robotis", "Joint", sample, baseport + 4);
+    addState("LSR 5 50", "Robotis", "Joint", sample, baseport + 5);
+    addState("LSY 5 50", "Robotis", "Joint", sample, baseport + 6);
+    addState("LEP 5 50", "Robotis", "Joint", sample, baseport + 7);
+    addState("HY 5 50",  "Robotis", "Joint", sample, baseport + 8);
+    addState("LHY 5 50", "Robotis", "Joint", sample, baseport + 9);
+    addState("LHR 5 50", "Robotis", "Joint", sample, baseport + 10);
+    addState("LHP 5 50", "Robotis", "Joint", sample, baseport + 11);
+    addState("LKP 5 50", "Robotis", "Joint", sample, baseport + 12);
+    addState("LAP 5 50", "Robotis", "Joint", sample, baseport + 13);
+    addState("LAR 5 50", "Robotis", "Joint", sample, baseport + 14);
+    addState("RHY 5 50", "Robotis", "Joint", sample, baseport + 15);
+    addState("RHR 5 50", "Robotis", "Joint", sample, baseport + 16);
+    addState("RHP 5 50", "Robotis", "Joint", sample, baseport + 17);
+    addState("RKP 5 50", "Robotis", "Joint", sample, baseport + 18);
+    addState("RAP 5 50", "Robotis", "Joint", sample, baseport + 19);
+    addState("RAR 5 50", "Robotis", "Joint", sample, baseport + 20);
 
     linkPD("pcol", "dLSP"); linkDS("dLSP", "LSP");
     linkPD("pcol", "dLSR"); linkDS("dLSR", "LSR");

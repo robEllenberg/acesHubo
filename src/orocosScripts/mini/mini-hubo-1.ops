@@ -1,57 +1,58 @@
 program main {
     var bool sample = false;
+    var int baseport = 2827;
 
     addHardware("hw 1 2000", "Robotis", "/dev/ttyUSB0");
     addProtocol("pcol 2 50", "Robotis", "");
 
     linkHP("hw", "pcol");
 
-    addController("miniCtrl 10 50", "Mini Leg", "walkPatterns/test9.txt");
+    addController("miniCtrl 10 50", "Mini Leg", "walkPatterns/trajectory.txt");
 
-    addDevice("dLSP 5 250", "Robotis", "55   3.070  -1.0");
-    addDevice("dLSR 5 250", "Robotis", "67   2.487  -1.0");
+    addDevice("dLSP 5 250", "Robotis", "55   3.070   1.0");
+    addDevice("dLSR 5 250", "Robotis", "67   2.487   1.0");
     addDevice("dLSY 5 250", "Robotis", "57   2.600   1.0");
-    addDevice("dLEP 5 250", "Robotis", "65   2.64   -1.0");
+    addDevice("dLEP 5 250", "Robotis", "65   2.640   1.0");
     addDevice("dRSP 5 250", "Robotis", "54   2.170   1.0");
     addDevice("dRSR 5 250", "Robotis", "68   2.830   1.0");
-    addDevice("dRSY 5 250", "Robotis", "59   2.262  -1.0");
-    addDevice("dREP 5 250", "Robotis", "61   2.641  -1.0");
+    addDevice("dRSY 5 250", "Robotis", "59   2.262   1.0");
+    addDevice("dREP 5 250", "Robotis", "61   2.641   1.0");
    
-    addDevice("dLHP 5 250", "Robotis", "42   2.792 -1.0");
-    addDevice("dRHP 5 250", "Robotis", "49   2.477  1.0");
-    addDevice("dLKP 5 250", "Robotis", "45   4.258 -1.0");
-    addDevice("dRKP 5 250", "Robotis", "52   4.275 -1.0");
-    addDevice("dLAP 5 250", "Robotis", "41   2.556 -1.0");
-    addDevice("dRAP 5 250", "Robotis", "40   2.565 -1.0");
-    addDevice("dHY  5 250", "Robotis", "64   2.615 -1.0");
-    addDevice("dLHY 5 250", "Robotis", "47   2.618 -1.0");
-    addDevice("dLHR 5 250", "Robotis", "44   2.618  1.0");
-    addDevice("dLAR 5 250", "Robotis", "43   2.635 -1.0");
-    addDevice("dRHY 5 250", "Robotis", "48   2.572 -1.0");
-    addDevice("dRHR 5 250", "Robotis", "51   2.572 -1.0");
-    addDevice("dRAR 5 250", "Robotis", "46   2.618 -1.0");
+    addDevice("dLHP 5 250", "Robotis", "42   2.377   -1.0");
+    addDevice("dRHP 5 250", "Robotis", "49   2.888   -1.0");
+    addDevice("dLKP 5 250", "Robotis", "45   3.747   1.0");
+    addDevice("dRKP 5 250", "Robotis", "52   1.458   1.0");
+    addDevice("dLAP 5 250", "Robotis", "41   2.818  -1.0");
+    addDevice("dRAP 5 250", "Robotis", "40   2.397   -1.0");
+    addDevice("dHY  5 250", "Robotis", "64   2.618   1.0");
+    addDevice("dLHY 5 250", "Robotis", "47   2.618   1.0");
+    addDevice("dLHR 5 250", "Robotis", "44   2.638   -1.0");
+    addDevice("dLAR 5 250", "Robotis", "43   2.658   -1.0");
+    addDevice("dRHY 5 250", "Robotis", "48   2.618   1.0");
+    addDevice("dRHR 5 250", "Robotis", "51   2.598   1.0");
+    addDevice("dRAR 5 250", "Robotis", "46   2.578   1.0");
 
-    addState("RSP 5 50", "Robotis", "Joint", sample);
-    addState("RSR 5 50", "Robotis", "Joint", sample);
-    addState("RSY 5 50", "Robotis", "Joint", sample);
-    addState("REP 5 50", "Robotis", "Joint", sample);
-    addState("LSP 5 50", "Robotis", "Joint", sample);
-    addState("LSR 5 50", "Robotis", "Joint", sample);
-    addState("LSY 5 50", "Robotis", "Joint", sample);
-    addState("LEP 5 50", "Robotis", "Joint", sample);
-    addState("HY 5 50",  "Robotis", "Joint", sample);
-    addState("LHY 5 50", "Robotis", "Joint", sample);
-    addState("LHR 5 50", "Robotis", "Joint", sample);
-    addState("LHP 5 50", "Robotis", "Joint", sample);
-    addState("LKP 5 50", "Robotis", "Joint", sample);
-    addState("LAP 5 50", "Robotis", "Joint", sample);
-    addState("LAR 5 50", "Robotis", "Joint", sample);
-    addState("RHY 5 50", "Robotis", "Joint", sample);
-    addState("RHR 5 50", "Robotis", "Joint", sample);
-    addState("RHP 5 50", "Robotis", "Joint", sample);
-    addState("RKP 5 50", "Robotis", "Joint", sample);
-    addState("RAP 5 50", "Robotis", "Joint", sample);
-    addState("RAR 5 50", "Robotis", "Joint", sample);
+    addState("RSP 5 50", "Robotis", "Joint", sample, baseport);
+    addState("RSR 5 50", "Robotis", "Joint", sample, baseport + 1);
+    addState("RSY 5 50", "Robotis", "Joint", sample, baseport + 2);
+    addState("REP 5 50", "Robotis", "Joint", sample, baseport + 3);
+    addState("LSP 5 50", "Robotis", "Joint", sample, baseport + 4);
+    addState("LSR 5 50", "Robotis", "Joint", sample, baseport + 5);
+    addState("LSY 5 50", "Robotis", "Joint", sample, baseport + 6);
+    addState("LEP 5 50", "Robotis", "Joint", sample, baseport + 7);
+    addState("HY 5 50",  "Robotis", "Joint", sample, baseport + 8);
+    addState("LHY 5 50", "Robotis", "Joint", sample, baseport + 9);
+    addState("LHR 5 50", "Robotis", "Joint", sample, baseport + 10);
+    addState("LHP 5 50", "Robotis", "Joint", sample, baseport + 11);
+    addState("LKP 5 50", "Robotis", "Joint", sample, baseport + 12);
+    addState("LAP 5 50", "Robotis", "Joint", sample, baseport + 13);
+    addState("LAR 5 50", "Robotis", "Joint", sample, baseport + 14);
+    addState("RHY 5 50", "Robotis", "Joint", sample, baseport + 15);
+    addState("RHR 5 50", "Robotis", "Joint", sample, baseport + 16);
+    addState("RHP 5 50", "Robotis", "Joint", sample, baseport + 17);
+    addState("RKP 5 50", "Robotis", "Joint", sample, baseport + 18);
+    addState("RAP 5 50", "Robotis", "Joint", sample, baseport + 19);
+    addState("RAR 5 50", "Robotis", "Joint", sample, baseport + 20);
 
     linkPD("pcol", "dLSP"); linkDS("dLSP", "LSP");
     linkPD("pcol", "dLSR"); linkDS("dLSR", "LSR");
