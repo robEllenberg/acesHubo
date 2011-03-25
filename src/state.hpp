@@ -27,6 +27,9 @@
 #include <string>
 #include <map>
 
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+
 #include <rtt/TaskContext.hpp>
 #include <rtt/InputPort.hpp>
 #include <rtt/OutputPort.hpp>
@@ -40,6 +43,7 @@
 #include "controller.hpp"
 #include "taskcfg.hpp"
 #include "word.hpp"
+#include "state/matlab.hpp"
 
 namespace ACES {
     //Webots Component Types
@@ -57,6 +61,7 @@ namespace ACES {
             bool diffEnable;
             float diffThreshold;
             bool subscribeController(RTT::TaskContext* c);
+            const std::string& getName();
     };
 
     template <class T>
@@ -94,7 +99,10 @@ namespace ACES {
     class State : public ProtoState
     {
         public:
-            State(std::string config, int nID, bool sampling);
+            State(std::string config, int nID, bool sampling, unsigned int
+                  portnum);
+            bool startHook();
+            void stopHook();
 
             virtual void updateHook();  
             virtual void sample();
@@ -106,6 +114,7 @@ namespace ACES {
             T getVal();
             float getInt();
             float getDiff();
+
             bool updateInt(Sample<T> cur, Sample<T> last);
             bool updateDiff(Sample<T> cur, Sample<T> last);
 
@@ -119,8 +128,11 @@ namespace ACES {
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
             RTT::InputPort< std::map<std::string, void*>* > rxDownStream;
+            
+            unsigned int port;
+            MatlabIO<T> matio;
+            RTT::Activity matActivity;
     };
-
 }
     
 #include "state.cc"

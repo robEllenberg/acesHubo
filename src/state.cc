@@ -108,10 +108,14 @@ namespace ACES{
     }
 
     template <class T>
-    State<T>::State(std::string cfg, int nID, bool sampling) :
+    State<T>::State(std::string cfg, int nID, bool sampling, unsigned int
+                    portnum) :
       ProtoState(cfg, nID, sampling),
       value(0),
-      hist(10)
+      hist(10),
+      port(portnum),
+      matio(this, port),
+      matActivity(priority, &matio)
     {
         this->addOperation("sample", &State<T>::sample, this, RTT::OwnThread
                           ).doc("Sample the State");
@@ -127,6 +131,7 @@ namespace ACES{
         this->addAttribute("value", value);
         this->addAttribute("integral", integral);
         this->addAttribute("diff", diff);
+        this->addAttribute("portnum", port);
 
         this->ports()->addPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
@@ -135,7 +140,21 @@ namespace ACES{
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Device) Transmission");
 
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(25);
+        matio.DSmatio.connectTo(&rxDownStream, policy);
+
         this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
+    }
+
+    template <class T>
+    bool State<T>::startHook(){
+        matActivity.start();
+        return true;
+    }
+
+    template <class T>
+    void State<T>::stopHook(){
+        matActivity.stop();
     }
 
     template <class T>
@@ -227,6 +246,11 @@ namespace ACES{
             updateDiff(hist.getSample(0), hist.getSample(1));
         }
 
+    }
+
+    template <class T>
+    T State<T>::getVal(){
+        return value;
     }
 
     template <class T>

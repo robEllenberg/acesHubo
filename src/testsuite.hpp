@@ -30,6 +30,7 @@
 #include "device.hpp"
 #include "protocol.hpp"
 #include "state.hpp"
+#include "state/matlab.hpp"
 #include "word.hpp"
 
 namespace TestSuite{
@@ -52,7 +53,8 @@ namespace TestSuite{
 
     class Spinner : public ACES::State<float>{
         public:
-            Spinner(std::string cfg, std::string args, bool sampling);
+            Spinner(std::string cfg, std::string args, bool sampling,
+                    unsigned int portnum);
             virtual void sample();
             //virtual void updateHook();
             float amp, dc;
