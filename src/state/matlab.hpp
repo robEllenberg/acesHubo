@@ -41,8 +41,9 @@ namespace ACES{
             void finalize();
         protected:
             State<T>* parent;
-            enum { bufSize = 1024 };
+            enum { bufSize = 128 };
             char data[bufSize];
+            void scrubBuffer();
 
             unsigned int port;
             boost::asio::io_service io_service;
@@ -69,6 +70,13 @@ namespace ACES{
 
     template <class T>
     void MatlabIO<T>::step(){
+    }
+
+    template <class T>
+    void MatlabIO<T>::scrubBuffer(){
+        for(int i = 0; i < bufSize; i++){
+            data[i] = 0;
+        }
     }
 
     template <class T>
@@ -99,6 +107,10 @@ namespace ACES{
                 (*n)[parent->getName()] = t;
                 DSmatio.write(n);
             }
+            if(ptype == "SMP"){
+                parent->sample();
+            }
+            scrubBuffer();
         }
     }
 
