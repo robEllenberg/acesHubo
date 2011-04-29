@@ -1,0 +1,97 @@
+program main{
+/*
+    //Grab the presently known value from a state
+    var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+
+    addCtrl("StateName", val) 		//Queue set point 'val' to StateName in buffer
+    sendCtrl()				//Apply set points in buffer to system
+*/
+
+addCtrl("HY",0);
+addCtrl("LAP",0);
+addCtrl("LAR",0);
+addCtrl("LEP",0);
+addCtrl("LHP",0);
+addCtrl("LHR",0);
+addCtrl("LHY",0);
+addCtrl("LKP",0);
+addCtrl("LSP",0);
+addCtrl("LSR",0);
+addCtrl("LSY",0);
+
+addCtrl("RAP",0);
+addCtrl("RAR",0.2);
+addCtrl("REP",0);
+addCtrl("RHP",0);
+addCtrl("RHR",0);
+addCtrl("RHY",0);
+addCtrl("RKP",0);
+addCtrl("RSP",0);
+addCtrl("RSR",0);
+addCtrl("RSY",0);
+
+sendCtrl();
+var float s=0;
+while(s<=150)
+{
+s=s+1;
+yield;
+}
+var float totalSteps=60;
+var float steps=0;
+var float preLHP=0;
+var float preRHP=0;
+var float preLKP=0;
+var float preRKP=0;
+var float preLAP=0;
+var float preRAP=0;
+while(steps<=totalSteps)
+{
+preLHP=preLHP+1.0/totalSteps;
+preRHP=preRHP+1.0/totalSteps;
+preLKP=preLKP+2.0/totalSteps;
+preRKP=preRKP+2.0/totalSteps;
+preLAP=preLAP+1.0/totalSteps;
+preRAP=preRAP+1.0/totalSteps;
+addCtrl("LHP",preLHP);
+addCtrl("RHP",preRHP);
+addCtrl("LKP",preLKP);
+addCtrl("RKP",preRKP);
+addCtrl("LAP",preLAP);
+addCtrl("RAP",preRAP);
+sendCtrl();
+steps=steps+1;
+yield;
+}
+
+var float shoulderSteps=60;
+var float currShoulderStep=0;
+var float currShoulderAngle=0;
+while(currShoulderStep<=shoulderSteps)
+{
+addCtrl("LSP",currShoulderAngle);
+currShoulderAngle=currShoulderAngle+0.8/shoulderSteps;
+currShoulderStep=currShoulderStep+1;
+sendCtrl();
+yield;
+}
+
+var float currHipYaw=0;
+var float HipYawSteps=60;
+while(currHipYaw<=1)
+{
+addCtrl("HY",currHipYaw);
+currHipYaw=currHipYaw+1.0/HipYawSteps;
+sendCtrl();
+yield;
+}
+//HP = 1
+//KP = 2
+//AP = 1
+//RAR = .2
+}

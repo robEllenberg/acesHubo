@@ -1,0 +1,64 @@
+program main{
+
+    //Grab the presently known value from a state
+  //  var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+//    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+// Init pose
+addCtrl("RHP", 1.2);
+addCtrl("LHP", 1.2);
+addCtrl("RHY", 0);
+addCtrl("LHY", 0);
+addCtrl("RHR", 0);
+addCtrl("LHR", 0);
+
+addCtrl("RKP", 2.4);
+addCtrl("LKP", 2.4);
+addCtrl("RAP", 1.2);
+addCtrl("LAP", 1.2);
+addCtrl("RAR", 0);
+addCtrl("LAR", 0);
+
+
+var float deg = 0.1,deg1 = 0.1;
+
+while(deg<2.3)
+{
+deg = deg + 0.1;
+addCtrl("RSP", deg);
+addCtrl("LSP", deg);
+
+sendCtrl();
+yield;
+}
+
+while(deg1<0.5)
+{
+deg1 = deg1 + 0.1;
+addCtrl("HY", deg1);
+sendCtrl();
+yield;
+}
+
+
+while(deg>0.1)
+{
+deg = deg - 0.1;
+addCtrl("RSP", deg);
+addCtrl("LSP", deg);
+
+sendCtrl();
+yield;
+}
+
+while(deg1 > 0.1)
+{
+deg1 = deg1 - 0.1;
+addCtrl("HY", deg1);
+sendCtrl();
+yield;
+}
+}

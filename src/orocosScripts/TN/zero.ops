@@ -1,0 +1,68 @@
+program main{
+/*
+    //Grab the presently known value from a state
+    var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+
+    addCtrl("StateName", val) 		//Queue set point 'val' to StateName in buffer
+    sendCtrl()				//Apply set points in buffer to system
+*/
+    	addCtrl("HY", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LAR", 0) ;		//Queue set point 'val' to StateName in buffer
+	addCtrl("LAP", 0) ;		//Queue set point 'val' to StateName in buffer
+	addCtrl("LEP", 0) ;		//Queue set point 'val' to StateName in buffer
+	addCtrl("LHP", 0) ;		//Queue set point 'val' to StateName in buffer
+	addCtrl("LHR", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LHY", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LKP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LSP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LSR", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("LSY", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RAP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RAR", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("REP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RHP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RHR", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RHY", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RKP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RSP", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RSY", 0); 		//Queue set point 'val' to StateName in buffer
+	addCtrl("RSR", 0); 		//Queue set point 'val' to StateName in buffer	
+	sendCtrl();				//Apply set points in buffer to system	
+	yield;
+
+	for(var int i=0; i< 3*5 ; i=i+1)
+	{
+		yield;
+	}
+
+	for(var float angle=0; angle < 0.3; angle=angle+.005)
+	{
+		addCtrl("LHP",angle); addCtrl("LKP",angle*2); addCtrl("LAP",angle);
+		addCtrl("RHP",angle); addCtrl("RKP",angle*2); addCtrl("RAP",angle);
+		sendCtrl();
+		yield;
+	}
+ 	
+	for(var float k=0; k < 1; k =k+.005)
+	{ addCtrl("HY",-k);
+	  addCtrl("LSR",0.5*k);
+	  addCtrl("RSR",0.5*k);
+	sendCtrl();
+	yield;
+	}
+
+	for(var float h=0; h < 0.9; h =h+.015)
+	{ addCtrl("LEP",h);sendCtrl();
+	yield;
+	}
+
+	
+
+
+
+}
