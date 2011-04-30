@@ -1,0 +1,41 @@
+program main {
+    addHardware("tsHW 90 1000","TestSuite",""); 
+    addProtocol("tsPro 80 1000", "TestSuite", ""); 
+    linkHP("tsHW", "tsPro"); 
+
+    //Create devices, representing physical nodes on the bus
+    addDevice("dX 20 1000", "TestSuite", "1"); 
+    addDevice("dY 20 1000", "TestSuite", "2"); 
+    addDevice("dZ 20 1000", "TestSuite", "3"); 
+
+    //Add states, each represents 1 property of the device
+    addState("X 10 50", "TestSuite", "-1.0 1.0", true, 2827); 
+    addState("Y 10 50", "TestSuite", "3.0 4.0", true, 2828); 
+    addState("Z 10 50", "TestSuite", "5.0 6.0", true, 2829); 
+
+    //Tell the states and devices to pay attention to each other
+    linkDS("dX", "X"); 
+    linkDS("dY", "Y"); 
+    linkDS("dZ", "Z"); 
+
+    //Tell the devices & protocol to pay attention to each other 
+    linkPD("tsPro", "dX"); 
+    linkPD("tsPro", "dY"); 
+    linkPD("tsPro", "dZ"); 
+
+    //Setup Logging
+    addLogger("log1 5 50", "File", "log50.txt"); 
+    linkLS("log1", "X", "value"); 
+    linkLS("log1", "Y", "value"); 
+    linkLS("log1", "Z", "value"); 
+    
+    // END CONFIG SECTION 
+
+    //Start the threads
+    startHW(); 
+    startProtocol(); 
+    startDevice(); 
+    startState(); 
+    startController(); 
+    startLogger(); 
+}

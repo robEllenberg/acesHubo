@@ -1,15 +1,15 @@
 program main {
-    addHardware("tsHW 90 500","TestSuite",""); 
-    addProtocol("tsPro 80 500", "TestSuite", ""); 
+    addHardware("tsHW 90 1000","TestSuite",""); 
+    addProtocol("tsPro 80 1000", "TestSuite", ""); 
     linkHP("tsHW", "tsPro"); 
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dX 20 500", "TestSuite", "1"); 
-    addDevice("dY 20 500", "TestSuite", "2"); 
-    addDevice("dZ 20 500", "TestSuite", "3"); 
+    addDevice("dX 20 1000", "TestSuite", "1"); 
+    addDevice("dY 20 1000", "TestSuite", "2"); 
+    addDevice("dZ 20 1000", "TestSuite", "3"); 
 
     //Add states, each represents 1 property of the device
-    addState("X 10 100", "TestSuite", "-1.0 1.0", false, 2827); 
+    addState("X 10 100", "TestSuite", "-1.0 1.0", true, 2827); 
     addState("Y 10 100", "TestSuite", "3.0 4.0", true, 2828); 
     addState("Z 10 100", "TestSuite", "5.0 6.0", true, 2829); 
 
@@ -24,12 +24,10 @@ program main {
     linkPD("tsPro", "dZ"); 
 
     //Setup Logging
-    addLogger("log1 5 200", "File", "log.txt"); 
+    addLogger("log1 5 100", "File", "log100.txt"); 
     linkLS("log1", "X", "value"); 
     linkLS("log1", "Y", "value"); 
     linkLS("log1", "Z", "value"); 
-    linkLS("log1", "X", "integral"); 
-    linkLS("log1", "X", "diff"); 
     
     // END CONFIG SECTION 
 
