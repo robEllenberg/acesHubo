@@ -31,7 +31,7 @@
 
 #include "taskcfg.hpp"
 #include "credentials.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "word.hpp"
 
 namespace ACES{

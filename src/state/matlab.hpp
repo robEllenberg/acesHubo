@@ -20,7 +20,7 @@
     please contact the author.
 */
 
-#include "../state.hpp"
+#include "state.hpp"
 
 #ifndef ACES_MATIO_HPP
 #define ACES_MATIO_HPP

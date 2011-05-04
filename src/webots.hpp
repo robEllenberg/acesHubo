@@ -33,7 +33,7 @@
 #include <rtt/os/TimeService.hpp>
 
 #include "protocol.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "hardware.hpp"
 #include "taskcfg.hpp"
 #include "credentials.hpp"

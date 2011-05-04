@@ -35,7 +35,7 @@
 #include <rtt/Activity.hpp>
 
 #include "message.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "taskcfg.hpp"
 #include "device.hpp"
 #include "word.hpp"

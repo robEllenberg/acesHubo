@@ -29,7 +29,7 @@
 #include "hardware.hpp"
 #include "device.hpp"
 #include "protocol.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "state/matlab.hpp"
 #include "word.hpp"
 

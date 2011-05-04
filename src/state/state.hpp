@@ -39,11 +39,11 @@
 #include <rtt/Attribute.hpp>
 #include <rtt/os/TimeService.hpp>
 
-#include "credentials.hpp"
-#include "controller.hpp"
-#include "taskcfg.hpp"
-#include "word.hpp"
-#include "state/matlab.hpp"
+#include "../credentials.hpp"
+#include "../controller.hpp"
+#include "../taskcfg.hpp"
+#include "../word.hpp"
+#include "matlab.hpp"
 
 namespace ACES {
     //Webots Component Types

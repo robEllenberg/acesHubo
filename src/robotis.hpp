@@ -41,7 +41,7 @@
 
 #include "protocol.hpp"
 #include "message.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "hardware.hpp"
 #include "credentials.hpp"
 //Defs for the lexer

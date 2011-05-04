@@ -33,7 +33,7 @@
 
 #include "protocol.hpp"
 #include "controller.hpp"
-#include "state.hpp"
+#include "state/state.hpp"
 #include "hardware.hpp"
 #include "taskcfg.hpp"
 #include "device.hpp"

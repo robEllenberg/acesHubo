@@ -40,7 +40,7 @@ include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
 
 rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
-                     src/credentials.cpp src/state.cpp
+                     src/credentials.cpp src/state/state.cpp
                      src/device.cpp src/protocol.cpp
                      src/hardware.cpp src/controller.cpp src/logger.cpp)
 

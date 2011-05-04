@@ -26,7 +26,7 @@
 #include "hardware.hpp"
 #include "protocol.hpp"
 #include "device.hpp"
-//#include "state.hpp" //If you need to derrive the state (try to avoid this)
+//#include "state/state.hpp" //If you need to derrive the state (try to avoid this)
 #include "credentials.hpp"
 //#include "word.hpp" // Word/Result
 //#include "message.hpp"

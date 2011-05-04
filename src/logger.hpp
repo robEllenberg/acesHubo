@@ -32,7 +32,7 @@
 //#include <rtt/Time.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "state.hpp"
+#include "state/state.hpp"
 #include "dispatcher.hpp"
 #include "taskcfg.hpp"
 
