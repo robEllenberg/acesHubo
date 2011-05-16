@@ -25,7 +25,6 @@
 
 #include "flexscanner/flexscanner.hpp"
 #include "flexscanner/adc/adcDS.hpp"
-#include "flexscanner/adc/adcFlex.hpp"
 #include "device.hpp"
 
 namespace MiniHubo{

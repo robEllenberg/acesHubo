@@ -25,7 +25,6 @@
 
 namespace Robotis {
 
-
     std::ostream &operator<<(std::ostream &out, RobotisPacket &p){
         p.printme();
         return out;
@@ -57,18 +56,6 @@ namespace Robotis {
         return v;
     }
 
-/*
-    ACES::Message<unsigned char>* RobotisQueue::renderMessageFromQueue(
-                                                PARAM_TABLE param)
-    {
-        ACES::Message<unsigned char>* m = NULL;
-        if(queue.find(param) != queue.end()){
-            m = renderMessageFromPackets(queue[param]);
-            return m;
-        }
-        return NULL;
-    }
-*/
     ACES::Message<unsigned char>* RobotisQueue::renderMessageFromPackets(
                                     std::map<unsigned char, RobotisPacket>& p)
     {
@@ -103,61 +90,6 @@ namespace Robotis {
 
         return messageFromPacket(&rp);
     }
-                                        
-/*
-    Reader::Reader(boost::asio::serial_port* p)
-     : RTT::base::RunnableInterface()
-    {
-        port = p;
-    }
-
-    bool Reader::initialize(){
-        return true;
-    }
-
-    void Reader::step(){
-    }
-
-    void Reader::loop(){
-        while(true){
-            boost::asio::read(*port, boost::asio::buffer((void*)&rxBuf, 1));
-            out.write(rxBuf);
-        }
-    }
-
-    void Reader::finalize(){
-    }
-*/
-
-/*
-    Hardware::Hardware(std::string cfg, std::string args)
-     : ACES::Hardware<unsigned char>(cfg, args),
-        io_service(),
-        port(io_service, (const char*)args.c_str()),
-        rxReader(&port),
-        rxActivity(priority, &rxReader)
-    {
-        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
-        rxReader.out.connectTo(&rxBuf, policy);
-    }
-    bool Hardware::startHook(){
-        rxActivity.start();
-        return true;
-    }
-
-    void Hardware::stopHook(){
-        rxActivity.stop();
-    }
-
-    void Hardware::rxBus(int size){
-        unsigned char c;
-        while(rxBuf.read(c) == RTT::NewData){
-            RTT::Logger::log() << "Got Something! - "
-                               << (int)c << RTT::endlog();
-            txUpStream.write(new ACES::Word<unsigned char>(c));
-        }
-    }
-*/    
 
     Hardware::Hardware(std::string cfg, std::string args)
      : FlexScanner::Hardware(cfg, args) {}
@@ -180,68 +112,6 @@ namespace Robotis {
         }
         return false;
     }
-
-
-/*
-    void Hardware::rxHandle(//Hardware* This,
-                            const boost::system::error_code& error,
-                            int numBytes)
-    {
-        RTT::Logger::log() << "Handler" << RTT::endlog();
-        for(int i=0; i< numBytes; i++){
-            ACES::Word<unsigned char> *w = NULL;
-            w = new ACES::Word<unsigned char>(This->rxBuf);
-            RTT::Logger::log() << "Got " << (int) This->rxBuf <<
-            RTT::endlog();
-            This->txUpStream.write(w);
-        }
-        This->rxBus(1);
-    }
-*/     
-
-/*
-    Protocol::Protocol(std::string cfg, std::string args)
-     : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args),
-       triggerDS(true)
-    {
-        this->addAttribute("triggerDS", triggerDS);
-    }
-
-    bool Protocol::startHook(){
-        yylex_init ( &scanner ) ;
-        curPacket = new RobotisPacket() ;
-        yyset_extra(curPacket, scanner) ;
-        return true;
-    }
-
-    void Protocol::stopHook(){
-        delete curPacket;
-        yylex_destroy(scanner);
-    }
-
-    ACES::Word<RobotisPacket>*
-      Protocol::processUS(ACES::Word<unsigned char>* usIn)
-    {
-        ACES::Word<RobotisPacket>* pw = NULL;
-        unsigned char c = 0;
-        c = usIn->getData();
-        //RTT::Logger::log() << "Got Something! - " << (int)c << RTT::endlog();
-        yy_scan_bytes( (const char*)(&c), 1, this->scanner);
-        //If yylex returns 1 we have matched a full packet
-        //if return is 0 we have only eaten a character
-        if( yylex(this->scanner) ){ 
-            RobotisPacket* p  = curPacket;
-            curPacket = new RobotisPacket();
-            yyset_extra(curPacket, scanner) ;
-
-            pw = new ACES::Word<RobotisPacket>(*p, 0, 0, 0,
-                (ACES::Credentials*)credFromPacket(p));
-            p->printme();
-            return pw;
-        }
-        return NULL;
-    }
-*/
 
     Protocol::Protocol(std::string cfg, std::string args)
      : FlexScanner::Protocol<RobotisPacket, robotisFlex>(cfg, args){}

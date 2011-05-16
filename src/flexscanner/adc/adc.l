@@ -21,7 +21,7 @@
 */
 
 %{
-#include "adcFlex.hpp"
+#include "adcDS.hpp"
 %}
 
 %x head

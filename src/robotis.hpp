@@ -48,20 +48,6 @@
 #include "flexscanner/flexscanner.hpp"
 #include "robotisTypes.hpp"
 
-//Defs for the lexer
-//#define YY_BUFFER_STATE yy_buffer_state*
-//TODO - find out the actual return type of YY_BUFFER_STATE (hint: it's not char*)
-/*
-extern "C"{
-    #define YY_EXTRA_TYPE Robotis::RobotisPacket*
-    typedef struct yy_buffer_state *YY_BUFFER_STATE;
-    typedef size_t yy_size_t;
-    #define MAKEP Robotis::RobotisPacket *p = yyget_extra(yyscanner);
-
-    struct yy_buffer_state;
-    typedef void* yyscan_t;
-}
-*/
 namespace Robotis {
     const unsigned char PARAM_LEN[] = {
             2, 0,           //MODEL_NUMBER = 0x0
@@ -117,20 +103,6 @@ namespace Robotis {
             RTT::os::Mutex qGuard;
     };
 
-/*
-    class Reader : public RTT::base::RunnableInterface {
-        public:
-            Reader(boost::asio::serial_port* p);
-            bool initialize();
-            void step();
-            void loop();
-            void finalize();
-        //private:
-            unsigned char rxBuf;
-            boost::asio::serial_port* port;
-            RTT::OutputPort< unsigned char > out;
-    };
-*/
     std::ostream &operator<<(std::ostream &out, const RobotisPacket &p);
 
     class Hardware : public FlexScanner::Hardware{
@@ -138,30 +110,6 @@ namespace Robotis {
             Hardware(std::string cfg, std::string args);
             virtual bool txBus(ACES::Message<unsigned char>* m);
     };
-
-    /*
-    class Hardware : public ACES::Hardware<unsigned char>{
-        public:
-            Hardware(std::string cfg, std::string args);
-            virtual bool txBus(ACES::Message<unsigned char>* m);
-            virtual void rxBus(int size=0);
-            bool startHook();
-            void stopHook();
-            //static void rxHandle(//Hardware* This,
-            //              const boost::system::error_code& error,
-            //              int numBytes);
-
-            //virtual bool processUS(ACES::Word<unsigned char>*);
-            //virtual bool processDS(ACES::Message<unsigned char>*);
-        protected:
-            boost::asio::io_service io_service;
-            boost::asio::serial_port port;
-            //boost::asio::socket_base::bytes_readable hasData;
-            RTT::InputPort<unsigned char> rxBuf;
-            Reader rxReader;
-            RTT::Activity rxActivity;
-    };
-    */
 
     class Protocol : public FlexScanner::Protocol<RobotisPacket, robotisFlex>{
         public:
@@ -174,30 +122,6 @@ namespace Robotis {
             bool triggerDS;
             RobotisQueue queue;
     };
-
-/*
-    class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
-        public:
-            Protocol(std::string cfg, std::string args); 
-            bool startHook();
-            void stopHook();
-            ACES::Word<RobotisPacket>* processUS(ACES::Word<unsigned char>* w);
-            ACES::Message<unsigned char>*
-              processDS(ACES::Word<RobotisPacket>* w);
-            void txDSPending();
-
-            //~Protocol();
-            //ACES::Message* buildMessage(ACES::Credentials* cred);
-
-            yyscan_t scanner;
-            RobotisPacket* curPacket;
-            unsigned char incoming_id;
-            unsigned char incoming_len;
-        private:
-            bool triggerDS;
-            RobotisQueue queue;
-    };
-*/
 
     class Device : public ACES::Device<float, RobotisPacket> {
         public:
@@ -240,17 +164,4 @@ namespace Robotis {
     int findTrueNodeID(int id, DIRECTION d);
 };
 
- 
-//Function defs for the lexer
-/*
-extern "C" {
-    int yylex ( yyscan_t yyscanner );
-    //int yylex();
-    int yylex_init( yyscan_t * ptr_yy_globals );
-    int yylex_destroy(yyscan_t yyscanner);
-    YY_EXTRA_TYPE yyget_extra(yyscan_t yyscanner);
-    void yyset_extra (YY_EXTRA_TYPE p, yyscan_t yyscanner);
-};
-    YY_BUFFER_STATE yy_scan_bytes(const char* bytes, int len, yyscan_t yyscanner);
-*/
 #endif

@@ -22,7 +22,6 @@
 
 %{
 #include "robotisDS.hpp"
-//%option reentrant
 %}
 
 %x head
