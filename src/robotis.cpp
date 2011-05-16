@@ -21,69 +21,10 @@
 */
 
 #include "robotis.hpp"
+#include "flexscanner/robotis/robotisDS.hpp"
 
 namespace Robotis {
-    RobotisPacket::RobotisPacket(){
-        //counter = 0;
-        id = 0;
-        len = 0;
-        error = 0;
-        checksum = 0;
-        parameters = new std::deque<unsigned char>();
-    }
 
-    void RobotisPacket::setID(unsigned char i){
-        id = i;
-    }
-
-    void RobotisPacket::setLen(unsigned char l){
-        len = l;
-    }
-
-    void RobotisPacket::setError(unsigned char err){
-        error = err;
-    }
-
-    void RobotisPacket::setChecksum(unsigned char check){
-        checksum = check;
-    }
-
-    void RobotisPacket::setInst(INST inst){
-        instruct = inst;
-    }
-
-    unsigned char RobotisPacket::getID(){
-        return id;
-    }
-
-    unsigned char RobotisPacket::getLen(){
-        return len;
-    }
-
-    unsigned char RobotisPacket::getError(){
-        return error;
-    }
-
-    unsigned char RobotisPacket::getChecksum(){
-        return checksum;
-    }
-
-    INST RobotisPacket::getInst(){
-        return instruct;
-    }
-
-    void RobotisPacket::printme(){
-        RTT::Logger::log() << "ID: " << (int)id << ", Len: " << (int)len
-                           << ", Error: " << (int)error 
-                           << ", Check: " << (int)checksum;
-        RTT::Logger::log() << ", Parameters: ";
-        for(std::deque<unsigned char>::iterator it = parameters->begin();
-            it != parameters->end(); it++)
-        {
-            RTT::Logger::log() <<  (int)(*it) << ", ";
-        }
-        RTT::Logger::log() << RTT::endlog();
-    }
 
     std::ostream &operator<<(std::ostream &out, RobotisPacket &p){
         p.printme();
@@ -163,7 +104,7 @@ namespace Robotis {
         return messageFromPacket(&rp);
     }
                                         
-
+/*
     Reader::Reader(boost::asio::serial_port* p)
      : RTT::base::RunnableInterface()
     {
@@ -186,7 +127,9 @@ namespace Robotis {
 
     void Reader::finalize(){
     }
+*/
 
+/*
     Hardware::Hardware(std::string cfg, std::string args)
      : ACES::Hardware<unsigned char>(cfg, args),
         io_service(),
@@ -196,15 +139,7 @@ namespace Robotis {
     {
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
         rxReader.out.connectTo(&rxBuf, policy);
-        /*
-        std::istringstream s1(args);
-        float z;
-        int id, d;
-        s1 >> id >> z >> d;
-        credentials = new Credentials(id, z, d);
-        */
     }
-    
     bool Hardware::startHook(){
         rxActivity.start();
         return true;
@@ -213,6 +148,19 @@ namespace Robotis {
     void Hardware::stopHook(){
         rxActivity.stop();
     }
+
+    void Hardware::rxBus(int size){
+        unsigned char c;
+        while(rxBuf.read(c) == RTT::NewData){
+            RTT::Logger::log() << "Got Something! - "
+                               << (int)c << RTT::endlog();
+            txUpStream.write(new ACES::Word<unsigned char>(c));
+        }
+    }
+*/    
+
+    Hardware::Hardware(std::string cfg, std::string args)
+     : FlexScanner::Hardware(cfg, args) {}
 
     bool Hardware::txBus(ACES::Message<unsigned char>* m){
         if(m){
@@ -233,32 +181,6 @@ namespace Robotis {
         return false;
     }
 
-    void Hardware::rxBus(int size){
-        //io_service.poll();
-        //io_service.run();
-        //std::iostream* i = (std::iostream*)port.native();
-        //i->read(&rxBuf, 1);
-        //RTT::Logger::log() << "Handler " << (int) rxBuf << RTT::endlog();
-        unsigned char c;
-        while(rxBuf.read(c) == RTT::NewData){
-            //rxBuf = new boost::asio::buffer((void*)(new unsigned char c[size]), size) b1;
-            RTT::Logger::log() << "Got Something! - " << (int)c << RTT::endlog();
-            txUpStream.write(new ACES::Word<unsigned char>(c));
-
-            //port.async_read_some(boost::asio::buffer((void*)&rxBuf, 1),
-            //                     Hardware::rxHandle);
-            //boost::asio::async_read(port, boost::asio::buffer((void*)&rxBuf,
-            //1), Hardware::rxHandle);
-            //port.read_some(boost::asio::buffer( (void*)&rxBuf, 1) );
-            //RTT::Logger::log() << "Handler " << (int) rxBuf << RTT::endlog();
-            /*port.async_read_some(boost::asio::buffer((void*)&rxBuf, 1),
-                               boost::bind(&Hardware::rxHandle, this,
-                               boost::asio::placeholders::error,
-                               boost::asio::placeholders::bytes_transferred
-                               ));
-            */
-        }
-    }
 
 /*
     void Hardware::rxHandle(//Hardware* This,
@@ -277,6 +199,7 @@ namespace Robotis {
     }
 */     
 
+/*
     Protocol::Protocol(std::string cfg, std::string args)
      : ACES::Protocol<unsigned char, RobotisPacket>(cfg, args),
        triggerDS(true)
@@ -318,6 +241,10 @@ namespace Robotis {
         }
         return NULL;
     }
+*/
+
+    Protocol::Protocol(std::string cfg, std::string args)
+     : FlexScanner::Protocol<RobotisPacket, robotisFlex>(cfg, args){}
 
     ACES::Message<unsigned char>*
         Protocol::processDS(ACES::Word<RobotisPacket>* w)
@@ -362,6 +289,13 @@ namespace Robotis {
                 txDownStream.write(*it);
             }
         }
+    }
+
+    ACES::Credentials* Protocol::credFromPacket(RobotisPacket* p){
+        //We need to generate a packet which will pass through the
+        //comparison operator on the motor of interest, the zero and direction
+        //information don't matter
+        return (ACES::Credentials*)new Credentials(p->getID(), 0.0, 0.0);
     }
 
     Device::Device(std::string cfg, std::string args)
@@ -553,13 +487,6 @@ namespace Robotis {
             }
         }
         return false;
-    }
-
-    Credentials* credFromPacket(RobotisPacket* p){
-        //We need to generate a packet which will pass through the
-        //comparison operator on the motor of interest, the zero and direction
-        //information don't matter
-        return new Credentials(p->getID(), 0.0, 0.0);
     }
 
     ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p){

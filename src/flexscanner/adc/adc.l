@@ -95,6 +95,7 @@
     int adcFlex::yylex( std::istream* new_in, std::ostream* new_out ){
         switch_streams(new_in, new_out );
         yylex(new_in, new_out);
+        return 0;
     }
 
 #ifdef __ADC_PARSE_TESTSUITE__

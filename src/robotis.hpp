@@ -44,9 +44,14 @@
 #include "state/state.hpp"
 #include "hardware.hpp"
 #include "credentials.hpp"
+#include "flexscanner/robotis/robotisDS.hpp"
+#include "flexscanner/flexscanner.hpp"
+#include "robotisTypes.hpp"
+
 //Defs for the lexer
 //#define YY_BUFFER_STATE yy_buffer_state*
 //TODO - find out the actual return type of YY_BUFFER_STATE (hint: it's not char*)
+/*
 extern "C"{
     #define YY_EXTRA_TYPE Robotis::RobotisPacket*
     typedef struct yy_buffer_state *YY_BUFFER_STATE;
@@ -56,33 +61,8 @@ extern "C"{
     struct yy_buffer_state;
     typedef void* yyscan_t;
 }
-
+*/
 namespace Robotis {
-    enum COMP_TYPE { JOINT=3 };
-    enum DIRECTION { UP=1, DOWN };
-
-    enum INST { PING=1, READ, WRITE, REG_WRITE, ACTION, RESET, SYNC_WRITE=0x83 };
-
-    enum PARAM_TABLE { 
-            MODEL_NUMBER = 0x0,                VERSION_OF_FIRMWARE = 0x2,
-            ID = 0x3,                          BAUD_RATE = 0x4,
-            RETURN_DELAY_TIME = 0x5,           CW_ANGLE_LIMIT = 0x6,
-            CCW_ANGLE_LIMIT = 0x8,             HIGHEST_LIMIT_TEMPERATURE = 0xB,
-            LOWEST_LIMIT_VOLTAGE = 0xC,        HIGHEST_LIMIT_VOLTAGE = 0xD,
-            MAX_TORQUE = 0xE,                  STATUS_RETURN_LEVEL = 0x10,
-            ALARM_LED = 0x11,                  ALARM_SHUTDOWN = 0x12,
-
-            TORQUE_ENABLE = 0x18,              LED = 0x19,
-            CW_COMPLIANCE_MARGIN = 0x1A,       CCW_COMPLIANCE_MARGIN = 0x1B,
-            CW_COMPLIANCE_SLOPE = 0x1C,        CCW_COMPLIANCE_SLOPE = 0x1D,
-            GOAL_POSITION = 0x1E,              MOVING_SPEED = 0x20,
-            TORQUE_LIMIT = 0x22,               PRESENT_POSITION = 0x24,
-            PRESENT_SPEED = 0x26,              PRESENT_LOAD = 0x28,
-            PRESENT_VOLTAGE = 0x2A,            PRESENT_TEMPERATURE = 0x2B,
-            REGISTERED_INSTRUCTION = 0x2C,     MOVING = 0x2E,
-            LOCK = 0x2F,                       PUNCH = 0x30
-    };
-
     const unsigned char PARAM_LEN[] = {
             2, 0,           //MODEL_NUMBER = 0x0
             1,              //VERSION_OF_FIRMWARE = 0x2
@@ -121,32 +101,6 @@ namespace Robotis {
             2, 0            //PUNCH = 0x30
     };
 
-    class RobotisPacket {
-        public:
-            RobotisPacket();
-            void printme();
-            //~RobotisPacket();
-            void setID(unsigned char id);
-            void setLen(unsigned char l);
-            void setError(unsigned char err);
-            void setChecksum(unsigned char check);
-            void setInst(INST inst);
-
-            unsigned char getID();
-            unsigned char getLen();
-            unsigned char getError();
-            unsigned char getChecksum();
-            INST getInst();
-
-            int counter;
-            std::deque<unsigned char>* parameters;
-        private:
-            unsigned char id;
-            unsigned char len;
-            unsigned char error;
-            unsigned char checksum;
-            INST instruct;
-    };
 
     class RobotisQueue {
         public:
@@ -163,6 +117,7 @@ namespace Robotis {
             RTT::os::Mutex qGuard;
     };
 
+/*
     class Reader : public RTT::base::RunnableInterface {
         public:
             Reader(boost::asio::serial_port* p);
@@ -175,9 +130,16 @@ namespace Robotis {
             boost::asio::serial_port* port;
             RTT::OutputPort< unsigned char > out;
     };
-
+*/
     std::ostream &operator<<(std::ostream &out, const RobotisPacket &p);
 
+    class Hardware : public FlexScanner::Hardware{
+        public: 
+            Hardware(std::string cfg, std::string args);
+            virtual bool txBus(ACES::Message<unsigned char>* m);
+    };
+
+    /*
     class Hardware : public ACES::Hardware<unsigned char>{
         public:
             Hardware(std::string cfg, std::string args);
@@ -199,7 +161,21 @@ namespace Robotis {
             Reader rxReader;
             RTT::Activity rxActivity;
     };
+    */
 
+    class Protocol : public FlexScanner::Protocol<RobotisPacket, robotisFlex>{
+        public:
+            Protocol(std::string cfg, std::string args); 
+            ACES::Message<unsigned char>*
+              processDS(ACES::Word<RobotisPacket>* w);
+            void txDSPending();
+            ACES::Credentials* credFromPacket(RobotisPacket* p);
+        private:
+            bool triggerDS;
+            RobotisQueue queue;
+    };
+
+/*
     class Protocol : public ACES::Protocol<unsigned char, RobotisPacket> {
         public:
             Protocol(std::string cfg, std::string args); 
@@ -221,6 +197,7 @@ namespace Robotis {
             bool triggerDS;
             RobotisQueue queue;
     };
+*/
 
     class Device : public ACES::Device<float, RobotisPacket> {
         public:
@@ -253,7 +230,6 @@ namespace Robotis {
             int motorNum;
     };
     
-    Credentials* credFromPacket(RobotisPacket* p);
     ACES::Message<unsigned char>* messageFromPacket(RobotisPacket* p);
     unsigned char checksum(RobotisPacket* p);
     template <class T>
@@ -266,6 +242,7 @@ namespace Robotis {
 
  
 //Function defs for the lexer
+/*
 extern "C" {
     int yylex ( yyscan_t yyscanner );
     //int yylex();
@@ -275,5 +252,5 @@ extern "C" {
     void yyset_extra (YY_EXTRA_TYPE p, yyscan_t yyscanner);
 };
     YY_BUFFER_STATE yy_scan_bytes(const char* bytes, int len, yyscan_t yyscanner);
-
+*/
 #endif

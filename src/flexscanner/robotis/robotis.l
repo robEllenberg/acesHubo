@@ -21,9 +21,8 @@
 */
 
 %{
-#include <iostream>
-#include "src/robotis.hpp"
-
+#include "robotisDS.hpp"
+//%option reentrant
 %}
 
 %x head
@@ -32,8 +31,10 @@
 %x error_frame
 %x param_frame
 %x check_frame
-%option reentrant
+%option c++
 %option noyywrap
+%option prefix="robotis"
+%option yyclass="robotisFlex"
 
 %%
 \xFF        {BEGIN(head);
@@ -48,24 +49,22 @@
                   BEGIN(id_frame);
                   return 0;}
 
-<id_frame>[\x00-\xFF]   {  MAKEP
-                          p->setID(*yytext);
+<id_frame>[\x00-\xFF]   { packet->setID(yytext[0]); 
                           //std::cout << "got id" << std::endl;
                           BEGIN(len_frame);
                           return 0;}
 
-<len_frame>[\x00-\xFF]    { MAKEP
-                            p->setLen(*yytext);
-                            p->counter = 0; //p->getLen() - 2; 
+<len_frame>[\x00-\xFF]    { packet->setLen(yytext[0]);
+                            packet->counter = 0; //p->getLen() - 2; 
                             //std::cout << "got len" << std::endl;
                             BEGIN(error_frame);
                             return 0;}
 
-<error_frame>[\x00-\xFF]    { MAKEP
-                              p->setError(*yytext); 
-                              p->counter += 1;
+<error_frame>[\x00-\xFF]    { packet->setError(yytext[0]); 
+                              packet->counter += 1;
                               //std::cout << "got error" << std::endl;
-                             if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
+                             if( (packet->counter + 1) >= packet->getLen() ){
+                               //The length of n include the checksum
                               BEGIN(check_frame);
                              }
                              else{
@@ -73,41 +72,54 @@
                              }
                               return 0;}
 
-<param_frame>[\x00-\xFF]     { MAKEP  
-                                  //std::cout << "got parms" << std::endl;
-                                  (*p).parameters->push_back(*yytext);
-                                  (p->counter)++;
-                                 if( (p->counter + 1) >= p->getLen() ){   //The length of n include the checksum
+<param_frame>[\x00-\xFF]     { //std::cout << "got parms" << std::endl;
+                               packet->parameters->push_back(yytext[0]);
+                               packet->counter++;
+                               if( (packet->counter + 1) >= packet->getLen() ){
+                                 //The length of n include the checksum
                                   BEGIN(check_frame); 
                                  }
                                  return 0;
                              }
 
-<check_frame>[\x00-\xFF]       { MAKEP
-                          p->setChecksum(*yytext);
+<check_frame>[\x00-\xFF]       { packet->setChecksum(yytext[0]);
                           //std::cout << "got check" << std::endl;
                           //(*p).printme();
-                          yyset_extra( p, yyscanner );
+                          //yyset_extra( packet, yyscanner );
                           BEGIN(INITIAL);
                           return 1;
                           } 
 %%
 
-/*
-int main()
-{
-    yyscan_t scanner;
-    yylex_init ( &scanner ) ;
-    //yylex(scanner);
-    int tok;
-    packet* p = new packet;
-    yyset_extra(p, scanner);
-    while ((tok=yylex(scanner)) > 0){
-        //std::cout << "tok=" << tok << "yytext=" << yyget_text(scanner) << std::endl;
-        p = yyget_extra( scanner);
-        std::cout << "id is " << (*p).id << std::endl;
+    robotisFlex::robotisFlex() : yyFlexLexer(){
+        counter = 0;
+        packet = NULL;
+        tempByte = 0;
     }
-    
-    yylex_destroy( scanner);
-}
-*/
+
+    Robotis::RobotisPacket* robotisFlex::releasePacket(){
+        Robotis::RobotisPacket* p = packet;
+        packet = NULL;
+        return p;
+    }
+
+    int robotisFlex::yylex( std::istream* new_in, std::ostream* new_out ){
+        switch_streams(new_in, new_out );
+        yylex(new_in, new_out);
+        return 0;
+    }
+
+#ifdef __ROBOTIS_PARSE_TESTSUITE__
+    int main()
+    {
+        robotisFlex robotisflex;
+        
+        while ( 1 ){
+            if(robotisflex.yylex()){
+                RobotisPacket *p = robotisflex.releasePacket();
+                p->printme();
+                delete p;
+            }
+        }
+    }
+#endif
