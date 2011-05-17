@@ -28,7 +28,6 @@ namespace ACES {
     {
     }
 
-
     bool ProtoHardware::subscribeController(RTT::TaskContext* c){
         return true;
     }
@@ -64,5 +63,58 @@ namespace ACES {
       //      ).handle();
         return true;
     }
-    
+ 
+    charHardware::charHardware(std::string cfg, std::string args)
+      : Hardware<unsigned char>(cfg, args),
+        io_service(),
+        port(io_service, (const char*)args.c_str())
+    {}
+
+    bool charHardware::txBus(ACES::Message<unsigned char>* m){
+        if(m){
+            ACES::Word<unsigned char>* w = NULL;
+            std::vector<unsigned char> buf;
+            while(m->size()){
+                w = m->pop();
+                buf.push_back(w->getData());
+            }
+            for(std::vector<unsigned char>::iterator it = buf.begin();
+                it != buf.end(); it++)
+            {
+                port.write_some(boost::asio::buffer((void*)(&(*it)), 1));
+                RTT::Logger::log() << (int) *it  << RTT::endlog();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    pStreamHardware::pStreamHardware(std::string cfg, std::string args)
+      : Hardware<unsigned char>(cfg, args),
+        ioFD( open( (const char*)args.c_str(), O_RDWR) )//,
+        //io_service(),
+        //port(io_service, ::dup(STDOUT_FILENO))
+        //::dup(ioFD)
+    {}
+
+    bool pStreamHardware::txBus(ACES::Message<unsigned char>* m){
+        if(m){
+            ACES::Word<unsigned char>* w = NULL;
+            std::vector<unsigned char> buf;
+            while(m->size()){
+                w = m->pop();
+                buf.push_back(w->getData());
+            }
+            for(std::vector<unsigned char>::iterator it = buf.begin();
+                it != buf.end(); it++)
+            {
+                //port.write_some(boost::asio::buffer((void*)(&(*it)), 1));
+                char c = *it;
+                write(ioFD, &c, 1);
+                RTT::Logger::log() << (int) *it  << RTT::endlog();
+            }
+            return true;
+        }
+        return false;
+    }
 }

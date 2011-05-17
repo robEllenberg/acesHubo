@@ -93,13 +93,4 @@ namespace ACES {
     void Hardware<T>::rxBus(int size){
     }
 
-    /*
-    template <class T>
-    bool Hardware<T>::rxDownStream(Message<T>* m){
-        dsQueue.enqueue(m);
-        return true;
-    }
-    */
-
-
 }

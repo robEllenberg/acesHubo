@@ -26,6 +26,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <boost/asio.hpp>
+
 #include <rtt/TaskContext.hpp>
 //#include <rtt/Event.hpp>
 #include <rtt/OutputPort.hpp>
@@ -58,31 +60,40 @@ namespace ACES {
     {
         public:
             Hardware(std::string cfg, std::string args);
-            //Hardware(std::string name);
             void updateHook();
-
-            //bool rxDownStream(Message<T>* m);
 
             virtual bool txBus(Message<T>* m);
             virtual void rxBus(int size=0);
-            //void txUpStream( Word<T>* );
 
             virtual bool processUS(Word<T>*);
             virtual bool processDS(Message<T>*);
             bool subscribeProtocol(RTT::TaskContext* p);
 
         protected:
-            //RTT::Event<void( Word<T>* )> txUpStream;
-            //T, read, write
             RTT::internal::Queue< Word<T>* > usQueue;
-            //, RTT::NonBlockingPolicy,
-            //           RTT::BlockingPolicy> usQueue;
-            /*
-            RTT::Queue< Message<T>*, RTT::NonBlockingPolicy,
-                       RTT::BlockingPolicy> dsQueue;
-            */
             RTT::OutputPort< Word<T>* > txUpStream;
             RTT::InputPort< Message<T>* > rxDownStream;
+    };
+
+    class charHardware : public Hardware<unsigned char>
+    {
+        public:
+            charHardware(std::string cfg, std::string args);
+            bool txBus(ACES::Message<unsigned char>* m);
+        protected:
+            boost::asio::io_service io_service;
+            boost::asio::serial_port port;
+    };
+
+    class pStreamHardware : public Hardware<unsigned char>
+    {
+        public:
+            pStreamHardware(std::string cfg, std::string args);
+            bool txBus(ACES::Message<unsigned char>* m);
+        protected:
+            int ioFD;
+            //boost::asio::io_service io_service;
+            //boost::asio::posix::stream_descriptor port;
     };
 }
 

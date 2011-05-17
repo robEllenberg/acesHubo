@@ -126,6 +126,12 @@ namespace ACES{
                                  std::string args)
     {
         RTT::TaskContext* h = NULL;
+        if (type == "Char"){
+            h = (RTT::TaskContext*) new ACES::charHardware(cfg, args);
+        }
+        if (type == "pStream"){
+            h = (RTT::TaskContext*) new ACES::pStreamHardware(cfg, args);
+        }
         
         #ifdef HUBO        
         if (type == "Hubo") {
@@ -158,6 +164,9 @@ namespace ACES{
                                  std::string args)
     {
         RTT::TaskContext* p = NULL;
+        if ( type == "Omni"){
+            p = (RTT::TaskContext*) new Omnibot::Protocol(cfg, args);
+        }
         #ifdef HUBO 
         if ( type == "Hubo"){
             p = (RTT::TaskContext*) new Hubo::Protocol(cfg, args);
@@ -195,6 +204,9 @@ namespace ACES{
         s >> type1;
         s >> type2;
 
+        if (type1 == "Omni"){
+            d = (RTT::TaskContext*) new Omnibot::Device(cfg, args);
+        }
         #ifdef HUBO
         if (type1 == "Hubo"){
             d = (RTT::TaskContext*) new Hubo::Device(cfg, args);
@@ -246,6 +258,14 @@ namespace ACES{
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
+        if (type == "Omni"){ 
+            int channel = 0;
+            if ( args == "1" ){
+                channel = 1;
+            }
+            s = (ProtoState*) new ACES::State<int>
+                            (cfg, channel, sampling, portnum);
+        }
         #ifdef HUBO 
         if ( type == "Hubo"){
             s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
