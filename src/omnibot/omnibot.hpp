@@ -47,6 +47,11 @@ namespace Omnibot {
                    M1_REV_SHORT,
                    M1_REV_LONG } PololuStates;
 
+    typedef enum { PARAM_DEVID = 0,
+                   PARAM_PWM,
+                   PARAM_SHUT_ON_ERR,
+                   PARAM_SER_TIMEOUT} PololuQuikParams;
+
     class PololuDS {
         public:
             PololuDS();
@@ -79,15 +84,17 @@ namespace Omnibot {
               processDS(ACES::Word<PololuDS>* w);
     };
 
-    class Device : public ACES::Device<int, PololuDS> {
+    class Device : public ACES::Device<float, PololuDS> {
         public:
             Device(std::string config, std::string args);
-            ACES::Word<PololuDS>* processDS(ACES::Word<int>*);
+            ACES::Word<PololuDS>* processDS(ACES::Word<float>*);
             void buildMotionCmdPacket(PololuDS &p, unsigned char nodeID,
                                       int data);
+            void setID(int newID);
     };
 
     ACES::Credentials* makeCredentials(std::string args);
+    ACES::Credentials* makeCredentials(int newid);
 
 };
 #endif

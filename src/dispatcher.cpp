@@ -263,7 +263,7 @@ namespace ACES{
             if ( args == "1" ){
                 channel = 1;
             }
-            s = (ProtoState*) new ACES::State<int>
+            s = (ProtoState*) new ACES::State<float>
                             (cfg, channel, sampling, portnum);
         }
         #ifdef HUBO 

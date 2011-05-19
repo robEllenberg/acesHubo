@@ -114,12 +114,25 @@ namespace Omnibot{
     }
 
     Device::Device(std::string cfg, std::string args)
-     : ACES::Device<int, PololuDS>(cfg){
+     : ACES::Device<float, PololuDS>(cfg){
         credentials = makeCredentials(args);
-            
+        this->addOperation("setID", &Device::setID, this,
+                    RTT::OwnThread).doc("Assign a new Device ID");
      }
 
-    ACES::Word<PololuDS>* Device::processDS(ACES::Word<int>* w){
+    void Device::setID(int newID){
+        PololuDS p;
+        p.setID( credentials->getDevID() );
+        p.setCommand( SET_CONFIG_PARAM );
+        p.setParameterID( PARAM_DEVID );
+        p.setParameterVal( newID );
+        txDownStream.write( new ACES::Word<PololuDS>(p) );
+
+        //Create a new credential with the reassigned ID
+        credentials = makeCredentials((int) newID);
+    }
+
+    ACES::Word<PololuDS>* Device::processDS(ACES::Word<float>* w){
         if(w){
             PololuDS p;
             p.setID(credentials->getDevID());
@@ -127,7 +140,7 @@ namespace Omnibot{
                 case(ACES::REFRESH):
                     break;
                 case(ACES::SET):
-                    buildMotionCmdPacket(p, w->getNodeID(), w->getData());
+                    buildMotionCmdPacket(p, w->getNodeID(), (int)w->getData());
                     break;
             }
             ACES::Word<PololuDS> *pw = new ACES::Word<PololuDS>(p);
@@ -169,6 +182,11 @@ namespace Omnibot{
 
     ACES::Credentials* makeCredentials(std::string args){
         ACES::Credentials* c = new ACES::Credentials(args);
+        return c;
+    }
+
+    ACES::Credentials* makeCredentials(int newid){
+        ACES::Credentials* c = new ACES::Credentials(newid);
         return c;
     }
 };

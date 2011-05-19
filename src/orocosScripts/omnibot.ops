@@ -1,0 +1,80 @@
+program main{
+    addHardware("hw 1 1000","pStream","fifo");
+    addProtocol("pro 2 100", "Omni", "");
+
+    addHardware("tsHW 90 500","TestSuite",""); 
+    addProtocol("tsPro 80 500", "TestSuite", ""); 
+    linkHP("hw", "pro");
+    linkHP("tsHW", "tsPro");
+
+    //Create devices, representing physical nodes on the bus
+    addDevice("dMA 3 250", "Omni", "9");
+    addDevice("dMB 3 250", "Omni", "5");
+    addDevice("dMC 3 250", "Omni", "11");
+    addDevice("dMD 3 250", "Omni", "23");
+
+    addDevice("dX 20 500", "TestSuite", "1"); 
+    addDevice("dY 20 500", "TestSuite", "2"); 
+    addDevice("dZ 20 500", "TestSuite", "3"); 
+    addDevice("dPit 20 500", "TestSuite", "4"); 
+    addDevice("dYaw 20 500", "TestSuite", "5"); 
+    addDevice("dRol 20 500", "TestSuite", "6"); 
+
+    //Add states, each represents 1 property of the device
+    addState("MA 10 50", "Omni", "0", false, 2827); 
+    addState("MB 10 50", "Omni", "0", false, 2828); 
+    addState("MC 10 50", "Omni", "0", false, 2829); 
+    addState("MD 10 50", "Omni", "0", false, 2830); 
+
+    var int startport = 2831;
+    var bool sample = false;
+    addState("X 10 100",   "TestSuite", "-1.0 1.0", sample, startport); 
+    addState("Y 10 100",   "TestSuite", "-1.0 1.0", sample, startport+1); 
+    addState("Z 10 100",   "TestSuite", "-1.0 1.0", sample, startport+2); 
+    addState("Pit 10 100", "TestSuite", "-1.0 1.0", sample, startport+3); 
+    addState("Yaw 10 100", "TestSuite", "-1.0 1.0", sample, startport+4); 
+    addState("Rol 10 100", "TestSuite", "-1.0 1.0", sample, startport+5); 
+
+    //Tell the states and devices to pay attention to each other
+    linkDS("dMA", "MA");
+    linkDS("dMB", "MB");
+    linkDS("dMC", "MC");
+    linkDS("dMD", "MD");
+
+    linkDS("dX", "X"); 
+    linkDS("dY", "Y"); 
+    linkDS("dZ", "Z"); 
+    linkDS("dPit", "Pit"); 
+    linkDS("dYaw", "Yaw"); 
+    linkDS("dRol", "Rol"); 
+
+    //Tell the devices & protocol to pay attention to each other 
+    linkPD("pro", "dMA");
+    linkPD("pro", "dMB");
+    linkPD("pro", "dMC");
+    linkPD("pro", "dMD");
+
+    linkPD("tsPro", "dX");
+    linkPD("tsPro", "dY");
+    linkPD("tsPro", "dZ");
+    linkPD("tsPro", "dPit");
+    linkPD("tsPro", "dRol");
+    linkPD("tsPro", "dYaw");
+
+    //Setup Logging
+    addLogger("log1 10 20", "File", "log.txt");
+    linkLS("log1", "X", "value");
+    linkLS("log1", "Y", "value");
+    linkLS("log1", "Z", "value");
+    linkLS("log1", "Pit", "value");
+    linkLS("log1", "Rol", "value");
+    linkLS("log1", "Yaw", "value");
+    
+    //Start the threads
+    startHW();
+    startProtocol();
+    startDevice();
+    startState();
+    startController();
+    startLogger();
+}
