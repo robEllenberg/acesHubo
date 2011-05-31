@@ -1,5 +1,6 @@
 program main{
-    addHardware("hw 1 1000","pStream","fifo");
+    addHardware("hw 1 1000","Char","/dev/ttyUSB0");
+    //addHardware("hw 1 1000","pStream","testout");
     addProtocol("pro 2 100", "Omni", "");
 
     addHardware("tsHW 90 500","TestSuite",""); 
@@ -8,10 +9,8 @@ program main{
     linkHP("tsHW", "tsPro");
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dMA 3 250", "Omni", "9");
-    addDevice("dMB 3 250", "Omni", "5");
-    addDevice("dMC 3 250", "Omni", "11");
-    addDevice("dMD 3 250", "Omni", "23");
+    addDevice("dMA 3 250", "Omni", "1");
+    addDevice("dMB 3 250", "Omni", "2");
 
     addDevice("dX 20 500", "TestSuite", "1"); 
     addDevice("dY 20 500", "TestSuite", "2"); 
@@ -21,10 +20,10 @@ program main{
     addDevice("dRol 20 500", "TestSuite", "6"); 
 
     //Add states, each represents 1 property of the device
-    addState("MA 10 50", "Omni", "0", false, 2827); 
-    addState("MB 10 50", "Omni", "0", false, 2828); 
-    addState("MC 10 50", "Omni", "0", false, 2829); 
-    addState("MD 10 50", "Omni", "0", false, 2830); 
+    addState("M1 10 50", "Omni", "0", false, 2827); 
+    addState("M2 10 50", "Omni", "1", false, 2828); 
+    addState("M3 10 50", "Omni", "0", false, 2829); 
+    addState("M4 10 50", "Omni", "1", false, 2830); 
 
     var int startport = 2831;
     var bool sample = false;
@@ -36,10 +35,10 @@ program main{
     addState("Rol 10 100", "TestSuite", "-1.0 1.0", sample, startport+5); 
 
     //Tell the states and devices to pay attention to each other
-    linkDS("dMA", "MA");
-    linkDS("dMB", "MB");
-    linkDS("dMC", "MC");
-    linkDS("dMD", "MD");
+    linkDS("dMA", "M1");
+    linkDS("dMB", "M2");
+    linkDS("dMB", "M3");
+    linkDS("dMA", "M4");
 
     linkDS("dX", "X"); 
     linkDS("dY", "Y"); 
@@ -51,8 +50,6 @@ program main{
     //Tell the devices & protocol to pay attention to each other 
     linkPD("pro", "dMA");
     linkPD("pro", "dMB");
-    linkPD("pro", "dMC");
-    linkPD("pro", "dMD");
 
     linkPD("tsPro", "dX");
     linkPD("tsPro", "dY");
