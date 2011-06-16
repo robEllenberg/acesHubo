@@ -135,7 +135,10 @@ namespace ACES{
         
         #ifdef HUBO        
         if (type == "Hubo") {
-            h = (RTT::TaskContext*) new Hubo::Hardware(cfg, args);
+            h = (RTT::TaskContext*) new HuboVia::Hardware(cfg, args);
+        }
+        if (type == "HuboCAN") {
+            h = (RTT::TaskContext*) new Hubo::CANHardware(cfg, args);
         }
         #endif 
         #ifdef WEBOTS        
@@ -156,7 +159,11 @@ namespace ACES{
         if(h){
             hwList.push_back(h);
             return connectPeers(h);
+        }else{
+            RTT::Logger::log(RTT::Logger::Warning) << "Invalid type \"" << type 
+                << "\" specified for Hardware." << RTT::endlog();
         }
+            
         return false;
     }
 
@@ -169,7 +176,7 @@ namespace ACES{
         }
         #ifdef HUBO 
         if ( type == "Hubo"){
-            p = (RTT::TaskContext*) new Hubo::Protocol(cfg, args);
+            p = (RTT::TaskContext*) new HuboVia::Protocol(cfg, args);
         } 
         #endif
         #ifdef WEBOTS
@@ -191,6 +198,9 @@ namespace ACES{
         if(p){
             pList.push_back(p);
             return connectPeers(p);
+        }else{
+            RTT::Logger::log(RTT::Logger::Warning) << "Invalid type \"" << type 
+                << "\" specified for Protocol." << RTT::endlog();
         }
         return false;
     }
@@ -209,7 +219,7 @@ namespace ACES{
         }
         #ifdef HUBO
         if (type1 == "Hubo"){
-            d = (RTT::TaskContext*) new Hubo::Device(cfg, args);
+            d = (RTT::TaskContext*) new HuboVia::Device(cfg, args);
         }
         #endif
         #ifdef WEBOTS 
@@ -247,6 +257,9 @@ namespace ACES{
         if(d){
             dList.push_back(d);
             return connectPeers(d);
+        } else{
+            RTT::Logger::log(RTT::Logger::Warning) << "Invalid type \"" << type 
+                << "\" specified for Device." << RTT::endlog();
         }
         return false;
     }
@@ -312,6 +325,9 @@ namespace ACES{
         if(s){
             stateList.push_back(s);
             return connectPeers(s);
+        }else{
+            RTT::Logger::log(RTT::Logger::Warning) << "Invalid type \"" << type 
+                << "\" specified for State." << RTT::endlog();
         }
         return false;
     }
@@ -358,6 +374,9 @@ namespace ACES{
         if(ctrl){
             cList.push_back(ctrl);
             return connectPeers(ctrl);
+        }else{
+            RTT::Logger::log(RTT::Logger::Warning) << "Invalid type \"" << type 
+                << "\" specified for Controller." << RTT::endlog();
         }
         return false;
     }

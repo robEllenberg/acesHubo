@@ -22,7 +22,7 @@
 
 #include "hubo.hpp"
 
-namespace Hubo{
+namespace HuboVia{
     HuboVia::HuboVia(double pos){
         rad = pos;
     }
@@ -142,3 +142,138 @@ namespace Hubo{
         return w;
     }
 };
+
+namespace Hubo{
+    #define TESTMODE 1
+    CANHardware::CANHardware(std::string cfg, std::string args)
+      : ACES::Hardware<canmsg_t*>(cfg, args)
+    {
+        //args contains the CAN device we're interested in e.g. "/dev/can0"
+        //the baud rate to operate at 
+        // args = "/dev/someFD <(int)baudrate>"
+        std::istringstream s(args);
+        s >> fd >> rate;
+
+        this->addAttribute("rate", rate);
+        this->addAttribute("fileNode", fd);
+
+        //Add a loopback connection that the device can use to add to its own
+        //queue
+        this->ports()->addPort("TxDSLoopback", txDSLoop).doc(
+                               "Downstream (to Bus) Self Connection");
+        RTT::base::PortInterface *tx = NULL, *rx=NULL;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
+        tx = (RTT::base::PortInterface*)this->ports()->getPort("TxDSLoopback");
+        rx = (RTT::base::PortInterface*)this->ports()->getPort("RxDS");
+        bool success = tx->connectTo(rx, policy);
+        assert(success);
+        
+        this->addOperation("genPacket", &CANHardware::genPacket, this,
+                               RTT::OwnThread).doc("Transmit a packet on the"
+                               " CAN line")
+                               .arg("ID", "Message ID")
+                               .arg("len", "Message Length")
+                               .arg("b0123", "Lower Order Bytes - Hex String")
+                               .arg("b4567", "Upper Order Bytes - Hex String");
+    }
+
+    bool CANHardware::startHook(){
+        channel = open(fd.c_str(), O_RDWR | O_NONBLOCK);
+
+        #if TESTMODE == 1
+            // Perform no special commands    
+        #else //Normal operation action
+            //Begin - snippit from can4linux examples baud.c
+            Config_par_t  CANcfg;
+            Command_par_t cmd;
+
+            cmd.cmd = CMD_STOP;
+            ioctl(channel, CAN_IOCTL_COMMAND, &cmd);
+
+            CANcfg.target = CONF_TIMING; 
+            CANcfg.val1   = rate;
+            ioctl(channel, CAN_IOCTL_CONFIG, &CANcfg);
+
+            cmd.cmd = CMD_START;
+            ioctl(channel, CAN_IOCTL_COMMAND, &cmd);
+            //End snippit
+        #endif
+        return true;
+    }
+    
+    void CANHardware::stopHook(){
+        close(channel);
+    }
+
+    bool CANHardware::genPacket(int ID, int len, 
+                                std::string lower, std::string upper)
+    {
+        ACES::Message<canmsg_t*> *m = new ACES::Message<canmsg_t*>();
+        unsigned int b0123 = 0, b4567 = 0;
+        std::istringstream u(upper), l(lower);
+        l >> std::setbase(16) >> b0123;
+        u >> std::setbase(16) >> b4567;
+
+        canmsg_t* msg = new canmsg_t;
+        msg->id = ID;
+        msg->cob = 0;
+        msg->flags = 0;
+        msg->length = len;
+        switch(len){
+            case 8:
+                msg->data[7] = ((b4567 & 0x000000FFu) >> (8*0));
+            case 7:
+                msg->data[6] = ((b4567 & 0x0000FF00u) >> (8*1));
+            case 6:
+                msg->data[5] = ((b4567 & 0x00FF0000u) >> (8*2));
+            case 5:
+                msg->data[4] = ((b4567 & 0xFF000000u) >> (8*3));
+            case 4:
+                msg->data[3] = ((b0123 & 0x000000FFu) >> (8*0));
+            case 3:
+                msg->data[2] = ((b0123 & 0x0000FF00u) >> (8*1));
+            case 2:
+                msg->data[1] = ((b0123 & 0x00FF0000u) >> (8*2));
+            case 1:
+                msg->data[0] = ((b0123 & 0xFF000000u) >> (8*3));
+            case 0:
+                break;
+            default:
+                assert(0);
+        }
+        m->push( new ACES::Word<canmsg_t*>(msg) );
+
+        txDSLoop.write(m);
+        return true;
+    }
+
+    bool CANHardware::txBus(ACES::Message<canmsg_t*>* m){
+        while( m->size() ){
+            ACES::Word<canmsg_t*>* w = m->pop();
+            canmsg_t* msg = w->getData();
+            #if TESTMODE == 1
+                void* p = &(msg->data);
+                int r = write(channel, p, msg->length);
+            #else //Normal operation
+                int r = write(channel, msg, 1);
+            #endif 
+            if(r == -1){
+                RTT::Logger::log() << RTT::Logger::Info
+                << "CAN Transmission Write Error"
+                << RTT::endlog();
+            } else if(r == 0){
+                RTT::Logger::log() << RTT::Logger::Info
+                << "CAN Transmission Timeout"
+                << RTT::endlog();
+            }
+            delete msg;
+            //TODO - Delete the word
+        }
+        delete m;
+        return true;
+    }
+
+    void CANHardware::rxBus(int size){
+    }
+
+}

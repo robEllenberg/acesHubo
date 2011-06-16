@@ -24,6 +24,7 @@
 #define ACES_HUBO_HPP
 
 #include <sstream>
+#include <iomanip>
 #include <cmath>
 #include <iostream>
 #include <boost/asio.hpp>
@@ -38,9 +39,12 @@
 
 #include "huboTxPacket.hpp"
 
+#include "huboCanDS.hpp"
+#include "can4linux.h"  //Include the can4linux data structures
+
 using boost::asio::ip::udp;
 
-namespace Hubo {
+namespace HuboVia {
 
     class HuboVia {
         public:
@@ -92,4 +96,25 @@ namespace Hubo {
             virtual ACES::Word<HuboVia>* processDS(ACES::Word<float>*);
     };
 };
+
+namespace Hubo{
+    class CANHardware : public ACES::Hardware<canmsg_t*>
+        {
+            public:
+                CANHardware(std::string cfg, std::string args);
+                virtual bool txBus(ACES::Message<canmsg_t*>* m);
+                virtual void rxBus(int size=0);
+                bool startHook();
+                void stopHook();
+                //virtual bool processUS(ACES::Word<canmsg_t*>* w);
+                bool genPacket(int ID, int len, 
+                               std::string lower, std::string upper);
+            protected:
+                std::string fd;
+                int rate;
+                int channel;    //! File descriptor for the CAN access node
+                RTT::OutputPort< ACES::Message<canmsg_t*>* > txDSLoop;
+        };
+};
+
 #endif

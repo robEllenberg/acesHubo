@@ -21,7 +21,7 @@
 */
 
 #include "huboTxPacket.hpp"
-namespace Hubo{
+namespace HuboVia{
 /*
 int main()
 {

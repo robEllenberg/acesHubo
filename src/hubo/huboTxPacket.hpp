@@ -24,7 +24,7 @@
 #define HUBO_TX_HPP
 
 #include <cmath>		
-namespace Hubo{
+namespace HuboVia{
     void getHuboTx(unsigned char motorNum, double deg, unsigned char* tx);
 };
 

@@ -32,6 +32,7 @@ namespace ACES{
     template <class T>
     class Message {
         public:
+            ~Message();
             void printme();
             int size();
             Word<T>* pop();
@@ -39,6 +40,15 @@ namespace ACES{
         protected:
             std::deque< Word<T>* > wordList;
     };
+
+    using namespace std;
+    template <class T>
+    Message<T>::~Message(){
+        while(wordList.size()){
+            delete wordList.back;
+            wordList.pop_back();
+        }
+    }
 
     template <class T>
     int Message<T>::size(){
