@@ -99,22 +99,41 @@ namespace HuboVia {
 
 namespace Hubo{
     class CANHardware : public ACES::Hardware<canmsg_t*>
-        {
-            public:
-                CANHardware(std::string cfg, std::string args);
-                virtual bool txBus(ACES::Message<canmsg_t*>* m);
-                virtual void rxBus(int size=0);
-                bool startHook();
-                void stopHook();
-                //virtual bool processUS(ACES::Word<canmsg_t*>* w);
-                bool genPacket(int ID, int len, 
-                               std::string lower, std::string upper);
-            protected:
-                std::string fd;
-                int rate;
-                int channel;    //! File descriptor for the CAN access node
-                RTT::OutputPort< ACES::Message<canmsg_t*>* > txDSLoop;
-        };
+    {
+        public:
+            CANHardware(std::string cfg, std::string args);
+            virtual bool txBus(ACES::Message<canmsg_t*>* m);
+            virtual void rxBus(int size=0);
+            bool startHook();
+            void stopHook();
+            //virtual bool processUS(ACES::Word<canmsg_t*>* w);
+            bool genPacket(int ID, int len, 
+                           std::string lower, std::string upper);
+        protected:
+            std::string fd;
+            int rate;
+            int channel;    //! File descriptor for the CAN access node
+            RTT::OutputPort< ACES::Message<canmsg_t*>* > txDSLoop;
+    };
+
+    class Protocol : public ACES::Protocol<canmsg_t*, canMsg> {
+        public:
+            Protocol(std::string cfg, std::string args);
+            virtual ACES::Message<canmsg_t*>*
+                      processDS(ACES::Word<canMsg>*);
+    };
+
+    class Device : public ACES::Device<float, canMsg>{
+        public:
+            Device(std::string cfg, std::string args);
+            virtual ACES::Word<HuboVia>* processDS(ACES::Word<float>*);
+            //Set Gain (Position)
+            //Set Gain (Torque)
+            //Set/Send Encoder Zero (?)
+            //Go Home
+            //PWM Command?
+            //Go Limit Pos?
+    };
 };
 
 #endif

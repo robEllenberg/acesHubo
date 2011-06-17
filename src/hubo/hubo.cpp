@@ -276,4 +276,17 @@ namespace Hubo{
     void CANHardware::rxBus(int size){
     }
 
+    Protocol::Protocol(std::string cfg, std::string args)
+      :ACES:Protocol<canmsg_t*, canMsg>(cfg, args)
+    {}
+
+    ACES::Message<canmsg_t*>* Protocol::processDS(ACES::Word<canMsg>* h){
+        ACES::Message<canmsg_t*> *m = NULL;
+        if(h){
+            canmsg_t* msg = h->getData()->toLineType();
+            m = new ACES::Message<canmsg_t*>;
+            m->push( new ACES::Word<canmsg_t*>(msg) );
+        }
+        return m;
+    }
 }

@@ -29,10 +29,10 @@ namespace Hubo{
         public:
             canMsg();
             canMsg(unsigned long id, short int length, unsigned char* data);
-            canMsg(unsigned long id, short int len, unsigned long d1,
-                   unsigned long d2);
+            //canMsg(unsigned long id, short int len, unsigned long d1,
+            //       unsigned long d2);
             void printMe();
-            canmsg_t toDriverType();
+            canmsg_t* toLineType();
         private:                       //   [bits] Meaning
             int flags;                  
             int cob;	               //!  CAN object number, used in Full CAN  
