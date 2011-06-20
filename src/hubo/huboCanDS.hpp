@@ -25,22 +25,46 @@ typedef struct {
 */
 
 namespace Hubo{
+    enum huboCanType { CMD_TXDF = 0x1, SEND_SENSOR_TXDF = 0x2, REF_TXDF = 0x10, 
+                       SENSOR_FT_RXDF = 0x40, SENSOR_AD_RXDF = 0x50,
+                       ENC_RXDF = 0x60, CUR_RXDF = 0x90, PM_RXDF = 0x120,
+                       STAT_RXDF = 0x150, NAME_RXDF = 0x190,
+                       DAOFFSET_RXDF = 0x310, ADOFFSET_RXDF = 0x320,
+                       OFFSET_RXDF = 0x330 };
+                       
+    enum cmdType { NAME_INFO = 0x1, BOARD_STATUS, SEND_ENC, SEND_CURR, 
+                   SEND_PM, ENC_ZERO, SET_POS_GAIN_A, SET_POS_GAIN_B,
+                   SET_TRQ_GAIN_A, SET_TRQ_GAIN_B, HIP_ENABLE, GO_HOME,
+                   PWM_CMD, RUN_CMD, STOP_CMD, CTRL_MODE, GO_LIMIT_POS,
+                   CURR_LIMIT, NULL_CMD = 0x81, SET_PERIOD_CMD, SET_SAMPLE_CMD,
+                   AD_READ_CMD, DA_OUT_CMD, DATA_TYPE_CMD, DA_OFFSET_CMD,
+                   AD_OFFSET_CMD, OFFSET_CMD };
+                       
     class canMsg {
         public:
             canMsg();
-            canMsg(unsigned long id, short int length, unsigned char* data);
-            //canMsg(unsigned long id, short int len, unsigned long d1,
-            //       unsigned long d2);
-            void printMe();
+            canMsg(unsigned long id, huboCanType type, cmdType subType);
+            canMsg(unsigned long id, huboCanType type, cmdType subType,
+                   unsigned long r1, unsigned long r2,
+                   unsigned long r3, unsigned long r4,
+                   unsigned long r5);
+
+            //void printMe();
+            static unsigned long bitStuff15byte(long bs);
+            static unsigned long bitStuff3byte(long bs);
+            static unsigned long unpack2byte();
+            static unsigned long unpack4byte();
             canmsg_t* toLineType();
         private:                       //   [bits] Meaning
-            int flags;                  
-            int cob;	               //!  CAN object number, used in Full CAN  
-            unsigned long id;		   //!  [11/29]CAN message ID, 4 bytes  
-            struct timeval  timestamp; //!  time stamp for received messages 
-            short int  length;	       //!  [4]number of bytes in the CAN message 
-            unsigned char data[8];     //!  [0-64]data, 8 bytes 
+            
+            unsigned long id;
+            huboCanType type;
+            cmdType subtype;
 
+            unsigned long r1;  //multi-purpose configuration registers
+            unsigned long r2;
+            unsigned long r3;
+            unsigned long r4;
     };
 }
 #endif

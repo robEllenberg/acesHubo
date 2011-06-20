@@ -22,128 +22,24 @@
 
 #include "hubo.hpp"
 
-namespace HuboVia{
-    HuboVia::HuboVia(double pos){
-        rad = pos;
-    }
-
-    HuboVia::HuboVia(){
-        rad = 0;
-    }
-
-    double HuboVia::getRad(){
-        return rad;
-    }
-
-    double HuboVia::getDeg(){
-        return 180.*rad/ (M_PI);
-    }
-
-    Credentials::Credentials(int id, double z, int dir)
-     : ACES::Credentials(id){
-        zero = z;
-        direction = dir;
-    }
-
-    double Credentials::getZero(){
-        return zero;
-    }
-
-    int Credentials::getDirection(){
-        return direction;
-    }
-
-    void Credentials::printme(){
-        RTT::Logger::log() << "(Hubo) Credentials: devID=" << devID
-                           << " zero=" << zero << " dir=" << direction
-                           << RTT::endlog();
-    }
-
-    Hardware::Hardware(std::string cfg, std::string args)
-     :ACES::Hardware<unsigned char*>(cfg, args),
-      io_service(),
-      resolver(io_service),
-      query(udp::v4(), "192.168.0.193", "11000"),
-      socket(io_service)
-    {
-        //try{
-        receiver_endpoint = *resolver.resolve(query);
-        socket.open(udp::v4());
-        //}
-    }
-
-    bool Hardware::startHook(){
-        //boost::asio::io_service io_service;
-        //udp::resolver resolver(io_service);
-        //udp::resolver::query query(udp::v4(), "192.168.0.193", 11000);
-        //udp::endpoint receiver_endpoint = *resolver.resolve(query);
-        //udp::socket socket(io_service);
-        //socket.open(udp::v4());
-
-        return true;
-    }
-
-    void Hardware::stopHook(){
-    }
-
-    //bool Hardware::processDS(Message<unsigned char*>*);
-    bool Hardware::txBus(ACES::Message<unsigned char*>* m){
-        RTT::Logger::log() << "Message: ";
-        unsigned char *buf = m->pop()->getData();
-        for(int i = 0; i < 8; i++){
-            RTT::Logger::log() << std::hex << (int) buf[i] << ", ";
-            send_buf[i] = buf[i];
-        }
-        RTT::Logger::log() << RTT::endlog();
-        socket.send_to(boost::asio::buffer(send_buf), receiver_endpoint);
-        return true;
-    }
-
-    Protocol::Protocol(std::string cfg, std::string args)
-     :ACES::Protocol<unsigned char*, HuboVia>(cfg, args)
-    {}
-
-    ACES::Message<unsigned char*>* Protocol::processDS(ACES::Word<HuboVia>* h){
-        ACES::Message<unsigned char*> *m = NULL;
-        if(h){
-            unsigned char *buf = new unsigned char[8];
-            getHuboTx( (unsigned char)h->getCred()->getDevID(),
-                       h->getData().getDeg(), buf);
-            m = new ACES::Message<unsigned char*>;
-            m->push(new ACES::Word<unsigned char*>(buf));
-        }
-        return m;
-    }
-
-    Device::Device(std::string cfg, std::string args)
-     : ACES::Device<float, HuboVia>(cfg)
-    {
-        std::istringstream s1(args);
-        float z;
-        int id, d;
-        s1 >> id >> z >> d;
-        credentials = new Credentials(id, z, d);
-    }
-
-    ACES::Word<HuboVia>* Device::processDS(ACES::Word<float>* s){
-        float pos = s->getData();       //User given set point
-
-        //Calculate the absolute command based on the configured zero and
-        //direction.
-        Credentials* c = (Credentials*)credentials;
-        double goal = c->getDirection()*pos + c->getZero(); 
-        HuboVia v(goal);
-
-        //Copy word info from state
-        ACES::Word<HuboVia>* w = new ACES::Word<HuboVia>(v, s->getNodeID(),
-                                                         s->getDevID(),
-                                                         s->getMode(), NULL);
-        w->setCred(credentials);    
-        return w;
-    }
-};
-
 namespace Hubo{
+    Credentials(int board, int chan) : ACES::Credentials(board)
+    {
+        if(chan > 0 && can <=3){
+            channels = chan;
+        } else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-3]." << RTT::endlog();
+        }
+    }
+
+    Credentials* Credentials::makeCredentials(std::string args){
+        std::istringstream s(args);
+        int board, channels;
+        s >> board >> channels;
+        return new Credentials(board, channels);
+    }
+
     #define TESTMODE 1
     CANHardware::CANHardware(std::string cfg, std::string args)
       : ACES::Hardware<canmsg_t*>(cfg, args)
@@ -288,5 +184,149 @@ namespace Hubo{
             m->push( new ACES::Word<canmsg_t*>(msg) );
         }
         return m;
+    }
+
+    MotorDevice::MotorDevice(std::string cfg, std::string args)
+      : ACES::Device<float, canMsg>, instantTrigger(false)
+    {
+        credentials =
+            (ACES::Credentials*)Credentials::makeCredentials(args);
+
+        this->addOperation("setTicks", &MotorDevice::setPPR, this,
+            RTT::OwnThread).doc("Set the PPR (Pulses/Revolution) of a channel")
+                           .arg("channel", "Channel number to set")
+                           .arg("PPR", "Number of ticks per revolution");
+
+        this->addOperation("setDirection", &MotorDevice::setPPR, this,
+            RTT::OwnThread).doc("Set the direction of rotation for a channel")
+                           .arg("channel", "Channel number to set")
+                           .arg("dir", "Direction of rotation = +/-1");
+
+        this->addAttribute("instantTrigger", instantTrigger);
+    }
+
+    ACES::Word<canMsg>* MotorDevice::processDS(ACES::Word<float>* w){
+        ACES::Word<canMsg>* msg = NULL;
+        if(w and (w->getMode() == ACES::SET) ){
+            msg = setSetPoint(w->getNodeID(), w->getData(), instantTrigger);
+        }
+        return msg;
+    }
+
+    MotorDevice::setPPR(int chan, float proposedPPR){
+        int numChan = (Credentials*)credentials->channels;
+        if(chan > 0 && chan <= numChan){
+            (Credentials*)credentials->PPR[chan] = proposedPPR;
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-" << numChan << "]."
+                << RTT::endlog();
+        }
+    }
+
+    MotorDevice::setDirection(int chan, float dir){
+        int numChan = (Credentials*)credentials->channels;
+        if(chan > 0 && chan <= numChan){
+            (Credentials*)credentials->direction[chan] = dir;
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-" << numChan << "]."
+                << RTT::endlog();
+        }
+    }
+
+    ACES::Word<canMsg>* MotorDevice::setSetPoint(int channel,
+                                                 float sp,
+                                                 bool instantTrigger)
+    {
+        ACES::Word<canMsg>* w = NULL;
+        int numChan = (Credentials*)credentials->channels;
+        if(chan > 0 && chan <= numChan){
+            setPoint[chan] = sp;
+            trigger[chan] = true;
+            
+            if(instantTrigger or triggerSet()){
+                Credentials* cred = (Credentials*)credentials;
+                new Word<canMsg>(buildSetPack(), channel, cred->getDevID(),
+                                 ACES::SET, cred);
+                clearTrigger();
+            }
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-" << numChan << "]."
+                << RTT::endlog();
+        } 
+        return w;
+    }
+
+    /*! Inform us if all channels have recieved new information and are ready
+     *  to fire. */
+    bool MotorDevice::triggersSet(){
+        int numChan = (Credentials*)credentials->channels;
+        bool go = true;
+        for(int i = 0; i < numChan; i++){
+            go = go && trigger[i];
+        }
+        return go;
+    }
+    
+    void MotorDevice::clearTrigger(){
+        int numChan = (Credentials*)credentials->channels;
+        for(int i = 0; i < numChan; i++){
+            trigger[i] = false;
+        }
+    }
+
+    canMsg MotorDevice::buildSetPacket(){
+        int numChan = (Credentials*)credentials->channels;
+        unsigned long temp[5];
+        switch(numChan){
+            float dir, ppr;
+            case 5: //Five Channel Motor Controller - Fingers
+                for(int i=0; i < 5; i++){
+                    dir = (Credntials*)credentials->direction[i];
+                    ppr = (Credntials*)credentials->PPR[i];
+                    temp[i] =
+                        canMsg::bitStuff15byte((long)setPoint[i]*dir*ppr/360.);
+                }
+                break;
+            case 3: //Three Channel Motor Controllers - Wrists & Neck
+                for(int i = 0; i < 3; i++){
+                    dir = (Credntials*)credentials->direction[i];
+                    ppr = (Credntials*)credentials->PPR[i];
+                    temp[i] = setPoint[i]*dir*ppr/360.;
+                }
+                break;
+            case 2: //Two Channel Motor Controllers - Limbs
+                for(int i = 0; i < 2; i++){
+                    dir = (Credntials*)credentials->direction[i];
+                    ppr = (Credntials*)credentials->PPR[i];
+                    temp[i] =
+                       canMsg::bitStuff3byte((long)setPoint[i]*dir*ppr/360.);
+                }
+                break;
+            default:
+                //TODO - Failure case
+                break;
+        }
+
+        canMsg cm( (Credentials*)credentials->getDevID(),
+                CMD_TXDF, numChan, temp[0], temp[1], temp[2], temp[3], temp[4],
+                temp[5]);
+        return cm;
+    }
+
+    canMsg buildRefreshPacket(){
+        canMsg cm(0, SEND_SENSOR_TXDF, 0);
+        return cm;
+    }
+
+    ACES::Word<canMsg>* SensorDevice::processDS(ACES::Word<float>* w){
+        if( w->getMode() == ACES::REFRESH ){
+            canMsg msg();
+        }
     }
 }

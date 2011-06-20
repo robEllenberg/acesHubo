@@ -25,9 +25,7 @@
 
 #include <sstream>
 #include <iomanip>
-#include <cmath>
 #include <iostream>
-#include <boost/asio.hpp>
 #include <boost/array.hpp>
 
 #include "../hardware.hpp"
@@ -37,67 +35,22 @@
 #include "../word.hpp"
 #include "../credentials.hpp"
 
-#include "huboTxPacket.hpp"
-
 #include "huboCanDS.hpp"
 #include "can4linux.h"  //Include the can4linux data structures
 
-using boost::asio::ip::udp;
-
-namespace HuboVia {
-
-    class HuboVia {
-        public:
-            HuboVia();
-            HuboVia(double pos);
-            double getRad();
-            double getDeg();
-        private:
-           double rad;
-    };
-
+namespace Hubo{
     class Credentials : public ACES::Credentials {
         public:
-            Credentials(int id, double zero, int direction);
-            double getZero();
-            int getDirection();
-            void printme();
-        protected:
-            double zero;
-            int direction;
+            Credentials(int board, int channels);
+            static Credentials* makeCredentials(std::string args);
+        private:
+            //int boardNum;       //! Identifying number for the motor controller
+            int channels;       //! Number of channels on the controller (1-3)
+            float PPR[3];       //! Pulses per revolution (one per channel)
+            float direction[3]; //! +/-1 Direction of motor revolution (1/channel)
+            //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
-    class Hardware : public ACES::Hardware<unsigned char*> {
-        public:
-            Hardware(std::string cfg, std::string args);
-            bool startHook();
-            void stopHook();
-            //virtual bool processDS(Message<unsigned char>*);
-            virtual bool txBus(ACES::Message<unsigned char*>* m);
-        protected:
-            boost::array<unsigned char, 8> send_buf;
-            boost::asio::io_service io_service;
-            udp::resolver resolver;
-            udp::resolver::query query;
-            udp::endpoint receiver_endpoint;
-            udp::socket socket;
-    };
-
-    class Protocol : public ACES::Protocol<unsigned char*, HuboVia> {
-        public:
-            Protocol(std::string cfg, std::string args);
-            virtual ACES::Message<unsigned char*>*
-                      processDS(ACES::Word<HuboVia>*);
-    };
-
-    class Device : public ACES::Device<float, HuboVia>{
-        public:
-            Device(std::string cfg, std::string args);
-            virtual ACES::Word<HuboVia>* processDS(ACES::Word<float>*);
-    };
-};
-
-namespace Hubo{
     class CANHardware : public ACES::Hardware<canmsg_t*>
     {
         public:
@@ -123,16 +76,42 @@ namespace Hubo{
                       processDS(ACES::Word<canMsg>*);
     };
 
-    class Device : public ACES::Device<float, canMsg>{
+    class MotorDevice : public ACES::Device<float, canMsg>{
         public:
-            Device(std::string cfg, std::string args);
-            virtual ACES::Word<HuboVia>* processDS(ACES::Word<float>*);
-            //Set Gain (Position)
-            //Set Gain (Torque)
-            //Set/Send Encoder Zero (?)
-            //Go Home
-            //PWM Command?
-            //Go Limit Pos?
+            MotorDevice(std::string cfg, std::string args);
+            virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
+
+            //User-Device interface functions
+            setPPR(int channel, float PPR);
+            setDirection(int channel, float direction);
+            //
+            setGain(type, channel, Kp, Ki, Kd)
+            ACES::Word<canMsg>* setSetPoint(int channel, float sp,
+                                            bool instantTrigger=false);
+            bool triggersSet();
+            void clearTrigger();
+            //
+            canMsg buildSetPacket();
+            canMsg buildRefreshPacket();
+        /*
+            getEncoderPos()
+            getCurrent()
+            getPM() //TODO - WTF is 'PM'?
+
+            enableHIP() //TODO - WTF is 'HIP'?
+            seekHome()
+        */
+        private:
+            float setPoint[5];
+            bool trigger[5]; //! Indicates which channels have recieved
+                             // information since the last trigger
+            bool instantTrigger;
+    };
+
+    class SensorDevice : public ACES::Device<float, canMsg>{
+        public:
+            SensorDevice(std::string cfg, std::string args);
+            virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
     };
 };
 
