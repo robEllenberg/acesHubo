@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <sys/time.h>
+#include <assert.h>
 #include "can4linux.h"  //Include the can4linux data structures
 
 //For reference, the canmsg_t data structure from can4linux
@@ -25,14 +26,14 @@ typedef struct {
 */
 
 namespace Hubo{
-    enum huboCanType { CMD_TXDF = 0x1, SEND_SENSOR_TXDF = 0x2, REF_TXDF = 0x10, 
+    enum huboCanType { CAN_NONE = 0x0, CMD_TXDF = 0x1, SEND_SENSOR_TXDF = 0x2, REF_TXDF = 0x10, 
                        SENSOR_FT_RXDF = 0x40, SENSOR_AD_RXDF = 0x50,
                        ENC_RXDF = 0x60, CUR_RXDF = 0x90, PM_RXDF = 0x120,
                        STAT_RXDF = 0x150, NAME_RXDF = 0x190,
                        DAOFFSET_RXDF = 0x310, ADOFFSET_RXDF = 0x320,
                        OFFSET_RXDF = 0x330 };
                        
-    enum cmdType { NAME_INFO = 0x1, BOARD_STATUS, SEND_ENC, SEND_CURR, 
+    enum cmdType { CMD_NONE = 0x0, NAME_INFO = 0x1, BOARD_STATUS, SEND_ENC, SEND_CURR, 
                    SEND_PM, ENC_ZERO, SET_POS_GAIN_A, SET_POS_GAIN_B,
                    SET_TRQ_GAIN_A, SET_TRQ_GAIN_B, HIP_ENABLE, GO_HOME,
                    PWM_CMD, RUN_CMD, STOP_CMD, CTRL_MODE, GO_LIMIT_POS,
@@ -54,17 +55,21 @@ namespace Hubo{
             static unsigned long bitStuff3byte(long bs);
             static unsigned long unpack2byte();
             static unsigned long unpack4byte();
+            static unsigned char bitStrip(unsigned long src, int byteNum);
             canmsg_t* toLineType();
         private:                       //   [bits] Meaning
-            
+            canmsg_t* processCMD(canmsg_t*);
+            canmsg_t* processREF(canmsg_t*);
+
             unsigned long id;
             huboCanType type;
-            cmdType subtype;
+            cmdType subType;
 
             unsigned long r1;  //multi-purpose configuration registers
             unsigned long r2;
             unsigned long r3;
             unsigned long r4;
+            unsigned long r5;
     };
 }
 #endif

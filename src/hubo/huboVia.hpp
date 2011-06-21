@@ -93,3 +93,4 @@ namespace HuboVia {
             virtual ACES::Word<HuboVia>* processDS(ACES::Word<float>*);
     };
 };
+#endif

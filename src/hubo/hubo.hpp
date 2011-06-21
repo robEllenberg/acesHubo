@@ -40,9 +40,16 @@
 
 namespace Hubo{
     class Credentials : public ACES::Credentials {
+        friend class MotorDevice;
         public:
             Credentials(int board, int channels);
             static Credentials* makeCredentials(std::string args);
+            int getChannels();
+            float getPPR(int chan);
+            float getDirection(int chan);
+        protected:
+            void setPPR(int chan, float proposedPPR);
+            void setDirection(int chan, float dir);
         private:
             //int boardNum;       //! Identifying number for the motor controller
             int channels;       //! Number of channels on the controller (1-3)
@@ -81,11 +88,12 @@ namespace Hubo{
             MotorDevice(std::string cfg, std::string args);
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
 
+            int getChannels();
             //User-Device interface functions
-            setPPR(int channel, float PPR);
-            setDirection(int channel, float direction);
+            bool setPPR(int channel, float PPR);
+            bool setDirection(int channel, float direction);
             //
-            setGain(type, channel, Kp, Ki, Kd)
+            // setGain(type, channel, Kp, Ki, Kd)
             ACES::Word<canMsg>* setSetPoint(int channel, float sp,
                                             bool instantTrigger=false);
             bool triggersSet();
@@ -108,11 +116,13 @@ namespace Hubo{
             bool instantTrigger;
     };
 
+    /*
     class SensorDevice : public ACES::Device<float, canMsg>{
         public:
             SensorDevice(std::string cfg, std::string args);
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
     };
+    */
 };
 
 #endif

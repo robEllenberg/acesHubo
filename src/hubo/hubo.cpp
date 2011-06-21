@@ -23,9 +23,9 @@
 #include "hubo.hpp"
 
 namespace Hubo{
-    Credentials(int board, int chan) : ACES::Credentials(board)
+    Credentials::Credentials(int board, int chan) : ACES::Credentials(board)
     {
-        if(chan > 0 && can <=3){
+        if(chan > 0 && chan <=3){
             channels = chan;
         } else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
@@ -38,6 +38,32 @@ namespace Hubo{
         int board, channels;
         s >> board >> channels;
         return new Credentials(board, channels);
+    }
+
+    int Credentials::getChannels(){
+        return channels;
+    }
+
+    void Credentials::setPPR(int chan, float proposedPPR){
+        PPR[chan] = proposedPPR;
+    }
+
+    void Credentials::setDirection(int chan, float dir){
+        direction[chan] = dir;
+    }
+
+    float Credentials::getPPR(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return PPR[chan];
+        }
+        return 0.0;
+    }
+
+    float Credentials::getDirection(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return direction[chan];
+        }
+        return 0.0;
     }
 
     #define TESTMODE 1
@@ -173,13 +199,13 @@ namespace Hubo{
     }
 
     Protocol::Protocol(std::string cfg, std::string args)
-      :ACES:Protocol<canmsg_t*, canMsg>(cfg, args)
+      : ACES::Protocol<canmsg_t*, canMsg>(cfg, args)
     {}
 
     ACES::Message<canmsg_t*>* Protocol::processDS(ACES::Word<canMsg>* h){
         ACES::Message<canmsg_t*> *m = NULL;
         if(h){
-            canmsg_t* msg = h->getData()->toLineType();
+            canmsg_t* msg = h->getData().toLineType();
             m = new ACES::Message<canmsg_t*>;
             m->push( new ACES::Word<canmsg_t*>(msg) );
         }
@@ -187,7 +213,7 @@ namespace Hubo{
     }
 
     MotorDevice::MotorDevice(std::string cfg, std::string args)
-      : ACES::Device<float, canMsg>, instantTrigger(false)
+      : ACES::Device<float, canMsg>(cfg), instantTrigger(false)
     {
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
@@ -213,28 +239,36 @@ namespace Hubo{
         return msg;
     }
 
-    MotorDevice::setPPR(int chan, float proposedPPR){
-        int numChan = (Credentials*)credentials->channels;
-        if(chan > 0 && chan <= numChan){
-            (Credentials*)credentials->PPR[chan] = proposedPPR;
-        }
-        else{
-            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-" << numChan << "]."
-                << RTT::endlog();
-        }
+    int MotorDevice::getChannels(){
+        return ((Credentials*)credentials)->getChannels();
     }
 
-    MotorDevice::setDirection(int chan, float dir){
-        int numChan = (Credentials*)credentials->channels;
+    bool MotorDevice::setPPR(int chan, float proposedPPR){
+        int numChan = getChannels();
         if(chan > 0 && chan <= numChan){
-            (Credentials*)credentials->direction[chan] = dir;
+            ((Credentials*)credentials)->setPPR(chan, proposedPPR);
+            return true;
         }
         else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
                 << chan << " specified. Must be [1-" << numChan << "]."
                 << RTT::endlog();
         }
+        return false;
+    }
+
+    bool MotorDevice::setDirection(int chan, float dir){
+        int numChan = getChannels();
+        if(chan > 0 && chan <= numChan){
+            ((Credentials*)credentials)->setDirection(chan, dir);
+            return true;
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-" << numChan << "]."
+                << RTT::endlog();
+        }
+        return false;
     }
 
     ACES::Word<canMsg>* MotorDevice::setSetPoint(int channel,
@@ -242,21 +276,21 @@ namespace Hubo{
                                                  bool instantTrigger)
     {
         ACES::Word<canMsg>* w = NULL;
-        int numChan = (Credentials*)credentials->channels;
-        if(chan > 0 && chan <= numChan){
-            setPoint[chan] = sp;
-            trigger[chan] = true;
+        int numChan = getChannels();
+        if(channel > 0 && channel <= numChan){
+            setPoint[channel] = sp;
+            trigger[channel] = true;
             
-            if(instantTrigger or triggerSet()){
+            if(instantTrigger or triggersSet()){
                 Credentials* cred = (Credentials*)credentials;
-                new Word<canMsg>(buildSetPack(), channel, cred->getDevID(),
+                new ACES::Word<canMsg>(buildSetPacket(), channel, cred->getDevID(),
                                  ACES::SET, cred);
                 clearTrigger();
             }
         }
         else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-" << numChan << "]."
+                << channel << " specified. Must be [1-" << numChan << "]."
                 << RTT::endlog();
         } 
         return w;
@@ -265,7 +299,7 @@ namespace Hubo{
     /*! Inform us if all channels have recieved new information and are ready
      *  to fire. */
     bool MotorDevice::triggersSet(){
-        int numChan = (Credentials*)credentials->channels;
+        int numChan = getChannels();
         bool go = true;
         for(int i = 0; i < numChan; i++){
             go = go && trigger[i];
@@ -274,36 +308,36 @@ namespace Hubo{
     }
     
     void MotorDevice::clearTrigger(){
-        int numChan = (Credentials*)credentials->channels;
+        int numChan = getChannels();
         for(int i = 0; i < numChan; i++){
             trigger[i] = false;
         }
     }
 
     canMsg MotorDevice::buildSetPacket(){
-        int numChan = (Credentials*)credentials->channels;
+        int numChan = getChannels(); 
         unsigned long temp[5];
         switch(numChan){
             float dir, ppr;
             case 5: //Five Channel Motor Controller - Fingers
                 for(int i=0; i < 5; i++){
-                    dir = (Credntials*)credentials->direction[i];
-                    ppr = (Credntials*)credentials->PPR[i];
+                    dir = ((Credentials*)credentials)->getDirection(i);
+                    ppr = ((Credentials*)credentials)->getPPR(i);
                     temp[i] =
                         canMsg::bitStuff15byte((long)setPoint[i]*dir*ppr/360.);
                 }
                 break;
             case 3: //Three Channel Motor Controllers - Wrists & Neck
                 for(int i = 0; i < 3; i++){
-                    dir = (Credntials*)credentials->direction[i];
-                    ppr = (Credntials*)credentials->PPR[i];
+                    dir = ((Credentials*)credentials)->getDirection(i);
+                    ppr = ((Credentials*)credentials)->getPPR(i);
                     temp[i] = setPoint[i]*dir*ppr/360.;
                 }
                 break;
             case 2: //Two Channel Motor Controllers - Limbs
                 for(int i = 0; i < 2; i++){
-                    dir = (Credntials*)credentials->direction[i];
-                    ppr = (Credntials*)credentials->PPR[i];
+                    dir = ((Credentials*)credentials)->getDirection(i);
+                    ppr = ((Credentials*)credentials)->getPPR(i);
                     temp[i] =
                        canMsg::bitStuff3byte((long)setPoint[i]*dir*ppr/360.);
                 }
@@ -313,20 +347,22 @@ namespace Hubo{
                 break;
         }
 
-        canMsg cm( (Credentials*)credentials->getDevID(),
-                CMD_TXDF, numChan, temp[0], temp[1], temp[2], temp[3], temp[4],
-                temp[5]);
+        canMsg cm( credentials->getDevID(),
+                CMD_TXDF, (cmdType)numChan, temp[0], temp[1], temp[2], temp[3],
+                temp[4]);
         return cm;
     }
 
-    canMsg buildRefreshPacket(){
-        canMsg cm(0, SEND_SENSOR_TXDF, 0);
+    canMsg MotorDevice::buildRefreshPacket(){
+        canMsg cm(0, SEND_SENSOR_TXDF, (cmdType)0);
         return cm;
     }
 
+    /*
     ACES::Word<canMsg>* SensorDevice::processDS(ACES::Word<float>* w){
         if( w->getMode() == ACES::REFRESH ){
             canMsg msg();
         }
     }
+    */
 }

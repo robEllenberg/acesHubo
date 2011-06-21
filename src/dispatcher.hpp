@@ -41,6 +41,7 @@
 #include "omnibot/omnibot.hpp"
 #ifdef HUBO 
     #include "hubo/hubo.hpp"
+    #include "hubo/huboVia.hpp"
 #endif
 #ifdef WEBOTS
     #include "webots.hpp"
