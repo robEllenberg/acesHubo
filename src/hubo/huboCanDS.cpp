@@ -34,17 +34,17 @@ namespace Hubo{
      * code base. They're wrong in that they use a sign bit instead of a two's
      * complement representation, but I'm maintaing them because they're needed
      * to ensure compatibility with the motor controllers */
-    unsigned long bitStuff15byte(long bs){
+    unsigned long canMsg::bitStuff15byte(long bs){
         if (bs < 0) return( (unsigned long)(((-bs) & 0x000007FF) | (1<<11)) );
         else	return( (unsigned long)(bs) );
     }
 
-    unsigned long bitStuff3byte(long bs){
+    unsigned long canMsg::bitStuff3byte(long bs){
         if (bs < 0) return( (unsigned long)(((-bs) & 0x007FFFFF) | (1<<23)) );
         else	return( (unsigned long)(bs) );
     }
 
-    unsigned char bitStrip(unsigned long src, int byteNum){
+    unsigned char canMsg::bitStrip(unsigned long src, int byteNum){
         return (unsigned char)( (src >> (8*byteNum)) & 0x000000FFu );
     }
 

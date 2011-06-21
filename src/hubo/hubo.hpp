@@ -47,6 +47,7 @@ namespace Hubo{
             int getChannels();
             float getPPR(int chan);
             float getDirection(int chan);
+            void printme();
         protected:
             void setPPR(int chan, float proposedPPR);
             void setDirection(int chan, float dir);

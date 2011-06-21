@@ -31,6 +31,10 @@ namespace Hubo{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
                 << chan << " specified. Must be [1-3]." << RTT::endlog();
         }
+        for(int i = 0; i < 3; i++){
+            PPR[i] = 0;
+            direction[i] = 1.;
+        }
     }
 
     Credentials* Credentials::makeCredentials(std::string args){
@@ -64,6 +68,17 @@ namespace Hubo{
             return direction[chan];
         }
         return 0.0;
+    }
+
+    void Credentials::printme(){
+        ACES::Credentials::printme();
+        RTT::Logger::log() << "(HuboCAN) Credentials: # Channels = "
+                           << channels
+                           << "; PPR: [" << PPR[0] <<", " << PPR[1] << ", "
+                           << PPR[2] << "]; "
+                           << "direction: [" << direction[0] << ", "
+                           << direction[1] << ", " << direction[2] << "]"
+                           << RTT::endlog();
     }
 
     #define TESTMODE 1
@@ -236,6 +251,8 @@ namespace Hubo{
         if(w and (w->getMode() == ACES::SET) ){
             msg = setSetPoint(w->getNodeID(), w->getData(), instantTrigger);
         }
+        RTT::Logger::log(RTT::Logger::Warning) <<  "Processing: " << msg
+        << RTT::endlog();
         return msg;
     }
 
@@ -245,13 +262,13 @@ namespace Hubo{
 
     bool MotorDevice::setPPR(int chan, float proposedPPR){
         int numChan = getChannels();
-        if(chan > 0 && chan <= numChan){
+        if(chan >= 0 && chan < numChan){
             ((Credentials*)credentials)->setPPR(chan, proposedPPR);
             return true;
         }
         else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-" << numChan << "]."
+                << chan << " specified. Must be [0-" << numChan-1 << "]."
                 << RTT::endlog();
         }
         return false;
@@ -259,13 +276,13 @@ namespace Hubo{
 
     bool MotorDevice::setDirection(int chan, float dir){
         int numChan = getChannels();
-        if(chan > 0 && chan <= numChan){
+        if(chan >= 0 && chan < numChan){
             ((Credentials*)credentials)->setDirection(chan, dir);
             return true;
         }
         else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-" << numChan << "]."
+                << chan << " specified. Must be [0-" << numChan-1 << "]."
                 << RTT::endlog();
         }
         return false;
@@ -277,14 +294,14 @@ namespace Hubo{
     {
         ACES::Word<canMsg>* w = NULL;
         int numChan = getChannels();
-        if(channel > 0 && channel <= numChan){
+        if(channel >= 0 && channel < numChan){
             setPoint[channel] = sp;
             trigger[channel] = true;
             
             if(instantTrigger or triggersSet()){
                 Credentials* cred = (Credentials*)credentials;
-                new ACES::Word<canMsg>(buildSetPacket(), channel, cred->getDevID(),
-                                 ACES::SET, cred);
+                w = new ACES::Word<canMsg>(buildSetPacket(), channel, cred->getDevID(),
+                                           ACES::SET, cred);
                 clearTrigger();
             }
         }
@@ -348,7 +365,7 @@ namespace Hubo{
         }
 
         canMsg cm( credentials->getDevID(),
-                CMD_TXDF, (cmdType)numChan, temp[0], temp[1], temp[2], temp[3],
+                REF_TXDF, (cmdType)numChan, temp[0], temp[1], temp[2], temp[3],
                 temp[4]);
         return cm;
     }

@@ -178,6 +178,9 @@ namespace ACES{
         if ( type == "Hubo"){
             p = (RTT::TaskContext*) new HuboVia::Protocol(cfg, args);
         } 
+        if (type == "HuboCAN"){
+            p = (RTT::TaskContext*) new Hubo::Protocol(cfg, args);
+        }
         #endif
         #ifdef WEBOTS
         if ( type == "Webots"){
@@ -220,6 +223,11 @@ namespace ACES{
         #ifdef HUBO
         if (type1 == "Hubo"){
             d = (RTT::TaskContext*) new HuboVia::Device(cfg, args);
+        }
+        if (type1 == "HuboCAN"){
+            if(type2 == "Motor"){
+                d = (RTT::TaskContext*) new Hubo::MotorDevice(cfg, args);
+            }
         }
         #endif
         #ifdef WEBOTS 

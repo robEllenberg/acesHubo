@@ -1,0 +1,6 @@
+program config {
+    One.NodeID = 0;
+    Two.NodeID = 1;
+    dHY.setTicks(0, 1000);
+    dHY.setTicks(1, 1000);
+}

@@ -2,14 +2,23 @@ program main {
     var bool sampling = false;
     var int baseport = 2827;
 
-    addHardware("via 90 100","Hubo","");
-    addHardware("hw 90 100","HuboCAN","./testfile 9600");
-    addHardware("something 90 100","junk","testfile 9600");
-    /*
-    addProtocol("pro 80 100", "Hubo", "");
-    linkHP("hw", "pro");
+    //addHardware("via 90 100","Hubo","");
 
-    addController("user 10 10", "User Program", "danscriptHandWave.ops main");
+    addHardware("hw 90 100","HuboCAN","./testfile 9600");
+    addProtocol("pro 80 100", "HuboCAN", "");
+    linkHP("hw", "pro");
+                                            //board#, #channels
+    addDevice("dHY  20 50", "HuboCAN Motor", "20 2");
+    linkPD("pro", "dHY");
+
+    addState("One  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
+    addState("Two  10 50", "Hubo", "-3.14 3.14", sampling, baseport+1);
+    linkDS("dHY",  "One");
+    linkDS("dHY",  "Two");
+
+
+    //addController("config 10 10", "User Program", "canConfig.ops config");
+    /*
 
     //Create devices, representing physical nodes on the bus
     addDevice("dHY  20 50", "Hubo", "38 0.0  1");
@@ -89,4 +98,5 @@ program main {
     startState();
     startController();
     startLogger();
+    scripting.loadPrograms("canConfig.ops")
 }
