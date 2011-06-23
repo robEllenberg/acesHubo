@@ -99,6 +99,7 @@ namespace Hubo{
                 cm->data[5] = bitStrip(r2, 1);
                 cm->data[6] = bitStrip(r3, 0);
                 cm->data[7] = bitStrip(r3, 1);
+                cm->length = 8;
                 break;
             case NAME_INFO:
             case BOARD_STATUS:

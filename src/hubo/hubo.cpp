@@ -48,12 +48,37 @@ namespace Hubo{
         return channels;
     }
 
-    void Credentials::setPPR(int chan, float proposedPPR){
-        PPR[chan] = proposedPPR;
+    bool Credentials::setPPR(int chan, float proposedPPR){
+        if(checkChannel(chan)){
+            PPR[chan] = proposedPPR;
+            return true;
+        }
+        return false;
     }
 
-    void Credentials::setDirection(int chan, float dir){
-        direction[chan] = dir;
+    bool Credentials::setDirection(int chan, float dir){
+        if(checkChannel(chan)){
+            direction[chan] = dir;
+            return true;
+        }
+        return false;
+    }
+
+    bool Credentials::setGearRatio(int chan, int drive, int driven){
+        if(checkChannel(chan)){
+            driveTeeth[chan] = drive;
+            drivenTeeth[chan] = driven;
+            return true;
+        }
+        return false;
+    }
+
+    bool Credentials::setEncoderSize(int chan, int size){
+        if(checkChannel(chan)){
+            encoderSize[chan] = size;
+            return true;
+        }
+        return false;
     }
 
     float Credentials::getPPR(int chan){
@@ -68,6 +93,18 @@ namespace Hubo{
             return direction[chan];
         }
         return 0.0;
+    }
+
+    bool Credentials::checkChannel(int chan){
+        if(chan >= 0 && chan < channels){
+            return true;
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [0-" << channels-1 << "]."
+                << RTT::endlog();
+        }
+        return false; 
     }
 
     void Credentials::printme(){
@@ -115,7 +152,8 @@ namespace Hubo{
     }
 
     bool CANHardware::startHook(){
-        channel = open(fd.c_str(), O_RDWR | O_NONBLOCK);
+        channel = open(fd.c_str(), O_RDWR | O_NONBLOCK | O_CREAT | O_TRUNC,
+                       0755);
 
         #if TESTMODE == 1
             // Perform no special commands    
@@ -188,11 +226,17 @@ namespace Hubo{
         while( m->size() ){
             ACES::Word<canmsg_t*>* w = m->pop();
             canmsg_t* msg = w->getData();
+            int r = 0;
             #if TESTMODE == 1
-                void* p = &(msg->data);
-                int r = write(channel, p, msg->length);
+                dprintf(channel, "%2.2X\t%d\t\t", (int)(msg->id), msg->length);
+                for(int i = 0; i < msg->length; i++){
+                    dprintf(channel, "%2.2X ", (msg->data[i]) );
+                }
+                dprintf(channel, "\n");
+                r = 1;  //Bypass the error checks later
+                //int r = write(channel, &(msg->data), msg->length);
             #else //Normal operation
-                int r = write(channel, msg, 1);
+                r = write(channel, msg, 1);
             #endif 
             if(r == -1){
                 RTT::Logger::log() << RTT::Logger::Info
@@ -243,13 +287,35 @@ namespace Hubo{
                            .arg("channel", "Channel number to set")
                            .arg("dir", "Direction of rotation = +/-1");
 
+        this->addOperation("setGearRatio", &MotorDevice::setGearRatio, this,
+            RTT::OwnThread).doc("Set the gear ratio for a channel")
+                           .arg("channel", "Channel number to set")
+                           .arg("drive", "Number of teeth on the drive axis")
+                           .arg("driven", "Number of teeth on the driven axis");
+
+        this->addOperation("setEncoderSize", &MotorDevice::setEncoderSize, this,
+            RTT::OwnThread).doc("Set the gear ratio for a channel")
+                           .arg("channel", "Channel number to set")
+                           .arg("size", "Number of ticks on the encoder");
+
+        this->addOperation("setGains", &MotorDevice::setGains, this,
+            RTT::OwnThread).doc("Set the gains for this controller")
+                           .arg("type", "Type of gain - Position or Torque")
+                           .arg("channel", "Channel number to set")
+                           .arg("Kp", "Proportional Gain")
+                           .arg("Ki", "Integral Gain")
+                           .arg("Kd", "Derivative Gain");
+
         this->addAttribute("instantTrigger", instantTrigger);
     }
 
     ACES::Word<canMsg>* MotorDevice::processDS(ACES::Word<float>* w){
         ACES::Word<canMsg>* msg = NULL;
         if(w and (w->getMode() == ACES::SET) ){
-            msg = setSetPoint(w->getNodeID(), w->getData(), instantTrigger);
+            if( applySetPoint(w->getNodeID(), w->getData(), instantTrigger) ){
+                canMsg c = buildSetPacket();
+                msg = buildWord(c, 0);
+            }
         }
         RTT::Logger::log(RTT::Logger::Warning) <<  "Processing: " << msg
         << RTT::endlog();
@@ -261,48 +327,46 @@ namespace Hubo{
     }
 
     bool MotorDevice::setPPR(int chan, float proposedPPR){
-        int numChan = getChannels();
-        if(chan >= 0 && chan < numChan){
-            ((Credentials*)credentials)->setPPR(chan, proposedPPR);
-            return true;
-        }
-        else{
-            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [0-" << numChan-1 << "]."
-                << RTT::endlog();
-        }
-        return false;
+        return ((Credentials*)credentials)->setPPR(chan, proposedPPR);
     }
 
     bool MotorDevice::setDirection(int chan, float dir){
-        int numChan = getChannels();
-        if(chan >= 0 && chan < numChan){
-            ((Credentials*)credentials)->setDirection(chan, dir);
-            return true;
-        }
-        else{
-            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [0-" << numChan-1 << "]."
-                << RTT::endlog();
-        }
-        return false;
+        return ((Credentials*)credentials)->setDirection(chan, dir);
     }
 
-    ACES::Word<canMsg>* MotorDevice::setSetPoint(int channel,
-                                                 float sp,
-                                                 bool instantTrigger)
+    bool MotorDevice::setGearRatio(int chan, int drive, int driven){
+        return ((Credentials*)credentials)->setGearRatio(chan, drive, driven);
+    }
+
+    bool MotorDevice::setEncoderSize(int chan, int size){
+        return ((Credentials*)credentials)->setEncoderSize(chan, size);
+    }
+
+    bool MotorDevice::setSetPoint(int channel, float sp, bool instantTrigger){
+        if(applySetPoint(channel, sp, instantTrigger)){
+            canMsg c = buildSetPacket();
+            ACES::Word<canMsg>* msg = buildWord(c, 0);
+            txDownStream.write(msg);
+            return true;
+        }
+        return false;
+    } 
+
+    /*! Applies a newly aquired set point to the device and checks if a full
+     * set of points has been received. Returns true if full set available, and
+     * false if a full set not available. instantTrigger can be used to always
+     * return true.
+     */
+    bool MotorDevice::applySetPoint(int channel, float sp, bool instantTrigger)
     {
-        ACES::Word<canMsg>* w = NULL;
         int numChan = getChannels();
         if(channel >= 0 && channel < numChan){
             setPoint[channel] = sp;
             trigger[channel] = true;
             
             if(instantTrigger or triggersSet()){
-                Credentials* cred = (Credentials*)credentials;
-                w = new ACES::Word<canMsg>(buildSetPacket(), channel, cred->getDevID(),
-                                           ACES::SET, cred);
                 clearTrigger();
+                return true;
             }
         }
         else{
@@ -310,7 +374,7 @@ namespace Hubo{
                 << channel << " specified. Must be [1-" << numChan << "]."
                 << RTT::endlog();
         } 
-        return w;
+        return false;
     }
 
     /*! Inform us if all channels have recieved new information and are ready
@@ -329,6 +393,55 @@ namespace Hubo{
         for(int i = 0; i < numChan; i++){
             trigger[i] = false;
         }
+    }
+
+    bool MotorDevice::setGains(std::string type, int channel, int Kp, int Ki, int Kd){
+        cmdType t = CMD_NONE;
+        if(type == "Position"){
+            switch(channel){
+                case 0:
+                    t = SET_POS_GAIN_A;
+                    break;
+                case 1:
+                case 2:
+                    t = SET_POS_GAIN_B;
+                    break;
+                default:
+                    RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                        << channel << " specified. Must be [0-" << channel-1 << "]."
+                        << RTT::endlog();
+            }
+        } else if(type == "Torque"){
+            switch(channel){
+                case 0:
+                    t = SET_TRQ_GAIN_A;
+                    break;
+                case 1:
+                case 2:
+                    t = SET_TRQ_GAIN_B;
+                    break;
+                default:
+                    RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                        << channel << " specified. Must be [0-" << channel-1 << "]."
+                        << RTT::endlog();
+            }
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid gain type, \""
+                << type << "\" specified. Must be \"Position\" or \"Torque\"."
+                << RTT::endlog();
+        }
+
+        if(t){
+            canMsg c = buildGainPacket(t, Kp, Ki, Kd);
+            txDownStream.write( buildWord(c, channel) );
+            return true;
+        }
+        return false;
+    }
+
+    canMsg MotorDevice::buildGainPacket(cmdType type, int Kp, int Ki, int Kd){
+        return canMsg(credentials->getDevID(), CMD_TXDF, type, Kp, Ki, Kd, 0, 0);
     }
 
     canMsg MotorDevice::buildSetPacket(){
@@ -369,11 +482,19 @@ namespace Hubo{
                 temp[4]);
         return cm;
     }
+        
+    ACES::Word<canMsg>* MotorDevice::buildWord(canMsg c, int channel){
+        Credentials* cred = (Credentials*)credentials;
+        return new ACES::Word<canMsg>(c, channel, cred->getDevID(),
+                                      ACES::SET, cred);
+    }
 
+    /*
     canMsg MotorDevice::buildRefreshPacket(){
         canMsg cm(0, SEND_SENSOR_TXDF, (cmdType)0);
         return cm;
     }
+    */
 
     /*
     ACES::Word<canMsg>* SensorDevice::processDS(ACES::Word<float>* w){

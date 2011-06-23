@@ -49,13 +49,19 @@ namespace Hubo{
             float getDirection(int chan);
             void printme();
         protected:
-            void setPPR(int chan, float proposedPPR);
-            void setDirection(int chan, float dir);
+            bool setPPR(int chan, float proposedPPR);
+            bool setDirection(int chan, float dir);
+            bool setGearRatio(int chan, int drive, int driven);
+            bool setEncoderSize(int chan, int size);
         private:
             //int boardNum;       //! Identifying number for the motor controller
+            bool checkChannel(int chan);
             int channels;       //! Number of channels on the controller (1-3)
-            float PPR[3];       //! Pulses per revolution (one per channel)
-            float direction[3]; //! +/-1 Direction of motor revolution (1/channel)
+            float PPR[5];       //! Pulses per revolution (one per channel)
+            float direction[5]; //! +/-1 Direction of motor revolution (1/channel)
+            unsigned int driveTeeth[5];
+            unsigned int drivenTeeth[5];
+            unsigned int encoderSize[5];
             //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
@@ -90,18 +96,26 @@ namespace Hubo{
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
 
             int getChannels();
-            //User-Device interface functions
+            //User facing (local) Configuration functions
             bool setPPR(int channel, float PPR);
             bool setDirection(int channel, float direction);
-            //
-            // setGain(type, channel, Kp, Ki, Kd)
-            ACES::Word<canMsg>* setSetPoint(int channel, float sp,
-                                            bool instantTrigger=false);
+            bool setGearRatio(int chan, int drive, int driven);
+            bool setEncoderSize(int chan, int size);
+            //User facing (remote) configuration functions
+            bool setGains(std::string type, int channel,
+                          int Kp, int Ki, int Kd);
+            bool setSetPoint(int channel, float sp,
+                             bool instantTrigger=false);
+            //Helper functions for processing new set points and config
+            //information
+            bool applySetPoint(int channel, float sp, bool instantTrigger);
             bool triggersSet();
             void clearTrigger();
-            //
+            ACES::Word<canMsg>* buildWord(canMsg c, int channel);
+            //Functions for generating the different types of configuration
+            //packets.
             canMsg buildSetPacket();
-            canMsg buildRefreshPacket();
+            canMsg buildGainPacket(cmdType type, int Kp, int Ki, int Kd);
         /*
             getEncoderPos()
             getCurrent()
@@ -122,6 +136,7 @@ namespace Hubo{
         public:
             SensorDevice(std::string cfg, std::string args);
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
+            canMsg buildRefreshPacket();
     };
     */
 };

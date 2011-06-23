@@ -26,14 +26,16 @@ typedef struct {
 */
 
 namespace Hubo{
-    enum huboCanType { CAN_NONE = 0x0, CMD_TXDF = 0x1, SEND_SENSOR_TXDF = 0x2, REF_TXDF = 0x10, 
+    enum huboCanType { CAN_NONE = 0x0, CMD_TXDF = 0x1, SEND_SENSOR_TXDF = 0x2,
+                       REF_TXDF = 0x10, 
                        SENSOR_FT_RXDF = 0x40, SENSOR_AD_RXDF = 0x50,
                        ENC_RXDF = 0x60, CUR_RXDF = 0x90, PM_RXDF = 0x120,
                        STAT_RXDF = 0x150, NAME_RXDF = 0x190,
                        DAOFFSET_RXDF = 0x310, ADOFFSET_RXDF = 0x320,
                        OFFSET_RXDF = 0x330 };
                        
-    enum cmdType { CMD_NONE = 0x0, NAME_INFO = 0x1, BOARD_STATUS, SEND_ENC, SEND_CURR, 
+    enum cmdType { CMD_NONE = 0x0, NAME_INFO = 0x1, BOARD_STATUS, SEND_ENC,
+                   SEND_CURR, 
                    SEND_PM, ENC_ZERO, SET_POS_GAIN_A, SET_POS_GAIN_B,
                    SET_TRQ_GAIN_A, SET_TRQ_GAIN_B, HIP_ENABLE, GO_HOME,
                    PWM_CMD, RUN_CMD, STOP_CMD, CTRL_MODE, GO_LIMIT_POS,
