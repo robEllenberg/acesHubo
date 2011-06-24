@@ -25,15 +25,21 @@
 namespace Hubo{
     Credentials::Credentials(int board, int chan) : ACES::Credentials(board)
     {
-        if(chan > 0 && chan <=3){
+        if(chan > 0 && chan <=ctrlSize){
             channels = chan;
         } else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-3]." << RTT::endlog();
+                << chan << " specified. Must be [1-" << ctrlSize <<"]." << RTT::endlog();
         }
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < ctrlSize; i++){
             PPR[i] = 0;
             direction[i] = 1.;
+            driveTeeth[i] = 1;
+            drivenTeeth[i] = 1;
+            encoderSize[i] = 0;
+            offsetPulse[i] = 0;
+            revOffset[i] = 0;
+            CCW[i] = true;
         }
     }
 
@@ -81,6 +87,30 @@ namespace Hubo{
         return false;
     }
 
+    bool Credentials::setOffsetPulse(int chan, int offset){
+        if(checkChannel(chan)){
+            offsetPulse[chan] = offset;
+            return true;
+        }
+        return false;
+    }
+
+    bool Credentials::setRevOffset(int chan, int offset){
+        if(checkChannel(chan)){
+            revOffset[chan] = offset;
+            return true;
+        }
+        return false;
+    }
+
+    bool Credentials::setCCW(int chan, bool ccw){
+        if(checkChannel(chan)){
+            CCW[chan] = ccw;
+            return true;
+        }
+        return false;
+    }
+
     float Credentials::getPPR(int chan){
         if((chan < channels) and (chan >= 0)){
             return PPR[chan];
@@ -93,6 +123,34 @@ namespace Hubo{
             return direction[chan];
         }
         return 0.0;
+    }
+
+    unsigned int Credentials::getEncoderSize(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return encoderSize[chan];
+        }
+        return 0;
+    }
+
+    int Credentials::getOffsetPulse(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return offsetPulse[chan];
+        }
+        return 0;
+    }
+
+    int Credentials::getRevOffset(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return revOffset[chan];
+        }
+        return 0;
+    }
+
+    bool Credentials::getCCW(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return CCW[chan];
+        }
+        return false;
     }
 
     bool Credentials::checkChannel(int chan){
@@ -109,13 +167,33 @@ namespace Hubo{
 
     void Credentials::printme(){
         ACES::Credentials::printme();
-        RTT::Logger::log() << "(HuboCAN) Credentials: # Channels = "
-                           << channels
-                           << "; PPR: [" << PPR[0] <<", " << PPR[1] << ", "
-                           << PPR[2] << "]; "
-                           << "direction: [" << direction[0] << ", "
-                           << direction[1] << ", " << direction[2] << "]"
-                           << RTT::endlog();
+        RTT::Logger::log() << "(HuboCAN) Credentials: \n"
+                           << "# Channels = " << channels << "\n"
+                           << "PPR: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << PPR[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nDirection: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << direction[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nEncoder Size: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << encoderSize[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nOffset Pulse: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << offsetPulse[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nRev Offset: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << revOffset[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nCCW?: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << CCW[i] << ", ";
+        }
+        RTT::Logger::log() <<  "]" << RTT::endlog();
     }
 
     #define TESTMODE 1
@@ -277,12 +355,12 @@ namespace Hubo{
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
 
-        this->addOperation("setTicks", &MotorDevice::setPPR, this,
+        this->addOperation("setPPR", &MotorDevice::setPPR, this,
             RTT::OwnThread).doc("Set the PPR (Pulses/Revolution) of a channel")
                            .arg("channel", "Channel number to set")
                            .arg("PPR", "Number of ticks per revolution");
 
-        this->addOperation("setDirection", &MotorDevice::setPPR, this,
+        this->addOperation("setDirection", &MotorDevice::setDirection, this,
             RTT::OwnThread).doc("Set the direction of rotation for a channel")
                            .arg("channel", "Channel number to set")
                            .arg("dir", "Direction of rotation = +/-1");
@@ -305,6 +383,26 @@ namespace Hubo{
                            .arg("Kp", "Proportional Gain")
                            .arg("Ki", "Integral Gain")
                            .arg("Kd", "Derivative Gain");
+
+        this->addOperation("setOffsetPulse", &MotorDevice::setOffsetPulse, this,
+            RTT::OwnThread).doc("Set the gains for this controller")
+                           .arg("channel", "Channel number to set")
+                           .arg("offset", "The offset in encoder ticks");
+
+        this->addOperation("setRevOffset", &MotorDevice::setRevOffset, this,
+            RTT::OwnThread).doc("Set the gains for this controller")
+                           .arg("channel", "Channel number to set")
+                           .arg("offset", "The offset in encoder ticks");
+
+        this->addOperation("setCCW", &MotorDevice::setCCW, this,
+            RTT::OwnThread).doc("Set the direction of rotation for calibration")
+                           .arg("channel", "Channel number to set")
+                           .arg("ccw", "Direction: true=ccw, false=cw");
+
+        this->addOperation("calibrate", &MotorDevice::setCalibrate, this,
+            RTT::OwnThread).doc("Send a calibreation pulse to the controller"
+                                " (zero the motor)")
+                           .arg("channel", "Channel number to send pulse on");
 
         this->addAttribute("instantTrigger", instantTrigger);
     }
@@ -340,6 +438,18 @@ namespace Hubo{
 
     bool MotorDevice::setEncoderSize(int chan, int size){
         return ((Credentials*)credentials)->setEncoderSize(chan, size);
+    }
+
+    bool MotorDevice::setOffsetPulse(int chan, int offset){
+        return ((Credentials*)credentials)->setOffsetPulse(chan, offset);
+    }
+
+    bool MotorDevice::setRevOffset(int chan, int offset){
+        return ((Credentials*)credentials)->setRevOffset(chan, offset);
+    }
+
+    bool MotorDevice::setCCW(int chan, bool CCW){
+        return ((Credentials*)credentials)->setCCW(chan, CCW);
     }
 
     bool MotorDevice::setSetPoint(int channel, float sp, bool instantTrigger){
@@ -440,6 +550,16 @@ namespace Hubo{
         return false;
     }
 
+    bool MotorDevice::setCalibrate(int channel){
+        if( ((Credentials*)credentials)->checkChannel(channel) ){
+            canMsg c = buildCalibratePulse(channel);
+            ACES::Word<canMsg>* msg = buildWord(c, channel);
+            txDownStream.write(msg);
+            return true;
+        }
+        return false;
+    }
+
     canMsg MotorDevice::buildGainPacket(cmdType type, int Kp, int Ki, int Kd){
         return canMsg(credentials->getDevID(), CMD_TXDF, type, Kp, Ki, Kd, 0, 0);
     }
@@ -488,6 +608,68 @@ namespace Hubo{
         return new ACES::Word<canMsg>(c, channel, cred->getDevID(),
                                       ACES::SET, cred);
     }
+
+    canMsg MotorDevice::buildCalibratePulse(int c){ //c - channel number
+        Credentials* cred = (Credentials*)credentials;
+        long offset1 =0, offset2 = 0, offset3 = 0;
+        canMsg msg;
+
+        //The lowest bit in mode is determined by the rotational direction of
+        //the motor 1 for CCW, 0 for CW
+        long mode = 0;
+        if(c > 1){c = 0;} //Treat the 3-channel motor specially
+
+        if(cred->getCCW(c)){
+            mode |= 1;
+        }
+        mode |= (1 << (4+c));
+
+        switch(cred->getChannels()){   //The rest of the processing depends not on which
+                            //channel we've selected, but on the number of
+                            //channels on the controller
+            case 2: //Hubo-Code equiv -> CalPulse()
+                offset1 = calPulse2Chan(c);
+                break;
+            case 3: //Hubo-Code equiv -> CalPulse1()
+                offset1 = calPulse2Chan(0);
+                offset2 = calPulse3Chan(1);
+                offset3 = calPulse3Chan(2);
+                break;
+            default:
+                RTT::Logger::log(RTT::Logger::Warning)
+                << "Cannot call calibrate on a " << cred->getChannels()
+                << " channel controller" << RTT::endlog();
+        } 
+        return canMsg(credentials->getDevID(), CMD_TXDF, GO_LIMIT_POS, 
+                      mode, offset1, offset2, offset3, 0);
+    }
+
+    long MotorDevice::calPulse2Chan(int c){
+        Credentials* cred = (Credentials*)credentials;
+        long offset = 0;
+        if(cred->getOffsetPulse(c) >= 0){
+            offset = (long)(cred->getDirection(c) *
+                            (cred->getOffsetPulse(c) +
+                             cred->getEncoderSize(c) * cred->getRevOffset(c)));
+        }else{
+            offset = (long)(cred->getDirection(c) *
+                            (cred->getOffsetPulse(c) -
+                             cred->getEncoderSize(c)*cred->getRevOffset(c)));
+        }
+        offset = canMsg::bitStuffCalibratePacket(offset);
+        return offset;
+    }
+
+    long MotorDevice::calPulse3Chan(int c){
+        Credentials* cred = (Credentials*)credentials;
+        if(cred->getOffsetPulse(c) == 128){
+            return cred->getDirection(c) * 10 * cred->getRevOffset(c);
+        }
+        else{
+            return 0;
+        }
+    }
+    
 
     /*
     canMsg MotorDevice::buildRefreshPacket(){

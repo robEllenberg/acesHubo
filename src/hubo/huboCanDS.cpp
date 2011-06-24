@@ -44,6 +44,11 @@ namespace Hubo{
         else	return( (unsigned long)(bs) );
     }
 
+    unsigned long canMsg::bitStuffCalibratePacket(long bs){
+        if (bs < 0) return( (unsigned long)(((-bs) & 0x0007FFFF) | (1<<19)) );
+        else	return( (unsigned long)(bs) );
+    }
+
     unsigned char canMsg::bitStrip(unsigned long src, int byteNum){
         return (unsigned char)( (src >> (8*byteNum)) & 0x000000FFu );
     }
@@ -114,6 +119,37 @@ namespace Hubo{
             case STOP_CMD:
             case CTRL_MODE:
             case GO_LIMIT_POS:
+                cm->data[2] = (unsigned char)r1; //Copy the mode bits
+                if(r3){     //r3 is only populated in the case of Neck or Wrist
+                    cm->data[3] = bitStrip(r2, 0);
+                    cm->data[4] = bitStrip(r2, 1);
+                    cm->data[5] = bitStrip(r3, 0);
+                    cm->data[6] = bitStrip(r4, 0);
+                    cm->length = 7;
+                }
+                else{
+                    //Use the mode bits to determine the channel
+                    switch( r1 & 0x30 ){  
+                        case 0x10: //Channel 1
+                            cm->data[3] = bitStrip(r2, 1);
+                            cm->data[4] = bitStrip(r2, 0);
+                            cm->data[5] = 0;
+                            cm->data[6] = 0;
+                            cm->data[7] = (unsigned char)((r2 >> 16) & 0xF);
+                            break;
+                        case 0x20: //Channel 2
+                            cm->data[3] = 0;
+                            cm->data[4] = 0;
+                            cm->data[5] = bitStrip(r2, 1);
+                            cm->data[6] = bitStrip(r2, 0);
+                            cm->data[7] =(unsigned char) (((r2>>16) & 0xF)<<4);
+                            break;
+                        default:
+                            assert(false);
+                    }
+                    cm->length = 8;
+                }
+                break;
             case CURR_LIMIT:
             case NULL_CMD:
             case SET_PERIOD_CMD:

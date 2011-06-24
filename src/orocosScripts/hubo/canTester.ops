@@ -4,24 +4,24 @@ program main {
 
     //addHardware("via 90 100","Hubo","");
 
-    addHardware("hw 90 100","HuboCAN","./testfile 9600");
-    addProtocol("pro 80 100", "HuboCAN", "");
-    linkHP("hw", "pro");
+    addHardware("ch1 90 100","HuboCAN","./testfile 9600");
+    addProtocol("pro1 80 100", "HuboCAN", "");
+    linkHP("ch1", "pro1");
                                             //board#, #channels
-    addDevice("dHY  20 50", "HuboCAN Motor", "20 2");
-    linkPD("pro", "dHY");
+    addDevice("dRHip1 20 50", "HuboCAN Motor", "0 2");
+    linkPD("pro1", "dRHip1");
 
-    addState("One  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
-    addState("Two  10 50", "Hubo", "-3.14 3.14", sampling, baseport+1);
-    linkDS("dHY",  "One");
-    linkDS("dHY",  "Two");
+    addState("RHY  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
+    addState("RHR  10 50", "Hubo", "-3.14 3.14", sampling, baseport+1);
+    linkDS("dRHip1",  "RHY");
+    linkDS("dRHip1",  "RHR");
 
 
     //addController("config 10 10", "User Program", "canConfig.ops config");
     /*
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dHY  20 50", "Hubo", "38 0.0  1");
+    addDevice("dRHip1  20 50", "Hubo", "38 0.0  1");
     addDevice("dRSP 20 50", "Hubo", "30 0.0  1");
     addDevice("dRSR 20 50", "Hubo", "31 0.0  1");
     addDevice("dRSY 20 50", "Hubo", "32 0.0  1");
@@ -47,7 +47,7 @@ program main {
     addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 10);
 
     //Tell the states and devices to pay attention to each other
-    linkDS("dHY",  "HY");
+    linkDS("dRHip1",  "HY");
     linkDS("dRSP", "RSP");
     linkDS("dRSR", "RSR");
     linkDS("dRSY", "RSY");
@@ -60,7 +60,7 @@ program main {
     linkDS("dLWY", "LWY");
 
     //Tell the devices & protocol to pay attention to each other 
-    linkPD("pro", "dHY");
+    linkPD("pro1", "dRHip1");
     linkPD("pro", "dRSP");
     linkPD("pro", "dRSR");
     linkPD("pro", "dRSY");

@@ -39,6 +39,7 @@
 #include "can4linux.h"  //Include the can4linux data structures
 
 namespace Hubo{
+    const int ctrlSize = 5;
     class Credentials : public ACES::Credentials {
         friend class MotorDevice;
         public:
@@ -47,21 +48,31 @@ namespace Hubo{
             int getChannels();
             float getPPR(int chan);
             float getDirection(int chan);
+            unsigned int getEncoderSize(int chan);
+            int getOffsetPulse(int chan);
+            int getRevOffset(int chan);
+            bool getCCW(int chan);
             void printme();
         protected:
             bool setPPR(int chan, float proposedPPR);
             bool setDirection(int chan, float dir);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
+            bool setOffsetPulse(int chan, int offset);
+            bool setRevOffset(int chan, int offset);
+            bool setCCW(int chan, bool CCW);
         private:
             //int boardNum;       //! Identifying number for the motor controller
             bool checkChannel(int chan);
             int channels;       //! Number of channels on the controller (1-3)
-            float PPR[5];       //! Pulses per revolution (one per channel)
-            float direction[5]; //! +/-1 Direction of motor revolution (1/channel)
-            unsigned int driveTeeth[5];
-            unsigned int drivenTeeth[5];
-            unsigned int encoderSize[5];
+            float PPR[ctrlSize];       //! Pulses per revolution (one per channel)
+            float direction[ctrlSize]; //! +/-1 Direction of motor revolution (1/channel)
+            unsigned int driveTeeth[ctrlSize];
+            unsigned int drivenTeeth[ctrlSize];
+            unsigned int encoderSize[ctrlSize];
+            int offsetPulse[ctrlSize];
+            int revOffset[ctrlSize];
+            bool CCW[ctrlSize];
             //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
@@ -101,6 +112,10 @@ namespace Hubo{
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
+            bool setOffsetPulse(int chan, int offset);
+            bool setRevOffset(int chan, int offset);
+            bool setCCW(int chan, bool CCW);
+            bool setCalibrate(int channel);
             //User facing (remote) configuration functions
             bool setGains(std::string type, int channel,
                           int Kp, int Ki, int Kd);
@@ -112,10 +127,14 @@ namespace Hubo{
             bool triggersSet();
             void clearTrigger();
             ACES::Word<canMsg>* buildWord(canMsg c, int channel);
+            //Helpers for buildCalibratePulse
+            long calPulse2Chan(int c);
+            long calPulse3Chan(int c);
             //Functions for generating the different types of configuration
             //packets.
             canMsg buildSetPacket();
             canMsg buildGainPacket(cmdType type, int Kp, int Ki, int Kd);
+            canMsg buildCalibratePulse(int c);
         /*
             getEncoderPos()
             getCurrent()
@@ -125,8 +144,8 @@ namespace Hubo{
             seekHome()
         */
         private:
-            float setPoint[5];
-            bool trigger[5]; //! Indicates which channels have recieved
+            float setPoint[ctrlSize];
+            bool trigger[ctrlSize]; //! Indicates which channels have recieved
                              // information since the last trigger
             bool instantTrigger;
     };

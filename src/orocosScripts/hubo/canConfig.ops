@@ -1,6 +1,29 @@
 program config {
-    One.NodeID = 0;
-    Two.NodeID = 1;
-    dHY.setTicks(0, 1000);
-    dHY.setTicks(1, 1000);
+    RHY.NodeID = 0;
+    RHR.NodeID = 1;
+    dRHip1.setPPR(0, 1000);
+    dRHip1.setPPR(1, 1000);
+    dRHip1.setDirection(0, 1);
+    dRHip1.setDirection(1, 1);
+    dRHip1.setGains("Position", 0, 200, 0, 500);
+    dRHip1.setGains("Position", 1, 15, 0, 15);
+    dRHip1.setEncoderSize(0, 4000);
+    dRHip1.setEncoderSize(1, 4000);
+    dRHip1.setOffsetPulse(0, 2000);
+    dRHip1.setOffsetPulse(1, 500);
+    dRHip1.setRevOffset(0, 3);
+    dRHip1.setRevOffset(1, 2);
+    dRHip1.setCCW(0, true);
+    dRHip1.setCCW(1, false);
+
+    /*
+    dRHip1.setPPR(channel, pulses);
+    dRHip1.setDirection(channel, +/-1);
+    dRHip1.setGearRatio(channel, numTicks);
+    dRHip1.setEncoderSize(channel, size);
+    dRHip1.setGains("Position/Torque", channel, Kp, Ki, Kd);
+    dRhip1.setOffsetPulse(channel, offset);
+    dRHip1.setRevOffset(channel, offset);
+    dRHip1.setCCW(channel, true/false);
+    */
 }

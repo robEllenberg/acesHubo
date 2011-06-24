@@ -55,6 +55,7 @@ namespace Hubo{
             //void printMe();
             static unsigned long bitStuff15byte(long bs);
             static unsigned long bitStuff3byte(long bs);
+            static unsigned long bitStuffCalibratePacket(long bs);
             static unsigned long unpack2byte();
             static unsigned long unpack4byte();
             static unsigned char bitStrip(unsigned long src, int byteNum);
