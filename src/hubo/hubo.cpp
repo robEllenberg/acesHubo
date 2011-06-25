@@ -32,7 +32,6 @@ namespace Hubo{
                 << chan << " specified. Must be [1-" << ctrlSize <<"]." << RTT::endlog();
         }
         for(int i = 0; i < ctrlSize; i++){
-            PPR[i] = 0;
             direction[i] = 1.;
             driveTeeth[i] = 1;
             drivenTeeth[i] = 1;
@@ -40,6 +39,7 @@ namespace Hubo{
             offsetPulse[i] = 0;
             revOffset[i] = 0;
             CCW[i] = true;
+            harmonic[i] = 0;
         }
     }
 
@@ -53,7 +53,7 @@ namespace Hubo{
     int Credentials::getChannels(){
         return channels;
     }
-
+/*
     bool Credentials::setPPR(int chan, float proposedPPR){
         if(checkChannel(chan)){
             PPR[chan] = proposedPPR;
@@ -61,7 +61,7 @@ namespace Hubo{
         }
         return false;
     }
-
+*/
     bool Credentials::setDirection(int chan, float dir){
         if(checkChannel(chan)){
             direction[chan] = dir;
@@ -111,13 +111,21 @@ namespace Hubo{
         return false;
     }
 
+    bool Credentials::setHarmonic(int chan, int harm){
+        if(checkChannel(chan)){
+            harmonic[chan] = harm;
+            return true;
+        }
+        return false;
+    }
+/*
     float Credentials::getPPR(int chan){
         if((chan < channels) and (chan >= 0)){
             return PPR[chan];
         }
         return 0.0;
     }
-
+*/
     float Credentials::getDirection(int chan){
         if((chan < channels) and (chan >= 0)){
             return direction[chan];
@@ -153,6 +161,20 @@ namespace Hubo{
         return false;
     }
 
+    unsigned int Credentials::getHarmonic(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return harmonic[chan];
+        }
+        return 0;
+    }
+
+    float Credentials::getGearRatio(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return (float)drivenTeeth[chan]/(float)driveTeeth[chan];
+        }
+        return 0;
+    }
+
     bool Credentials::checkChannel(int chan){
         if(chan >= 0 && chan < channels){
             return true;
@@ -168,12 +190,14 @@ namespace Hubo{
     void Credentials::printme(){
         ACES::Credentials::printme();
         RTT::Logger::log() << "(HuboCAN) Credentials: \n"
-                           << "# Channels = " << channels << "\n"
+                           << "# Channels = " << channels << "\n";
+        /*
                            << "PPR: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << PPR[i] << ", ";
         }
-        RTT::Logger::log() << "]\nDirection: [";
+        */
+        RTT::Logger::log() << "Direction: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << direction[i] << ", ";
         }
@@ -192,6 +216,14 @@ namespace Hubo{
         RTT::Logger::log() << "]\nCCW?: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << CCW[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nGear Ratio: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << (float)drivenTeeth[i]/(float)driveTeeth[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nHarmonic: [";
+        for(int i = 0; i < ctrlSize; i++){
+            RTT::Logger::log() << harmonic[i] << ", ";
         }
         RTT::Logger::log() <<  "]" << RTT::endlog();
     }
@@ -354,12 +386,12 @@ namespace Hubo{
     {
         credentials =
             (ACES::Credentials*)Credentials::makeCredentials(args);
-
+/*
         this->addOperation("setPPR", &MotorDevice::setPPR, this,
             RTT::OwnThread).doc("Set the PPR (Pulses/Revolution) of a channel")
                            .arg("channel", "Channel number to set")
                            .arg("PPR", "Number of ticks per revolution");
-
+*/
         this->addOperation("setDirection", &MotorDevice::setDirection, this,
             RTT::OwnThread).doc("Set the direction of rotation for a channel")
                            .arg("channel", "Channel number to set")
@@ -399,6 +431,11 @@ namespace Hubo{
                            .arg("channel", "Channel number to set")
                            .arg("ccw", "Direction: true=ccw, false=cw");
 
+        this->addOperation("setHarmonic", &MotorDevice::setHarmonic, this,
+            RTT::OwnThread).doc("Set the harmonic drive ratio.")
+                           .arg("channel", "Channel number to set")
+                           .arg("harmonic", "Drive ratio");
+
         this->addOperation("calibrate", &MotorDevice::setCalibrate, this,
             RTT::OwnThread).doc("Send a calibreation pulse to the controller"
                                 " (zero the motor)")
@@ -423,11 +460,11 @@ namespace Hubo{
     int MotorDevice::getChannels(){
         return ((Credentials*)credentials)->getChannels();
     }
-
+/*
     bool MotorDevice::setPPR(int chan, float proposedPPR){
         return ((Credentials*)credentials)->setPPR(chan, proposedPPR);
     }
-
+*/
     bool MotorDevice::setDirection(int chan, float dir){
         return ((Credentials*)credentials)->setDirection(chan, dir);
     }
@@ -450,6 +487,10 @@ namespace Hubo{
 
     bool MotorDevice::setCCW(int chan, bool CCW){
         return ((Credentials*)credentials)->setCCW(chan, CCW);
+    }
+
+    bool MotorDevice::setHarmonic(int chan, int harmonic){
+        return ((Credentials*)credentials)->setHarmonic(chan, harmonic);
     }
 
     bool MotorDevice::setSetPoint(int channel, float sp, bool instantTrigger){
@@ -572,24 +613,31 @@ namespace Hubo{
             case 5: //Five Channel Motor Controller - Fingers
                 for(int i=0; i < 5; i++){
                     dir = ((Credentials*)credentials)->getDirection(i);
-                    ppr = ((Credentials*)credentials)->getPPR(i);
+                    //ppr = ((Credentials*)credentials)->getPPR(i);
+                    ppr = ((Credentials*)credentials)->getHarmonic(i)
+                          *((Credentials*)credentials)->getGearRatio(i)
+                          *((Credentials*)credentials)->getEncoderSize(i);
                     temp[i] =
-                        canMsg::bitStuff15byte((long)setPoint[i]*dir*ppr/360.);
+                        canMsg::bitStuff15byte((long)(setPoint[i]*dir*ppr/360.));
                 }
                 break;
             case 3: //Three Channel Motor Controllers - Wrists & Neck
                 for(int i = 0; i < 3; i++){
                     dir = ((Credentials*)credentials)->getDirection(i);
-                    ppr = ((Credentials*)credentials)->getPPR(i);
+                    ppr = ((Credentials*)credentials)->getHarmonic(i)
+                          *((Credentials*)credentials)->getGearRatio(i)
+                          *((Credentials*)credentials)->getEncoderSize(i);
                     temp[i] = setPoint[i]*dir*ppr/360.;
                 }
                 break;
             case 2: //Two Channel Motor Controllers - Limbs
                 for(int i = 0; i < 2; i++){
                     dir = ((Credentials*)credentials)->getDirection(i);
-                    ppr = ((Credentials*)credentials)->getPPR(i);
+                    ppr = ((Credentials*)credentials)->getHarmonic(i)
+                          *((Credentials*)credentials)->getGearRatio(i)
+                          *((Credentials*)credentials)->getEncoderSize(i);
                     temp[i] =
-                       canMsg::bitStuff3byte((long)setPoint[i]*dir*ppr/360.);
+                       canMsg::bitStuff3byte((long)(setPoint[i]*dir*ppr/360.));
                 }
                 break;
             default:

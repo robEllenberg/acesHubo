@@ -46,30 +46,34 @@ namespace Hubo{
             Credentials(int board, int channels);
             static Credentials* makeCredentials(std::string args);
             int getChannels();
-            float getPPR(int chan);
+            //float getPPR(int chan);
             float getDirection(int chan);
             unsigned int getEncoderSize(int chan);
             int getOffsetPulse(int chan);
             int getRevOffset(int chan);
             bool getCCW(int chan);
+            unsigned int getHarmonic(int chan);
+            float getGearRatio(int chan);
             void printme();
         protected:
-            bool setPPR(int chan, float proposedPPR);
+            //bool setPPR(int chan, float proposedPPR);
             bool setDirection(int chan, float dir);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
             bool setOffsetPulse(int chan, int offset);
             bool setRevOffset(int chan, int offset);
+            bool setHarmonic(int chan, int harmonic);
             bool setCCW(int chan, bool CCW);
         private:
             //int boardNum;       //! Identifying number for the motor controller
             bool checkChannel(int chan);
             int channels;       //! Number of channels on the controller (1-3)
-            float PPR[ctrlSize];       //! Pulses per revolution (one per channel)
+            //float PPR[ctrlSize];       //! Pulses per revolution (one per channel)
             float direction[ctrlSize]; //! +/-1 Direction of motor revolution (1/channel)
             unsigned int driveTeeth[ctrlSize];
             unsigned int drivenTeeth[ctrlSize];
             unsigned int encoderSize[ctrlSize];
+            unsigned int harmonic[ctrlSize];
             int offsetPulse[ctrlSize];
             int revOffset[ctrlSize];
             bool CCW[ctrlSize];
@@ -108,7 +112,7 @@ namespace Hubo{
 
             int getChannels();
             //User facing (local) Configuration functions
-            bool setPPR(int channel, float PPR);
+            //bool setPPR(int channel, float PPR);
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
@@ -116,6 +120,7 @@ namespace Hubo{
             bool setRevOffset(int chan, int offset);
             bool setCCW(int chan, bool CCW);
             bool setCalibrate(int channel);
+            bool setHarmonic(int chan, int harmonic);
             //User facing (remote) configuration functions
             bool setGains(std::string type, int channel,
                           int Kp, int Ki, int Kd);
@@ -135,14 +140,6 @@ namespace Hubo{
             canMsg buildSetPacket();
             canMsg buildGainPacket(cmdType type, int Kp, int Ki, int Kd);
             canMsg buildCalibratePulse(int c);
-        /*
-            getEncoderPos()
-            getCurrent()
-            getPM() //TODO - WTF is 'PM'?
-
-            enableHIP() //TODO - WTF is 'HIP'?
-            seekHome()
-        */
         private:
             float setPoint[ctrlSize];
             bool trigger[ctrlSize]; //! Indicates which channels have recieved
