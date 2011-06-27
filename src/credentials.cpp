@@ -49,4 +49,14 @@ namespace ACES {
     void Credentials::printme(){
         RTT::Logger::log() << "(Base) Credentials: devID=" << devID << RTT::endlog();
     }
+
+    Credentials* Credentials::makeCredentials(std::string args){
+        ACES::Credentials* c = new ACES::Credentials(args);
+        return c;
+    }
+
+    Credentials* Credentials::makeCredentials(int newid){
+        ACES::Credentials* c = new ACES::Credentials(newid);
+        return c;
+    }
 }

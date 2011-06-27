@@ -34,6 +34,8 @@ namespace ACES {
             virtual void printme();
             virtual bool operator==(Credentials& other);
             int getDevID();
+            static Credentials* makeCredentials(std::string args);
+            static Credentials* makeCredentials(int newid);
         protected:
             int devID;
     };

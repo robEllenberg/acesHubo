@@ -40,11 +40,11 @@
 
 namespace Hubo{
     const int ctrlSize = 5;
-    class Credentials : public ACES::Credentials {
+    class MotorCredentials : public ACES::Credentials {
         friend class MotorDevice;
         public:
-            Credentials(int board, int channels);
-            static Credentials* makeCredentials(std::string args);
+            MotorCredentials(int board, int channels);
+            static ACES::Credentials* makeCredentials(std::string args);
             int getChannels();
             //float getPPR(int chan);
             float getDirection(int chan);
@@ -80,6 +80,16 @@ namespace Hubo{
             //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
+    /*
+    class SensorCredentials : public ACES::Credentials
+    {
+        friend class SensorDevice;
+        public:
+        protected:
+        private:
+    };
+    */
+
     class CANHardware : public ACES::Hardware<canmsg_t*>
     {
         public:
@@ -105,14 +115,20 @@ namespace Hubo{
                       processDS(ACES::Word<canMsg>*);
     };
 
-    class MotorDevice : public ACES::Device<float, canMsg>{
+    class HuboDevice : public ACES::Device<float, canMsg>{
+        public: 
+            HuboDevice(std::string cfg, std::string args);
+        protected:
+            ACES::Word<canMsg>* buildWord(canMsg c, int channel);
+    };
+
+    class MotorDevice : public HuboDevice{
         public:
             MotorDevice(std::string cfg, std::string args);
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
 
             int getChannels();
             //User facing (local) Configuration functions
-            //bool setPPR(int channel, float PPR);
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
@@ -131,7 +147,6 @@ namespace Hubo{
             bool applySetPoint(int channel, float sp, bool instantTrigger);
             bool triggersSet();
             void clearTrigger();
-            ACES::Word<canMsg>* buildWord(canMsg c, int channel);
             //Helpers for buildCalibratePulse
             long calPulse2Chan(int c);
             long calPulse3Chan(int c);
@@ -142,19 +157,17 @@ namespace Hubo{
             canMsg buildCalibratePulse(int c);
         private:
             float setPoint[ctrlSize];
-            bool trigger[ctrlSize]; //! Indicates which channels have recieved
-                             // information since the last trigger
+            bool trigger[ctrlSize]; /*! Indicates which channels have recieved
+                                     * information since the last trigger */
             bool instantTrigger;
     };
 
-    /*
-    class SensorDevice : public ACES::Device<float, canMsg>{
+    class SensorDevice : public HuboDevice{
         public:
             SensorDevice(std::string cfg, std::string args);
-            virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
+            //virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
             canMsg buildRefreshPacket();
     };
-    */
 };
 
 #endif

@@ -92,9 +92,5 @@ namespace Omnibot {
                                       int data);
             void setID(int newID);
     };
-
-    ACES::Credentials* makeCredentials(std::string args);
-    ACES::Credentials* makeCredentials(int newid);
-
 };
 #endif
