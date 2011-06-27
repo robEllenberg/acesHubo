@@ -80,15 +80,26 @@ namespace Hubo{
             //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
-    /*
+    const int senseSize = 4;
     class SensorCredentials : public ACES::Credentials
     {
         friend class SensorDevice;
         public:
+            SensorCredentials(int boardID, int chan);
+            static ACES::Credentials* makeCredentials(std::string args);
+            float getDirection(int chan);
+            float getScale(int chan);
+            int getChannels();
+            void printme();
         protected:
+            bool setDirection(int chan, float direction);
+            bool setScale(int chan, float scale);
         private:
+            bool checkChannel(int chan);
+            int channels;
+            float direction[senseSize]; //! +/-1.0, use to force sign to convention
+            float scale[senseSize];//! Arbitrary (multiplicative) scaling const
     };
-    */
 
     class CANHardware : public ACES::Hardware<canmsg_t*>
     {
@@ -113,6 +124,9 @@ namespace Hubo{
             Protocol(std::string cfg, std::string args);
             virtual ACES::Message<canmsg_t*>*
                       processDS(ACES::Word<canMsg>*);
+            //Helper functions
+            bool offsetRange(huboCanType t, int lineID);
+            unsigned long assemble2Byte(unsigned char lsb, unsigned char msb);
     };
 
     class HuboDevice : public ACES::Device<float, canMsg>{
@@ -167,6 +181,8 @@ namespace Hubo{
             SensorDevice(std::string cfg, std::string args);
             //virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
             canMsg buildRefreshPacket();
+            bool setDirection(int chan, float direction);
+            bool setScale(int chan, float scale);
     };
 };
 

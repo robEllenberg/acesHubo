@@ -23,13 +23,15 @@
 #include "hubo.hpp"
 
 namespace Hubo{
-    MotorCredentials::MotorCredentials(int board, int chan) : ACES::Credentials(board)
+    MotorCredentials::MotorCredentials(int board, int chan)
+     : ACES::Credentials(board)
     {
         if(chan > 0 && chan <=ctrlSize){
             channels = chan;
         } else{
             RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                << chan << " specified. Must be [1-" << ctrlSize <<"]." << RTT::endlog();
+                << chan << " specified. Must be [1-" << ctrlSize <<"]."
+                << RTT::endlog();
         }
         for(int i = 0; i < ctrlSize; i++){
             direction[i] = 1.;
@@ -174,7 +176,7 @@ namespace Hubo{
 
     void MotorCredentials::printme(){
         ACES::Credentials::printme();
-        RTT::Logger::log() << "(HuboCAN) Credentials: \n"
+        RTT::Logger::log() << "(HuboDriver) Credentials: \n"
                            << "# Channels = " << channels << "\n";
         
         RTT::Logger::log() << "Direction: [";
@@ -206,6 +208,91 @@ namespace Hubo{
             RTT::Logger::log() << harmonic[i] << ", ";
         }
         RTT::Logger::log() <<  "]" << RTT::endlog();
+    }
+
+    SensorCredentials::SensorCredentials(int boardID, int chan)
+     :ACES::Credentials(boardID)
+    {
+        if(chan > 0 && chan <=senseSize){
+            channels = chan;
+        } else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [1-" << ctrlSize <<"]."
+                << RTT::endlog();
+        }
+        for(int i = 0; i < senseSize; i++){
+            direction[i] = 1.;
+            scale[i] = 1.;
+        }
+    }
+
+    ACES::Credentials* SensorCredentials::makeCredentials(std::string args){
+        std::istringstream s(args);
+        int id, channels;
+        s >> id >> channels;
+        return (ACES::Credentials*)new SensorCredentials(di, channels);
+    }
+
+    int SensorCredentials::getChannels(){
+        return channels;
+    }
+
+    bool SensorCredentials::checkChannel(int chan){
+        if(chan >= 0 && chan < channels){
+            return true;
+        }
+        else{
+            RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
+                << chan << " specified. Must be [0-" << channels-1 << "]."
+                << RTT::endlog();
+        }
+        return false; 
+    }
+
+    float SensorCredentials::getScale(int chan);
+        if((chan < channels) and (chan >= 0)){
+            return scale[chan];
+        }
+        return 0.0;
+    }
+
+    float SensorCredentials::getDirection(int chan){
+        if((chan < channels) and (chan >= 0)){
+            return direction[chan];
+        }
+        return 0.0;
+    }
+    
+    void SensorCredentials::printme(){
+        ACES::Credentials::printme();
+        RTT::Logger::log() << "(HuboSensor) Credentials: \n"
+                           << "# Channels = " << channels << "\n";
+        
+        RTT::Logger::log() << "Direction: [";
+        for(int i = 0; i < senseSize; i++){
+            RTT::Logger::log() << direction[i] << ", ";
+        }
+        RTT::Logger::log() << "]\nScale: [";
+        for(int i = 0; i < senseSize; i++){
+            RTT::Logger::log() << scale[i] << ", ";
+        }
+        RTT::Logger::log() <<  "]" << RTT::endlog();
+    }
+
+    bool setDirection(int chan, float dir){
+        if(checkChannel(chan)){
+            direction[chan] = dir;
+            return true;
+        }
+        return false;
+    }
+
+    bool setScale(int chan, float sca){
+        if(checkChannel(chan)){
+            scale[chan] = sca;
+            return true;
+        }
+        return false;
     }
 
     #define TESTMODE 1
@@ -344,7 +431,45 @@ namespace Hubo{
         return true;
     }
 
+    canmsg_t rxBuffer[canBuffSize]; 
+
     void CANHardware::rxBus(int size){
+        Word<canmsg_t*>* w = NULL;
+        float time = 0;
+        int channel = 0, len = 0, rxSize = 0;
+        unsigned long msgID = 0;
+        std::string junk;
+
+        #if TESTMODE == 1 //Offline operation
+            while( getline() and (rxSize < canBuffSize)){
+                rxSize++;
+                s >> time >> channel >> msgID >> junk >> junk >> len;
+                rxBuffer[n].id = msgID;
+                rxBuffer[n].length = len;
+                //switch stream to hex mode
+                for(int i = 0, temp = 0; i < len; i++){
+                    s >> temp;
+                    rxBuffer[n].data[i] = temp;
+                }
+            }
+        #else             //Online operation
+            rxSize = read(channel, &rxBuffer, canBufSize);
+        #endif
+
+        for(int i = 0; i < rxSize; i++){
+            canmsg_t* msg = new canmsg_t;
+            msg->flags = rxBuffer[i].flags;
+            msg->cob = rxBuffer[i].cob;
+            msg->id = rxBuffer[i].id;
+            msg->timestamp = rxBuffer[i].timestamp;
+            msg->length = rxBuffer[i].length;
+            for(int j = 0; j < length; j++){
+                msg->data[j] = rxBuffer[i].data[j];
+            }
+
+            Word<canmsg_t*>* w = new Word<canmsg_t*>(msg);
+            usQueue.enqueue(w);
+        }
     }
 
     Protocol::Protocol(std::string cfg, std::string args)
@@ -361,14 +486,77 @@ namespace Hubo{
         return m;
     }
 
-    ACES::Word<canMsg>* Protocol<>::processUS(ACES::Word<canmsg_t*>* usIn){
+    ACES::Word<canMsg>* Protocol<canmsg_t*, canMsg>::processUS(ACES::Word<canmsg_t*>* usIn){
         ACES::Word<canMsg>* pw = NULL;
         canmsg_t* c = usIn->getData();
-        c->id;
-        canMsg msg();
-        pw = new Word<canMsg>();
+        unsigned long r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0;
+        huboCanType idClass = CAN_NONE;
+
+        if( offsetRange(SENSOR_FT_RXDF, c->id)){
+            idClass = SENSOR_FT_RXDF;
+            r1 = assemble2Byte(c->data[0], c->data[1]); //Mx
+            r2 = assemble2Byte(c->data[2], c->data[3]); //My
+            r3 = assemble2Byte(c->data[4], c->data[5]); //Fz
+        }
+        else if( offsetRange(SENSOR_AD_RXDF, c->id)){
+            idClass = SENSOR_AD_RXDF;
+            r1 = assemble2Byte(c->data[0], c->data[1]); //Acc1
+            r2 = assemble2Byte(c->data[2], c->data[3]); //Acc2
+            r3 = assemble2Byte(c->data[4], c->data[5]); //Gyro1
+            r4 = assemble2Byte(c->data[6], c->data[7]); //Gyro2
+        }
+        else if( offsetRange(DAOFFSET_RXDF, c->id)){
+            idClass = DAOFFSET_RXDF;
+            r1 = assemble2Byte(c->data[0], c->data[1]); //Mx
+            r2 = assemble2Byte(c->data[2], c->data[3]); //My
+            r3 = assemble2Byte(c->data[4], c->data[5]); //Fz
+        }
+        else if( offsetRange(ADOFFSET_RXDF, c->id)){
+            idClass = ADOFFSET_RXDF;
+            r1 = assemble2Byte(c->data[0], c->data[1]); //Mx
+            r2 = assemble2Byte(c->data[2], c->data[3]); //My
+            r3 = assemble2Byte(c->data[4], c->data[5]); //Fz
+        }
+        else if( offsetRange(OFFSET_RXDF, c->id)){
+            idClass = OFFSET_RXDF;
+            r1 = assemble2Byte(c->data[0], c->data[1]); //AD
+            r2 = assemble2Byte(c->data[2], c->data[3]); //DA
+        } else {
+            //printf(failed to match a packet)
+            return pw;
+        }
+
+        int id = c->id % (int)idClass;
+        canMsg msg(id, idClass, CMD_NONE, r1, r2, r3, r4, r5);
+        pw = new Word<canMsg>(msg);
         return pw;
     }
+
+    /*! \param t Indicator of the range we wish to test against
+        \param lineID The message ID used in the CAN packet
+
+        Function is only useful when comparing the gyro/adc packets
+    */
+    bool Protocol::offsetRange(huboCanType t, int lineID){
+        int baseval = (int)t;
+        //All address ranges for these types of sensors are 0x10 wide
+        if( (lineID >= baseval) or (lineID < baseval+0x10) ){
+            return true;
+        }
+        return false;
+    }
+
+    unsigned long Protocol::assemble2Byte(unsigned char lsb, unsigned char msb){
+        unsigned long t = 0;
+        t |= msb;
+        t <<= 8;
+        t |= lsb;
+        return t;
+    }
+
+    /*
+    unsigned long Protocol::assemble4Byte(unsigned char b1, unsigned char b2)
+    */
 
     HuboDevice::HuboDevice(std::string cfg, std::string args)
      :ACES::Device<float, canMsg>(cfg)
@@ -705,6 +893,22 @@ namespace Hubo{
      :HuboDevice(cfg,args)
     {
         credentials = ACES::Credentials::makeCredentials(args);
+    }
+
+    Word<float>* SensorDevice::processUS(Word<canMsg>* w){
+        Word<float>* out;
+        msg = pw->getData();
+        switch(msg.type){
+            case SENSOR_FT_RXDF:
+                float val = XX?
+                id = 
+            case SENSOR_AD_RXDF:
+            case DAOFFSET_RXDF:
+            case ADOFFSET_RXDF:
+            case OFFSET_RXDF:
+        }
+        txUpStream.write(float_word);
+        return NULL;
     }
     /*
     canMsg MotorDevice::buildRefreshPacket(){
