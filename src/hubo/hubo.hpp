@@ -101,12 +101,15 @@ namespace Hubo{
             float scale[senseSize];//! Arbitrary (multiplicative) scaling const
     };
 
+    const int canBuffSize = 50;
+    canmsg_t rxBuffer[canBuffSize]; 
     class CANHardware : public ACES::Hardware<canmsg_t*>
     {
         public:
             CANHardware(std::string cfg, std::string args);
             virtual bool txBus(ACES::Message<canmsg_t*>* m);
             virtual void rxBus(int size=0);
+            int readFDline(int fd, char* buffer, int maxlen);
             bool startHook();
             void stopHook();
             //virtual bool processUS(ACES::Word<canmsg_t*>* w);
@@ -124,6 +127,7 @@ namespace Hubo{
             Protocol(std::string cfg, std::string args);
             virtual ACES::Message<canmsg_t*>*
                       processDS(ACES::Word<canMsg>*);
+            ACES::Word<canMsg>* processUS(ACES::Word<canmsg_t*>* usIn);
             //Helper functions
             bool offsetRange(huboCanType t, int lineID);
             unsigned long assemble2Byte(unsigned char lsb, unsigned char msb);
@@ -179,6 +183,7 @@ namespace Hubo{
     class SensorDevice : public HuboDevice{
         public:
             SensorDevice(std::string cfg, std::string args);
+            //ACES::Word<float>* processUS(ACES::Word<canMsg>* w);
             //virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
             canMsg buildRefreshPacket();
             bool setDirection(int chan, float direction);
