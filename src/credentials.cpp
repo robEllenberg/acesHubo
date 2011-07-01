@@ -30,6 +30,7 @@ namespace ACES {
         return devID;
     }
 
+    /*! \param args a string representation of the device ID e.g. "23" */
     Credentials::Credentials(std::string args){
         std::istringstream s1(args, std::istringstream::in);
         int idnum;
@@ -46,6 +47,7 @@ namespace ACES {
         }
     }
 
+    /*! Debugging function for printing the device ID to the logging stream. */
     void Credentials::printme(){
         RTT::Logger::log() << "(Base) Credentials: devID=" << devID << RTT::endlog();
     }

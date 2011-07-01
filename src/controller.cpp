@@ -48,7 +48,7 @@ namespace ACES{
 
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name ));
-	curMap = NULL;
+        curMap = NULL;
     }
 
     void Controller::addCtrl(std::string dest, float sp){
@@ -100,6 +100,7 @@ namespace ACES{
         return false;
     }
 
+/*
     ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
       : Controller(cfg, args),
         walkScript((const char*)args.c_str(), std::ifstream::in)
@@ -165,6 +166,133 @@ namespace ACES{
         else
             return false;
     }
+*/
+//---------------Flexscript-----------------------
+
+    FlexibleScript::FlexibleScript(std::string cfg, std::string args)
+      : Controller(cfg, args),
+        scriptPath(args),
+        scriptFile()
+    {
+        //Set the current state of the simulation to stopped
+        simState = CTRL_HALT;
+
+        //Make sure we have an existant script file
+        openScript(scriptPath);
+
+        this->addOperation("step", &FlexibleScript::step, this, RTT::OwnThread).doc(
+                           "Advance the script by one step.");
+        this->addOperation("run", &FlexibleScript::run, this, RTT::OwnThread).doc(
+                           "Start the script (free running).");
+        this->addOperation("halt",  &FlexibleScript::halt, this, RTT::OwnThread).doc(
+                           "Halt the script.");
+        this->addOperation("openScript", &FlexibleScript::openScript, this,
+                          RTT::OwnThread).doc("Open a new trajectory file").arg(
+                          "sfile", "Script file path");           
+    }
+
+    void FlexibleScript::updateHook(){
+        switch(simState){
+            case CTRL_HALT:
+            case CTRL_FAIL:
+                break;
+            case CTRL_STEP:
+                //Fall through here is intentional
+            case CTRL_RUN:
+                if( getStateVector(true) ){
+                    txDownStream.write(curMap);
+                    curMap = NULL;
+                }
+                if(simState == CTRL_STEP){
+                    simState = CTRL_HALT;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    bool FlexibleScript::getStateVector(bool echo){
+        curMap = new std::map<std::string, void*>;
+        float value;
+        scriptFile >> value;
+        if(not scriptFile.eof() ){
+            (*curMap)[ states[0] ] = new float(value);
+            for(int i = 1; i < states.size(); i++){  
+                //offset = it+i;
+                scriptFile >> value;
+                (*curMap)[ states[i] ] = new float(value);
+                if(echo){
+                    RTT::Logger::log() << value << ", ";
+                }
+            }
+            return true;
+        }
+        else{
+            simState = CTRL_FAIL;
+        }
+        return false;
+    }
+
+    void FlexibleScript::step(){
+        if(simState == CTRL_FAIL){
+            RTT::Logger::log(RTT::Logger::Warning)
+             << "You may not run without a valid script." << RTT::endlog();
+        } else{
+            simState = CTRL_STEP;
+        }
+    };
+
+    bool FlexibleScript::run(){
+        if(simState == CTRL_FAIL){
+            RTT::Logger::log(RTT::Logger::Warning)
+             << "You may not run without a valid script." << RTT::endlog();
+        }
+        else{
+            simState = CTRL_RUN;
+        }
+        return true;
+    }
+
+    void FlexibleScript::halt(){
+        simState = CTRL_HALT;
+    }
+
+    bool FlexibleScript::openScript(std::string sp){
+        if(scriptFile.is_open()){
+            scriptFile.close();
+            //Flush the current state list
+            while(states.size()){
+                states.pop_back();
+            }
+        }
+
+        scriptPath = sp;
+        scriptFile.open((const char*)scriptPath.c_str(), std::ifstream::in);
+
+        if(scriptFile.is_open()){
+            char buf[1024];
+            scriptFile.getline(buf, 1024);
+            std::string headerLine(buf);
+            istringstream s(headerLine);
+            while(not s.eof()){
+                std::string stateName;
+                s >> stateName;
+                states.push_back(stateName);
+            }
+            simState = CTRL_HALT;
+            return true;
+        }
+        else {
+            simState = CTRL_FAIL;
+            RTT::Logger::log(RTT::Logger::Warning) << "Unable to open the "
+                << "script file at \"" << scriptPath << "\"."
+                << RTT::endlog();
+        }
+        return false;
+    }
+//-----------------/FlexScript--------------
+
 
     NullCtrl::NullCtrl(std::string cfg, std::string args)
       : Controller(cfg, args)
@@ -175,6 +303,7 @@ namespace ACES{
         return true; 
     }
 
+/*
     LegCtrl::LegCtrl(std::string cfg, std::string args)
       : ScriptCtrl(cfg, args)
     {}
@@ -277,6 +406,7 @@ namespace ACES{
 
         return true;
     }
+*/
 
     PID::PID(std::string config, std::string args)
       :Controller(config, args)
@@ -339,6 +469,7 @@ namespace ACES{
         return true;
     }
 
+/*
     YJCtrl::YJCtrl(std::string config, std::string args)
      : LegCtrl(config, args){}
 
@@ -351,4 +482,5 @@ namespace ACES{
         addCtrl("RSP", temp);
         return true;
     }
+*/
 }

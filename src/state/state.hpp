@@ -23,24 +23,23 @@
 #ifndef ACES_STATE_HPP
 #define ACES_STATE_HPP
 
-#include <iostream>
+//#include <iostream>
 #include <string>
 #include <map>
 
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
+//#include <boost/bind.hpp>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/InputPort.hpp>
 #include <rtt/OutputPort.hpp>
 #include <rtt/Activity.hpp>
 #include <rtt/Logger.hpp>
-#include <rtt/Operation.hpp>
-#include <rtt/Attribute.hpp>
+//#include <rtt/Operation.hpp>
+//#include <rtt/Attribute.hpp>
 #include <rtt/os/TimeService.hpp>
 
-#include "../credentials.hpp"
-#include "../controller.hpp"
+//#include "../credentials.hpp"
+//#include "../controller.hpp"
 #include "../taskcfg.hpp"
 #include "../word.hpp"
 #include "matlab.hpp"

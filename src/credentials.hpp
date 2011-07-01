@@ -37,7 +37,13 @@ namespace ACES {
             static Credentials* makeCredentials(std::string args);
             static Credentials* makeCredentials(int newid);
         protected:
-            int devID;
+            //! Unique numerical identifier for device
+            /*! The unique ID for the device is used to match upstream packets
+             * to the owner device. The physical meaning of this is dependent
+             * on the underlying hardware. (Likely a device ID of some sort).
+             */
+            int devID;  
+                        
     };
 }
 #endif

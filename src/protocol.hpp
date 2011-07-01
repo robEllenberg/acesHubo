@@ -23,8 +23,8 @@
 #ifndef ACES_PROTOCOL_HPP
 #define ACES_PROTOCOL_HPP
 
-#include <vector>
-#include <iostream>
+//#include <vector>
+//#include <iostream>
 #include <string>
 
 #include <rtt/TaskContext.hpp>
@@ -35,16 +35,16 @@
 #include <rtt/Activity.hpp>
 
 #include "message.hpp"
-#include "state/state.hpp"
+//#include "state/state.hpp"
 #include "taskcfg.hpp"
-#include "device.hpp"
+//#include "device.hpp"
 #include "word.hpp"
 
 namespace ACES {
     class Credentials;
 
-    template <class T>
-    class State;
+    //template <class T>
+    //class State;
 
     template <class H>
     class Hardware;
