@@ -24,7 +24,7 @@
 #define ACES_HARDWARE_HPP
 
 #include <fstream>
-#include <iostream>
+//#include <iostream>
 
 #include <boost/asio.hpp>
 
@@ -40,7 +40,7 @@
 //#include "protocol.hpp"
 #include "taskcfg.hpp"
 #include "word.hpp"
-#include "controller.hpp"
+//#include "controller.hpp"
 
 namespace ACES {
     //template <class HW, class P>

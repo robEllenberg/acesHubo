@@ -30,8 +30,9 @@
 #include "device.hpp"
 #include "protocol.hpp"
 #include "state/state.hpp"
-#include "state/matlab.hpp"
+//#include "state/matlab.hpp"
 #include "word.hpp"
+#include "controller.hpp"
 
 namespace TestSuite{
 

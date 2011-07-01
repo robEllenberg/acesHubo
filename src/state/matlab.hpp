@@ -20,6 +20,8 @@
     please contact the author.
 */
 
+#include <boost/asio.hpp>
+
 #include "state.hpp"
 
 #ifndef ACES_MATIO_HPP

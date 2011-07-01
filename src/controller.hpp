@@ -25,14 +25,14 @@
 
 #include <vector>
 #include <map>
-#include <list>
+//#include <list>
 #include <iostream>
 #include <fstream>
 #include <string>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
-#include <rtt/InputPort.hpp>
+//#include <rtt/InputPort.hpp>
 #include <rtt/OutputPort.hpp>
 #include <rtt/scripting/Scripting.hpp>
 
@@ -40,6 +40,7 @@
 
 //TODO - Relocate this definition 
 enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
+enum scriptState { CTRL_HALT, CTRL_RUN, CTRL_STEP, CTRL_FAIL, CTRL_END };
 
 namespace ACES{
     class Controller :  protected taskCfg,
@@ -60,6 +61,7 @@ namespace ACES{
             std::map<std::string, void*>* curMap;
     };
 
+/*
     class ScriptCtrl : public Controller
     {
         public:
@@ -74,6 +76,24 @@ namespace ACES{
             std::ifstream walkScript;
             int simState;
     };
+*/
+    class FlexibleScript : public Controller
+    {
+        public:
+            FlexibleScript(std::string cfg, std::string args);
+            void updateHook();
+
+            void step();
+            bool run();
+            void halt();
+            bool openScript(std::string scriptPath);
+            bool getStateVector(bool echo=false);
+
+            std::vector<std::string> states; //! The States we're controlling
+            std::string scriptPath;          //! Location of the script file
+            std::ifstream scriptFile;        //! Script stream
+            scriptState simState;            //! Internal state tracker
+    };
 
     class NullCtrl : public Controller 
     {
@@ -82,6 +102,7 @@ namespace ACES{
             virtual bool getStateVector(bool echo=0);
     };
 
+/*
     class LegCtrl : public ScriptCtrl
     {
         public:
@@ -95,7 +116,7 @@ namespace ACES{
             ArmCtrl(std::string config, std::string args);
             virtual bool getStateVector(bool echo=0);
     };
-
+*/
     class PID : public Controller{
         public:
             PID(std::string config, std::string args);
@@ -125,11 +146,13 @@ namespace ACES{
             std::string progname;
     };
 
+/*
     class YJCtrl : public LegCtrl {
         public:
             YJCtrl(std::string config, std::string args);
             virtual bool modStateVector();
     };
+*/
 }
 
 #endif

@@ -38,7 +38,9 @@
 #include "taskcfg.hpp"
 #include "device.hpp"
 #include "logger.hpp"
-#include "omnibot/omnibot.hpp"
+#ifdef OMNIBOT
+    #include "omnibot/omnibot.hpp"
+#endif
 #ifdef HUBO 
     #include "hubo/hubo.hpp"
 #endif
@@ -51,7 +53,6 @@
 #ifdef TESTSUITE
     #include "testsuite.hpp"
 #endif
-
 
 namespace ACES{
     class Logger;

@@ -24,14 +24,15 @@
 #define ACES_DEVICE_HPP
 
 #include <rtt/TaskContext.hpp>
-#include <rtt/Operation.hpp>
+//#include <rtt/Operation.hpp>
+#include <rtt/Activity.hpp>
 #include <rtt/base/PortInterface.hpp>
 #include <rtt/OutputPort.hpp>
 #include <rtt/InputPort.hpp>
 
 #include "taskcfg.hpp"
 #include "credentials.hpp"
-#include "state/state.hpp"
+//#include "state/state.hpp"
 #include "word.hpp"
 
 namespace ACES{

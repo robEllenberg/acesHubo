@@ -34,6 +34,7 @@ namespace ACES{
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")
                            .arg("args", "arguments specific to the type");
+
         this->addOperation("addProtocol", &Dispatcher::addProtocol, this,
                            RTT::OwnThread).doc("add new Protocol")
                            .arg("config", "_name_ _priority_ _freq_")
@@ -59,6 +60,7 @@ namespace ACES{
                            .arg("config", "_name_ _priority_ _freq_")
                            .arg("type", "_mainType_ _subType_")
                            .arg("args", "arguments specific to the type");
+
         this->addOperation("addLogger", &Dispatcher::addLogger, this,
                            RTT::OwnThread).doc("add new Logger")
                            .arg("config", "_name_ _priority_ _freq_")
@@ -67,32 +69,43 @@ namespace ACES{
 
         this->addOperation("startDebug", &Dispatcher::startDebug, this,
                            RTT::OwnThread).doc("Start debugging statements");
+
         this->addOperation("stopDebug", &Dispatcher::stopDebug, this,
                            RTT::OwnThread).doc("Stop debugging statements");
 
         this->addOperation("startHW", &Dispatcher::startHW, this,
                            RTT::OwnThread).doc("Start Hardware");
+
         this->addOperation("startProtocol", &Dispatcher::startProtocol,
                            this, RTT::OwnThread).doc("Start Protocol");
+
         this->addOperation("startDevice", &Dispatcher::startDevice, this,
                            RTT::OwnThread).doc("Start Device");
+
         this->addOperation("startState", &Dispatcher::startState, this,
                            RTT::OwnThread).doc("Start State");
+
         this->addOperation("startController", &Dispatcher::startController,
                            this, RTT::OwnThread).doc("Start Controller");
+
         this->addOperation("startLogger", &Dispatcher::startLogger, this,
                            RTT::OwnThread).doc("Start Logger");
 
         this->addOperation("stopHW", &Dispatcher::stopHW, this,
                            RTT::OwnThread).doc("Stop Hardware");
+
         this->addOperation("stopProtocol", &Dispatcher::stopProtocol, this,
                            RTT::OwnThread).doc("Stop Protocol");
+
         this->addOperation("stopDevice", &Dispatcher::stopDevice, this,
                            RTT::OwnThread).doc("Stop Device");
+
         this->addOperation("stopState", &Dispatcher::stopState, this,
                            RTT::OwnThread).doc("Stop State");
+
         this->addOperation("stopController", &Dispatcher::stopController,
                            this, RTT::OwnThread).doc("Stop Controller");
+
         this->addOperation("stopLogger", &Dispatcher::stopLogger, this,
                            RTT::OwnThread).doc("Stop Logger");
                                    
@@ -100,22 +113,27 @@ namespace ACES{
                            .doc("Link Protocol to Device")
                            .arg("protocol", "protocol")
                            .arg("device", "device");
+
         this->addOperation("linkDS", &Dispatcher::linkDS, this, RTT::OwnThread)
                            .doc("Link Device to State")
                            .arg("device", "device")
                            .arg("state", "state");
+
         this->addOperation("linkHP", &Dispatcher::linkHP, this, RTT::OwnThread)
                            .doc("Link Hardware to Protocol")
                            .arg("hardware", "hardware")
                            .arg("protocol", "protocol");
+
         this->addOperation("linkSC", &Dispatcher::linkSC, this, RTT::OwnThread)
                            .doc("Link State to Controller")
                            .arg("state", "state")
                            .arg("controller", "controller");
+
         this->addOperation("linkHC", &Dispatcher::linkHC, this, RTT::OwnThread)
                            .doc("Link Hardware to Controller")
                            .arg("hardware", "hardware")
                            .arg("controller", "controller");
+
         this->addOperation("linkLS", &Dispatcher::linkLS, this, RTT::OwnThread)
                            .doc("Link Logger to State")
                            .arg("logger", "logger")
@@ -171,9 +189,11 @@ namespace ACES{
                                  std::string args)
     {
         RTT::TaskContext* p = NULL;
+        #ifdef OMNIBOT
         if ( type == "Omni"){
             p = (RTT::TaskContext*) new Omnibot::Protocol(cfg, args);
         }
+        #endif
         #ifdef HUBO 
         if ( type == "Hubo"){
             p = (RTT::TaskContext*) new HuboVia::Protocol(cfg, args);
@@ -214,9 +234,11 @@ namespace ACES{
         s >> type1;
         s >> type2;
 
+        #ifdef OMNIBOT
         if (type1 == "Omni"){
             d = (RTT::TaskContext*) new Omnibot::Device(cfg, args);
         }
+        #endif
         #ifdef HUBO
         if (type1 == "Hubo"){
             d = (RTT::TaskContext*) new HuboVia::Device(cfg, args);
@@ -271,6 +293,7 @@ namespace ACES{
         //taskCfg c(cfg);
         ProtoState* s = NULL;
         
+        #ifdef OMNIBOT
         if (type == "Omni"){ 
             int channel = 0;
             if ( args == "1" ){
@@ -279,6 +302,7 @@ namespace ACES{
             s = (ProtoState*) new ACES::State<float>
                             (cfg, channel, sampling, portnum);
         }
+        #endif
         #ifdef HUBO 
         if ( type == "Hubo"){
             s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
@@ -353,6 +377,10 @@ namespace ACES{
         if (t1 == "PID"){
             ctrl = (Controller*) new PID(cfg, args);
         }
+        if (t1 == "Script"){
+            ctrl = (Controller*) new FlexibleScript(cfg, args);
+        }
+        /*
         #ifdef WEBOTS 
         if ( t1 == "Mini"){
             if (t2 == "Leg"){
@@ -369,6 +397,7 @@ namespace ACES{
             }
         } 
         #endif
+        */
         #ifdef TESTSUITE
         #endif
         if(ctrl){
