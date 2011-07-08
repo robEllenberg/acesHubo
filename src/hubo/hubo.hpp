@@ -23,6 +23,7 @@
 #ifndef ACES_HUBO_HPP
 #define ACES_HUBO_HPP
 
+#include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -106,7 +107,13 @@ namespace Hubo{
             float scale[senseSize];//! Arbitrary (multiplicative) scaling const
     };
 
-    const int canBuffSize = 50;
+    #if TESTMODE == 1
+    const int canBuffSize = 1; //!The number of lines to load from the log each
+                               //tick
+    #else
+    const int canBuffSize = 100; //!The maximum number of packets we can pull 
+                                 // from the FIFO buffer on each tick
+    #endif
     canmsg_t rxBuffer[canBuffSize]; 
     class CANHardware : public ACES::Hardware<canmsg_t*>
     {
@@ -114,7 +121,6 @@ namespace Hubo{
             CANHardware(std::string cfg, std::string args);
             virtual bool txBus(ACES::Message<canmsg_t*>* m);
             virtual void rxBus(int size=0);
-            int readFDline(int fd, char* buffer, int maxlen);
             bool startHook();
             void stopHook();
             //virtual bool processUS(ACES::Word<canmsg_t*>* w);
@@ -124,7 +130,7 @@ namespace Hubo{
             std::string fd;
             int rate;
             #if TESTMODE == 1
-                int ichannel;   //! File descripted for input (offline only)
+                std::ifstream ichannel;   //! File descripted for input (offline only)
                 RTT::os::TimeService::ticks beginning;
             #endif
                 int channel;    //! File descriptor for the CAN access node

@@ -1,9 +1,13 @@
 program config {
+/*
     RHY.NodeID = 0;
     RHR.NodeID = 1;
     RSY.NodeID = 0;
     REP.NodeID = 1;
-
+    RMx.NodeID = 0;
+    RMy.NodeID = 1;
+    RFz.NodeID = 2;
+*/
     dRHip1.setDirection(0, -1.0);
     dRHip1.setDirection(1, 1.0);
     dRHip1.setGearRatio(0, 10, 25);

@@ -292,8 +292,13 @@ namespace ACES{
         }
         #ifdef HUBO 
         if ( type == "Hubo"){
-            s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
-                                                     portnum);
+            std::istringstream str(args);
+            int id = 0;
+            str >> id;
+            s = (ProtoState*) new ACES::State<float>(cfg, id, sampling,
+                                                    portnum);
+            //s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
+            //                                         portnum);
         } 
         #endif
         #ifdef WEBOTS

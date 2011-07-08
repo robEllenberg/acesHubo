@@ -2,6 +2,8 @@
 #define ACES_HUBOCAN_HPP
 
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <sys/time.h>
 #include <assert.h>
 #include <rtt/Logger.hpp>

@@ -333,15 +333,16 @@ namespace Hubo{
 
         #if TESTMODE == 1
             channel = open(fd.c_str(), O_WRONLY | O_FSYNC | O_CREAT | O_APPEND,
-                           0755);
+                           0655);
             // If we're in offline operation, we need to open in the input file
             // and set it up for reading
             std::string ifd = fd + "Input";
-            ichannel = open(ifd.c_str(), O_RDONLY);
+            ichannel.open(ifd.c_str());
+
             char linebuf[100];
             for(int i = 0; i < 4; i++){
                 //Read & discard the CAN sniff header which is 4 lines
-                readFDline(ichannel, linebuf, 100);
+                ichannel.getline(linebuf, 100);
             }
         #else //Normal operation action
             //Begin - snippit from can4linux examples baud.c
@@ -367,7 +368,7 @@ namespace Hubo{
     void CANHardware::stopHook(){
         close(channel);
         #if TESTMODE == 1
-            close(ichannel);
+            ichannel.close();
         #endif
     }
 
@@ -426,7 +427,7 @@ namespace Hubo{
                 s << sampleTime;
 
                 //Print timestamp, id, and length
-                dprintf(channel, "%s\t%2.2X\t%d\t\t", s.str().c_str(),
+                dprintf(channel, "%s\t\t%2.2X\t%d\t\t", s.str().c_str(),
                         (int)(msg->id), msg->length);
                 //Print the contents of the data buffer
                 for(int i = 0; i < msg->length; i++){
@@ -463,7 +464,7 @@ namespace Hubo{
         #if TESTMODE == 1 //Offline operation
 
             char linebuf[100];
-            while( readFDline(ichannel, linebuf, 100) and (rxSize < canBuffSize)){
+            while( ichannel.getline(linebuf, 100) and (rxSize < canBuffSize)){
                 std::string buf(linebuf);
                 std::istringstream s(buf);
                 s >> time >> chan >> std::setbase(16) >> msgID >> junk >> junk >> len;
@@ -498,6 +499,7 @@ namespace Hubo{
         }
     }
 
+/*
     int CANHardware::readFDline(int fd, char* buffer, int maxlen){
         int ret = 0;
         for(int i = 0; i < maxlen-1; i++){
@@ -512,6 +514,7 @@ namespace Hubo{
         }
         return -1;
     }
+*/
 
     Protocol::Protocol(std::string cfg, std::string args)
       : ACES::Protocol<canmsg_t*, canMsg>(cfg, args)
@@ -568,14 +571,14 @@ namespace Hubo{
         }
         else if( offsetRange(SENSOR_FT_RXDF, c->id)){
             idClass = SENSOR_FT_RXDF;
-            equalizer = 0x29;
+            equalizer = 0x2F;
             r1 = assemble2Byte(c->data[0], c->data[1]); //Mx
             r2 = assemble2Byte(c->data[2], c->data[3]); //My
             r3 = assemble2Byte(c->data[4], c->data[5]); //Fz
         }
         else if( offsetRange(SENSOR_AD_RXDF, c->id)){
             idClass = SENSOR_AD_RXDF;
-            equalizer = 0x29;
+            equalizer = 0x2F;
             r1 = assemble2Byte(c->data[0], c->data[1]); //Acc1
             r2 = assemble2Byte(c->data[2], c->data[3]); //Acc2
             r3 = assemble2Byte(c->data[4], c->data[5]); //Gyro1
@@ -626,20 +629,20 @@ namespace Hubo{
             case ADOFFSET_RXDF:
             case OFFSET_RXDF:
                 //These classes of command have a width of 0x10
-                if( (lineID >= baseval) or (lineID < baseval+0x10) ){
+                if( (lineID >= baseval) and (lineID < baseval+0x10) ){
                     return true;
                 } break;
             case ENC_RXDF:
             case CUR_RXDF:
             case PM_RXDF:
                 //These classes of command have a width of 0x30
-                if( (lineID >= baseval) or (lineID < baseval+0x30) ){
+                if( (lineID >= baseval) and (lineID < baseval+0x30) ){
                     return true;
                 } break;
             case NAME_RXDF:
             case STAT_RXDF:
                 //These classes of command have a width of 0x40
-                if( (lineID >= baseval) or (lineID < baseval+0x40) ){
+                if( (lineID >= baseval) and (lineID < baseval+0x40) ){
                     return true;
                 } break;
             default:
@@ -1190,7 +1193,7 @@ namespace Hubo{
             canMsg c(0, SEND_SENSOR_TXDF, CMD_NONE);
             msg = new ACES::Word<canMsg>(c);
         }
-        //TODO: Clean up the Word here
+        //TODO: Clean up the input Word here
         return msg;
     }
 }

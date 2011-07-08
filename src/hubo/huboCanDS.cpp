@@ -49,14 +49,18 @@ namespace Hubo{
     }
 
     void canMsg::printme(){
-        RTT::Logger::log() << "[" << id << "]{" << type << "/" << subType
-                           << "} "; 
-        RTT::Logger::log() << "R1 = 0x" << std::hex << r1 << ", ";
-        RTT::Logger::log() << "R2 = 0x" << std::hex << r2 << ", ";
-        RTT::Logger::log() << "R3 = 0x" << std::hex << r3 << ", ";
-        RTT::Logger::log() << "R4 = 0x" << std::hex << r4 << ", ";
-        RTT::Logger::log() << "R5 = 0x" << std::hex << r5 << std::dec
-                          << RTT::endlog();
+        std::ostringstream s(std::ostringstream::out);
+
+        s << "[" << std::setbase(16) << id << "]{"
+                 << std::setbase(16) << type << "/"
+                 << std::setbase(16) << subType
+                 << "} "; 
+        s << "R1 = 0x" << std::hex << r1 << ", ";
+        s << "R2 = 0x" << std::hex << r2 << ", ";
+        s << "R3 = 0x" << std::hex << r3 << ", ";
+        s << "R4 = 0x" << std::hex << r4 << ", ";
+        s << "R5 = 0x" << std::hex << r5;
+        RTT::Logger::log() << s.str() << RTT::endlog();
     }
 
     /* The bitStuffing algorithems are pulled directly from the original hubo

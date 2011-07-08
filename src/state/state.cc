@@ -172,14 +172,14 @@ namespace ACES{
         
         Word<T>* usIn = NULL;
         while( rxUpStream.read(usIn) == RTT::NewData ){
-            RTT::Logger::log() << RTT::Logger::Debug << "(state: " 
+            RTT::Logger::log(RTT::Logger::Debug) << "(state: " 
                                << name << ") rxUS"
                                << RTT::endlog();
             //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
             //                     << nodeIDAttr.get() << RTT::endlog();
             
             if(usIn->getNodeID() == nodeID){
-                RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+                RTT::Logger::log(RTT::Logger::Debug) << "(state: "
                                    << name << ") assign"
                                    << RTT::endlog();
                 assign(usIn);
@@ -199,7 +199,7 @@ namespace ACES{
 
     template <class T>
     void State<T>::sample(){
-        RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+        RTT::Logger::log(RTT::Logger::Debug) << "(state: "
                            << name << ") sample"
                            << RTT::endlog();
         Word<T>* s = new Word<T>(0., nodeID, 0, REFRESH);
@@ -211,7 +211,7 @@ namespace ACES{
         RTT::Logger::log() << "State: " << name
         << ", (Freq:" << freq << ", Pri:"
         << priority << "),"
-        << "(Val = " << value.get() << ")" << std::endl;
+        << "(Val = " << value.get() << ")" << RTT::endlog();
     }
 
     template <class T>
@@ -221,7 +221,7 @@ namespace ACES{
 
     template <class T>
     void State<T>::go(T sp){
-        RTT::Logger::log() << RTT::Logger::Debug << "(state: "
+        RTT::Logger::log(RTT::Logger::Debug) << "(state: "
                            << name << ") go: " << (float)sp
                            << RTT::endlog();
         Word<T>* w = new Word<T>(sp, nodeID, 0, SET);
@@ -233,9 +233,9 @@ namespace ACES{
 
     template <class T>
     void State<T>::assign(Word<T>* w){
-        RTT::Logger::log() << RTT::Logger::Debug
-                           << "(state: "
-                           << this->name << ") Value: " << w->getData();
+        RTT::Logger::log(RTT::Logger::Debug) << "(state: "
+                           << this->name << ") Value: "
+                           << w->getData() << RTT::endlog();
         hist.update( w->getData() );
         value = w->getData();
 
