@@ -2,8 +2,8 @@
 
 namespace Hubo{
 
-    canMsg::canMsg(): id(0), type(CAN_NONE), subType(CMD_NONE), r1(0), r2(0), r3(0), r4(0),
-                      r5(0)
+    canMsg::canMsg(): id(0), type(CAN_NONE), subType(CMD_NONE), r1(0), r2(0),
+                      r3(0), r4(0), r5(0)
     {}
 
     canMsg::canMsg(unsigned long ID, huboCanType Type, cmdType st) :
@@ -16,19 +16,48 @@ namespace Hubo{
             : id(ID), type(Type), subType(st), r1(R1), r2(R2), r3(R3), r4(R4),
               r5(R5){}
 
-    /*
-    TODO - Fix the printme() function
-    void canMsg::printMe(){
-        RTT::Logger::log() << "[" << id << "]: {" << flags << ", " << cob
-                           << "} " << std::hex << "0x"
-        //<< RTT::Logger::Debug << 
-        for(int i = 0; i < length; i++){
-            RTT::Logger:log() << data[i];
-        }
-            
-        << std::dec << RTT::endlog()
+    unsigned long canMsg::getID(){
+        return id;
     }
-    */
+
+    huboCanType canMsg::getType(){
+        return type;
+    }
+
+    cmdType canMsg::getCmd(){
+        return subType;
+    }
+
+    unsigned long canMsg::getR1(){
+        return r1;
+    }
+
+    unsigned long canMsg::getR2(){
+        return r2;
+    }
+
+    unsigned long canMsg::getR3(){
+        return r3;
+    }
+
+    unsigned long canMsg::getR4(){
+        return r4;
+    }
+
+    unsigned long canMsg::getR5(){
+        return r5;
+    }
+
+    void canMsg::printme(){
+        RTT::Logger::log() << "[" << id << "]{" << type << "/" << subType
+                           << "} "; 
+        RTT::Logger::log() << "R1 = 0x" << std::hex << r1 << ", ";
+        RTT::Logger::log() << "R2 = 0x" << std::hex << r2 << ", ";
+        RTT::Logger::log() << "R3 = 0x" << std::hex << r3 << ", ";
+        RTT::Logger::log() << "R4 = 0x" << std::hex << r4 << ", ";
+        RTT::Logger::log() << "R5 = 0x" << std::hex << r5 << std::dec
+                          << RTT::endlog();
+    }
 
     /* The bitStuffing algorithems are pulled directly from the original hubo
      * code base. They're wrong in that they use a sign bit instead of a two's
@@ -106,18 +135,25 @@ namespace Hubo{
                 cm->data[7] = bitStrip(r3, 1);
                 cm->length = 8;
                 break;
+            case HIP_ENABLE:
+                cm->data[2] = 1;
+                cm->length = 3; 
+                break;
+            case RUN_CMD:
+                cm->length = 2;
+                break;
             case NAME_INFO:
             case BOARD_STATUS:
             case SEND_ENC:
             case SEND_CURR:
             case SEND_PM:
             case ENC_ZERO:
-            case HIP_ENABLE:
             case GO_HOME:
             case PWM_CMD:
-            case RUN_CMD:
             case STOP_CMD:
             case CTRL_MODE:
+                assert(false);
+                break;
             case GO_LIMIT_POS:
                 cm->data[2] = (unsigned char)r1; //Copy the mode bits
                 if(r3){     //r3 is only populated in the case of Neck or Wrist

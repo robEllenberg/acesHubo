@@ -4,22 +4,38 @@ program main {
 
     //addHardware("via 90 100","Hubo","");
 
-    addHardware("ch1 90 100","HuboCAN","./testfile 9600");
+    addHardware("ch1 90 100","HuboCAN","./testfile 1000");
     addProtocol("pro1 80 100", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
-    addDevice("dRHip1 20 50", "HuboCAN Motor", "0 2");
+    addDevice("dRHip1 20 50", "HuboCAN Motor", "0xA 2");
+    addDevice("dRArm1 20 50", "HuboCAN Motor", "0x9 2");
+    addDevice("dRFT 20 50", "HuboCAN Sensor", "0x30 3");
+
     linkPD("pro1", "dRHip1");
+    linkPD("pro1", "dRArm1");
+    linkPD("pro1", "dRFT");
 
     addState("RHY  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
     addState("RHR  10 50", "Hubo", "-3.14 3.14", sampling, baseport+1);
     linkDS("dRHip1",  "RHY");
     linkDS("dRHip1",  "RHR");
 
+    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling, baseport+2);
+    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling, baseport+3);
+    linkDS("dRArm1",  "RSY");
+    linkDS("dRArm1",  "REP");
+
+    addState("RMx 10 50", "Hubo", "-3.14 3.14", sampling, baseport+4);
+    addState("RMy 10 50", "Hubo", "-3.14 3.14", sampling, baseport+5);
+    addState("RFz 10 50", "Hubo", "-3.14 3.14", sampling, baseport+6);
+    linkDS("dRFT", "RMx");
+    linkDS("dRFT", "RMy");
+    linkDS("dRFT", "RFz");
 
     //addController("config 10 10", "User Program", "canConfig.ops config");
-    /*
 
+    /*
     //Create devices, representing physical nodes on the bus
     addDevice("dRHip1  20 50", "Hubo", "38 0.0  1");
     addDevice("dRSP 20 50", "Hubo", "30 0.0  1");
@@ -92,6 +108,7 @@ program main {
     
     /* END CONFIG SECTION */
 
+    startDebug();
     startHW();
     startProtocol();
     startDevice();

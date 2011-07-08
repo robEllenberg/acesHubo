@@ -228,6 +228,9 @@ namespace ACES{
             if(type2 == "Motor"){
                 d = (RTT::TaskContext*) new Hubo::MotorDevice(cfg, args);
             }
+            if(type2 == "Sensor"){
+                d = (RTT::TaskContext*) new Hubo::SensorDevice(cfg, args);
+            }
         }
         #endif
         #ifdef WEBOTS 
