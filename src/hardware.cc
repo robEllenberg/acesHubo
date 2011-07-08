@@ -56,7 +56,7 @@ namespace ACES {
         while( rxDownStream.read(dsIn) == RTT::NewData ){
             dsIn->printme();
             if( processDS(dsIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW: " << name 
+                RTT::Logger::log(RTT::Logger::Debug) << "(HW: " << name 
                                    << ") got DS"
                                    << RTT::endlog();
                 txBus(dsIn);
@@ -69,7 +69,7 @@ namespace ACES {
         while(not usQueue.isEmpty() ){
             usQueue.dequeue(usIn);
             if( processUS(usIn) ){
-                RTT::Logger::log() << RTT::Logger::Debug << "(HW: " 
+                RTT::Logger::log(RTT::Logger::Debug) << "(HW: " 
                                    << name << ") got US"
                                    << RTT::endlog();
                 txUpStream.write(usIn);

@@ -51,7 +51,7 @@ namespace ACES{
         if(not DSlockout){
             while( rxDownStream.read(dsIn) == RTT::NewData ){
                 if( (dsOut = processDS(dsIn)) ){
-                    RTT::Logger::log() << RTT::Logger::Debug << "(dev: " 
+                    RTT::Logger::log(RTT::Logger::Debug) << "(dev: " 
                                        << name << ") got DS"
                                        << RTT::endlog();
                     txDownStream.write(dsOut);
@@ -64,7 +64,7 @@ namespace ACES{
         if(not USlockout){
             while( rxUpStream.read(usIn) == RTT::NewData ){
                 if( (usOut = processUS(usIn)) ){
-                    RTT::Logger::log() << RTT::Logger::Debug << "(dev: "
+                    RTT::Logger::log(RTT::Logger::Debug) << "(dev: "
                                        << name << ") got US"
                                        << RTT::endlog();
                 //typename std::deque< PDWord<P>* >::iterator it;
