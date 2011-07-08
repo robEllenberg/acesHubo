@@ -56,9 +56,9 @@ namespace Hubo{
             //float getPPR(int chan);
             float getDirection(int chan);
             unsigned int getEncoderSize(int chan);
-            int getOffsetPulse(int chan);
-            int getRevOffset(int chan);
-            bool getCCW(int chan);
+            //int getOffsetPulse(int chan);
+            //int getRevOffset(int chan);
+            //bool getCCW(int chan);
             unsigned int getHarmonic(int chan);
             float getGearRatio(int chan);
         protected:
@@ -66,10 +66,10 @@ namespace Hubo{
             bool setDirection(int chan, float dir);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
-            bool setOffsetPulse(int chan, int offset);
-            bool setRevOffset(int chan, int offset);
+            //bool setOffsetPulse(int chan, int offset);
+            //bool setRevOffset(int chan, int offset);
             bool setHarmonic(int chan, int harmonic);
-            bool setCCW(int chan, bool CCW);
+            //bool setCCW(int chan, bool CCW);
         private:
             //int boardNum;       //! Identifying number for the motor controller
             bool checkChannel(int chan);
@@ -80,9 +80,9 @@ namespace Hubo{
             unsigned int drivenTeeth[ctrlSize];
             unsigned int encoderSize[ctrlSize];
             unsigned int harmonic[ctrlSize];
-            int offsetPulse[ctrlSize];
-            int revOffset[ctrlSize];
-            bool CCW[ctrlSize];
+            //int offsetPulse[ctrlSize];
+            //int revOffset[ctrlSize];
+            //bool CCW[ctrlSize];
             //TODO - Do we need to save the 'motor number' for each channel? 
     };
 
@@ -172,10 +172,11 @@ namespace Hubo{
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
-            bool setOffsetPulse(int chan, int offset);
-            bool setRevOffset(int chan, int offset);
-            bool setCCW(int chan, bool CCW);
-            bool setCalibrate(int channel);
+            //bool setOffsetPulse(int chan, int offset);
+            //bool setRevOffset(int chan, int offset);
+            //bool setCCW(int chan, bool CCW);
+            bool setZero(int chan, int ticks, bool ccw);
+            //bool setCalibrate(int channel);
             bool setHIPenable();
             bool setRunCmd();
             bool setHarmonic(int chan, int harmonic);
@@ -190,13 +191,14 @@ namespace Hubo{
             bool triggersSet();
             void clearTrigger();
             //Helpers for buildCalibratePulse
-            long calPulse2Chan(int c);
-            long calPulse3Chan(int c);
+            //long calPulse2Chan(int c);
+            //long calPulse3Chan(int c);
             //Functions for generating the different types of configuration
             //packets.
             canMsg buildSetPacket();
             canMsg buildGainPacket(cmdType type, int Kp, int Ki, int Kd);
-            canMsg buildCalibratePulse(int c);
+            canMsg buildZeroPacket(int c, int ticks, bool ccw);
+            //canMsg buildCalibratePulse(int c);
             canMsg buildHIPpacket();
             canMsg buildRunCmdPacket();
         private:

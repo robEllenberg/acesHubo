@@ -1,25 +1,10 @@
 program config {
-/*
-    RHY.NodeID = 0;
-    RHR.NodeID = 1;
-    RSY.NodeID = 0;
-    REP.NodeID = 1;
-    RMx.NodeID = 0;
-    RMy.NodeID = 1;
-    RFz.NodeID = 2;
-*/
     dRHip1.setDirection(0, -1.0);
     dRHip1.setDirection(1, 1.0);
     dRHip1.setGearRatio(0, 10, 25);
     dRHip1.setGearRatio(1, 324, 1024);
     dRHip1.setEncoderSize(0, 4000);
     dRHip1.setEncoderSize(1, 4000);
-    dRHip1.setOffsetPulse(0, 2000);
-    dRHip1.setOffsetPulse(1, 500);
-    dRHip1.setRevOffset(0, 3);
-    dRHip1.setRevOffset(1, 2);
-    dRHip1.setCCW(0, true);
-    dRHip1.setCCW(1, false);
     dRHip1.setHarmonic(0, 100);
     dRHip1.setHarmonic(1, 160);
 
@@ -28,16 +13,16 @@ program config {
     dRHip1.setGains("Position", 1, 15, 0, 15);
 
     //Cluster all calibrates
-    dRHip1.calibrate(0);
-    dRHip1.calibrate(1);
-    dRArm1.calibrate(0);
-    dRArm1.calibrate(1);
+    dRHip1.setZero(0, -18100, true);
+    dRHip1.setZero(1,  13000, false);
 
     //Cluster pairs of HIPenable/run commands
     dRHip1.HIPenable();
     dRHip1.run();
     dRArm1.HIPenable();
     dRArm1.run();
+
+    //Null the Sensors
 
     /*
     dRHip1.setDirection(channel, +/-1);

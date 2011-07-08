@@ -38,9 +38,9 @@ namespace Hubo{
             driveTeeth[i] = 1;
             drivenTeeth[i] = 1;
             encoderSize[i] = 0;
-            offsetPulse[i] = 0;
-            revOffset[i] = 0;
-            CCW[i] = true;
+            //offsetPulse[i] = 0;
+            //revOffset[i] = 0;
+            //CCW[i] = true;
             harmonic[i] = 0;
         }
     }
@@ -82,6 +82,7 @@ namespace Hubo{
         return false;
     }
 
+/*
     bool MotorCredentials::setOffsetPulse(int chan, int offset){
         if(checkChannel(chan)){
             offsetPulse[chan] = offset;
@@ -105,7 +106,7 @@ namespace Hubo{
         }
         return false;
     }
-
+*/
     bool MotorCredentials::setHarmonic(int chan, int harm){
         if(checkChannel(chan)){
             harmonic[chan] = harm;
@@ -128,6 +129,7 @@ namespace Hubo{
         return 0;
     }
 
+/*
     int MotorCredentials::getOffsetPulse(int chan){
         if((chan < channels) and (chan >= 0)){
             return offsetPulse[chan];
@@ -148,7 +150,7 @@ namespace Hubo{
         }
         return false;
     }
-
+*/
     unsigned int MotorCredentials::getHarmonic(int chan){
         if((chan < channels) and (chan >= 0)){
             return harmonic[chan];
@@ -188,6 +190,7 @@ namespace Hubo{
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << encoderSize[i] << ", ";
         }
+        /*
         RTT::Logger::log() << "]\nOffset Pulse: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << offsetPulse[i] << ", ";
@@ -200,6 +203,7 @@ namespace Hubo{
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << CCW[i] << ", ";
         }
+        */
         RTT::Logger::log() << "]\nGear Ratio: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << (float)drivenTeeth[i]/(float)driveTeeth[i] << ", ";
@@ -329,14 +333,14 @@ namespace Hubo{
     }
 
     bool CANHardware::startHook(){
-        beginning = RTT::os::TimeService::Instance()->getTicks();
 
         #if TESTMODE == 1
-            channel = open(fd.c_str(), O_WRONLY | O_FSYNC | O_CREAT | O_APPEND,
+            beginning = RTT::os::TimeService::Instance()->getTicks();
+            channel = open(fd.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
                            0655);
             // If we're in offline operation, we need to open in the input file
             // and set it up for reading
-            std::string ifd = fd + "Input";
+            std::string ifd = fd + ".in";
             ichannel.open(ifd.c_str());
 
             char linebuf[100];
@@ -346,8 +350,8 @@ namespace Hubo{
             }
         #else //Normal operation action
             //Begin - snippit from can4linux examples baud.c
-            channel = open(fd.c_str(), O_RDWR | O_NONBLOCK | O_CREAT | O_APPEND,
-                           0755);
+            channel = open(fd.c_str(), O_RDWR | O_NONBLOCK,
+                           0655);
             Config_par_t  CANcfg;
             Command_par_t cmd;
 
@@ -448,10 +452,10 @@ namespace Hubo{
                 << "CAN Transmission Timeout"
                 << RTT::endlog();
             }
-            delete msg;
+            //delete msg;
             //TODO - Delete the word
         }
-        delete m;
+        //delete m;
         return true;
     }
 
@@ -464,11 +468,13 @@ namespace Hubo{
         #if TESTMODE == 1 //Offline operation
 
             char linebuf[100];
-            while( ichannel.getline(linebuf, 100) and (rxSize < canBuffSize)){
+            while( (not ichannel.eof()) and (rxSize < canBuffSize)){
+                ichannel.getline(linebuf, 100);
                 std::string buf(linebuf);
                 std::istringstream s(buf);
-                s >> time >> chan >> std::setbase(16) >> msgID >> junk >> junk >> len;
-                //RTT::Logger::log() << buf << RTT::endlog(); 
+                s >> time >> chan >> std::setbase(16)
+                  >> msgID >> junk >> junk >> len;
+
                 rxBuffer[rxSize].id = msgID;
                 rxBuffer[rxSize].length = len;
                 //switch stream to hex mode
@@ -479,7 +485,7 @@ namespace Hubo{
                 rxSize++;
             }
         #else             //Online operation
-            rxSize = read(channel, &rxBuffer, canBufSize);
+            rxSize = read(channel, &rxBuffer, canBuffSize);
         #endif
 
         for(int i = 0; i < rxSize; i++){
@@ -492,8 +498,6 @@ namespace Hubo{
             for(int j = 0; j < msg->length; j++){
                 msg->data[j] = rxBuffer[i].data[j];
             }
-            //RTT::Logger::log() << " id:" << msg->id
-            //                   << " len: " << msg->length << RTT::endlog();
             ACES::Word<canmsg_t*>* w = new ACES::Word<canmsg_t*>(msg);
             txUpStream.write(w);
         }
@@ -606,8 +610,6 @@ namespace Hubo{
         }
 
         int id = (c->id) - ((int)idClass) + equalizer;
-        //RTT::Logger::log() << " id:" << id << "/" << c->id << "," << (int)idClass
-        //                   << RTT::endlog();
         canMsg msg(id, idClass, CMD_NONE, r1, r2, r3, r4, r5);
         msg.printme();
         pw = new ACES::Word<canMsg>(msg, 0, 0, 0, Protocol::credFromPacket(msg));
@@ -703,6 +705,7 @@ namespace Hubo{
                            .arg("Ki", "Integral Gain")
                            .arg("Kd", "Derivative Gain");
 
+/*
         this->addOperation("setOffsetPulse", &MotorDevice::setOffsetPulse, this,
             RTT::OwnThread).doc("Set the gains for this controller")
                            .arg("channel", "Channel number to set")
@@ -713,20 +716,27 @@ namespace Hubo{
                            .arg("channel", "Channel number to set")
                            .arg("offset", "The offset in encoder ticks");
 
+        this->addOperation("calibrate", &MotorDevice::setCalibrate, this,
+            RTT::OwnThread).doc("Send a calibreation pulse to the controller"
+                                " (zero the motor)")
+                           .arg("channel", "Channel number to send pulse on");
         this->addOperation("setCCW", &MotorDevice::setCCW, this,
             RTT::OwnThread).doc("Set the direction of rotation for calibration")
                            .arg("channel", "Channel number to set")
                            .arg("ccw", "Direction: true=ccw, false=cw");
+*/
+
+        this->addOperation("setZero", &MotorDevice::setZero, this,
+            RTT::OwnThread).doc("Set the harmonic drive ratio.")
+                           .arg("channel", "Channel number to set")
+                           .arg("ticks", "Number of ticks for zero")
+                           .arg("ccw", "true - counter-clockwise, "
+                                "false - clockwise");
 
         this->addOperation("setHarmonic", &MotorDevice::setHarmonic, this,
             RTT::OwnThread).doc("Set the harmonic drive ratio.")
                            .arg("channel", "Channel number to set")
                            .arg("harmonic", "Drive ratio");
-
-        this->addOperation("calibrate", &MotorDevice::setCalibrate, this,
-            RTT::OwnThread).doc("Send a calibreation pulse to the controller"
-                                " (zero the motor)")
-                           .arg("channel", "Channel number to send pulse on");
 
         this->addOperation("HIPenable", &MotorDevice::setHIPenable, this,
             RTT::OwnThread).doc("Send a packet to the controller enabling"
@@ -747,8 +757,8 @@ namespace Hubo{
                 msg = buildWord(c, 0);
             }
         }
-        RTT::Logger::log(RTT::Logger::Warning) <<  "Processing: " << msg
-        << RTT::endlog();
+        //RTT::Logger::log(RTT::Logger::Warning) <<  "Processing: " << msg
+        //<< RTT::endlog();
         return msg;
     }
 
@@ -814,7 +824,7 @@ namespace Hubo{
                 << RTT::endlog();
         }else{
             RTT::Logger::log(RTT::Logger::Debug)
-                <<  "Received a clear ACK on Controller"
+                <<  "Received a clean ACK on Controller"
                 << credentials->getDevID() << ", Channel 0"
                 << RTT::endlog();
         }
@@ -847,6 +857,7 @@ namespace Hubo{
         return ((MotorCredentials*)credentials)->setEncoderSize(chan, size);
     }
 
+/*
     bool MotorDevice::setOffsetPulse(int chan, int offset){
         return ((MotorCredentials*)credentials)->setOffsetPulse(chan, offset);
     }
@@ -858,7 +869,7 @@ namespace Hubo{
     bool MotorDevice::setCCW(int chan, bool CCW){
         return ((MotorCredentials*)credentials)->setCCW(chan, CCW);
     }
-
+*/
     bool MotorDevice::setHarmonic(int chan, int harmonic){
         return ((MotorCredentials*)credentials)->setHarmonic(chan, harmonic);
     }
@@ -928,8 +939,10 @@ namespace Hubo{
                     t = SET_POS_GAIN_B;
                     break;
                 default:
-                    RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                        << channel << " specified. Must be [0-" << channel-1 << "]."
+                    RTT::Logger::log(RTT::Logger::Warning)
+                        << "Invalid channel number "
+                        << channel << " specified. Must be [0-"
+                        << channel-1 << "]."
                         << RTT::endlog();
             }
         } else if(type == "Torque"){
@@ -942,8 +955,10 @@ namespace Hubo{
                     t = SET_TRQ_GAIN_B;
                     break;
                 default:
-                    RTT::Logger::log(RTT::Logger::Warning) <<  "Invalid channel number "
-                        << channel << " specified. Must be [0-" << channel-1 << "]."
+                    RTT::Logger::log(RTT::Logger::Warning)
+                        << "Invalid channel number "
+                        << channel << " specified. Must be [0-"
+                        << channel-1 << "]."
                         << RTT::endlog();
             }
         }
@@ -961,6 +976,74 @@ namespace Hubo{
         return false;
     }
 
+    bool MotorDevice::setZero(int chan, int ticks, bool ccw){
+        canMsg c = buildZeroPacket(chan, ticks, ccw);
+        txDownStream.write( buildWord(c, chan) );
+        return true;
+    }
+
+    canMsg MotorDevice::buildZeroPacket(int c, int ticks, bool ccw){
+        MotorCredentials* cred = (MotorCredentials*)credentials;
+        long r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5=0;
+
+        //Check to make sure we're not exceding the value that can be held in
+        //hubolab's 19bit + sign bit representation
+        int nineteenMax = 0x7FFFF;
+        if(ticks > nineteenMax){
+            ticks = nineteenMax;
+        }
+        if(ticks < -nineteenMax){
+            ticks = -nineteenMax;
+        }
+
+        //Convert to a sign-bit (as opposed to 2's complement) representation
+        unsigned long sign = 0;
+        if(ticks < 0){
+            ticks *= -1;
+            sign = 0x80000;
+        }
+        ticks |= sign;
+        
+        //The lowest bit in mode is determined by the rotational direction of
+        //the motor. 1 for CCW, 0 for CW
+        long mode = 0;
+        if( ccw ){
+                mode |= 1;
+        }
+
+        if( cred->getChannels() == 2 ){  //Two channel controller
+            mode |= (1 << (4+c)); //add a flag to indicate the channel number
+            r1 = mode;
+            switch(c){
+                case 0:
+                    r2 = ticks & 0xFFFF;
+                    r4 = (ticks & 0xF0000) >> 16;
+                    break;
+                case 1:
+                    r3 = ticks & 0xFFFF;
+                    r4 = (ticks & 0xF0000) >> 12;
+                    break;
+                default:
+                    break;
+            }
+        } else if (cred->getChannels() == 3){  //Three channel controller
+            r5 = 1;     //We use r5 as a flag to indicate a three channel
+                        //controller to the lower level functions
+            mode |= (0x10); //three channel boards always use this designation
+            r2 = ((short)ticks & 0xFFFF);
+            //TODO - Correct This
+            r3 = 0x3232;
+        } else{
+            //Fail - we can't do this for other controller configurations
+            RTT::Logger::log(RTT::Logger::Warning) << "Attempted to calibrate "
+            "a board with improper channel setting. " << cred->getChannels() 
+            << "channels were specified. Only 2 or 3 are allowed for this "
+            "operation." << RTT::endlog();
+        }
+
+        return canMsg(cred->getDevID(), CMD_TXDF, GO_LIMIT_POS, r1, r2, r3, r4, r5);
+    }
+/*
     bool MotorDevice::setCalibrate(int channel){
         if( ((MotorCredentials*)credentials)->checkChannel(channel) ){
             canMsg c = buildCalibratePulse(channel);
@@ -970,7 +1053,7 @@ namespace Hubo{
         }
         return false;
     }
-
+*/
     bool MotorDevice::setHIPenable(){
         canMsg c = buildHIPpacket();
         ACES::Word<canMsg>* msg = buildWord(c, 0);
@@ -1033,7 +1116,8 @@ namespace Hubo{
                 temp[4]);
         return cm;
     }
-        
+
+/*        
     canMsg MotorDevice::buildCalibratePulse(int c){ //c - channel number
         MotorCredentials* cred = (MotorCredentials*)credentials;
         long offset1 =0, offset2 = 0, offset3 = 0;
@@ -1094,7 +1178,7 @@ namespace Hubo{
             return 0;
         }
     }
-
+*/
     canMsg MotorDevice::buildHIPpacket(){
         return canMsg( credentials->getDevID(), CMD_TXDF, HIP_ENABLE);
     }

@@ -6,7 +6,7 @@ program main {
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
-    addDevice("dRHip1 20 100", "HuboCAN Motor", "0xA 2");
+    addDevice("dRHip1 20 100", "HuboCAN Motor", "0x0 2");
     addDevice("dRArm1 20 100", "HuboCAN Motor", "0x9 2");
     addDevice("dRFT 20 1000", "HuboCAN Sensor", "0x30 3");
 
@@ -26,7 +26,7 @@ program main {
 
     addState("RMx 10 50", "Hubo", "0", sampling, baseport+4);
     addState("RMy 10 50", "Hubo", "1", sampling, baseport+5);
-    addState("RFz 10 50", "Hubo", "2", true, baseport+6);
+    addState("RFz 10 50", "Hubo", "2", sampling, baseport+6);
     linkDS("dRFT", "RMx");
     linkDS("dRFT", "RMy");
     linkDS("dRFT", "RFz");
@@ -41,7 +41,7 @@ program main {
     
     /* END CONFIG SECTION */
 
-    startDebug();
+    //startDebug();
     startHW();
     startProtocol();
     startDevice();

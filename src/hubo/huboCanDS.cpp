@@ -160,33 +160,16 @@ namespace Hubo{
                 break;
             case GO_LIMIT_POS:
                 cm->data[2] = (unsigned char)r1; //Copy the mode bits
-                if(r3){     //r3 is only populated in the case of Neck or Wrist
-                    cm->data[3] = bitStrip(r2, 0);
-                    cm->data[4] = bitStrip(r2, 1);
-                    cm->data[5] = bitStrip(r3, 0);
-                    cm->data[6] = bitStrip(r4, 0);
-                    cm->length = 7;
+                cm->data[3] = bitStrip(r2, 1);
+                cm->data[4] = bitStrip(r2, 0);
+                cm->data[5] = bitStrip(r3, 1);
+                cm->data[6] = bitStrip(r3, 0);
+
+                if(r5){     //r5 is only populated in the case of 3ch ctrlr
+                    cm->length = 7;    
                 }
                 else{
-                    //Use the mode bits to determine the channel
-                    switch( r1 & 0x30 ){  
-                        case 0x10: //Channel 1
-                            cm->data[3] = bitStrip(r2, 1);
-                            cm->data[4] = bitStrip(r2, 0);
-                            cm->data[5] = 0;
-                            cm->data[6] = 0;
-                            cm->data[7] = (unsigned char)((r2 >> 16) & 0xF);
-                            break;
-                        case 0x20: //Channel 2
-                            cm->data[3] = 0;
-                            cm->data[4] = 0;
-                            cm->data[5] = bitStrip(r2, 1);
-                            cm->data[6] = bitStrip(r2, 0);
-                            cm->data[7] =(unsigned char) (((r2>>16) & 0xF)<<4);
-                            break;
-                        default:
-                            assert(false);
-                    }
+                    cm->data[7] = bitStrip(r4, 0);
                     cm->length = 8;
                 }
                 break;
