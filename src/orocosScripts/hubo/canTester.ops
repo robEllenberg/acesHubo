@@ -2,96 +2,46 @@ program main {
     var bool sampling = false;
     var int baseport = 2827;
 
-    //addHardware("via 90 100","Hubo","");
-
-    addHardware("ch1 90 100","HuboCAN","./testfile 9600");
-    addProtocol("pro1 80 100", "HuboCAN", "");
+    addHardware("ch1 90 1000","HuboCAN","./testfile 1000");
+    addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
-    addDevice("dRHip1 20 50", "HuboCAN Motor", "0 2");
-    linkPD("pro1", "dRHip1");
+    addDevice("dRHip1 20 100", "HuboCAN Motor", "0x0 2");
+    addDevice("dRArm1 20 100", "HuboCAN Motor", "0x9 2");
+    addDevice("dRFT 20 1000", "HuboCAN Sensor", "0x30 3");
 
-    addState("RHY  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
-    addState("RHR  10 50", "Hubo", "-3.14 3.14", sampling, baseport+1);
+    linkPD("pro1", "dRHip1");
+    linkPD("pro1", "dRArm1");
+    linkPD("pro1", "dRFT");
+
+    addState("RHY 10 50", "Hubo", "0", sampling, baseport);
+    addState("RHR 10 50", "Hubo", "1", sampling, baseport+1);
     linkDS("dRHip1",  "RHY");
     linkDS("dRHip1",  "RHR");
 
+    addState("RSY 10 50", "Hubo", "0", sampling, baseport+2);
+    addState("REP 10 50", "Hubo", "1", sampling, baseport+3);
+    linkDS("dRArm1",  "RSY");
+    linkDS("dRArm1",  "REP");
+
+    addState("RMx 10 50", "Hubo", "0", sampling, baseport+4);
+    addState("RMy 10 50", "Hubo", "1", sampling, baseport+5);
+    addState("RFz 10 50", "Hubo", "2", sampling, baseport+6);
+    linkDS("dRFT", "RMx");
+    linkDS("dRFT", "RMy");
+    linkDS("dRFT", "RFz");
 
     //addController("config 10 10", "User Program", "canConfig.ops config");
-    /*
-
-    //Create devices, representing physical nodes on the bus
-    addDevice("dRHip1  20 50", "Hubo", "38 0.0  1");
-    addDevice("dRSP 20 50", "Hubo", "30 0.0  1");
-    addDevice("dRSR 20 50", "Hubo", "31 0.0  1");
-    addDevice("dRSY 20 50", "Hubo", "32 0.0  1");
-    addDevice("dLSP 20 50", "Hubo", "34 0.0  1");
-    addDevice("dLSR 20 50", "Hubo", "35 0.0 -1");
-    addDevice("dLSY 20 50", "Hubo", "36 0.0  1");
-    addDevice("dREP 20 50", "Hubo", "33 0.0  1");
-    addDevice("dLEP 20 50", "Hubo", "37 0.0  1");
-    addDevice("dRWY 20 50", "Hubo", "0  0.0  1");
-    addDevice("dLWY 20 50", "Hubo", "3  0.0  1");
-
-    //Add states, each represents 1 property of the device
-    addState("HY  10 50", "Hubo", "-3.14 3.14", sampling, baseport);
-    addState("RSP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 1);
-    addState("RSR 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 2);
-    addState("RSY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 3);
-    addState("LSP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 4);
-    addState("LSR 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 5);
-    addState("LSY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 6);
-    addState("REP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 7);
-    addState("LEP 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 8);
-    addState("RWY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 9);
-    addState("LWY 10 50", "Hubo", "-3.14 3.14", sampling, baseport + 10);
-
-    //Tell the states and devices to pay attention to each other
-    linkDS("dRHip1",  "HY");
-    linkDS("dRSP", "RSP");
-    linkDS("dRSR", "RSR");
-    linkDS("dRSY", "RSY");
-    linkDS("dLSP", "LSP");
-    linkDS("dLSR", "LSR");
-    linkDS("dLSY", "LSY");
-    linkDS("dREP", "REP");
-    linkDS("dLEP", "LEP");
-    linkDS("dRWY", "RWY");
-    linkDS("dLWY", "LWY");
-
-    //Tell the devices & protocol to pay attention to each other 
-    linkPD("pro1", "dRHip1");
-    linkPD("pro", "dRSP");
-    linkPD("pro", "dRSR");
-    linkPD("pro", "dRSY");
-    linkPD("pro", "dLSP");
-    linkPD("pro", "dLSR");
-    linkPD("pro", "dLSY");
-    linkPD("pro", "dREP");
-    linkPD("pro", "dLEP");
-    linkPD("pro", "dRWY");
-    linkPD("pro", "dLWY");
-
-    linkSC("HY",  "user");
-    linkSC("RSP", "user");
-    linkSC("RSR", "user");
-    linkSC("RSY", "user");
-    linkSC("LSP", "user");
-    linkSC("LSR", "user");
-    linkSC("LSY", "user");
-    linkSC("REP", "user");
-    linkSC("LEP", "user");
-    linkSC("RWY", "user");
-    linkSC("LWY", "user");
 
     //Setup Logging
-    //addLogger("log1 5 200", "File", "log.txt");
-    //linkLS("log1", "RSP", "value");
-    //linkLS("log1", "LSP", "value");
-    */
+    addLogger("log1 5 200", "File", "log.txt");
+    linkLS("log1", "RMx", "value");
+    linkLS("log1", "RMy", "value");
+    linkLS("log1", "RFz", "value");
     
     /* END CONFIG SECTION */
 
+    //startDebug();
     startHW();
     startProtocol();
     startDevice();

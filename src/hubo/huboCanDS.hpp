@@ -2,8 +2,11 @@
 #define ACES_HUBOCAN_HPP
 
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <sys/time.h>
 #include <assert.h>
+#include <rtt/Logger.hpp>
 #include "can4linux.h"  //Include the can4linux data structures
 
 //For reference, the canmsg_t data structure from can4linux
@@ -51,8 +54,17 @@ namespace Hubo{
                    unsigned long r1, unsigned long r2,
                    unsigned long r3, unsigned long r4,
                    unsigned long r5);
+            unsigned long getID();
+            huboCanType getType();
+            cmdType getCmd();
 
-            //void printMe();
+            unsigned long getR1();
+            unsigned long getR2();
+            unsigned long getR3();
+            unsigned long getR4();
+            unsigned long getR5();
+
+            void printme();
             static unsigned long bitStuff15byte(long bs);
             static unsigned long bitStuff3byte(long bs);
             static unsigned long bitStuffCalibratePacket(long bs);
