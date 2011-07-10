@@ -91,18 +91,20 @@ namespace Hubo{
         cm->flags = 0;
         cm->cob = 0;
         //cm->timestamp = 0;
-        cm->id = (unsigned char) type;
         
         switch(type){
             //How to construct the outbound packets
             case CMD_TXDF:
+		cm->id = (unsigned char) type;
                 processCMD(cm);
                 break;
             case SEND_SENSOR_TXDF:
+		cm->id = (unsigned char) type;
                 cm->length = 1;
                 cm->data[0] = 0;
                 break;
             case REF_TXDF:
+		cm->id = id + (unsigned char) type;
                 processREF(cm);
                 break;
             //Inbound packet types are not allowed here, and represent an error

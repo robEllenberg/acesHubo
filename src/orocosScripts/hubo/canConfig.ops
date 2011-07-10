@@ -9,18 +9,19 @@ program config {
     dRHip1.setHarmonic(1, 160);
 
     //Cluster all Gain sets
+    ch1.genPacket(1, 8, "0x00010A0A", "0x0A8445FD");
     dRHip1.setGains("Position", 0, 200, 0, 500);
     dRHip1.setGains("Position", 1, 15, 0, 15);
 
     //Cluster all calibrates
-    dRHip1.setZero(0, -18100, true);
-    dRHip1.setZero(1,  13000, false);
+    //dRHip1.setZero(0, -18100, true);
+    //dRHip1.setZero(1,  13000, false);
 
     //Cluster pairs of HIPenable/run commands
-    dRHip1.HIPenable();
-    dRHip1.run();
-    dRArm1.HIPenable();
-    dRArm1.run();
+    //dRHip1.HIPenable();
+    //dRHip1.run();
+    //dRArm1.HIPenable();
+    //dRArm1.run();
 
     //Null the Sensors
 

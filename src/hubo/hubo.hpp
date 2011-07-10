@@ -41,7 +41,7 @@
 
 
 //Set to 1 for file I/O mode, and 0 for the actual PCM3680 driver
-#define TESTMODE 1
+#define TESTMODE 0
 
 namespace Hubo{
     const int ctrlSize = 5;

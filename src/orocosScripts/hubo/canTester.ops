@@ -2,7 +2,7 @@ program main {
     var bool sampling = false;
     var int baseport = 2827;
 
-    addHardware("ch1 90 1000","HuboCAN","./testfile 1000");
+    addHardware("ch1 90 1000","HuboCAN","/dev/can0 1000");
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
@@ -34,10 +34,12 @@ program main {
     //addController("config 10 10", "User Program", "canConfig.ops config");
 
     //Setup Logging
+    /*
     addLogger("log1 5 200", "File", "log.txt");
     linkLS("log1", "RMx", "value");
     linkLS("log1", "RMy", "value");
     linkLS("log1", "RFz", "value");
+    */
     
     /* END CONFIG SECTION */
 
