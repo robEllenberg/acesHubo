@@ -45,7 +45,7 @@ namespace ACES{
     template <class T>
     Message<T>::~Message(){
         while(wordList.size()){
-            delete wordList.back;
+            delete wordList.back();
             wordList.pop_back();
         }
     }
