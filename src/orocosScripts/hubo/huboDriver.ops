@@ -130,5 +130,6 @@ program main {
     startState();
     startController();
     startLogger();
-    scripting.loadPrograms("huboConfig.ops")
+    scripting.loadPrograms("huboConfig.ops");
+    scripting.loadPrograms("huboController.ops");
 }
