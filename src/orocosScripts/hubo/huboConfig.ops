@@ -18,7 +18,7 @@ program internals {
 
 	//Defining internal properties for device dRUpperLeg, node 0
 
-	dRUpperLeg.setDirection(0, -1);
+	dRUpperLeg.setDirection(0, 1);
 	dRUpperLeg.setGearRatio(0, 16, 20);
 	dRUpperLeg.setHarmonic(0,160);
 	dRUpperLeg.setEncoderSize(0,4000);
@@ -30,16 +30,23 @@ program internals {
 	dRUpperLeg.setHarmonic(0,160);
 	dRUpperLeg.setEncoderSize(0,4000);
 
+	//Defining internal properties for device dRKnee, node 0
+
+	dRKnee.setDirection(0, 1);
+	dRKnee.setGearRatio(0, 16, 16);
+	dRKnee.setHarmonic(0,160);
+	dRKnee.setEncoderSize(0,4000);
+
 	//Defining internal properties for device dRAnkle, node 0
 
-	dRAnkle.setDirection(0, 1);
+	dRAnkle.setDirection(0, -1);
 	dRAnkle.setGearRatio(0, 10, 25);
 	dRAnkle.setHarmonic(0,100);
 	dRAnkle.setEncoderSize(0,4000);
 
 	//Defining internal properties for device dRAnkle, node 1
 
-	dRAnkle.setDirection(1, -1);
+	dRAnkle.setDirection(1, 1);
 	dRAnkle.setGearRatio(1, 324, 1024);
 	dRAnkle.setHarmonic(1,100);
 	dRAnkle.setEncoderSize(1,4000);
@@ -53,14 +60,14 @@ program internals {
 
 	//Defining internal properties for device dLHipYR, node 1
 
-	dLHipYR.setDirection(1, 1);
+	dLHipYR.setDirection(1, -1);
 	dLHipYR.setGearRatio(1, 324, 1024);
 	dLHipYR.setHarmonic(1,160);
 	dLHipYR.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dLUpperLeg, node 0
 
-	dLUpperLeg.setDirection(0, 1);
+	dLUpperLeg.setDirection(0, 1); 
 	dLUpperLeg.setGearRatio(0, 16, 20);
 	dLUpperLeg.setHarmonic(0,160);
 	dLUpperLeg.setEncoderSize(0,4000);
@@ -72,16 +79,23 @@ program internals {
 	dLUpperLeg.setHarmonic(0,160);
 	dLUpperLeg.setEncoderSize(0,4000);
 
+	//Defining internal properties for device dLKnee, node 0
+
+	dLKnee.setDirection(0, -1);
+	dLKnee.setGearRatio(0, 16, 16);
+	dLKnee.setHarmonic(0,160);
+	dLKnee.setEncoderSize(0,4000);
+
 	//Defining internal properties for device dLAnkle, node 0
 
-	dLAnkle.setDirection(0, -1);
+	dLAnkle.setDirection(0, 1);
 	dLAnkle.setGearRatio(0, 10, 25);
 	dLAnkle.setHarmonic(0,100);
 	dLAnkle.setEncoderSize(0,4000);
 
 	//Defining internal properties for device dLAnkle, node 1
 
-	dLAnkle.setDirection(1, -1);
+	dLAnkle.setDirection(1, 1);
 	dLAnkle.setGearRatio(1, 324, 1024);
 	dLAnkle.setHarmonic(1,100);
 	dLAnkle.setEncoderSize(1,4000);
@@ -212,6 +226,25 @@ program internals {
 	dHip.setHarmonic(0,100);
 	dHip.setEncoderSize(0,4000);
 	*/
+}
+
+program instant {
+    dRHipYR.instantTrigger = true;
+    dRUpperLeg.instantTrigger = true;
+    dRAnkle.instantTrigger = true;
+    dLHipYR.instantTrigger = true;
+    dLUpperLeg.instantTrigger = true;
+    dLAnkle.instantTrigger = true;
+    dRKnee.instantTrigger = true;
+    dLKnee.instantTrigger = true;
+    dRShoulderPR.instantTrigger = true;
+    dRUpperArm.instantTrigger = true;
+    dLShoulderPR.instantTrigger = true;
+    dLUpperArm.instantTrigger = true;
+    //dRWrist.instantTrigger = true;
+    //dLWrist.instantTrigger = true;
+    //dNeck.instantTrigger = true;
+    //dHip.instantTrigger = true;
 }
 
 program gains {
