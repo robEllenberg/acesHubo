@@ -1084,7 +1084,7 @@ namespace Hubo{
                           *((MotorCredentials*)credentials)->getGearRatio(i)
                           *((MotorCredentials*)credentials)->getEncoderSize(i);
                     temp[i] =
-                        canMsg::bitStuff15byte((long)(setPoint[i]*dir*ppr/360.));
+                        canMsg::bitStuff15byte((long)((setPoint[i]*RAD2DEG)*dir*ppr/360.));
                 }
                 break;
             case 3: //Three Channel Motor Controllers - Wrists & Neck
@@ -1093,7 +1093,7 @@ namespace Hubo{
                     ppr = ((MotorCredentials*)credentials)->getHarmonic(i)
                           *((MotorCredentials*)credentials)->getGearRatio(i)
                           *((MotorCredentials*)credentials)->getEncoderSize(i);
-                    temp[i] = setPoint[i]*dir*ppr/360.;
+                    temp[i] = (setPoint[i]*RAD2DEG)*dir*ppr/360.;
                 }
                 break;
             case 2: //Two Channel Motor Controllers - Limbs
@@ -1103,7 +1103,7 @@ namespace Hubo{
                           *((MotorCredentials*)credentials)->getGearRatio(i)
                           *((MotorCredentials*)credentials)->getEncoderSize(i);
                     temp[i] =
-                       canMsg::bitStuff3byte((long)(setPoint[i]*dir*ppr/360.));
+                       canMsg::bitStuff3byte((long)((setPoint[i]*RAD2DEG)*dir*ppr/360.));
                 }
                 break;
             default:

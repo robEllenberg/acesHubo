@@ -213,14 +213,16 @@ namespace ACES{
     }
 
     bool FlexibleScript::getStateVector(bool echo){
+	char buf[1024];
         curMap = new std::map<std::string, void*>;
-        float value;
-        scriptFile >> value;
+        scriptFile.getline(buf, 1024);
         if(not scriptFile.eof() ){
-            (*curMap)[ states[0] ] = new float(value);
-            for(int i = 1; i < states.size(); i++){  
+            std::string line(buf);
+            istringstream lineStream(line);
+            for(int i = 0; i < states.size(); i++){  
                 //offset = it+i;
-                scriptFile >> value;
+                float value;
+                lineStream >> value;
                 (*curMap)[ states[i] ] = new float(value);
                 if(echo){
                     RTT::Logger::log() << value << ", ";
