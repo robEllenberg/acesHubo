@@ -503,8 +503,8 @@ namespace Hubo{
             rxSize = read(channel, &rxBuffer, canBuffSize);
         #endif
 
-        ostringstream packet (ostringstream::out);
-        packet << "Reception of size " << rxSize << ": ";
+        //ostringstream packet (ostringstream::out);
+        //packet << "Reception of size " << rxSize << ": ";
         for(int i = 0; i < rxSize; i++){
             canmsg_t* msg = new canmsg_t;
             msg->flags = rxBuffer[i].flags;
@@ -514,14 +514,14 @@ namespace Hubo{
             msg->length = rxBuffer[i].length;
             for(int j = 0; j < msg->length; j++){
                 msg->data[j] = rxBuffer[i].data[j];
-                packet << "0x" << std::setbase(16) << (int)(msg->data[j]) << ", ";
+                //packet << "0x" << std::setbase(16) << (int)(msg->data[j]) << ", ";
             }
-            packet << std::endl;
+            //packet << std::endl;
             ACES::Word<canmsg_t*>* w = new ACES::Word<canmsg_t*>(msg);
             txUpStream.write(w);
         }
-        packet << "$";
-        RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
+        //packet << "$";
+        //RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
     }
 
 /*
