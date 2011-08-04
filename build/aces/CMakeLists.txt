@@ -69,7 +69,7 @@ rosbuild_add_library(aces-testsuite ../src/testsuite.cpp)
 
 rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
 #                               ../src/hubo/huboVia.cpp
-                               ../src/hubo/huboCanDS.cpp
+                               ../src/hubo/huboCanDS.cpp)
 #                               ../src/hubo/huboTxPacket.cpp)
 #rosbuild_add_compile_flags(aces-hubo -pg)
 #rosbuild_add_link_flags(aces-hubo -pg)
