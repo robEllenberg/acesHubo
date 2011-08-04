@@ -152,9 +152,9 @@ namespace ACES{
         }
         
         #ifdef HUBO        
-        if (type == "Hubo") {
-            h = (RTT::TaskContext*) new HuboVia::Hardware(cfg, args);
-        }
+        //if (type == "Hubo") {
+        //    h = (RTT::TaskContext*) new HuboVia::Hardware(cfg, args);
+        //}
         if (type == "HuboCAN") {
             h = (RTT::TaskContext*) new Hubo::CANHardware(cfg, args);
         }
@@ -195,9 +195,9 @@ namespace ACES{
         }
         #endif
         #ifdef HUBO 
-        if ( type == "Hubo"){
-            p = (RTT::TaskContext*) new HuboVia::Protocol(cfg, args);
-        } 
+        //if ( type == "Hubo"){
+        //    p = (RTT::TaskContext*) new HuboVia::Protocol(cfg, args);
+        //} 
         if (type == "HuboCAN"){
             p = (RTT::TaskContext*) new Hubo::Protocol(cfg, args);
         }
@@ -243,9 +243,9 @@ namespace ACES{
         }
         #endif
         #ifdef HUBO
-        if (type1 == "Hubo"){
-            d = (RTT::TaskContext*) new HuboVia::Device(cfg, args);
-        }
+        //if (type1 == "Hubo"){
+        //    d = (RTT::TaskContext*) new HuboVia::Device(cfg, args);
+        //}
         if (type1 == "HuboCAN"){
             if(type2 == "Motor"){
                 d = (RTT::TaskContext*) new Hubo::MotorDevice(cfg, args);
