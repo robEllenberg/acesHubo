@@ -1,0 +1,29 @@
+program defineController
+{
+	addController("ybscript 90 100","Script","100hz.txt");
+
+	linkSC("RHY","ybscript");
+	linkSC("RHR","ybscript");
+	linkSC("RHP","ybscript");
+	linkSC("RKP","ybscript");
+	linkSC("RAP","ybscript");
+	linkSC("RAR","ybscript");
+	linkSC("LHY","ybscript");
+	linkSC("LHR","ybscript");
+	linkSC("LHP","ybscript");
+	linkSC("LKP","ybscript");
+	linkSC("LAP","ybscript");
+	linkSC("LAR","ybscript");
+
+    //linkHC("ch1", "ybscript");
+/*
+	linkSC("RSP","ybscript");
+	linkSC("RSR","ybscript");
+	linkSC("RSY","ybscript");
+	linkSC("REB","ybscript");
+	linkSC("LSP","ybscript");
+	linkSC("LSR","ybscript");
+	linkSC("LSY","ybscript");
+	linkSC("LEB","ybscript");
+*/
+}

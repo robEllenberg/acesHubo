@@ -25,7 +25,9 @@ namespace ACES{
 
     Controller::Controller(std::string cfg, std::string args)
       : taskCfg(cfg),
-        RTT::TaskContext(name)
+        RTT::TaskContext(name),
+        packetsPerSP(0),
+        packetCounter(0)
     {
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to State) Transmission");
@@ -45,6 +47,10 @@ namespace ACES{
                            RTT::OwnThread).doc("Grab the value of a state")
                            .arg("state", "State to grab value from")
                            .arg("attribute", "Quantity on state to grab");
+
+        this->addAttribute("packetsPerSP", packetsPerSP);
+        this->ports()->addPort("packetReport", packetReporter).doc(
+               "Port for Hardware to report reception of setpoints");
 
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name ));
@@ -80,11 +86,30 @@ namespace ACES{
     }
 
     void Controller::updateHook(){
-        if(getStateVector()){
-            modStateVector();
-            txDownStream.write(curMap);
-            curMap = NULL;
+        if(lastTXcleared()){
+            if(getStateVector()){
+                modStateVector();
+                txDownStream.write(curMap);
+                curMap = NULL;
+            }
         }
+    }
+
+    bool Controller::lastTXcleared(){
+        if(not packetsPerSP){   //if this is >0, we should be paying attention to it
+            return true;
+        }
+        int in = 0;
+        while(packetReporter.read(in) == RTT::NewData){
+            packetCounter += in;
+            in = 0;
+        }
+        if(packetCounter >= packetsPerSP){
+            packetCounter = 0;
+            return true;
+        }
+
+        return false;
     }
 
     float Controller::checkCtrl(std::string ctrl){
@@ -213,14 +238,16 @@ namespace ACES{
     }
 
     bool FlexibleScript::getStateVector(bool echo){
+	char buf[1024];
         curMap = new std::map<std::string, void*>;
-        float value;
-        scriptFile >> value;
+        scriptFile.getline(buf, 1024);
         if(not scriptFile.eof() ){
-            (*curMap)[ states[0] ] = new float(value);
-            for(int i = 1; i < states.size(); i++){  
+            std::string line(buf);
+            istringstream lineStream(line);
+            for(int i = 0; i < states.size(); i++){  
                 //offset = it+i;
-                scriptFile >> value;
+                float value;
+                lineStream >> value;
                 (*curMap)[ states[i] ] = new float(value);
                 RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
             }

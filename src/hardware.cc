@@ -60,6 +60,7 @@ namespace ACES {
                                    << ") got DS"
                                    << RTT::endlog();
                 txBus(dsIn);
+                reportTransmission(dsIn);
             }
         }
         rxBus();
@@ -76,6 +77,14 @@ namespace ACES {
             }
         }
         
+    }
+
+    template<class T>
+    void Hardware<T>::reportTransmission(Message<T>* m){
+        Word<T>* w = m->peek();
+        //if(w->getMode() == ACES::SET){
+            packetReporter.write(1);
+        //}
     }
 
     template <class T>

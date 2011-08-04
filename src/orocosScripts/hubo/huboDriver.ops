@@ -7,22 +7,22 @@ program main {
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
-	//addDevice("dNeck 20 2","HuboCAN Motor", "0x22 3");
-	addDevice("dLAnkle 20 2","HuboCAN Motor", "0x7 2");
-	addDevice("dLHipYR 20 2","HuboCAN Motor", "0x4 2");
-	addDevice("dLShoulderPR 20 2","HuboCAN Motor", "0xA 2");
-	addDevice("dLUpperArm 20 2","HuboCAN Motor", "0xB 2");
-	addDevice("dLUpperLeg 20 2","HuboCAN Motor", "0x5 2");
-	addDevice("dLKnee 20 2","HuboCAN Motor", "0x6 2");
-	//addDevice("dLWrist 20 2","HuboCAN Motor", "0x21 3");
-	//addDevice("dNeck 20 2","HuboCAN Motor", "0x22 3");
-	addDevice("dRAnkle 20 2","HuboCAN Motor", "0x3 2");
-	addDevice("dRHipYR 20 2","HuboCAN Motor", "0x0 2");
-	addDevice("dRShoulderPR 20 2","HuboCAN Motor", "0x8 2");
-	addDevice("dRUpperArm 20 2","HuboCAN Motor", "0x9 2");
-	addDevice("dRUpperLeg 20 2","HuboCAN Motor", "0x1 2");
-	addDevice("dRKnee 20 2","HuboCAN Motor", "0x2 2");
-	//addDevice("dRWrist 20 2","HuboCAN Motor", "0x20 3");
+	//addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
+	addDevice("dLAnkle 10 200","HuboCAN Motor", "0x7 2");
+	addDevice("dLHipYR 11 200","HuboCAN Motor", "0x4 2");
+	//addDevice("dLShoulderPR 20 200","HuboCAN Motor", "0xA 2");
+	//addDevice("dLUpperArm 20 200","HuboCAN Motor", "0xB 2");
+	addDevice("dLUpperLeg 12 200","HuboCAN Motor", "0x5 2");
+	addDevice("dLKnee 13 200","HuboCAN Motor", "0x6 2");
+	//addDevice("dLWrist 20 200","HuboCAN Motor", "0x21 3");
+	//addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
+	addDevice("dRAnkle 14 200","HuboCAN Motor", "0x3 2");
+	addDevice("dRHipYR 15 200","HuboCAN Motor", "0x0 2");
+	//addDevice("dRShoulderPR 20 200","HuboCAN Motor", "0x8 2");
+	//addDevice("dRUpperArm 20 200","HuboCAN Motor", "0x9 2");
+	addDevice("dRUpperLeg 16 200","HuboCAN Motor", "0x1 2");
+	addDevice("dRKnee 17 200","HuboCAN Motor", "0x2 2");
+	//addDevice("dRWrist 20 200","HuboCAN Motor", "0x20 3");
 
 	//linkPD("pro1","dNeck");
 	linkPD("pro1","dLAnkle");
@@ -41,50 +41,53 @@ program main {
 	linkPD("pro1","dRKnee");
 	//linkPD("pro1","dRWrist");
 
-	addState("RHY 10 2", "Hubo", "0", sampling, baseport + 0);
-	addState("RHR 10 2", "Hubo", "1", sampling, baseport + 1);
-	addState("RHP 10 2", "Hubo", "0", sampling, baseport + 2);
-	addState("RKN 10 2", "Hubo", "0", sampling, baseport + 3);
-	addState("RAP 10 2", "Hubo", "0", sampling, baseport + 4);
-	addState("RAR 10 2", "Hubo", "1", sampling, baseport + 5);
-	addState("LHY 10 2", "Hubo", "0", sampling, baseport + 6);
-	addState("LHR 10 2", "Hubo", "1", sampling, baseport + 7);
-	addState("LHP 10 2", "Hubo", "0", sampling, baseport + 8);
-	addState("LKN 10 2", "Hubo", "0", sampling, baseport + 9);
-	addState("LAP 10 2", "Hubo", "0", sampling, baseport + 10);
-	addState("LAR 10 2", "Hubo", "1", sampling, baseport + 11);
-	addState("RSP 10 2", "Hubo", "0", sampling, baseport + 12);
-	addState("RSR 10 2", "Hubo", "1", sampling, baseport + 13);
-	addState("RSY 10 2", "Hubo", "0", sampling, baseport + 14);
-	addState("REB 10 2", "Hubo", "1", sampling, baseport + 15);
-	addState("LSP 10 2", "Hubo", "0", sampling, baseport + 16);
-	addState("LSR 10 2", "Hubo", "1", sampling, baseport + 17);
-	addState("LSY 10 2", "Hubo", "0", sampling, baseport + 18);
-	addState("LEB 10 2", "Hubo", "1", sampling, baseport + 19);
+	addState("RHY 20 200", "Hubo", "0", sampling, baseport + 0);
+	addState("RHR 21 200", "Hubo", "1", sampling, baseport + 1);
+	addState("RHP 22 200", "Hubo", "0", sampling, baseport + 2);
+	addState("RKP 23 200", "Hubo", "0", sampling, baseport + 3);
+	addState("RAP 24 200", "Hubo", "0", sampling, baseport + 4);
+	addState("RAR 25 200", "Hubo", "1", sampling, baseport + 5);
+	addState("LHY 26 200", "Hubo", "0", sampling, baseport + 6);
+	addState("LHR 27 200", "Hubo", "1", sampling, baseport + 7);
+	addState("LHP 28 200", "Hubo", "0", sampling, baseport + 8);
+	addState("LKP 29 200", "Hubo", "0", sampling, baseport + 9);
+	addState("LAP 30 200", "Hubo", "0", sampling, baseport + 10);
+	addState("LAR 31 200", "Hubo", "1", sampling, baseport + 11);
 /*
-	addState("RWY 10 2", "Hubo", "0", sampling, baseport + 20);
-	addState("RW1 10 2", "Hubo", "1", sampling, baseport + 21);
-	addState("RW2 10 2", "Hubo", "2", sampling, baseport + 22);
-	addState("LWY 10 2", "Hubo", "0", sampling, baseport + 23);
-	addState("LW1 10 2", "Hubo", "1", sampling, baseport + 24);
-	addState("LW2 10 2", "Hubo", "2", sampling, baseport + 25);
-	addState("NKY 10 2", "Hubo", "0", sampling, baseport + 26);
-	addState("NK1 10 2", "Hubo", "1", sampling, baseport + 27);
-	addState("NK2 10 2", "Hubo", "2", sampling, baseport + 28);
-	addState("WST 10 2", "Hubo", "0", sampling, baseport + 29);
+	addState("RSP 10 200", "Hubo", "0", sampling, baseport + 12);
+	addState("RSR 10 200", "Hubo", "1", sampling, baseport + 13);
+	addState("RSY 10 200", "Hubo", "0", sampling, baseport + 14);
+	addState("REB 10 200", "Hubo", "1", sampling, baseport + 15);
+	addState("LSP 10 200", "Hubo", "0", sampling, baseport + 16);
+	addState("LSR 10 200", "Hubo", "1", sampling, baseport + 17);
+	addState("LSY 10 200", "Hubo", "0", sampling, baseport + 18);
+	addState("LEB 10 200", "Hubo", "1", sampling, baseport + 19);
+*/
+/*
+	addState("RWY 10 200", "Hubo", "0", sampling, baseport + 20);
+	addState("RW1 10 200", "Hubo", "1", sampling, baseport + 21);
+	addState("RW2 10 200", "Hubo", "2", sampling, baseport + 22);
+	addState("LWY 10 200", "Hubo", "0", sampling, baseport + 23);
+	addState("LW1 10 200", "Hubo", "1", sampling, baseport + 24);
+	addState("LW2 10 200", "Hubo", "2", sampling, baseport + 25);
+	addState("NKY 10 200", "Hubo", "0", sampling, baseport + 26);
+	addState("NK1 10 200", "Hubo", "1", sampling, baseport + 27);
+	addState("NK2 10 200", "Hubo", "2", sampling, baseport + 28);
+	addState("WST 10 200", "Hubo", "0", sampling, baseport + 29);
 */
 	linkDS("dRHipYR","RHY");
 	linkDS("dRHipYR","RHR");
 	linkDS("dRUpperLeg","RHP");
-	linkDS("dRKnee","RKN");
+	linkDS("dRKnee","RKP");
 	linkDS("dRAnkle","RAP");
 	linkDS("dRAnkle","RAR");
 	linkDS("dLHipYR","LHY");
 	linkDS("dLHipYR","LHR");
 	linkDS("dLUpperLeg","LHP");
-	linkDS("dLKnee","LKN");
+	linkDS("dLKnee","LKP");
 	linkDS("dLAnkle","LAP");
 	linkDS("dLAnkle","LAR");
+/*
 	linkDS("dRShoulderPR","RSP");
 	linkDS("dRShoulderPR","RSR");
 	linkDS("dRUpperArm","RSY");
@@ -93,6 +96,7 @@ program main {
 	linkDS("dLShoulderPR","LSR");
 	linkDS("dLUpperArm","LSY");
 	linkDS("dLUpperArm","LEB");
+*/
 /*
 	linkDS("dRWrist","RWY");
 	linkDS("dRWrist","RW1");
@@ -131,5 +135,6 @@ program main {
     startState();
     startController();
     startLogger();
-    scripting.loadPrograms("huboConfig.ops")
+    scripting.loadPrograms("huboConfig.ops");
+    scripting.loadPrograms("huboController.ops");
 }
