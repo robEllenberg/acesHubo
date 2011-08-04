@@ -43,16 +43,16 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/credentials.cpp src/state/state.cpp
                      src/device.cpp src/protocol.cpp
                      src/hardware.cpp src/controller.cpp src/logger.cpp)
-rosbuild_add_compile_flags(aces-common -pg)
-rosbuild_add_link_flags(aces-common -pg)
+#rosbuild_add_compile_flags(aces-common -pg)
+#rosbuild_add_link_flags(aces-common -pg)
 
-#add_subdirectory(robotis)
+add_subdirectory(robotis)
 #add_subdirectory(ik)
-#add_subdirectory(flexscanner)
+add_subdirectory(flexscanner)
                     
 add_definitions(-DTESTSUITE)
-#add_definitions(-DROBOTIS)
 add_definitions(-DHUBO)
+#add_definitions(-DROBOTIS)
 #add_definitions(-DWEBOTS)
 #add_definitions(-DOMNIBOT)
 
@@ -60,19 +60,19 @@ rosbuild_add_library(aces-dispatcher src/dispatcher.cpp)
 target_link_libraries(aces-dispatcher aces-testsuite)
 #target_link_libraries(aces-dispatcher aces-robotis)
 #target_link_libraries(aces-dispatcher aces-webots)
-rosbuild_add_compile_flags(aces-dispatcher -pg)
-rosbuild_add_link_flags(aces-dispatcher -pg)
+#rosbuild_add_compile_flags(aces-dispatcher -pg)
+#rosbuild_add_link_flags(aces-dispatcher -pg)
 
 rosbuild_add_library(aces-testsuite ../src/testsuite.cpp)
-rosbuild_add_compile_flags(aces-testsuite -pg)
-rosbuild_add_link_flags(aces-testsuite -pg)
+#rosbuild_add_compile_flags(aces-testsuite -pg)
+#rosbuild_add_link_flags(aces-testsuite -pg)
 
 rosbuild_add_library(aces-hubo ../src/hubo/hubo.cpp
-                               ../src/hubo/huboVia.cpp
+#                               ../src/hubo/huboVia.cpp
                                ../src/hubo/huboCanDS.cpp
-                               ../src/hubo/huboTxPacket.cpp)
-rosbuild_add_compile_flags(aces-hubo -pg)
-rosbuild_add_link_flags(aces-hubo -pg)
+#                               ../src/hubo/huboTxPacket.cpp)
+#rosbuild_add_compile_flags(aces-hubo -pg)
+#rosbuild_add_link_flags(aces-hubo -pg)
 
 #rosbuild_add_library(aces-webots ../src/webots.cpp)
 #target_link_libraries(aces-webots Controller)
@@ -84,6 +84,9 @@ rosbuild_add_link_flags(aces-hubo -pg)
 #target_link_libraries(omnibot aces-common)
 
 rosbuild_add_executable(aces-launcher ../src/launcher.cpp)
+#rosbuild_add_compile_flags(aces-launcher -pg)
+#rosbuild_add_link_flags(aces-launcher -pg)
+
 target_link_libraries(aces-launcher aces-common)
 target_link_libraries(aces-launcher aces-dispatcher)
 target_link_libraries(aces-launcher aces-testsuite)
@@ -93,5 +96,5 @@ target_link_libraries(aces-launcher aces-hubo)
 #target_link_libraries(aces-launcher minihubo)
 #target_link_libraries(aces-launcher omnibot)
 target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)
-rosbuild_add_compile_flags(aces-launcher -pg)
-rosbuild_add_link_flags(aces-launcher -pg)
+#rosbuild_add_compile_flags(aces-launcher -pg)
+#rosbuild_add_link_flags(aces-launcher -pg)

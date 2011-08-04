@@ -40,6 +40,7 @@
 #include <boost/asio.hpp>
 
 #include "protocol.hpp"
+#include "device.hpp"
 #include "message.hpp"
 #include "state/state.hpp"
 #include "hardware.hpp"
