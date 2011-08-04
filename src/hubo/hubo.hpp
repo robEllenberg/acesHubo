@@ -62,6 +62,8 @@ namespace Hubo{
             //bool getCCW(int chan);
             unsigned int getHarmonic(int chan);
             float getGearRatio(int chan);
+            int getZeroTicks(int chan);
+            bool getZeroCCW(int chan);
         protected:
             //bool setPPR(int chan, float proposedPPR);
             bool setDirection(int chan, float dir);
@@ -70,6 +72,7 @@ namespace Hubo{
             //bool setOffsetPulse(int chan, int offset);
             //bool setRevOffset(int chan, int offset);
             bool setHarmonic(int chan, int harmonic);
+            bool setZero(int chan, int ticks, bool ccw);
             //bool setCCW(int chan, bool CCW);
         private:
             //int boardNum;       //! Identifying number for the motor controller
@@ -81,6 +84,8 @@ namespace Hubo{
             unsigned int drivenTeeth[ctrlSize];
             unsigned int encoderSize[ctrlSize];
             unsigned int harmonic[ctrlSize];
+            int zeroTicks[ctrlSize];
+            bool zeroCCW[ctrlSize];
             //int offsetPulse[ctrlSize];
             //int revOffset[ctrlSize];
             //bool CCW[ctrlSize];
@@ -125,8 +130,8 @@ namespace Hubo{
             bool startHook();
             void stopHook();
             //virtual bool processUS(ACES::Word<canmsg_t*>* w);
-            bool genPacket(int ID, int len, 
-                           std::string lower, std::string upper);
+            bool genPacket(int ID, int len, std::string packet);
+                           
         protected:
             std::string fd;
             int rate;
@@ -177,6 +182,7 @@ namespace Hubo{
             //bool setRevOffset(int chan, int offset);
             //bool setCCW(int chan, bool CCW);
             bool setZero(int chan, int ticks, bool ccw);
+            bool programZero(int chan);
             //bool setCalibrate(int channel);
             bool setHIPenable();
             bool setRunCmd();

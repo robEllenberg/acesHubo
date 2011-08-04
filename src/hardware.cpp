@@ -26,9 +26,19 @@ namespace ACES {
       taskCfg(cfg),
       RTT::TaskContext(name)
     {
+        this->ports()->addPort("packetReport", packetReporter).doc(
+               "Port to report transmission of setpoints to controller");
     }
 
     bool ProtoHardware::subscribeController(RTT::TaskContext* c){
+        this->connectPeers(c);
+        RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
+        bool success;
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(200);
+        theirPort = (RTT::base::PortInterface*)c->ports()->getPort("packetReporter");
+        myPort = (RTT::base::PortInterface*)this->ports()->getPort("packetReporter");
+        success = myPort->connectTo(theirPort, policy);
+        assert(success);
         return true;
     }
 

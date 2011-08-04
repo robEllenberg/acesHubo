@@ -53,6 +53,7 @@ namespace ACES {
             ProtoHardware(std::string cfg, std::string args);
             bool subscribeProtocol(RTT::TaskContext* p);
             virtual bool subscribeController(RTT::TaskContext* c);
+            RTT::OutputPort<int> packetReporter;
     };
 
     template <class T>
@@ -61,6 +62,7 @@ namespace ACES {
         public:
             Hardware(std::string cfg, std::string args);
             void updateHook();
+            void reportTransmission(Message<T>*);
 
             virtual bool txBus(Message<T>* m);
             virtual void rxBus(int size=0);

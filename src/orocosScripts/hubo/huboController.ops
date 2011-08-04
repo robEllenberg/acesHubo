@@ -1,6 +1,6 @@
 program defineController
 {
-	addController("ybscript 90 5","Script","test2.txt");
+	addController("ybscript 90 100","Script","100hz.txt");
 
 	linkSC("RHY","ybscript");
 	linkSC("RHR","ybscript");
@@ -14,6 +14,9 @@ program defineController
 	linkSC("LKP","ybscript");
 	linkSC("LAP","ybscript");
 	linkSC("LAR","ybscript");
+
+    //linkHC("ch1", "ybscript");
+/*
 	linkSC("RSP","ybscript");
 	linkSC("RSR","ybscript");
 	linkSC("RSY","ybscript");
@@ -22,4 +25,5 @@ program defineController
 	linkSC("LSR","ybscript");
 	linkSC("LSY","ybscript");
 	linkSC("LEB","ybscript");
+*/
 }

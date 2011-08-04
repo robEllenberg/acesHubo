@@ -101,7 +101,7 @@ program internals {
 	dLAnkle.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dRShoulderPR, node 0
-
+    /*
 	dRShoulderPR.setDirection(0, 1);
 	dRShoulderPR.setGearRatio(0, 11, 16);
 	dRShoulderPR.setHarmonic(0,100);
@@ -155,6 +155,7 @@ program internals {
 	dLUpperArm.setGearRatio(1, 20, 24);
 	dLUpperArm.setHarmonic(1,100);
 	dLUpperArm.setEncoderSize(1,4000);
+    */
 
 	//Defining internal properties for device dRWrist, node 0
 	/*
@@ -226,21 +227,58 @@ program internals {
 	dHip.setHarmonic(0,100);
 	dHip.setEncoderSize(0,4000);
 	*/
+
+	//Specify Zeros for joints
+
+	dRHipYR.setZero(0,-18100,1);
+	dRHipYR.setZero(1,13000,0);
+	dRUpperLeg.setZero(0,8400,0);
+	dRKnee.setZero(0,-17600,0);
+	dRAnkle.setZero(0,-3000,0);
+	dRAnkle.setZero(1,30800,0);
+	dLHipYR.setZero(0,26100,0);
+	dLHipYR.setZero(1,-32600,1);
+	dLUpperLeg.setZero(0,-17500,1);
+	dLKnee.setZero(0,51900,1);
+	dLAnkle.setZero(0,-1600,1);
+	dLAnkle.setZero(1,-13200,1);
+    /*
+	dRShoulderPR.setZero(0,-35000,0);
+	dRShoulderPR.setZero(1,8000,0);
+	dRUpperArm.setZero(0,-30000,0);
+	dRUpperArm.setZero(1,80000,0);
+	dLShoulderPR.setZero(0,-10000,1);
+	dLShoulderPR.setZero(1,4000,1);
+	dLUpperArm.setZero(0,12000,1);
+	dLUpperArm.setZero(1,-72000,1);
+    */
+	/*
+	dRWrist.setZero(0,-72000,1);
+	dRWrist.setZero(1,0,0);
+	dRWrist.setZero(2,0,0);
+	dLWrist.setZero(0,0,0);
+	dLWrist.setZero(1,0,0);
+	dLWrist.setZero(2,0,0);
+	dNeck.setZero(0,0,0);
+	dNeck.setZero(1,0,0);
+	dNeck.setZero(2,0,0);
+	dHip.setZero(0,8000,1);
+	*/
 }
 
 program instant {
-    dRHipYR.instantTrigger = true;
+    //dRHipYR.instantTrigger = true;
     dRUpperLeg.instantTrigger = true;
-    dRAnkle.instantTrigger = true;
-    dLHipYR.instantTrigger = true;
+    //dRAnkle.instantTrigger = true;
+    //dLHipYR.instantTrigger = true;
     dLUpperLeg.instantTrigger = true;
-    dLAnkle.instantTrigger = true;
+    //dLAnkle.instantTrigger = true;
     dRKnee.instantTrigger = true;
     dLKnee.instantTrigger = true;
-    dRShoulderPR.instantTrigger = true;
-    dRUpperArm.instantTrigger = true;
-    dLShoulderPR.instantTrigger = true;
-    dLUpperArm.instantTrigger = true;
+    //dRShoulderPR.instantTrigger = true;
+    //dRUpperArm.instantTrigger = true;
+    //dLShoulderPR.instantTrigger = true;
+    //dLUpperArm.instantTrigger = true;
     //dRWrist.instantTrigger = true;
     //dLWrist.instantTrigger = true;
     //dNeck.instantTrigger = true;
@@ -262,6 +300,7 @@ program gains {
 	dLUpperLeg.setGains("Position", 0, 200, 0, 500);
 	dLAnkle.setGains("Position", 0, 200, 0, 500);
 	dLAnkle.setGains("Position", 1, 200, 0, 500);
+    /*
 	dRShoulderPR.setGains("Position", 0, 200, 0, 500);
 	dRShoulderPR.setGains("Position", 1, 200, 0, 500);
 	dRUpperArm.setGains("Position", 0, 200, 0, 500);
@@ -270,6 +309,7 @@ program gains {
 	dLShoulderPR.setGains("Position", 1, 200, 0, 500);
 	dLUpperArm.setGains("Position", 0, 200, 0, 500);
 	dLUpperArm.setGains("Position", 1, 200, 0, 500);
+    */
 	/*
 	dRWrist.setGains("Position", 0, 15, 0, 15);
 	dRWrist.setGains("Position", 1, 15, 0, 15);
@@ -285,40 +325,6 @@ program gains {
 }
 
 program zeros {
-	//Specify Zeros for joints
-
-	dRHipYR.setZero(0,-18100,1);
-	dRHipYR.setZero(1,13000,0);
-	dRUpperLeg.setZero(0,8400,0);
-	dRKnee.setZero(0,-17600,0);
-	dRAnkle.setZero(0,-3000,0);
-	dRAnkle.setZero(1,30800,0);
-	dLHipYR.setZero(0,26100,0);
-	dLHipYR.setZero(1,-32600,1);
-	dLUpperLeg.setZero(0,-17500,1);
-	dLKnee.setZero(0,51900,1);
-	dLAnkle.setZero(0,-1600,1);
-	dLAnkle.setZero(1,-13200,1);
-	dRShoulderPR.setZero(0,-35000,0);
-	dRShoulderPR.setZero(1,8000,0);
-	dRUpperArm.setZero(0,-30000,0);
-	dRUpperArm.setZero(1,80000,0);
-	dLShoulderPR.setZero(0,-10000,1);
-	dLShoulderPR.setZero(1,4000,1);
-	dLUpperArm.setZero(0,12000,1);
-	dLUpperArm.setZero(1,-72000,1);
-	/*
-	dRWrist.setZero(0,-72000,1);
-	dRWrist.setZero(1,0,0);
-	dRWrist.setZero(2,0,0);
-	dLWrist.setZero(0,0,0);
-	dLWrist.setZero(1,0,0);
-	dLWrist.setZero(2,0,0);
-	dNeck.setZero(0,0,0);
-	dNeck.setZero(1,0,0);
-	dNeck.setZero(2,0,0);
-	dHip.setZero(0,8000,1);
-	*/
 }
 
 program enable {
@@ -348,6 +354,7 @@ program enable {
 	dLAnkle.run();
 	dLAnkle.HIPenable();
 	dLAnkle.run();
+    /*
 	dRShoulderPR.HIPenable();
 	dRShoulderPR.run();
 	dRShoulderPR.HIPenable();
@@ -364,6 +371,7 @@ program enable {
 	dLUpperArm.run();
 	dLUpperArm.HIPenable();
 	dLUpperArm.run();
+    */
 	/*
 	dRWrist.HIPenable();
 	dRWrist.run();

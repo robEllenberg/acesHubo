@@ -32,7 +32,7 @@
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
-//#include <rtt/InputPort.hpp>
+#include <rtt/InputPort.hpp>
 #include <rtt/OutputPort.hpp>
 #include <rtt/scripting/Scripting.hpp>
 
@@ -51,14 +51,19 @@ namespace ACES{
             virtual void updateHook(); 
             virtual bool getStateVector(bool echo=0) = 0;
             virtual bool modStateVector();
+            bool lastTXcleared();
             void addCtrl(std::string dest, float sp);
             float checkCtrl(std::string ctrl);
             bool sendCtrl();
             float getSurface(std::string state, std::string attr);
 
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
+            RTT::InputPort<int> packetReporter;
         protected:
             std::map<std::string, void*>* curMap;
+        private:
+            int packetsPerSP;
+            int packetCounter;
     };
 
 /*

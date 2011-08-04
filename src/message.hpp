@@ -36,6 +36,7 @@ namespace ACES{
             void printme();
             int size();
             Word<T>* pop();
+            Word<T>* peek();
             Word<T>* push(Word<T>* item);
         protected:
             std::deque< Word<T>* > wordList;
@@ -62,6 +63,11 @@ namespace ACES{
         Word<T>* item = wordList.front();
         wordList.pop_front();
         return item;
+    }
+
+    template <class T>
+    Word<T>* Message<T>::peek(){
+        return wordList.front();
     }
 
     template <class T>

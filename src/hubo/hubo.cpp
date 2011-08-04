@@ -38,9 +38,8 @@ namespace Hubo{
             driveTeeth[i] = 1;
             drivenTeeth[i] = 1;
             encoderSize[i] = 0;
-            //offsetPulse[i] = 0;
-            //revOffset[i] = 0;
-            //CCW[i] = true;
+            zeroTicks[i] = 0;
+            zeroCCW[i] = false;
             harmonic[i] = 0;
         }
     }
@@ -77,6 +76,15 @@ namespace Hubo{
     bool MotorCredentials::setEncoderSize(int chan, int size){
         if(checkChannel(chan)){
             encoderSize[chan] = size;
+            return true;
+        }
+        return false;
+    }
+
+    bool MotorCredentials::setZero(int chan, int ticks, bool ccw){
+        if(checkChannel(chan)){
+            zeroTicks[chan] = ticks;
+	    zeroCCW[chan] = ccw;
             return true;
         }
         return false;
@@ -165,6 +173,20 @@ namespace Hubo{
         return 0;
     }
 
+    int MotorCredentials::getZeroTicks(int chan){
+        if(checkChannel(chan)){
+            return zeroTicks[chan];
+        }
+        return 0;
+    }
+
+    bool MotorCredentials::getZeroCCW(int chan){
+        if(checkChannel(chan)){
+            return zeroCCW[chan];
+        }
+        return false;
+    }
+
     bool MotorCredentials::checkChannel(int chan){
         if(chan >= 0 && chan < channels){
             return true;
@@ -190,20 +212,14 @@ namespace Hubo{
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << encoderSize[i] << ", ";
         }
-        /*
-        RTT::Logger::log() << "]\nOffset Pulse: [";
+        RTT::Logger::log() << "]\nZeroTicks: [";
         for(int i = 0; i < ctrlSize; i++){
-            RTT::Logger::log() << offsetPulse[i] << ", ";
+            RTT::Logger::log() << zeroTicks[i] << ", ";
         }
-        RTT::Logger::log() << "]\nRev Offset: [";
+        RTT::Logger::log() << "]\nZeroCCW: [";
         for(int i = 0; i < ctrlSize; i++){
-            RTT::Logger::log() << revOffset[i] << ", ";
+            RTT::Logger::log() << zeroCCW[i] << ", ";
         }
-        RTT::Logger::log() << "]\nCCW?: [";
-        for(int i = 0; i < ctrlSize; i++){
-            RTT::Logger::log() << CCW[i] << ", ";
-        }
-        */
         RTT::Logger::log() << "]\nGear Ratio: [";
         for(int i = 0; i < ctrlSize; i++){
             RTT::Logger::log() << (float)drivenTeeth[i]/(float)driveTeeth[i] << ", ";
@@ -328,8 +344,7 @@ namespace Hubo{
                                " CAN line")
                                .arg("ID", "Message ID")
                                .arg("len", "Message Length")
-                               .arg("b0123", "Lower Order Bytes - Hex String")
-                               .arg("b4567", "Upper Order Bytes - Hex String");
+                               .arg("packet", "Hex string containing packet content");
     }
 
     bool CANHardware::startHook(){
@@ -377,13 +392,12 @@ namespace Hubo{
     }
 
     bool CANHardware::genPacket(int ID, int len, 
-                                std::string lower, std::string upper)
+                                std::string packetContent)
     {
         ACES::Message<canmsg_t*> *m = new ACES::Message<canmsg_t*>();
-        unsigned int b0123 = 0, b4567 = 0;
-        std::istringstream u(upper), l(lower);
-        l >> std::setbase(16) >> b0123;
-        u >> std::setbase(16) >> b4567;
+        unsigned long long int packet = 0ULL;
+        std::istringstream pacContStream(packetContent);
+        pacContStream >> std::setbase(16) >> packet;
 
         canmsg_t* msg = new canmsg_t;
         msg->id = ID;
@@ -392,21 +406,21 @@ namespace Hubo{
         msg->length = len;
         switch(len){
             case 8:
-                msg->data[7] = ((b4567 & 0x000000FFu) >> (8*0));
+                msg->data[7] = ((packet & 0x00000000000000FFULL) >> (8*0));
             case 7:
-                msg->data[6] = ((b4567 & 0x0000FF00u) >> (8*1));
+                msg->data[6] = ((packet & 0x000000000000FF00ULL) >> (8*1));
             case 6:
-                msg->data[5] = ((b4567 & 0x00FF0000u) >> (8*2));
+                msg->data[5] = ((packet & 0x0000000000FF0000ULL) >> (8*2));
             case 5:
-                msg->data[4] = ((b4567 & 0xFF000000u) >> (8*3));
+                msg->data[4] = ((packet & 0x00000000FF000000ULL) >> (8*3));
             case 4:
-                msg->data[3] = ((b0123 & 0x000000FFu) >> (8*0));
+                msg->data[3] = ((packet & 0x000000FF00000000ULL) >> (8*4));
             case 3:
-                msg->data[2] = ((b0123 & 0x0000FF00u) >> (8*1));
+                msg->data[2] = ((packet & 0x0000FF0000000000ULL) >> (8*5));
             case 2:
-                msg->data[1] = ((b0123 & 0x00FF0000u) >> (8*2));
+                msg->data[1] = ((packet & 0x00FF000000000000ULL) >> (8*6));
             case 1:
-                msg->data[0] = ((b0123 & 0xFF000000u) >> (8*3));
+                msg->data[0] = ((packet & 0xFF00000000000000ULL) >> (8*7));
             case 0:
                 break;
             default:
@@ -705,26 +719,9 @@ namespace Hubo{
                            .arg("Ki", "Integral Gain")
                            .arg("Kd", "Derivative Gain");
 
-/*
-        this->addOperation("setOffsetPulse", &MotorDevice::setOffsetPulse, this,
-            RTT::OwnThread).doc("Set the gains for this controller")
-                           .arg("channel", "Channel number to set")
-                           .arg("offset", "The offset in encoder ticks");
-
-        this->addOperation("setRevOffset", &MotorDevice::setRevOffset, this,
-            RTT::OwnThread).doc("Set the gains for this controller")
-                           .arg("channel", "Channel number to set")
-                           .arg("offset", "The offset in encoder ticks");
-
-        this->addOperation("calibrate", &MotorDevice::setCalibrate, this,
-            RTT::OwnThread).doc("Send a calibreation pulse to the controller"
-                                " (zero the motor)")
-                           .arg("channel", "Channel number to send pulse on");
-        this->addOperation("setCCW", &MotorDevice::setCCW, this,
-            RTT::OwnThread).doc("Set the direction of rotation for calibration")
-                           .arg("channel", "Channel number to set")
-                           .arg("ccw", "Direction: true=ccw, false=cw");
-*/
+        this->addOperation("programZero", &MotorDevice::programZero, this,
+            RTT::OwnThread).doc("Set the harmonic drive ratio.")
+                           .arg("channel", "Channel number to set");
 
         this->addOperation("setZero", &MotorDevice::setZero, this,
             RTT::OwnThread).doc("Set the harmonic drive ratio.")
@@ -857,21 +854,12 @@ namespace Hubo{
         return ((MotorCredentials*)credentials)->setEncoderSize(chan, size);
     }
 
-/*
-    bool MotorDevice::setOffsetPulse(int chan, int offset){
-        return ((MotorCredentials*)credentials)->setOffsetPulse(chan, offset);
-    }
-
-    bool MotorDevice::setRevOffset(int chan, int offset){
-        return ((MotorCredentials*)credentials)->setRevOffset(chan, offset);
-    }
-
-    bool MotorDevice::setCCW(int chan, bool CCW){
-        return ((MotorCredentials*)credentials)->setCCW(chan, CCW);
-    }
-*/
     bool MotorDevice::setHarmonic(int chan, int harmonic){
         return ((MotorCredentials*)credentials)->setHarmonic(chan, harmonic);
+    }
+
+    bool MotorDevice::setZero(int chan, int ticks, bool ccw){
+        return ((MotorCredentials*)credentials)->setZero(chan, ticks, ccw);
     }
 
     bool MotorDevice::setSetPoint(int channel, float sp, bool instantTrigger){
@@ -976,10 +964,16 @@ namespace Hubo{
         return false;
     }
 
-    bool MotorDevice::setZero(int chan, int ticks, bool ccw){
-        canMsg c = buildZeroPacket(chan, ticks, ccw);
-        txDownStream.write( buildWord(c, chan) );
-        return true;
+    bool MotorDevice::programZero(int chan){
+        MotorCredentials* c = (MotorCredentials*)credentials;
+        if(c->checkChannel(chan)){
+            int ticks = c->getZeroTicks(chan);
+            bool ccw = c->getZeroCCW(chan);
+            canMsg c = buildZeroPacket(chan, ticks, ccw);
+            txDownStream.write( buildWord(c, chan) );
+            return true;
+        }
+        return false;
     }
 
     canMsg MotorDevice::buildZeroPacket(int c, int ticks, bool ccw){
