@@ -86,13 +86,13 @@ namespace ACES{
     }
 
     void Controller::updateHook(){
-        if(lastTXcleared()){
+        //if(lastTXcleared()){
             if(getStateVector()){
                 modStateVector();
                 txDownStream.write(curMap);
                 curMap = NULL;
             }
-        }
+        //}
     }
 
     bool Controller::lastTXcleared(){
@@ -249,9 +249,9 @@ namespace ACES{
                 float value;
                 lineStream >> value;
                 (*curMap)[ states[i] ] = new float(value);
-                RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
+                //RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
             }
-            RTT::Logger::log(RTT::Logger::Debug) << RTT::endlog();
+            //RTT::Logger::log(RTT::Logger::Debug) << RTT::endlog();
             return true;
         }
         else{

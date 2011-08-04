@@ -54,13 +54,13 @@ namespace ACES {
     
         Message<T>* dsIn = NULL;
         while( rxDownStream.read(dsIn) == RTT::NewData ){
-            dsIn->printme();
+            //dsIn->printme();
             if( processDS(dsIn) ){
                 RTT::Logger::log(RTT::Logger::Debug) << "(HW: " << name 
                                    << ") got DS"
                                    << RTT::endlog();
                 txBus(dsIn);
-                reportTransmission(dsIn);
+                //reportTransmission(dsIn);
             }
         }
         rxBus();

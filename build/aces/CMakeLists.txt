@@ -46,7 +46,7 @@ rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
 #rosbuild_add_compile_flags(aces-common -pg)
 #rosbuild_add_link_flags(aces-common -pg)
 
-add_subdirectory(robotis)
+#add_subdirectory(robotis)
 #add_subdirectory(ik)
 add_subdirectory(flexscanner)
                     
@@ -89,7 +89,7 @@ rosbuild_add_executable(aces-launcher ../src/launcher.cpp)
 
 target_link_libraries(aces-launcher aces-common)
 target_link_libraries(aces-launcher aces-dispatcher)
-target_link_libraries(aces-launcher aces-testsuite)
+#target_link_libraries(aces-launcher aces-testsuite)
 target_link_libraries(aces-launcher aces-hubo)
 #target_link_libraries(aces-launcher aces-webots)
 #target_link_libraries(aces-launcher aces-robotis)
