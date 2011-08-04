@@ -249,10 +249,9 @@ namespace ACES{
                 float value;
                 lineStream >> value;
                 (*curMap)[ states[i] ] = new float(value);
-                if(echo){
-                    RTT::Logger::log() << value << ", ";
-                }
+                RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
             }
+            RTT::Logger::log(RTT::Logger::Debug) << RTT::endlog();
             return true;
         }
         else{
@@ -298,6 +297,9 @@ namespace ACES{
         scriptFile.open((const char*)scriptPath.c_str(), std::ifstream::in);
 
         if(scriptFile.is_open()){
+            RTT::Logger::log(RTT::Logger::Warning) << "Successfully opened the "
+                << "script file at \"" << scriptPath << "\"."
+                << RTT::endlog();
             char buf[1024];
             scriptFile.getline(buf, 1024);
             std::string headerLine(buf);

@@ -8,10 +8,27 @@ program config {
     dRHip1.setHarmonic(0, 100);
     dRHip1.setHarmonic(1, 160);
 
+    dRWrist.setDirection(0, 1.0);
+    dRWrist.setDirection(1, 1.0);
+    dRWrist.setDirection(2, 1.0);
+    dRWrist.setGearRatio(0, 1, 1);
+    dRWrist.setGearRatio(1, 1, 1);
+    dRWrist.setGearRatio(2, 1, 1);
+    dRWrist.setEncoderSize(0, 128);
+    dRWrist.setEncoderSize(1, 128);
+    dRWrist.setEncoderSize(1, 128);
+    dRWrist.setHarmonic(0, 100);
+    dRWrist.setHarmonic(1, 100);
+    dRWrist.setHarmonic(2, 100);
+
     //Cluster all Gain sets
     ch1.genPacket(1, 8, "0x00010A0A", "0x0A8445FD");
     dRHip1.setGains("Position", 0, 200, 0, 500);
-    dRHip1.setGains("Position", 1, 15, 0, 15);
+    dRHip1.setGains("Position", 1, 200, 0, 500);
+
+    dRWrist.setGains("Position", 0, 15, 0, 15);
+    dRWrist.setGains("Position", 1, 15, 0, 15);
+    dRWrist.setGains("Position", 2, 15, 0, 15);
 
     //Cluster all calibrates
     //dRHip1.setZero(0, -18100, true);

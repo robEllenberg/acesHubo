@@ -351,8 +351,10 @@ namespace Hubo{
 
         #if TESTMODE == 1
             beginning = RTT::os::TimeService::Instance()->getTicks();
-            channel = open(fd.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
+            std::string ofd = fd + ".out";
+            channel = open(ofd.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
                            0655);
+            assert(channel >= 0 );
             // If we're in offline operation, we need to open in the input file
             // and set it up for reading
             std::string ifd = fd + ".in";
@@ -365,8 +367,7 @@ namespace Hubo{
             }
         #else //Normal operation action
             //Begin - snippit from can4linux examples baud.c
-            channel = open(fd.c_str(), O_RDWR | O_NONBLOCK,
-                           0655);
+            channel = open(fd.c_str(), O_RDWR | O_NONBLOCK );
             Config_par_t  CANcfg;
             Command_par_t cmd;
 
@@ -502,6 +503,8 @@ namespace Hubo{
             rxSize = read(channel, &rxBuffer, canBuffSize);
         #endif
 
+        ostringstream packet (ostringstream::out);
+        packet << "Reception of size " << rxSize << ": ";
         for(int i = 0; i < rxSize; i++){
             canmsg_t* msg = new canmsg_t;
             msg->flags = rxBuffer[i].flags;
@@ -511,10 +514,14 @@ namespace Hubo{
             msg->length = rxBuffer[i].length;
             for(int j = 0; j < msg->length; j++){
                 msg->data[j] = rxBuffer[i].data[j];
+                packet << "0x" << std::setbase(16) << (int)(msg->data[j]) << ", ";
             }
+            packet << std::endl;
             ACES::Word<canmsg_t*>* w = new ACES::Word<canmsg_t*>(msg);
             txUpStream.write(w);
         }
+        packet << "$";
+        RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
     }
 
 /*
