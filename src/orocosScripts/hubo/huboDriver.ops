@@ -2,7 +2,8 @@ program main {
     var bool sampling = false;
     var int baseport = 2827;
 
-    addHardware("ch1 90 1000","HuboCAN","/dev/can0 1000");
+    //addHardware("ch1 90 1000","HuboCAN","/dev/can0 1000");
+    addHardware("ch1 90 1000","HuboCAN","/dev/testfile");
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
