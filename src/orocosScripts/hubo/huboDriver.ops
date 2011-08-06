@@ -23,6 +23,9 @@ program main {
 	addDevice("dRUpperLeg 16 200","HuboCAN Motor", "0x1 2");
 	addDevice("dRKnee 17 200","HuboCAN Motor", "0x2 2");
 	//addDevice("dRWrist 20 200","HuboCAN Motor", "0x20 3");
+    
+    //Sensor node                              //bus ID#, # of channels (FT=3, IMU/Hand(?)=4)
+    addDevice("dRFT 18 200", "HuboCAN Sensor", "0x30 3");
 
 	//linkPD("pro1","dNeck");
 	linkPD("pro1","dLAnkle");
@@ -40,6 +43,7 @@ program main {
 	linkPD("pro1","dRUpperLeg");
 	linkPD("pro1","dRKnee");
 	//linkPD("pro1","dRWrist");
+    linkPD("pro1", "dRFT");
 
 	addState("RHY 20 200", "Hubo", "0", sampling, baseport + 0);
 	addState("RHR 21 200", "Hubo", "1", sampling, baseport + 1);
@@ -53,6 +57,14 @@ program main {
 	addState("LKP 29 200", "Hubo", "0", sampling, baseport + 9);
 	addState("LAP 30 200", "Hubo", "0", sampling, baseport + 10);
 	addState("LAR 31 200", "Hubo", "1", sampling, baseport + 11);
+
+                                 //channel #
+    addState("RMx 32 200", "Hubo", "0", sampling, baseport+12);
+    addState("RMy 33 200", "Hubo", "1", sampling, baseport+13);
+    addState("RFz 34 200", "Hubo", "2", sampling, baseport+14);
+    linkDS("dRFT", "RMx");
+    linkDS("dRFT", "RMy");
+    linkDS("dRFT", "RFz");
 /*
 	addState("RSP 10 200", "Hubo", "0", sampling, baseport + 12);
 	addState("RSR 10 200", "Hubo", "1", sampling, baseport + 13);

@@ -503,9 +503,11 @@ namespace Hubo{
             rxSize = read(channel, &rxBuffer, canBuffSize);
         #endif
 
-        //ostringstream packet (ostringstream::out);
-        //packet << "Reception of size " << rxSize << ": ";
+        ostringstream packet (ostringstream::out);
         for(int i = 0; i < rxSize; i++){
+            if(i == 0){
+                packet << "Reception of size " << rxSize << ": ";
+            }
             canmsg_t* msg = new canmsg_t;
             msg->flags = rxBuffer[i].flags;
             msg->cob = rxBuffer[i].cob;
@@ -514,14 +516,17 @@ namespace Hubo{
             msg->length = rxBuffer[i].length;
             for(int j = 0; j < msg->length; j++){
                 msg->data[j] = rxBuffer[i].data[j];
-                //packet << "0x" << std::setbase(16) << (int)(msg->data[j]) << ", ";
+                packet << "0x" << std::setbase(16) << (int)(msg->data[j]) << ", ";
             }
-            //packet << std::endl;
+            packet << std::endl;
             ACES::Word<canmsg_t*>* w = new ACES::Word<canmsg_t*>(msg);
             txUpStream.write(w);
+
+            if(i == rxSize-1){
+                packet << "$";
+                RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
+            }
         }
-        //packet << "$";
-        //RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
     }
 
 /*
@@ -824,23 +829,24 @@ namespace Hubo{
         if(m0Stat & 0xA){
             RTT::Logger::log(RTT::Logger::Warning)
                 <<  "Failed to aquire origin/limit on Controller "
-                << credentials->getDevID() << ", Channel 0"
+                << ", Channel 0"
                 << RTT::endlog();
-        }else{
-            RTT::Logger::log(RTT::Logger::Debug)
-                <<  "Received a clean ACK on Controller"
-                << credentials->getDevID() << ", Channel 0"
+        }else if(m0Stat & 0x5){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Received a clean ACK on " << name << " "
+                << ", Channel 0"
                 << RTT::endlog();
         }
+
         if(m1Stat & 0xA){
             RTT::Logger::log(RTT::Logger::Warning)
                 <<  "Failed to aquire origin/limit on Controller "
-                << credentials->getDevID() << ", Channel 1"
+                << ", Channel 1"
                 << RTT::endlog();
-        }else{
-            RTT::Logger::log(RTT::Logger::Debug)
-                <<  "Received a clear ACK on Controller"
-                << credentials->getDevID() << ", Channel 1"
+        }else if(m1Stat & 0x5){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Received a clean ACK on " << name << " "
+                << ", Channel 1"
                 << RTT::endlog();
         }
     }
