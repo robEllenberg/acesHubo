@@ -180,7 +180,8 @@ namespace Hubo{
             virtual ACES::Word<float>* processUS(ACES::Word<canMsg>*);
             void processUS_SENSOR_FT_RXDF(ACES::Word<canMsg>* msg);
             void processUS_AD_RXDF(ACES::Word<canMsg>* msg);
-
+            //Redfine this function from parent class to avoid clutter
+            void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
             int getChannels();
             //User facing (local) Configuration functions
             bool setDirection(int channel, float direction);
@@ -216,7 +217,10 @@ namespace Hubo{
             //canMsg buildCalibratePulse(int c);
             canMsg buildHIPpacket();
             canMsg buildRunCmdPacket();
+            int checkZero(int channel);
         private:
+            int zeroFlag[ctrlSize];
+            void clearZeroFlag();
             float setPoint[ctrlSize];
             bool trigger[ctrlSize]; /*! Indicates which channels have recieved
                                      * information since the last trigger */

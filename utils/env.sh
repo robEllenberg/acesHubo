@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ACES_ROOT=$HOME/thesis/aces
+ACES_ROOT=$HOME/aces
 
 source /opt/ros/cturtle/setup.sh
 #RTT_COMPONENT_PATH=/home/bob/thesis/aces/build:/opt/ros/cturtle/stacks/orocos_toolchain_ros/rtt/install/lib/orocos
@@ -21,6 +21,7 @@ export WEBOTS_STDIN=1
 MATLABPATH=$ACES_ROOT/utils:$ACES_ROOT/utils/matlabIO:$MATLABPATH
 export MATLABPATH
 
+export ACES_BUILD=$ACES_ROOT/build/aces
 #stty -F /dev/ttyUSB0 raw
 #stty -F /dev/ttyUSB0 1000000
 #stty -F /dev/ttyUSB1 raw

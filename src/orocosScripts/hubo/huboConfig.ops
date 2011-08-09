@@ -1,7 +1,6 @@
 program internals {
 	//Internal definitions for devices
 
-
 	//Defining internal properties for device dRHipYR, node 0
 
 	dRHipYR.setDirection(0, -1);
@@ -16,19 +15,13 @@ program internals {
 	dRHipYR.setHarmonic(1,160);
 	dRHipYR.setEncoderSize(1,4000);
 
-	//Defining internal properties for device dRUpperLeg, node 0
+	//Defining internal properties for device dRHipP, node 0
 
-	dRUpperLeg.setDirection(0, 1);
-	dRUpperLeg.setGearRatio(0, 16, 20);
-	dRUpperLeg.setHarmonic(0,160);
-	dRUpperLeg.setEncoderSize(0,4000);
-
-	//Defining internal properties for device dRUpperLeg, node 0
-
-	dRUpperLeg.setDirection(0, 1);
-	dRUpperLeg.setGearRatio(0, 16, 16);
-	dRUpperLeg.setHarmonic(0,160);
-	dRUpperLeg.setEncoderSize(0,4000);
+	dRHipP.setDirection(0, 1);
+	dRHipP.setGearRatio(0, 16, 20);
+	//dRHipP.setGearRatio(0, 10, 16);
+	dRHipP.setHarmonic(0,160);
+	dRHipP.setEncoderSize(0,4000);
 
 	//Defining internal properties for device dRKnee, node 0
 
@@ -37,19 +30,19 @@ program internals {
 	dRKnee.setHarmonic(0,160);
 	dRKnee.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dRAnkle, node 0
+	//Defining internal properties for device dRAnklePR, node 0
 
-	dRAnkle.setDirection(0, -1);
-	dRAnkle.setGearRatio(0, 10, 25);
-	dRAnkle.setHarmonic(0,100);
-	dRAnkle.setEncoderSize(0,4000);
+	dRAnklePR.setDirection(0, -1);
+	dRAnklePR.setGearRatio(0, 10, 25);
+	dRAnklePR.setHarmonic(0,100);
+	dRAnklePR.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dRAnkle, node 1
+	//Defining internal properties for device dRAnklePR, node 1
 
-	dRAnkle.setDirection(1, 1);
-	dRAnkle.setGearRatio(1, 324, 1024);
-	dRAnkle.setHarmonic(1,100);
-	dRAnkle.setEncoderSize(1,4000);
+	dRAnklePR.setDirection(1, 1);
+	dRAnklePR.setGearRatio(1, 324, 1024);
+	dRAnklePR.setHarmonic(1,100);
+	dRAnklePR.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dLHipYR, node 0
 
@@ -65,19 +58,13 @@ program internals {
 	dLHipYR.setHarmonic(1,160);
 	dLHipYR.setEncoderSize(1,4000);
 
-	//Defining internal properties for device dLUpperLeg, node 0
+	//Defining internal properties for device dLHipP, node 0
 
-	dLUpperLeg.setDirection(0, 1); 
-	dLUpperLeg.setGearRatio(0, 16, 20);
-	dLUpperLeg.setHarmonic(0,160);
-	dLUpperLeg.setEncoderSize(0,4000);
-
-	//Defining internal properties for device dLUpperLeg, node 0
-
-	dLUpperLeg.setDirection(0, -1);
-	dLUpperLeg.setGearRatio(0, 16, 16);
-	dLUpperLeg.setHarmonic(0,160);
-	dLUpperLeg.setEncoderSize(0,4000);
+	dLHipP.setDirection(0, -1); 
+	//dLHipP.setGearRatio(0, 10, 16);
+	dLHipP.setGearRatio(0, 16, 20);
+	dLHipP.setHarmonic(0,160);
+	dLHipP.setEncoderSize(0,4000);
 
 	//Defining internal properties for device dLKnee, node 0
 
@@ -86,19 +73,19 @@ program internals {
 	dLKnee.setHarmonic(0,160);
 	dLKnee.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dLAnkle, node 0
+	//Defining internal properties for device dLAnklePR, node 0
 
-	dLAnkle.setDirection(0, 1);
-	dLAnkle.setGearRatio(0, 10, 25);
-	dLAnkle.setHarmonic(0,100);
-	dLAnkle.setEncoderSize(0,4000);
+	dLAnklePR.setDirection(0, 1);
+	dLAnklePR.setGearRatio(0, 10, 25);
+	dLAnklePR.setHarmonic(0,100);
+	dLAnklePR.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dLAnkle, node 1
+	//Defining internal properties for device dLAnklePR, node 1
 
-	dLAnkle.setDirection(1, 1);
-	dLAnkle.setGearRatio(1, 324, 1024);
-	dLAnkle.setHarmonic(1,100);
-	dLAnkle.setEncoderSize(1,4000);
+	dLAnklePR.setDirection(1, 1);
+	dLAnklePR.setGearRatio(1, 324, 1024);
+	dLAnklePR.setHarmonic(1,100);
+	dLAnklePR.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dRShoulderPR, node 0
     /*
@@ -232,16 +219,16 @@ program internals {
 
 	dRHipYR.setZero(0,-18100,1);
 	dRHipYR.setZero(1,13000,0);
-	dRUpperLeg.setZero(0,8400,0);
+	dRHipP.setZero(0,8400,0);
 	dRKnee.setZero(0,-17600,0);
-	dRAnkle.setZero(0,-3000,0);
-	dRAnkle.setZero(1,30800,0);
+	dRAnklePR.setZero(0,-3000,0);
+	dRAnklePR.setZero(1,30800,0);
 	dLHipYR.setZero(0,26100,0);
 	dLHipYR.setZero(1,-32600,1);
-	dLUpperLeg.setZero(0,-17500,1);
+	dLHipP.setZero(0,-17500,1);
 	dLKnee.setZero(0,51900,1);
-	dLAnkle.setZero(0,-1600,1);
-	dLAnkle.setZero(1,-13200,1);
+	dLAnklePR.setZero(0,-1600,1);
+	dLAnklePR.setZero(1,-13200,1);
     /*
 	dRShoulderPR.setZero(0,-35000,0);
 	dRShoulderPR.setZero(1,8000,0);
@@ -268,11 +255,11 @@ program internals {
 
 program instant {
     //dRHipYR.instantTrigger = true;
-    dRUpperLeg.instantTrigger = true;
-    //dRAnkle.instantTrigger = true;
+    dRHipP.instantTrigger = true;
+    //dRAnklePR.instantTrigger = true;
     //dLHipYR.instantTrigger = true;
-    dLUpperLeg.instantTrigger = true;
-    //dLAnkle.instantTrigger = true;
+    dLHipP.instantTrigger = true;
+    //dLAnklePR.instantTrigger = true;
     dRKnee.instantTrigger = true;
     dLKnee.instantTrigger = true;
     //dRShoulderPR.instantTrigger = true;
@@ -313,16 +300,16 @@ program gains {
 
 	dRHipYR.setGains("Position", 0, 200, 0, 500);
 	dRHipYR.setGains("Position", 1, 200, 0, 500);
-	dRUpperLeg.setGains("Position", 0, 200, 0, 500);
-	dRUpperLeg.setGains("Position", 0, 200, 0, 500);
-	dRAnkle.setGains("Position", 0, 200, 0, 500);
-	dRAnkle.setGains("Position", 1, 200, 0, 500);
+	dRHipP.setGains("Position", 0, 200, 0, 500);
+	dRHipP.setGains("Position", 0, 200, 0, 500);
+	dRAnklePR.setGains("Position", 0, 200, 0, 500);
+	dRAnklePR.setGains("Position", 1, 200, 0, 500);
 	dLHipYR.setGains("Position", 0, 200, 0, 500);
 	dLHipYR.setGains("Position", 1, 200, 0, 500);
-	dLUpperLeg.setGains("Position", 0, 200, 0, 500);
-	dLUpperLeg.setGains("Position", 0, 200, 0, 500);
-	dLAnkle.setGains("Position", 0, 200, 0, 500);
-	dLAnkle.setGains("Position", 1, 200, 0, 500);
+	dLHipP.setGains("Position", 0, 200, 0, 500);
+	dLHipP.setGains("Position", 0, 200, 0, 500);
+	dLAnklePR.setGains("Position", 0, 200, 0, 500);
+	dLAnklePR.setGains("Position", 1, 200, 0, 500);
     /*
 	dRShoulderPR.setGains("Position", 0, 200, 0, 500);
 	dRShoulderPR.setGains("Position", 1, 200, 0, 500);
@@ -357,26 +344,26 @@ program enable {
 	dRHipYR.run();
 	dRHipYR.HIPenable();
 	dRHipYR.run();
-	dRUpperLeg.HIPenable();
-	dRUpperLeg.run();
-	dRUpperLeg.HIPenable();
-	dRUpperLeg.run();
-	dRAnkle.HIPenable();
-	dRAnkle.run();
-	dRAnkle.HIPenable();
-	dRAnkle.run();
+	dRHipP.HIPenable();
+	dRHipP.run();
+	dRHipP.HIPenable();
+	dRHipP.run();
+	dRAnklePR.HIPenable();
+	dRAnklePR.run();
+	dRAnklePR.HIPenable();
+	dRAnklePR.run();
 	dLHipYR.HIPenable();
 	dLHipYR.run();
 	dLHipYR.HIPenable();
 	dLHipYR.run();
-	dLUpperLeg.HIPenable();
-	dLUpperLeg.run();
-	dLUpperLeg.HIPenable();
-	dLUpperLeg.run();
-	dLAnkle.HIPenable();
-	dLAnkle.run();
-	dLAnkle.HIPenable();
-	dLAnkle.run();
+	dLHipP.HIPenable();
+	dLHipP.run();
+	dLHipP.HIPenable();
+	dLHipP.run();
+	dLAnklePR.HIPenable();
+	dLAnklePR.run();
+	dLAnklePR.HIPenable();
+	dLAnklePR.run();
     /*
 	dRShoulderPR.HIPenable();
 	dRShoulderPR.run();

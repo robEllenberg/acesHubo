@@ -1,0 +1,133 @@
+StateMachine LeftLeg_AutoZero
+{
+	//flags to indicate that a joint has been rezeroed 
+    int zeroAttempts = 0;
+    int RETRY_LIMIT = 2;
+
+    initial state zeroHubo
+	{
+		entry 
+		{
+			internals.start
+		}
+		
+		transition if true then {} select LHY
+	}
+
+	state LHY
+	{
+		entry
+        {
+            //Start fresh
+            dLHipYR.programZero(0);
+            zeroAttempts=1;
+        }
+
+        handle
+        {
+            //If it fails, resend and wait
+            if(dLHipYR.checkZero(0)==0x0A)
+            {
+                dLHipYR.programZero(0); //resets status flag as well
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        transition if (dLHipYR.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
+        {
+            //TODO: say that this joint fails
+        } select Failure
+        transition if (dLHipYR.checkZero(0)==0x05) then 
+		{} select LHR
+	}
+
+	state LHR
+	{
+		entry
+        {
+            //Start fresh
+            dLHipYR.programZero(1);
+            zeroAttempts=1;
+        }
+
+        handle
+        {
+            //If it fails, resend and wait
+            if(dLHipYR.checkZero(1)==0x0A)
+            {
+                dLHipYR.programZero(1); //resets status flag as well
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        transition if (dLHipYR.checkZero(1)==0x0A && zeroAttempts>RETRY_LIMIT) then 
+        {
+            //TODO: say that this joint fails
+        } select Failure
+
+        transition if (dLHipYR.checkZero(1)==0x05) then 
+		{} select zeroDone
+	}
+
+	state LHP
+	{
+		entry
+        {
+            //Start fresh
+            dLHipP.programZero(0);
+            zeroAttempts=1;
+        }
+
+        handle
+        {
+            //If it fails, resend and wait
+            if(dLHipP.checkZero(0)==0x0A)
+            {
+                dLHipP.programZero(0); //resets status flag as well
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        transition if (dLHipP.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
+        {
+            //TODO: say that this joint fails
+        } select Failure
+
+        transition if (dLHipP.checkZero(0)==0x05) then 
+		{} select LKP
+	}
+	state LKP
+	{
+		entry
+        {
+            //Start fresh
+            dLKnee.programZero(0);
+            zeroAttempts=1;
+        }
+
+        handle
+        {
+            //If it fails, resend and wait
+            if(dLKnee.checkZero(0)==0x0A)
+            {
+                dLKnee.programZero(0); //resets status flag as well
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        transition if (dLKnee.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
+        {
+            //TODO: say that this joint fails
+        } select Failure
+
+        transition if (dLKnee.checkZero(0)==0x05) then 
+		{} select ZeroDone
+	}
+
+	final state ZeroDone {
+        entry 
+        {
+            gains.start();
+        }
+    }
+
+}  

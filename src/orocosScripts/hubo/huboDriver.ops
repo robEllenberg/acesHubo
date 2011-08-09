@@ -7,43 +7,49 @@ program main {
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
-	//addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
-	addDevice("dLAnkle 10 200","HuboCAN Motor", "0x7 2");
+	/*
+    //Upper body devices
+    addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
+	addDevice("dLShoulderPR 20 200","HuboCAN Motor", "0xA 2");
+	addDevice("dLUpperArm 20 200","HuboCAN Motor", "0xB 2");
+	addDevice("dLWrist 20 200","HuboCAN Motor", "0x21 3");
+	addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
+	addDevice("dRShoulderPR 20 200","HuboCAN Motor", "0x8 2");
+	addDevice("dRUpperArm 20 200","HuboCAN Motor", "0x9 2");
+	addDevice("dRWrist 20 200","HuboCAN Motor", "0x20 3");
+    */
+
+	addDevice("dLAnklePR 10 200","HuboCAN Motor", "0x7 2");
 	addDevice("dLHipYR 11 200","HuboCAN Motor", "0x4 2");
-	//addDevice("dLShoulderPR 20 200","HuboCAN Motor", "0xA 2");
-	//addDevice("dLUpperArm 20 200","HuboCAN Motor", "0xB 2");
-	addDevice("dLUpperLeg 12 200","HuboCAN Motor", "0x5 2");
+	addDevice("dLHipP 12 200","HuboCAN Motor", "0x5 2");
 	addDevice("dLKnee 13 200","HuboCAN Motor", "0x6 2");
-	//addDevice("dLWrist 20 200","HuboCAN Motor", "0x21 3");
-	//addDevice("dNeck 20 200","HuboCAN Motor", "0x22 3");
-	addDevice("dRAnkle 14 200","HuboCAN Motor", "0x3 2");
+	addDevice("dRAnklePR 14 200","HuboCAN Motor", "0x3 2");
 	addDevice("dRHipYR 15 200","HuboCAN Motor", "0x0 2");
-	//addDevice("dRShoulderPR 20 200","HuboCAN Motor", "0x8 2");
-	//addDevice("dRUpperArm 20 200","HuboCAN Motor", "0x9 2");
-	addDevice("dRUpperLeg 16 200","HuboCAN Motor", "0x1 2");
+	addDevice("dRHipP 16 200","HuboCAN Motor", "0x1 2");
 	addDevice("dRKnee 17 200","HuboCAN Motor", "0x2 2");
-	//addDevice("dRWrist 20 200","HuboCAN Motor", "0x20 3");
     
     //Sensor node                              //bus ID#, # of channels (FT=3, IMU/Hand(?)=4)
     addDevice("dRFT 18 200", "HuboCAN Sensor", "0x30 3");
+    addDevice("dLFT 18 200", "HuboCAN Sensor", "0x31 3");
 
 	//linkPD("pro1","dNeck");
-	linkPD("pro1","dLAnkle");
+	linkPD("pro1","dLAnklePR");
 	linkPD("pro1","dLHipYR");
 	linkPD("pro1","dLShoulderPR");
 	linkPD("pro1","dLUpperArm");
-	linkPD("pro1","dLUpperLeg");
+	linkPD("pro1","dLHipP");
 	linkPD("pro1","dLKnee");
 	//linkPD("pro1","dLWrist");
 	//linkPD("pro1","dNeck");
-	linkPD("pro1","dRAnkle");
+	linkPD("pro1","dRAnklePR");
 	linkPD("pro1","dRHipYR");
 	linkPD("pro1","dRShoulderPR");
 	linkPD("pro1","dRUpperArm");
-	linkPD("pro1","dRUpperLeg");
+	linkPD("pro1","dRHipP");
 	linkPD("pro1","dRKnee");
 	//linkPD("pro1","dRWrist");
     linkPD("pro1", "dRFT");
+    linkPD("pro1", "dLFT");
 
 	addState("RHY 20 200", "Hubo", "0", sampling, baseport + 0);
 	addState("RHR 21 200", "Hubo", "1", sampling, baseport + 1);
@@ -58,13 +64,22 @@ program main {
 	addState("LAP 30 200", "Hubo", "0", sampling, baseport + 10);
 	addState("LAR 31 200", "Hubo", "1", sampling, baseport + 11);
 
-                                 //channel #
-    addState("RMx 32 200", "Hubo", "0", sampling, baseport+12);
-    addState("RMy 33 200", "Hubo", "1", sampling, baseport+13);
-    addState("RFz 34 200", "Hubo", "2", sampling, baseport+14);
+    //Sensor states for leg force / torque sensors
+    addState("RMx 32 200", "Hubo", "0", sampling, baseport+30);
+    //addState("RMy 33 200", "Hubo", "1", sampling, baseport+31);
+    //addState("RFz 34 200", "Hubo", "2", sampling, baseport+32);
     linkDS("dRFT", "RMx");
-    linkDS("dRFT", "RMy");
-    linkDS("dRFT", "RFz");
+    //linkDS("dRFT", "RMy");
+    //linkDS("dRFT", "RFz");
+
+    //addState("LMx 35 200", "Hubo", "0", sampling, baseport+33);
+    //addState("LMy 36 200", "Hubo", "1", sampling, baseport+34);
+    //addState("LFz 37 200", "Hubo", "2", sampling, baseport+35);
+    //linkDS("dLFT", "LMx");
+    //linkDS("dLFT", "LMy");
+    //linkDS("dLFT", "LFz");
+
+//Extra states commented out for speed
 /*
 	addState("RSP 10 200", "Hubo", "0", sampling, baseport + 12);
 	addState("RSR 10 200", "Hubo", "1", sampling, baseport + 13);
@@ -89,16 +104,16 @@ program main {
 */
 	linkDS("dRHipYR","RHY");
 	linkDS("dRHipYR","RHR");
-	linkDS("dRUpperLeg","RHP");
+	linkDS("dRHipP","RHP");
 	linkDS("dRKnee","RKP");
-	linkDS("dRAnkle","RAP");
-	linkDS("dRAnkle","RAR");
+	linkDS("dRAnklePR","RAP");
+	linkDS("dRAnklePR","RAR");
 	linkDS("dLHipYR","LHY");
 	linkDS("dLHipYR","LHR");
-	linkDS("dLUpperLeg","LHP");
+	linkDS("dLHipP","LHP");
 	linkDS("dLKnee","LKP");
-	linkDS("dLAnkle","LAP");
-	linkDS("dLAnkle","LAR");
+	linkDS("dLAnklePR","LAP");
+	linkDS("dLAnklePR","LAR");
 /*
 	linkDS("dRShoulderPR","RSP");
 	linkDS("dRShoulderPR","RSR");
@@ -122,22 +137,18 @@ program main {
 	linkDS("dHip","WST");
 */
 
-/*
-    addState("RMx 10 50", "Hubo", "0", sampling, baseport+4);
-    addState("RMy 10 50", "Hubo", "1", sampling, baseport+5);
-    addState("RFz 10 50", "Hubo", "2", sampling, baseport+6);
-    linkDS("dRFT", "RMx");
-    linkDS("dRFT", "RMy");
-    linkDS("dRFT", "RFz");
-*/
     //addController("config 10 10", "User Program", "canConfig.ops config");
 
     //Setup Logging
-    addLogger("log1 5 200", "File", "log.txt");
+    addLogger("log1 5 100", "File", "log.txt");
+    /*
     linkLS("log1", "RMx", "value");
     linkLS("log1", "RMy", "value");
     linkLS("log1", "RFz", "value");
-    
+    linkLS("log1", "LMx", "value");
+    linkLS("log1", "LMy", "value");
+    linkLS("log1", "LFz", "value");
+    */
     /* END CONFIG SECTION */
 
     //startDebug();

@@ -764,6 +764,12 @@ namespace Hubo{
                                );
 
         this->addAttribute("instantTrigger", instantTrigger);
+
+        //Check if a given channel has been zeroed properly (ROB)
+        this->addOperation("checkZero", &MotorDevice::checkZero,this,
+            RTT::OwnThread).doc("Check if a given motor channel has been zeroed properly")
+                          .arg("channel","Channel number to check");
+        this->clearZeroFlag();
     }
 
     ACES::Word<canMsg>* MotorDevice::processDS(ACES::Word<float>* w){
@@ -836,7 +842,8 @@ namespace Hubo{
         //hubo code
         if(m0Stat & 0xA){
             RTT::Logger::log(RTT::Logger::Warning)
-                <<  "Failed to aquire origin/limit on Controller "
+                <<  "Failed to aquire origin/limit on Controller " 
+		        << name << " "
                 << ", Channel 0"
                 << RTT::endlog();
         }else if(m0Stat & 0x5){
@@ -845,10 +852,10 @@ namespace Hubo{
                 << ", Channel 0"
                 << RTT::endlog();
         }
-
         if(m1Stat & 0xA){
             RTT::Logger::log(RTT::Logger::Warning)
                 <<  "Failed to aquire origin/limit on Controller "
+        		<< name << " "
                 << ", Channel 1"
                 << RTT::endlog();
         }else if(m1Stat & 0x5){
@@ -859,10 +866,60 @@ namespace Hubo{
         }
     }
 
+    void MotorDevice::processUS_STAT_RXDF(ACES::Word<canMsg>* msg){
+        canMsg c = msg->getData();
+        //I'm not doing anything with these because they really don't seem to
+        //contain any meaningful information. They're just being broken out so,
+        //if they end up being important, someone can easily grab them. See the
+        //hubo code base: BLDC_ReadCMD.c; Send_Status(void)
+        //unsigned char JmcSTATbyte = c.getR1();
+        //unsigned char m0STATbyte = c.bitStrip(c.getR2(), 0);
+        //unsigned char m1STATbyte = c.bitStrip(c.getR2(), 1);
+        //unsigned char m0CTLbyte = c.bitStrip(c.getR3(), 0);
+        //unsigned char m1CTLbyte = c.bitStrip(c.getR3(), 1);
+        unsigned char m0Stat = c.bitStrip(c.getR4(), 0);
+        unsigned char m1Stat = c.bitStrip(c.getR4(), 1);
+                      
+        //TODO - Make these messages more elaborate
+        //0xA is a mask which reveals only the origin and limit state - see
+        //hubo code
+        if(m0Stat & 0xA){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Failed to aquire origin/limit on Controller " 
+		        << name << " "
+                << ", Channel 0"
+                << RTT::endlog();
+            //Set flag in device node
+            zeroFlag[0]=m0Stat;
+            
+        }else if(m0Stat & 0x5){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Received a clean ACK on " << name << " "
+                << ", Channel 0"
+                << RTT::endlog();
+            zeroFlag[0]=m0Stat;
+        }
+
+        if(m1Stat & 0xA){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Failed to aquire origin/limit on Controller "
+        		<< name << " "
+                << ", Channel 1"
+                << RTT::endlog();
+            zeroFlag[1]=m1Stat;
+        }else if(m1Stat & 0x5){
+            RTT::Logger::log(RTT::Logger::Warning)
+                <<  "Received a clean ACK on " << name << " "
+                << ", Channel 1"
+                << RTT::endlog();
+            zeroFlag[1]=m1Stat;
+        }
+    }
+
     int MotorDevice::getChannels(){
         return ((MotorCredentials*)credentials)->getChannels();
     }
-
+    
     bool MotorDevice::setDirection(int chan, float dir){
         return ((MotorCredentials*)credentials)->setDirection(chan, dir);
     }
@@ -992,6 +1049,7 @@ namespace Hubo{
             bool ccw = c->getZeroCCW(chan);
             canMsg c = buildZeroPacket(chan, ticks, ccw);
             txDownStream.write( buildWord(c, chan) );
+            zeroFlag[chan]=0; //Reset the status flag, since a successful transmission will update when complete
             return true;
         }
         return false;
@@ -1200,6 +1258,25 @@ namespace Hubo{
 
     canMsg MotorDevice::buildRunCmdPacket(){
         return canMsg( credentials->getDevID(), CMD_TXDF, RUN_CMD);
+    }
+    
+    void MotorDevice::clearZeroFlag(){
+        // Clear the zero flags (ie reset each flag to 0 = not attempted
+        for (int k = 0; k<ctrlSize ; k++){
+            zeroFlag[k]=0;
+        }
+    }
+
+    int MotorDevice::checkZero(int chan){
+        //Check if zeroing is complete.  There are 3 states:
+        // 0 = not attempted
+        // 5 = SUCCESS
+        // 10 = FAIL
+        if (chan>=0 && chan <ctrlSize)
+        {
+            return zeroFlag[chan];
+        }
+        else return 0; //Invalid channel #
     }
 
     SensorDevice::SensorDevice(std::string cfg, std::string args)
