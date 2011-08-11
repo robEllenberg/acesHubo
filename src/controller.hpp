@@ -53,6 +53,8 @@ namespace ACES{
             virtual bool modStateVector();
             bool lastTXcleared();
             void addCtrl(std::string dest, float sp);
+            bool deleteCtrl(std::string ctrl);
+            bool clearCtrl();
             float checkCtrl(std::string ctrl);
             bool sendCtrl();
             float getSurface(std::string state, std::string attr);
@@ -66,26 +68,10 @@ namespace ACES{
             int packetCounter;
     };
 
-/*
-    class ScriptCtrl : public Controller
+    class DumbTrajectory : public Controller
     {
         public:
-            ScriptCtrl(std::string cfg, std::string args);
-            void updateHook();
-
-            void step();
-            bool run();
-            void halt();
-            bool openScript(std::string scriptPath);
-
-            std::ifstream walkScript;
-            int simState;
-    };
-*/
-    class FlexibleScript : public Controller
-    {
-        public:
-            FlexibleScript(std::string cfg, std::string args);
+            DumbTrajectory(std::string cfg, std::string args);
             void updateHook();
 
             void step();
@@ -107,21 +93,6 @@ namespace ACES{
             virtual bool getStateVector(bool echo=0);
     };
 
-/*
-    class LegCtrl : public ScriptCtrl
-    {
-        public:
-            LegCtrl(std::string config, std::string args);
-            virtual bool getStateVector(bool echo=0);
-    };
-
-    class ArmCtrl : public ScriptCtrl
-    {
-        public:
-            ArmCtrl(std::string config, std::string args);
-            virtual bool getStateVector(bool echo=0);
-    };
-*/
     class PID : public Controller{
         public:
             PID(std::string config, std::string args);
@@ -129,6 +100,20 @@ namespace ACES{
         private:
             std::string inputSurface, outputSurface;
             float Kp, Ki, Kd, val;
+    };
+
+    class UserTrajectory : public Controller{
+        public:
+            UserTrajectory(std::string config, std::string args);
+            void updateHook();
+            bool getStateVector(bool echo=false);
+            bool getLine();
+            bool openTrajectory(std::string sp);
+        private:
+            std::vector<std::string> states; //! The States we're controlling
+            std::ifstream scriptFile;        //! Script stream
+            std::string fileName;
+            std::string trajName;
     };
 
     class UserProg : public Controller{

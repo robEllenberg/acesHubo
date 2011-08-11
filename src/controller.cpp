@@ -47,6 +47,13 @@ namespace ACES{
                            RTT::OwnThread).doc("Grab the value of a state")
                            .arg("state", "State to grab value from")
                            .arg("attribute", "Quantity on state to grab");
+        this->addOperation("deleteCtrl", &Controller::deleteCtrl, this,
+                           RTT::OwnThread)
+                           .doc("Clear a part of the set point buffer")
+                           .arg("target", "The controlled state to remove");
+        this->addOperation("clearCtrl", &Controller::clearCtrl, this,
+                           RTT::OwnThread)
+                           .doc("Clear the entire set point buffer");
 
         this->addAttribute("packetsPerSP", packetsPerSP);
         this->ports()->addPort("packetReport", packetReporter).doc(
@@ -69,6 +76,21 @@ namespace ACES{
             curMap = new std::map<std::string, void*>;
         }
         txDownStream.write(curMap);
+        curMap = NULL;
+        return true;
+    }
+
+    bool Controller::deleteCtrl(std::string ctrl){
+        if(curMap){
+            map<std::string, void*>::iterator it;
+            it = curMap->find(ctrl);
+            curMap->erase(it);
+            return true;
+        }
+        return false;
+    }
+
+    bool Controller::clearCtrl(){
         curMap = NULL;
         return true;
     }
@@ -125,76 +147,9 @@ namespace ACES{
         return false;
     }
 
-/*
-    ScriptCtrl::ScriptCtrl(std::string cfg, std::string args)
-      : Controller(cfg, args),
-        walkScript((const char*)args.c_str(), std::ifstream::in)
-    {
-        //Set the current state of the simulation to stopped
-        simState = WB_CTRL_HALT;
-
-        //Make sure we have an existant script file
-        assert(walkScript.is_open());
-
-        this->addOperation("step", &ScriptCtrl::step, this, RTT::OwnThread).doc(
-                           "Advance the simulation one time step.");
-        this->addOperation("run", &ScriptCtrl::run, this, RTT::OwnThread).doc(
-                           "Start the simulation (free running).");
-        this->addOperation("halt",  &ScriptCtrl::halt, this, RTT::OwnThread).doc(
-                           "Halt the simulation.");
-        this->addOperation("openScript", &ScriptCtrl::openScript, this,
-                          RTT::OwnThread).doc("Open a new trajectory file").arg(
-                          "sfile", "Script file path");           
-    }
-
-    void ScriptCtrl::updateHook(){
-        switch(simState){
-            case WB_CTRL_HALT:
-                break;
-            case WB_CTRL_STEP:
-                //Fall through here is intentional
-            case WB_CTRL_RUN:
-                if( getStateVector() ){
-                    modStateVector();
-                    txDownStream.write(curMap);
-                    curMap = NULL;
-                }
-                if(simState == WB_CTRL_STEP){
-                    simState = WB_CTRL_HALT;
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    void ScriptCtrl::step(){
-        simState = WB_CTRL_STEP;
-    }
-
-    bool ScriptCtrl::run(){
-        simState = WB_CTRL_RUN;
-        return true;
-    }
-
-    void ScriptCtrl::halt(){
-        simState = WB_CTRL_HALT;
-    }
-
-    bool ScriptCtrl::openScript(std::string scriptPath){
-        if(walkScript.is_open()){
-            walkScript.close();
-        }
-        walkScript.open((const char*)scriptPath.c_str());
-
-        if(walkScript.is_open())
-            return true;
-        else
-            return false;
-    }
-*/
 //---------------Flexscript-----------------------
 
-    FlexibleScript::FlexibleScript(std::string cfg, std::string args)
+    DumbTrajectory::DumbTrajectory(std::string cfg, std::string args)
       : Controller(cfg, args),
         scriptPath(args),
         scriptFile()
@@ -205,18 +160,18 @@ namespace ACES{
         //Make sure we have an existant script file
         openScript(scriptPath);
 
-        this->addOperation("step", &FlexibleScript::step, this, RTT::OwnThread).doc(
+        this->addOperation("step", &DumbTrajectory::step, this, RTT::OwnThread).doc(
                            "Advance the script by one step.");
-        this->addOperation("run", &FlexibleScript::run, this, RTT::OwnThread).doc(
+        this->addOperation("run", &DumbTrajectory::run, this, RTT::OwnThread).doc(
                            "Start the script (free running).");
-        this->addOperation("halt",  &FlexibleScript::halt, this, RTT::OwnThread).doc(
+        this->addOperation("halt",  &DumbTrajectory::halt, this, RTT::OwnThread).doc(
                            "Halt the script.");
-        this->addOperation("openScript", &FlexibleScript::openScript, this,
+        this->addOperation("openScript", &DumbTrajectory::openScript, this,
                           RTT::OwnThread).doc("Open a new trajectory file").arg(
                           "sfile", "Script file path");           
     }
 
-    void FlexibleScript::updateHook(){
+    void DumbTrajectory::updateHook(){
         switch(simState){
             case CTRL_HALT:
             case CTRL_FAIL:
@@ -237,14 +192,14 @@ namespace ACES{
         }
     }
 
-    bool FlexibleScript::getStateVector(bool echo){
+    bool DumbTrajectory::getStateVector(bool echo){
 	char buf[1024];
         curMap = new std::map<std::string, void*>;
         scriptFile.getline(buf, 1024);
         if(not scriptFile.eof() ){
             std::string line(buf);
             istringstream lineStream(line);
-            for(int i = 0; i < states.size(); i++){  
+            for(unsigned int i = 0; i < states.size(); i++){  
                 //offset = it+i;
                 float value;
                 lineStream >> value;
@@ -260,7 +215,7 @@ namespace ACES{
         return false;
     }
 
-    void FlexibleScript::step(){
+    void DumbTrajectory::step(){
         if(simState == CTRL_FAIL){
             RTT::Logger::log(RTT::Logger::Warning)
              << "You may not run without a valid script." << RTT::endlog();
@@ -269,7 +224,7 @@ namespace ACES{
         }
     };
 
-    bool FlexibleScript::run(){
+    bool DumbTrajectory::run(){
         if(simState == CTRL_FAIL){
             RTT::Logger::log(RTT::Logger::Warning)
              << "You may not run without a valid script." << RTT::endlog();
@@ -280,11 +235,11 @@ namespace ACES{
         return true;
     }
 
-    void FlexibleScript::halt(){
+    void DumbTrajectory::halt(){
         simState = CTRL_HALT;
     }
 
-    bool FlexibleScript::openScript(std::string sp){
+    bool DumbTrajectory::openScript(std::string sp){
         if(scriptFile.is_open()){
             scriptFile.close();
             //Flush the current state list
@@ -322,7 +277,6 @@ namespace ACES{
     }
 //-----------------/FlexScript--------------
 
-
     NullCtrl::NullCtrl(std::string cfg, std::string args)
       : Controller(cfg, args)
     {}
@@ -331,111 +285,6 @@ namespace ACES{
         curMap = new std::map<std::string, void*>;
         return true; 
     }
-
-/*
-    LegCtrl::LegCtrl(std::string cfg, std::string args)
-      : ScriptCtrl(cfg, args)
-    {}
-
-    bool LegCtrl::getStateVector(bool echo)
-    {
-        //The state vector is a lookup table by the name of the joint
-
-        std::vector<float> angles;      //Temp container
-        curMap = new std::map<std::string, void*>;
-        //Fill w/the script info if we have data left, 
-        //otherwise zero fill the vector
-        if(not walkScript.eof()){
-            //For the moment, 13 is magic, based on the #of joints and
-            //the length of the script-file format.
-            for(int i = 0; i<13; i++){  
-                //offset = it+i;
-                float value;
-                walkScript >> value;
-                angles.push_back(value);
-               if(echo){
-                    RTT::Logger::log() << value << ", ";
-               }
-            }
-        }else{
-            for(int i=0; i< 13; i++){
-                angles.push_back(0.0);
-                if(echo){
-                    RTT::Logger::log() << "EOF" << ", ";
-                }
-            }
-            //Issue an empty vector if we don't want to do anything
-            //(picked up by HW to advance timestep in sim)
-            return true;
-        }
-        if(echo){
-            RTT::Logger::log() << RTT::endlog();
-        }
-
-        //Eat the remainder of the line
-        char a[1000];
-        walkScript.getline(a, 1000);
-
-        //Populate the state vector
-        (*curMap)["HY"] = new float(angles[0]);
-        (*curMap)["LHY"] = new float(angles[1]);
-        (*curMap)["LHR"] = new float(angles[2]);
-        (*curMap)["LHP"] = new float(angles[3]);
-        (*curMap)["LKP"] = new float(angles[4]);
-        (*curMap)["LAP"] = new float(angles[5]);
-        (*curMap)["LAR"] = new float(angles[6]);
-        (*curMap)["RHY"] = new float(angles[7]);
-        (*curMap)["RHR"] = new float(angles[8]);
-        (*curMap)["RHP"] = new float(angles[9]);
-        (*curMap)["RKP"] = new float(angles[10]);
-        (*curMap)["RAP"] = new float(angles[11]);
-        (*curMap)["RAR"] = new float(angles[12]);
-        //(*curMap)["RSP"] = new float(1.2);
- 
-        return true;
-    }
-
-    ArmCtrl::ArmCtrl(std::string cfg, std::string args)
-      : ScriptCtrl(cfg, args)
-    {}
-
-    bool ArmCtrl::getStateVector(bool echo)
-    {
-        //The state vector is a lookup table by the name of the joint
-        std::vector<float> angles;      //Temp container
-        curMap = new std::map<std::string, void*>;
-        //Fill w/the script info if we have data left, 
-        //otherwise zero fill the vector
-        if(not walkScript.eof()){
-            //For the moment, 13 is magic, based on the #of joints and
-            //the length of the script-file format.
-            for(int i = 0; i<2; i++){  
-                //offset = it+i;
-                float value;
-                walkScript >> value;
-                angles.push_back(value);
-               if(echo){
-                    RTT::Logger::log() << value << ", ";
-               }
-            }
-        }else{
-           return true;
-        }
-        if(echo){
-            RTT::Logger::log() << RTT::endlog();
-        }
-
-        //Eat the remainder of the line
-        char a[1000];
-        walkScript.getline(a, 1000);
-
-        //Populate the state vector
-        (*curMap)["RSP"] = new float(angles[0]);
-        (*curMap)["LSP"] = new float(angles[1]);
-
-        return true;
-    }
-*/
 
     PID::PID(std::string config, std::string args)
       :Controller(config, args)
@@ -459,6 +308,83 @@ namespace ACES{
 
         (*curMap)[outputSurface] = (void*) new float(val);
         return true;
+    }
+
+    UserTrajectory::UserTrajectory(std::string config, std::string args)
+     :Controller(config, args)
+    {
+        std::istringstream s1(args);
+        s1 >> fileName >> trajName;
+
+        this->addOperation("getLine", &UserTrajectory::getLine,
+                            this, RTT::OwnThread)
+                           .doc("Open a new trajectory file");
+        this->addOperation("openTrajectory", &UserTrajectory::openTrajectory,
+                            this, RTT::OwnThread)
+                           .doc("Open a new trajectory file");
+
+        openTrajectory(trajName);
+        getProvider<RTT::Scripting>("scripting")->loadPrograms(fileName);
+    }
+
+    void UserTrajectory::updateHook(){
+    }
+
+    bool UserTrajectory::openTrajectory(std::string sp){
+        if(scriptFile.is_open()){
+            scriptFile.close();
+            //Flush the current state list
+            while(states.size()){
+                states.pop_back();
+            }
+        }
+
+        scriptFile.open((const char*)trajName.c_str(), std::ifstream::in);
+
+        if(scriptFile.is_open()){
+            RTT::Logger::log(RTT::Logger::Warning) << "Successfully opened the "
+                << "script file at \"" << trajName << "\"."
+                << RTT::endlog();
+            char buf[1024];
+            scriptFile.getline(buf, 1024);
+            std::string headerLine(buf);
+            istringstream s(headerLine);
+            while(not s.eof()){
+                std::string stateName;
+                s >> stateName;
+                states.push_back(stateName);
+            }
+            return true;
+        }
+        else {
+            RTT::Logger::log(RTT::Logger::Warning) << "Unable to open the "
+                << "script file at \"" << trajName << "\"."
+                << RTT::endlog();
+        }
+        return false;
+    }
+
+    bool UserTrajectory::getStateVector(bool echo){
+        return false;
+    }
+
+    bool UserTrajectory::getLine(){
+        char buf[1024];
+        scriptFile.getline(buf, 1024);
+        if(not scriptFile.eof() ){
+            std::string line(buf);
+            istringstream lineStream(line);
+            for(unsigned int i = 0; i < states.size(); i++){  
+                //offset = it+i;
+                float value;
+                lineStream >> value;
+                addCtrl( states[i], value);
+                //RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
+            }
+            //RTT::Logger::log(RTT::Logger::Debug) << RTT::endlog();
+            return true;
+        }
+        return false;
     }
 
     UserProg::UserProg(std::string config, std::string args)

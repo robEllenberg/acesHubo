@@ -389,12 +389,15 @@ namespace ACES{
             if (t2 == "StateMachine"){
                 ctrl = (Controller*) new UserSM(cfg, args);
             }
+            if (t2 == "Trajectory"){
+                ctrl = (Controller*) new UserTrajectory(cfg, args);
+            }
         }
         if (t1 == "PID"){
             ctrl = (Controller*) new PID(cfg, args);
         }
         if (t1 == "Script"){
-            ctrl = (Controller*) new FlexibleScript(cfg, args);
+            ctrl = (Controller*) new DumbTrajectory(cfg, args);
         }
         /*
         #ifdef WEBOTS 
