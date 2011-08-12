@@ -88,7 +88,6 @@ program internals {
 	dLAnklePR.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dRShoulderPR, node 0
-    /*
 	dRShoulderPR.setDirection(0, 1);
 	dRShoulderPR.setGearRatio(0, 11, 16);
 	dRShoulderPR.setHarmonic(0,100);
@@ -142,7 +141,6 @@ program internals {
 	dLUpperArm.setGearRatio(1, 20, 24);
 	dLUpperArm.setHarmonic(1,100);
 	dLUpperArm.setEncoderSize(1,4000);
-    */
 
 	//Defining internal properties for device dRWrist, node 0
 	/*
@@ -206,6 +204,7 @@ program internals {
 	dNeck.setGearRatio(2, 1, 1);
 	dNeck.setHarmonic(2,100);
 	dNeck.setEncoderSize(2,128);
+	*/
 
 	//Defining internal properties for device dHip, node 0
 
@@ -213,23 +212,24 @@ program internals {
 	dHip.setGearRatio(0, 10, 25);
 	dHip.setHarmonic(0,100);
 	dHip.setEncoderSize(0,4000);
-	*/
 
 	//Specify Zeros for joints
 
-	dRHipYR.setZero(0,-18100,1);
-	dRHipYR.setZero(1,13000,0);
-	dRHipP.setZero(0,8400,0);
-	dRKnee.setZero(0,-17600,0);
-	dRAnklePR.setZero(0,-3000,0);
-	dRAnklePR.setZero(1,30800,0);
-	dLHipYR.setZero(0,26100,0);
-	dLHipYR.setZero(1,-32600,1);
-	dLHipP.setZero(0,-17500,1);
-	dLKnee.setZero(0,51900,1);
-	dLAnklePR.setZero(0,-1600,1);
-	dLAnklePR.setZero(1,-13200,1);
-    /*
+	dRHipYR.setZero(0,-18600,1);
+	dRHipYR.setZero(1,15000,0);
+	dRHipP.setZero(0,3800,0);
+	dRKnee.setZero(0,-20600,0);
+	dRAnklePR.setZero(0,3600,0);
+	dRAnklePR.setZero(1,29800,0);
+	dLHipYR.setZero(0,26400,0);
+	dLHipYR.setZero(1,-33600,1);
+	dLHipP.setZero(0,-14100,1);
+	dLKnee.setZero(0,52900,1);
+	dLAnklePR.setZero(0,-3100,1);
+	dLAnklePR.setZero(1,-12300,1);
+	
+    dHip.setZero(0,8000,1);
+
 	dRShoulderPR.setZero(0,-35000,0);
 	dRShoulderPR.setZero(1,8000,0);
 	dRUpperArm.setZero(0,-30000,0);
@@ -238,7 +238,33 @@ program internals {
 	dLShoulderPR.setZero(1,4000,1);
 	dLUpperArm.setZero(0,12000,1);
 	dLUpperArm.setZero(1,-72000,1);
-    */
+    
+    //Position Limits 
+    //TODO: Make these actually mean something by measuring the real limits, for now just use +/- pi
+
+	dRHipYR.setPosLimits(0,-180,180);
+	dRHipYR.setPosLimits(1,-180,180);
+	dRHipP.setPosLimits(0,-180,180);
+	dRKnee.setPosLimits(0,-180,180);
+	dRAnklePR.setPosLimits(0,-180,180);
+	dRAnklePR.setPosLimits(1,-180,180);
+	dLHipYR.setPosLimits(0,-180,180);
+	dLHipYR.setPosLimits(1,-180,180);
+	dLHipP.setPosLimits(0,-180,180);
+	dLKnee.setPosLimits(0,-180,180);
+	dLAnklePR.setPosLimits(0,-180,180);
+	dLAnklePR.setPosLimits(1,-180,180);
+	
+    dHip.setPosLimits(0,-180,180);
+
+	dRShoulderPR.setPosLimits(0,-180,180);
+	dRShoulderPR.setPosLimits(1,-180,180);
+	dRUpperArm.setPosLimits(0,-180,180);
+	dRUpperArm.setPosLimits(1,-180,180);
+	dLShoulderPR.setPosLimits(0,-180,180);
+	dLShoulderPR.setPosLimits(1,-180,180);
+	dLUpperArm.setPosLimits(0,-180,180);
+	dLUpperArm.setPosLimits(1,-180,180);
 	/*
 	dRWrist.setZero(0,-72000,1);
 	dRWrist.setZero(1,0,0);
@@ -249,11 +275,11 @@ program internals {
 	dNeck.setZero(0,0,0);
 	dNeck.setZero(1,0,0);
 	dNeck.setZero(2,0,0);
-	dHip.setZero(0,8000,1);
 	*/
-}
 
-program instant {
+
+    //Set Instant Trigger options
+
     //dRHipYR.instantTrigger = true;
     dRHipP.instantTrigger = true;
     //dRAnklePR.instantTrigger = true;
@@ -269,10 +295,11 @@ program instant {
     //dRWrist.instantTrigger = true;
     //dLWrist.instantTrigger = true;
     //dNeck.instantTrigger = true;
-    //dHip.instantTrigger = true;
+    dHip.instantTrigger = true;
 }
 
 program nameinfo {
+    printWarning("Sending interpolation data and joint limits...");
 	ch1.genPacket(1,8,"0x00010A0A0A8445FD");
 	ch1.genPacket(1,8,"0x01010A0A0001000A");
 	ch1.genPacket(1,8,"0x02010A1400B3000C");
@@ -298,19 +325,20 @@ program nameinfo {
 program gains {
 	//Specify gains to transmit to motors
 
+    printWarning("Sending position gains to motor controllers...");
 	dRHipYR.setGains("Position", 0, 200, 0, 500);
 	dRHipYR.setGains("Position", 1, 200, 0, 500);
 	dRHipP.setGains("Position", 0, 200, 0, 500);
-	dRHipP.setGains("Position", 0, 200, 0, 500);
+	dRKnee.setGains("Position", 0, 200, 0, 500);
 	dRAnklePR.setGains("Position", 0, 200, 0, 500);
 	dRAnklePR.setGains("Position", 1, 200, 0, 500);
 	dLHipYR.setGains("Position", 0, 200, 0, 500);
 	dLHipYR.setGains("Position", 1, 200, 0, 500);
 	dLHipP.setGains("Position", 0, 200, 0, 500);
-	dLHipP.setGains("Position", 0, 200, 0, 500);
+	dLKnee.setGains("Position", 0, 200, 0, 500);
 	dLAnklePR.setGains("Position", 0, 200, 0, 500);
 	dLAnklePR.setGains("Position", 1, 200, 0, 500);
-    /*
+
 	dRShoulderPR.setGains("Position", 0, 200, 0, 500);
 	dRShoulderPR.setGains("Position", 1, 200, 0, 500);
 	dRUpperArm.setGains("Position", 0, 200, 0, 500);
@@ -319,7 +347,6 @@ program gains {
 	dLShoulderPR.setGains("Position", 1, 200, 0, 500);
 	dLUpperArm.setGains("Position", 0, 200, 0, 500);
 	dLUpperArm.setGains("Position", 1, 200, 0, 500);
-    */
 	/*
 	dRWrist.setGains("Position", 0, 15, 0, 15);
 	dRWrist.setGains("Position", 1, 15, 0, 15);
@@ -334,74 +361,44 @@ program gains {
 	*/
 }
 
-program zeros {
-}
-
 program enable {
 	//Enable each device
 
+    printWarning("Sending enable flag to motor controllers");
 	dRHipYR.HIPenable();
-	dRHipYR.run();
-	dRHipYR.HIPenable();
-	dRHipYR.run();
-	dRHipP.HIPenable();
-	dRHipP.run();
-	dRHipP.HIPenable();
-	dRHipP.run();
-	dRAnklePR.HIPenable();
-	dRAnklePR.run();
-	dRAnklePR.HIPenable();
-	dRAnklePR.run();
-	dLHipYR.HIPenable();
-	dLHipYR.run();
-	dLHipYR.HIPenable();
-	dLHipYR.run();
-	dLHipP.HIPenable();
-	dLHipP.run();
-	dLHipP.HIPenable();
-	dLHipP.run();
+    dRHipYR.run();
+    dRHipP.HIPenable();
+    dRHipP.run();
+    dRKnee.HIPenable();
+    dRKnee.run();
+    dRAnklePR.HIPenable();
+    dRAnklePR.run();
+    dLHipYR.HIPenable();
+    dLHipYR.run();
+    dLHipP.HIPenable();
+    dLHipP.run();
+    dLKnee.HIPenable();
+    dLKnee.run();
 	dLAnklePR.HIPenable();
 	dLAnklePR.run();
-	dLAnklePR.HIPenable();
-	dLAnklePR.run();
-    /*
-	dRShoulderPR.HIPenable();
-	dRShoulderPR.run();
+       //Upper body
 	dRShoulderPR.HIPenable();
 	dRShoulderPR.run();
 	dRUpperArm.HIPenable();
 	dRUpperArm.run();
-	dRUpperArm.HIPenable();
-	dRUpperArm.run();
-	dLShoulderPR.HIPenable();
-	dLShoulderPR.run();
 	dLShoulderPR.HIPenable();
 	dLShoulderPR.run();
 	dLUpperArm.HIPenable();
 	dLUpperArm.run();
-	dLUpperArm.HIPenable();
-	dLUpperArm.run();
-    */
-	/*
-	dRWrist.HIPenable();
-	dRWrist.run();
-	dRWrist.HIPenable();
-	dRWrist.run();
-	dRWrist.HIPenable();
-	dRWrist.run();
-	dLWrist.HIPenable();
-	dLWrist.run();
-	dLWrist.HIPenable();
-	dLWrist.run();
-	dLWrist.HIPenable();
-	dLWrist.run();
-	dNeck.HIPenable();
-	dNeck.run();
-	dNeck.HIPenable();
-	dNeck.run();
-	dNeck.HIPenable();
-	dNeck.run();
 	dHip.HIPenable();
 	dHip.run();
+	/*
+       //3-motor controllers
+	dRWrist.HIPenable();
+	dRWrist.run();
+	dLWrist.HIPenable();
+	dLWrist.run();
+	dNeck.HIPenable();
+	dNeck.run();
 	*/
 }

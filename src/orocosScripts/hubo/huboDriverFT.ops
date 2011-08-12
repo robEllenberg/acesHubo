@@ -1,0 +1,242 @@
+program main {
+    var bool sampling = false;
+    var int baseport = 2827;
+
+    addHardware("ch1 90 500","HuboCAN","/dev/can0 1000");
+    addHardware("ch2 90 500","HuboCAN","/dev/can1 1000");
+    addHardware("ch1 90 1000","HuboCAN","testfile");
+    addProtocol("Pro1 80 500", "HuboCAN", "");
+    addProtocol("Pro2 80 500", "HuboCAN", "");
+
+    linkHP("ch1", "Pro1");
+    linkHP("ch2", "Pro2");
+
+    //Testing Purposes
+    //addHardware("ch1 90 1000","HuboCAN","testfile");
+
+    //Upper body devices
+    addDevice("dNeck 21 200","HuboCAN Motor", "0x22 3");
+	addDevice("dLShoulderPR 22 200","HuboCAN Motor", "0xA 2");
+	addDevice("dLUpperArm 23 200","HuboCAN Motor", "0xB 2");
+	addDevice("dNeck 25 200","HuboCAN Motor", "0x22 3");
+	addDevice("dRShoulderPR 26 200","HuboCAN Motor", "0x8 2");
+	addDevice("dRUpperArm 27 200","HuboCAN Motor", "0x9 2");
+    
+	//addDevice("dLWrist 24 200","HuboCAN Motor", "0x21 3");
+	//addDevice("dRWrist 28 200","HuboCAN Motor", "0x20 3");
+
+    addDevice("dHip 29 200","HuboCAN Motor","0x23 1");
+
+	addDevice("dLAnklePR 10 200","HuboCAN Motor", "0x7 2");
+	addDevice("dLHipYR 11 200","HuboCAN Motor", "0x4 2");
+	addDevice("dLHipP 12 200","HuboCAN Motor", "0x5 2");
+	addDevice("dLKnee 13 200","HuboCAN Motor", "0x6 2");
+	addDevice("dRAnklePR 14 200","HuboCAN Motor", "0x3 2");
+	addDevice("dRHipYR 15 200","HuboCAN Motor", "0x0 2");
+	addDevice("dRHipP 16 200","HuboCAN Motor", "0x1 2");
+	addDevice("dRKnee 17 200","HuboCAN Motor", "0x2 2");
+    
+    //Sensor node     //bus ID#, # of channels (FT=3, IMU/Hand(?)=4)
+    addDevice("dRFT 18 200", "HuboCAN Sensor", "0x30 3");
+    addDevice("dLFT 19 200", "HuboCAN Sensor", "0x31 3");
+    addDevice("dRWFT 19 200", "HuboCAN Sensor", "0x35 3");
+    addDevice("dLWFT 19 200", "HuboCAN Sensor", "0x36 3");
+    
+    //Link devices to appropriate protocol
+	linkPD("Pro1","dLAnklePR");
+	linkPD("Pro1","dLHipYR");
+	linkPD("Pro1","dLHipP");
+	linkPD("Pro1","dLKnee");
+	linkPD("Pro1","dRAnklePR");
+	linkPD("Pro1","dRHipYR");
+	linkPD("Pro1","dRHipP");
+	linkPD("Pro1","dRKnee");
+
+    linkPD("Pro2", "dHip");
+	linkPD("Pro2","dLShoulderPR");
+	linkPD("Pro2","dLUpperArm");
+	linkPD("Pro2","dRShoulderPR");
+	linkPD("Pro2","dRUpperArm");
+
+    linkPD("Pro1", "dRFT");
+    linkPD("Pro1", "dLFT");
+
+    linkPD("Pro2", "dRWFT");
+    linkPD("Pro2", "dLWFT");
+	//linkPD("Pro2","dLWrist");
+	//linkPD("Pro2","dNeck");
+	//linkPD("Pro2","dRWrist");
+
+	addState("RHY 20 200", "HuboSmoothed", "0 30", sampling, baseport + 0);
+	addState("RHR 21 200", "HuboSmoothed", "1 30", sampling, baseport + 1);
+	addState("RHP 22 200", "HuboSmoothed", "0 30", sampling, baseport + 2);
+	addState("RKP 23 200", "HuboSmoothed", "0 30", sampling, baseport + 3);
+	addState("RAP 24 200", "HuboSmoothed", "0 30", sampling, baseport + 4);
+	addState("RAR 25 200", "HuboSmoothed", "1 30", sampling, baseport + 5);
+	addState("LHY 26 200", "HuboSmoothed", "0 30", sampling, baseport + 6);
+	addState("LHR 27 200", "HuboSmoothed", "1 30", sampling, baseport + 7);
+	addState("LHP 28 200", "HuboSmoothed", "0 30", sampling, baseport + 8);
+	addState("LKP 29 200", "HuboSmoothed", "0 30", sampling, baseport + 9);
+	addState("LAP 30 200", "HuboSmoothed", "0 30", sampling, baseport + 10);
+	addState("LAR 31 200", "HuboSmoothed", "1 30", sampling, baseport + 11);
+
+	addState("RSP 10 200", "HuboSmoothed", "0 30", sampling, baseport + 12);
+	addState("RSR 10 200", "HuboSmoothed", "1 30", sampling, baseport + 13);
+	addState("RSY 10 200", "HuboSmoothed", "0 30", sampling, baseport + 14);
+	addState("REB 10 200", "HuboSmoothed", "1 30", sampling, baseport + 15);
+	addState("LSP 10 200", "HuboSmoothed", "0 30", sampling, baseport + 16);
+	addState("LSR 10 200", "HuboSmoothed", "1 30", sampling, baseport + 17);
+	addState("LSY 10 200", "HuboSmoothed", "0 30", sampling, baseport + 18);
+	addState("LEB 10 200", "HuboSmoothed", "1 30", sampling, baseport + 19);
+    
+	addState("WST 10 200", "HuboSmoothed", "0 30", sampling, baseport + 29);
+
+    /** Force Torque state definitions and links */
+    addState("RMx 32 200", "HuboSmoothed", "0 50", sampling, baseport+30);
+    addState("RMy 33 200", "HuboSmoothed", "1 50", sampling, baseport+31);
+    addState("RFz 34 200", "HuboSmoothed", "2 50", sampling, baseport+32);
+    linkDS("dRFT", "RMx");
+    linkDS("dRFT", "RMy");
+    linkDS("dRFT", "RFz");
+
+    addState("LMx 35 200", "HuboSmoothed", "0 50", sampling, baseport+33);
+    addState("LMy 36 200", "HuboSmoothed", "1 50", sampling, baseport+34);
+    addState("LFz 37 200", "HuboSmoothed", "2 50", sampling, baseport+35);
+
+    linkDS("dLFT", "LMx");
+    linkDS("dLFT", "LMy");
+    linkDS("dLFT", "LFz");
+
+    addState("LWMx 35 200", "HuboSmoothed", "0 50", sampling, baseport+36);
+    addState("LWMy 36 200", "HuboSmoothed", "1 50", sampling, baseport+37);
+    addState("LWFz 37 200", "HuboSmoothed", "2 50", sampling, baseport+38);
+
+    addState("RWMx 35 200", "HuboSmoothed", "0 50", sampling, baseport+39);
+    addState("RWMy 36 200", "HuboSmoothed", "1 50", sampling, baseport+40);
+    addState("RWFz 37 200", "HuboSmoothed", "2 50", sampling, baseport+41);
+
+    linkDS("dLWFT", "LWMx");
+    linkDS("dLWFT", "LWMy");
+    linkDS("dLWFT", "LWFz");
+
+    linkDS("dRWFT", "RWMx");
+    linkDS("dRWFT", "RWMy");
+    linkDS("dRWFT", "RWFz");
+
+    //These states don't exactly work yet...
+/*
+	addState("RWY 10 200", "Hubo", "0", sampling, baseport + 20);
+	addState("RW1 10 200", "Hubo", "1", sampling, baseport + 21);
+	addState("RW2 10 200", "Hubo", "2", sampling, baseport + 22);
+	addState("LWY 10 200", "Hubo", "0", sampling, baseport + 23);
+	addState("LW1 10 200", "Hubo", "1", sampling, baseport + 24);
+	addState("LW2 10 200", "Hubo", "2", sampling, baseport + 25);
+	addState("NKY 10 200", "Hubo", "0", sampling, baseport + 26);
+	addState("NK1 10 200", "Hubo", "1", sampling, baseport + 27);
+	addState("NK2 10 200", "Hubo", "2", sampling, baseport + 28);
+*/
+	linkDS("dRHipYR","RHY");
+	linkDS("dRHipYR","RHR");
+	linkDS("dRHipP","RHP");
+	linkDS("dRKnee","RKP");
+	linkDS("dRAnklePR","RAP");
+	linkDS("dRAnklePR","RAR");
+	linkDS("dLHipYR","LHY");
+	linkDS("dLHipYR","LHR");
+	linkDS("dLHipP","LHP");
+	linkDS("dLKnee","LKP");
+	linkDS("dLAnklePR","LAP");
+	linkDS("dLAnklePR","LAR");
+    //Upper Body
+	linkDS("dRShoulderPR","RSP");
+	linkDS("dRShoulderPR","RSR");
+	linkDS("dRUpperArm","RSY");
+	linkDS("dRUpperArm","REB");
+	linkDS("dLShoulderPR","LSP");
+	linkDS("dLShoulderPR","LSR");
+	linkDS("dLUpperArm","LSY");
+	linkDS("dLUpperArm","LEB");
+	linkDS("dHip","WST");
+/*
+	linkDS("dRWrist","RWY");
+	linkDS("dRWrist","RW1");
+	linkDS("dRWrist","RW2");
+	linkDS("dLWrist","LWY");
+	linkDS("dLWrist","LW1");
+	linkDS("dLWrist","LW2");
+	linkDS("dNeck","NKY");
+	linkDS("dNeck","NK1");
+	linkDS("dNeck","NK2");
+*/
+
+    //Setup Logging
+    addLogger("log1 5 100", "File", "SmoothingTest-log.txt");
+    linkLS("log1","LKP","value");
+    linkLS("log1","LHP","value");
+    /*
+    linkLS("log1", "RMx", "value");
+    linkLS("log1", "RMy", "value");
+    linkLS("log1", "RFz", "value");
+    linkLS("log1", "LMx", "value");
+    linkLS("log1", "LMy", "value");
+    linkLS("log1", "LFz", "value");
+    linkLS("log1", "RAP", "value");
+    linkLS("log1", "RAR", "value");
+    linkLS("log1", "LAP", "value");
+    linkLS("log1", "LAR", "value");
+    */
+    //--------------------------------------------------------------------------
+    //  Define controller for FT feedback
+    //--------------------------------------------------------------------------
+    //addController("ctrl 50 100","User Trajectory","huboCtrlerPID.ops YBwalking5.txt");
+
+    //addController("ctrl 90 100","User Trajectory","huboCtrler.ops 100hz-WalkingInPlaceSlowR9.txt");
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops onestepstairsR6.txt");
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops RobWalkInPlaceR8_FINAL_WORKING.txt"); //Need to Tune
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops RobWalkForward50mmR1_FINAL_WORKING.txt");
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops RobWalkForward100mmR2_FINAL_WORKING.txt");
+
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops trajectory.txt");
+    //addController("ctrl 50 100","User Trajectory","huboCtrler.ops SingleSupport.txt");
+//    addController("ctrl 50 100","User Trajectory","huboCtrlerPID.ops SingleSupport.txt");
+//    addController("ctrl 50 100","User Trajectory","huboCtrlerPID.ops SingleSupportonRight.txt");
+    addController("ctrl 50 100","User Trajectory","smoothingTest.ops traj-smoothingStep.txt");
+    //addController("ctrl 50 100","User Trajectory","huboCtrlerPID.ops trajectory.txt");
+
+    //addController("ctrl 50 100","User Trajectory","huboCtrlerScript.ops trajectory.txt");
+
+    //Controlled states
+//    linkSC("RHY","ctrl");
+//    linkSC("RHR","ctrl");
+//    linkSC("RHP","ctrl");
+//    linkSC("RKP","ctrl");
+//    linkSC("RAP","ctrl");
+//    linkSC("RAR","ctrl");
+    linkSC("LKP","ctrl");
+//    linkSC("LHR","ctrl");
+    linkSC("LHP","ctrl");
+//    linkSC("LKP","ctrl");
+//    linkSC("LAP","ctrl");
+//    linkSC("LAR","ctrl");
+
+    //Sensor states
+    //linkSC("LMx","ctrl");
+    //linkSC("LMy","ctrl");
+    //linkSC("LFz","ctrl");
+    //linkSC("RMx","ctrl");
+    //linkSC("RMy","ctrl");
+    //linkSC("RFz","ctrl");
+
+    /* END CONFIG SECTION */
+
+    //startDebug();
+    startHW();
+    startProtocol();
+    startDevice();
+    startState();
+    startController();
+    startLogger();
+    scripting.loadPrograms("huboConfig.ops");
+    scripting.loadStateMachines("autoZero.osd");
+    //scripting.loadPrograms("setup.ops");
+}

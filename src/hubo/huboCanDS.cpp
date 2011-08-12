@@ -207,6 +207,9 @@ namespace Hubo{
                 break;
             case CURR_LIMIT:
             case NULL_CMD:
+                cm->data[2] = (unsigned char)r1; //Copy the mode bits
+                cm->length = 3;
+                break;
             case SET_PERIOD_CMD:
             case SET_SAMPLE_CMD:
             case AD_READ_CMD:

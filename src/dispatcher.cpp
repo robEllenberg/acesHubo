@@ -78,6 +78,10 @@ namespace ACES{
         this->addOperation("startDebug", &Dispatcher::startDebug, this,
                            RTT::OwnThread).doc("Start debugging statements");
 
+        this->addOperation("printWarning", &Dispatcher::printWarning, this,
+                           RTT::OwnThread).doc("Start debugging statements")
+                           .arg("string", "Send a string message to the RTT Log at Warning level");
+
         this->addOperation("stopDebug", &Dispatcher::stopDebug, this,
                            RTT::OwnThread).doc("Stop debugging statements");
 
@@ -331,6 +335,17 @@ namespace ACES{
                                                     portnum);
             //s = (ProtoState*) new TestSuite::Spinner(cfg, args, sampling,
             //                                         portnum);
+        } 
+        else if ( type == "HuboSmoothed"){
+            std::istringstream str(args);
+            int id = 0;
+            int filterLength = 30;
+            str >> id;
+            str >> filterLength;
+            //TODO: hit the argument limit here, so filter length has to be set
+            //manually. Add to config string?
+            s = (ProtoState*) new ACES::FilteredState<float>(cfg, id, sampling,
+                                                    portnum,filterLength);
         } 
         #endif
         #ifdef WEBOTS
@@ -654,6 +669,14 @@ namespace ACES{
         //stopDevice();
         //stopProtocol();
         //stopHW();
+    }
+
+    void Dispatcher::printWarning(std::string s){
+        ///Send a message to log (visible by default)
+        ///
+        ///
+        RTT::Logger::log(RTT::Logger::Warning)
+            <<  s  << RTT::endlog();
     }
 
 } 

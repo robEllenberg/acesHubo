@@ -3,4 +3,6 @@ build/aces/build
 build/aces/lib
 build/aces/bin
 build/aces/src
-
+*.log
+*.txt
+*.tb_history

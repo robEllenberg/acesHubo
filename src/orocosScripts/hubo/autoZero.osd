@@ -1,133 +1,971 @@
-StateMachine LeftLeg_AutoZero
+StateMachine LeftHip
 {
-	//flags to indicate that a joint has been rezeroed 
-    int zeroAttempts = 0;
-    int RETRY_LIMIT = 2;
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
 
-    initial state zeroHubo
-	{
-		entry 
-		{
-			internals.start
-		}
-		
-		transition if true then {} select LHY
-	}
-
-	state LHY
-	{
-		entry
+    //Automatic mode design, since at this point processing time is irrelevant
+    initial state LHY
+    {
+        entry
         {
-            //Start fresh
-            dLHipYR.programZero(0);
-            zeroAttempts=1;
-        }
-
-        handle
-        {
-            //If it fails, resend and wait
-            if(dLHipYR.checkZero(0)==0x0A)
+            zeroAttempts=0;
+            if (forceZero) then
             {
-                dLHipYR.programZero(0); //resets status flag as well
+                dLHipYR.programZero(0);
                 zeroAttempts=zeroAttempts+1;
             }
         }
-        transition if (dLHipYR.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
-        {
-            //TODO: say that this joint fails
-        } select Failure
-        transition if (dLHipYR.checkZero(0)==0x05) then 
-		{} select LHR
-	}
-
-	state LHR
-	{
-		entry
-        {
-            //Start fresh
-            dLHipYR.programZero(1);
-            zeroAttempts=1;
-        }
-
         handle
-        {
-            //If it fails, resend and wait
-            if(dLHipYR.checkZero(1)==0x0A)
+        { 
+            if(dLHipYR.checkZero(0)==10) then
             {
-                dLHipYR.programZero(1); //resets status flag as well
+                //Repeat, since it could simply need to move farther
+                dLHipYR.programZero(0);
                 zeroAttempts=zeroAttempts+1;
-            }
-        }
+            } 
+        }   
 
-        transition if (dLHipYR.checkZero(1)==0x0A && zeroAttempts>RETRY_LIMIT) then 
+        transition if (dLHipYR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
         {
-            //TODO: say that this joint fails
+             
         } select Failure
-
-        transition if (dLHipYR.checkZero(1)==0x05) then 
-		{} select zeroDone
-	}
-
-	state LHP
-	{
-		entry
+        transition if (dLHipYR.checkZero(0)==5) then 
         {
-            //Start fresh
-            dLHipP.programZero(0);
-            zeroAttempts=1;
-        }
 
-        handle
-        {
-            //If it fails, resend and wait
-            if(dLHipP.checkZero(0)==0x0A)
-            {
-                dLHipP.programZero(0); //resets status flag as well
-                zeroAttempts=zeroAttempts+1;
-            }
-        }
-
-        transition if (dLHipP.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
-        {
-            //TODO: say that this joint fails
-        } select Failure
-
-        transition if (dLHipP.checkZero(0)==0x05) then 
-		{} select LKP
-	}
-	state LKP
-	{
-		entry
-        {
-            //Start fresh
-            dLKnee.programZero(0);
-            zeroAttempts=1;
-        }
-
-        handle
-        {
-            //If it fails, resend and wait
-            if(dLKnee.checkZero(0)==0x0A)
-            {
-                dLKnee.programZero(0); //resets status flag as well
-                zeroAttempts=zeroAttempts+1;
-            }
-        }
-
-        transition if (dLKnee.checkZero(0)==0x0A && zeroAttempts>RETRY_LIMIT) then 
-        {
-            //TODO: say that this joint fails
-        } select Failure
-
-        transition if (dLKnee.checkZero(0)==0x05) then 
-		{} select ZeroDone
-	}
-
-	final state ZeroDone {
-        entry 
-        {
-            gains.start();
-        }
+        } select LHR
     }
 
-}  
+    state LHR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLHipYR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dLHipYR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLHipYR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dLHipYR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLHipYR.checkZero(1)==5) then 
+        {
+
+        } select exit
+    }
+    //Boilerplate
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+
+StateMachine LeftLegPitch
+{
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    //Automatic mode design, since at this point processing time is irrelevant
+
+    initial state LHP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLHipP.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dLHipP.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLHipP.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dLHipP.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLHipP.checkZero(0)==5) then 
+        {
+
+        } select LKP
+    }
+    state LKP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLKnee.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dLKnee.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLKnee.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dLKnee.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLKnee.checkZero(0)==5) then 
+        {
+
+        } select exit
+    }
+    //Boilerplate
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+
+StateMachine LeftAnkle
+{
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    initial state LAP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+            dLAnklePR.programZero(0);
+                dLHipYR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dLAnklePR.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLAnklePR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dLAnklePR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLAnklePR.checkZero(0)==5) then 
+        {
+        } select LAR
+    }
+    state LAR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLAnklePR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dLAnklePR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLAnklePR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dLAnklePR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+        } select Failure
+        transition if (dLAnklePR.checkZero(1)==5) then 
+        {
+        } select exit
+    }
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+StateMachine RightHip
+{
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    //Automatic mode design, since at this point processing time is irrelevant
+    initial state RHY
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRHipYR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dRHipYR.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRHipYR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dRHipYR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+             
+        } select Failure
+        transition if (dRHipYR.checkZero(0)==5) then 
+        {
+
+        } select RHR
+    }
+
+    state RHR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRHipYR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dRHipYR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRHipYR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dRHipYR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRHipYR.checkZero(1)==5) then 
+        {
+
+        } select exit
+    }
+    //Boilerplate
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+
+StateMachine RightLegPitch
+{
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    initial state RHP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRHipP.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dRHipP.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRHipP.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dRHipP.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRHipP.checkZero(0)==5) then 
+        {
+
+        } select RKP
+    }
+    state RKP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRKnee.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dRKnee.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRKnee.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dRKnee.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRKnee.checkZero(0)==5) then 
+        {
+
+        } select exit
+    }
+    //Boilerplate
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+
+StateMachine RightAnkle
+{
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    initial state RAP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRAnklePR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dRAnklePR.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRAnklePR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dRAnklePR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRAnklePR.checkZero(0)==5) then 
+        {
+        } select RAR
+    }
+    state RAR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRAnklePR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+
+        handle
+        { 
+            if(dRAnklePR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRAnklePR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+        transition if (dRAnklePR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+        } select Failure
+        transition if (dRAnklePR.checkZero(1)==5) then 
+        {
+        } select exit
+    }
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit 
+    {
+    }
+}
+
+StateMachine LeftArm
+{
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    //Automatic mode design, since at this point processing time is irrelevant
+    initial state LSP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+            dLShoulderPR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dLShoulderPR.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLShoulderPR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dLShoulderPR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLShoulderPR.checkZero(0)==5) then 
+        {
+
+        } select LSR
+    }
+
+    state LSR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+            dLShoulderPR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dLShoulderPR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLShoulderPR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dLShoulderPR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLShoulderPR.checkZero(1)==5) then 
+        {
+
+        } select LSY
+    }
+
+    state LSY
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLUpperArm.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dLUpperArm.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLUpperArm.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dLUpperArm.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLUpperArm.checkZero(0)==5) then 
+        {
+
+        } select LEP
+    }
+    state LEP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dLUpperArm.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dLUpperArm.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dLUpperArm.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dLUpperArm.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dLUpperArm.checkZero(1)==5) then 
+        {
+
+        } select exit
+    }
+    //No wrists yet
+    state Failure
+    {
+        entry
+        {   
+            
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit {
+    }
+} 
+
+StateMachine RightArm
+{
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    //Automatic mode design, since at this point processing time is irrelevant
+    initial state RSP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+            dRShoulderPR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dRShoulderPR.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRShoulderPR.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dRShoulderPR.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRShoulderPR.checkZero(0)==5) then 
+        {
+
+        } select RSR
+    }
+
+    state RSR
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRShoulderPR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dRShoulderPR.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRShoulderPR.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dRShoulderPR.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRShoulderPR.checkZero(1)==5) then 
+        {
+
+        } select RSY
+    }
+
+    state RSY
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRUpperArm.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dRUpperArm.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRUpperArm.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dRUpperArm.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dRUpperArm.checkZero(0)==5) then 
+        {
+
+        } select REP
+    }
+    state REP
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+                dRUpperArm.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dRUpperArm.checkZero(1)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dRUpperArm.programZero(1);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dRUpperArm.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        {
+        } select Failure
+        transition if (dRUpperArm.checkZero(1)==5) then 
+        {
+
+        } select exit
+    }
+    //No wrists yet
+    state Failure
+    {
+        entry
+        {   
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit {
+    }
+} 
+StateMachine Waist
+{
+    //flags to indicate that a joint has been rezeroed 
+    param bool forceZero;
+    var int zeroAttempts = 0;
+    param int retryLimit;
+
+    //Automatic mode design, since at this point processing time is irrelevant
+    initial state Waist
+    {
+        entry
+        {
+            zeroAttempts=0;
+            if (forceZero) then
+            {
+            dHip.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            }
+        }
+        handle
+        { 
+            if(dHip.checkZero(0)==10) then
+            {
+                //Repeat, since it could simply need to move farther
+                dHip.programZero(0);
+                zeroAttempts=zeroAttempts+1;
+            } 
+        }   
+
+        transition if (dHip.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        {
+
+        } select Failure
+        transition if (dHip.checkZero(0)==5) then 
+        {
+
+        } select exit
+    }
+
+    state Failure
+    {
+        entry
+        {   
+            
+            printWarning("Aborting zero procedure; one or more joints failed to properly zero");
+        }
+    }
+    final state exit {
+    }
+} 
+
+StateMachine ZeroAll
+{
+    //Parameters for state machines
+    param bool forceZero;
+
+    //initialize Leg state machines (multiple machines allow us to zero multiple joints simultaneously)
+    SubMachine LeftHip leftHip(forceZero = forceZero,retryLimit=2);
+    SubMachine RightHip rightHip(forceZero = forceZero,retryLimit=2);
+    SubMachine LeftAnkle leftAnkle(forceZero = forceZero,retryLimit=2);
+    SubMachine RightAnkle rightAnkle(forceZero = forceZero,retryLimit=2);
+    SubMachine LeftLegPitch leftLegPitch(forceZero = forceZero,retryLimit=2);
+    SubMachine RightLegPitch rightLegPitch(forceZero = forceZero,retryLimit=2);
+    SubMachine Waist waist(forceZero = forceZero,retryLimit=2);
+
+    //Initialize Arm state machines
+    SubMachine LeftArm leftArm(forceZero = forceZero,retryLimit=3);
+    SubMachine RightArm rightArm(forceZero = forceZero,retryLimit=3);
+
+    initial state start
+    {
+       entry
+       {
+            nameinfo.start;
+       }
+
+       transition select setup
+    }
+    state setup
+    {
+    entry
+        {
+            printWarning("Starting zero process");
+            printWarning("Setting up motor controllers...");
+            internals.start;
+        }
+        transition select Hips
+    }
+
+    state Hips
+    {
+        entry
+        {
+            leftHip.activate;
+            leftHip.start;
+            rightHip.activate;
+            rightHip.start;
+        }
+        transition 
+        {
+            //Drop straight through to start the ankles, since they can be 
+            //run simultaneously with hips
+        }select Ankles
+    }
+
+    state Ankles
+    {
+        entry
+        {
+            leftAnkle.activate;
+            leftAnkle.start;
+            rightAnkle.activate;
+            rightAnkle.start;
+        }
+        transition if (leftHip.inFinalState && rightHip.inFinalState && leftHip.inFinalState && rightHip.inFinalState) then
+        {
+            leftHip.stop;
+            leftHip.deactivate;
+            rightHip.stop;
+            rightHip.deactivate;
+            leftAnkle.stop;
+            leftAnkle.deactivate;
+            rightAnkle.stop;
+            rightAnkle.deactivate;
+        }select Pitch
+        transition if (leftAnkle.isRunning == false || rightAnkle.isRunning == false || leftAnkle.isRunning == false || rightAnkle.isRunning == false) then {
+            printWarning("Error of some sort in Ankle joints");
+        } select exit
+        transition if (leftHip.isRunning == false || rightAnkle.isRunning == false || leftAnkle.isRunning == false || rightAnkle.isRunning == false) then {
+            printWarning("Error of some sort in Hip joints");
+        } select exit
+    }
+    state Pitch
+    {
+        entry
+        {
+            leftLegPitch.activate;
+            leftLegPitch.start;
+            rightLegPitch.activate;
+            rightLegPitch.start;
+        }
+        transition if (leftLegPitch.inFinalState && rightLegPitch.inFinalState && leftLegPitch.inFinalState && rightLegPitch.inFinalState) then
+        {
+            leftLegPitch.stop;
+            leftLegPitch.deactivate;
+            rightLegPitch.stop;
+            rightLegPitch.deactivate;
+        }select Arms
+        transition if (leftLegPitch.isRunning == false || rightLegPitch.isRunning == false || leftLegPitch.isRunning == false || rightLegPitch.isRunning == false) then {
+            printWarning("Zeroing of Leg Pitch joints halted");
+        } select exit
+
+    }
+
+    state Arms
+    {
+        entry
+        {
+            leftArm.activate;
+            rightArm.activate;
+            leftArm.start;
+            rightArm.start;
+        }
+        transition if (leftArm.inFinalState && rightArm.inFinalState) then
+        {
+            leftArm.stop;
+            rightArm.stop;
+            leftArm.deactivate;
+            rightArm.deactivate;
+        } select waist
+        transition if (leftArm.isRunning == false || rightArm.isRunning == false ) then {
+            printWarning("Zeroing of Arms halted");
+        } select exit
+    }
+
+    state waist
+    {
+        entry
+        {
+            waist.activate;
+            waist.start;
+        }
+        transition if (waist.inFinalState) then
+        {
+            waist.stop;
+            waist.deactivate;
+        } select sendConfig
+        transition if (waist.isRunning == false) then
+        {   
+            printWarning("Zeroing of Waist halted");
+        }
+
+    }
+
+    state sendConfig
+    {
+        entry
+        {
+            printWarning("Zeroing of Hubo complete");
+            gains.start;
+            enable.start;
+            dLFT.programZero;
+            dRFT.programZero;
+
+        }
+        transition select exit
+    }
+
+    final state exit
+    {
+    }
+}
+RootMachine ZeroAll zeroHubo(forceZero = true)

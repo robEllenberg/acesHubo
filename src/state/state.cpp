@@ -29,6 +29,7 @@
 */
 
 #include "state.hpp"
+
 namespace ACES {
     ProtoState::ProtoState(std::string cfg, int nID, bool sampling) :
       ACESTask(cfg),
@@ -74,20 +75,4 @@ namespace ACES {
         return name;
     }
    
-/*
-    template <class T>
-    void State<T>::rxUpStream(Word<T>* rx){
-        RTT::Logger::log() << "in:" << rx.getNodeID() << " my:"
-                           << nodeID.get()
-                           << " equiv: "
-                           <<  (rx.getNodeID() == nodeID.get())
-                           << RTT::endlog();
-        if(rx.getNodeID() == nodeID.get())
-        {
-            usQueue.enqueue(rx);
-            //RTT::OS::MutexLock lock(usqGuard);
-            //usQueue.push_back(rx);
-        }
-    }
-*/
 }

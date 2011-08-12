@@ -28,7 +28,7 @@
     Systems (IROS), 2011 IEEE/RSJ International Conference on. 
 */
 
-#ifndef ACES_HUBOCANi_HPP
+#ifndef ACES_HUBOCAN_HPP
 #define ACES_HUBOCAN_HPP
 
 #include <iostream>

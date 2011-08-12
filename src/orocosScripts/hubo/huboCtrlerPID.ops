@@ -1,0 +1,764 @@
+/*
+    //Grab the presently known value from a state
+    var float n = getSurface("StateName", "quant") 	
+					//StateName is the state to check
+					//quant is 'value', 'diff', or 'integral'
+    
+    var float n = checkCtrl("StateName") //Review the set point stored in the
+				         //buffer for StateName
+
+    addCtrl("StateName", val) 		//Queue set point 'val' to StateName in buffer
+    sendCtrl()				//Apply set points in buffer to system
+*/
+
+program main{
+
+    // Constants
+    var float pi = 3.14159;
+
+
+//------------------------------------------
+//----[ Start KAIST Constants and Vars ]----
+//------------------------------------------
+
+    // for roll
+    var float paR = 3.939;
+    var float pbR = -4.333;
+    var float pcR = 0.0007566526;
+    var float pkR = -57.295779513;
+
+    var float x1rRnew = 0;          // right ankkle roll
+    var float x1rR = 0;             // right ankkle roll
+
+    var float x1rLnew = 0;          // left ankkle roll
+    var float x1rL = 0;             // left ankkle roll
+
+
+
+    // for pitch
+    var float paP = 4.238;
+    var float pbP = -5.712;
+    var float pcP = 0.0006317315;
+    var float pkP = -57.295779513;
+
+    var float x1pRnew = 0;          // right ankkle pitch
+    var float x1pR = 0;             // right ankkle pitch
+
+    var float x1pLnew = 0;          // left ankkle pitch
+    var float x1pL = 0;             // left ankkle pitch
+
+    var float DampGainP = 0.6;  
+    var float DampGainR = 1.0;
+
+    var array RF_DC_MAT(23);
+    var array LF_DC_MAT(23);
+
+    RF_DC_MAT[0] = -0.0722;
+    RF_DC_MAT[1] = 0.0002;
+    RF_DC_MAT[2] = 0.0007;
+    
+    RF_DC_MAT[10] = 0.0012;
+    RF_DC_MAT[11] = 0.0740;
+    RF_DC_MAT[12] = -0.0014;
+
+    RF_DC_MAT[20] = -0.0562;
+    RF_DC_MAT[21] = 0.0469;
+    RF_DC_MAT[22] = 0.3234;
+
+    LF_DC_MAT[0] = 0.07111;
+    LF_DC_MAT[1] = -0.0017;
+    LF_DC_MAT[2] = -0.0002;
+
+    LF_DC_MAT[10] = -0.0005;
+    LF_DC_MAT[11] = -0.0723;
+    LF_DC_MAT[12] = -0.0013;
+
+    LF_DC_MAT[20] = -0.0272;
+    LF_DC_MAT[21] = -0.1580;
+    LF_DC_MAT[22] = 0.3264;
+//------------------------------------------
+//-----[ End KAIST Constants and Vars ]-----
+//------------------------------------------
+
+
+
+
+//==================================
+//======[ Start FT Filter ]=========
+//==================================
+
+    var int fLMx = 0;
+    var int fLMy = 1;
+    var int fLFz = 2;
+    var int fRMx = 3;
+    var int fRMy = 4;
+    var int fRFz = 5;
+    var int fLength = 6;     // the is the length of the amount of FTs there are
+
+    var int fL = 5;        // filter averaging length
+    var float fLd = 5.0;   // save as above but in float so we can devide
+    var array fyn = array(fL); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fyn1 = array(fL); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fxn = array(fL); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+    var float fk1 = 0.60;
+    var float fk0 = 1.0-fk1;
+    var array fzn = array(fL); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var int fLi = 0;            // filter mean indexer
+    var array fbuff0(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuff1(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuff2(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuff3(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuff4(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuff5(6); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    var array fbuffSum = array(fL); //(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    
+    var float LMxMf = 0.0;
+    var float LMyMf = 0.0;
+    var float LFzMf = 0.0;
+
+    var float RMxMf = 0.0;
+    var float RMyMf = 0.0;
+    var float RFzMf = 0.0;
+
+//==================================
+//=======[ End FT Filter ]==========
+//==================================
+
+
+
+
+
+
+    // Gains
+    // Left foot
+    var float LpP = -0.0003;     // pitch P gain
+    var float LpD = -0.00007;     // pitch D gain
+    var float LpI = 0.0;     // pitch I gain
+
+    var float LrP = -0.001;     
+    var float LrD = 0.0005;
+    var float LrI = 0.0;
+
+    // Right foot
+    var float RpP = -0.0003;     // pitch P gain
+    var float RpD = -0.00007;     // pitch D gain
+    var float RpI = 0.0;     // pitch I gain
+
+    var float RrP = -0.0005;     
+    var float RrD = 0.0005;
+    var float RrI = 0.0;
+
+    //--------------------------------------
+    //--[ Start Set all PR gains to zero ]--
+    //--------------------------------------
+    // Left foot
+    /*
+    LpP = 0.0;     // pitch P gain
+    LpD = 0.0;     // pitch D gain
+    LpI = 0.0;     // pitch I gain
+
+    LrP = 0.0;
+    LrD = 0.0;
+    LrI = 0.0;
+    
+    // Right foot
+    RpP = 0.0;     // pitch P gain
+    RpD = 0.0;     // pitch D gain
+    RpI = 0.0;     // pitch I gain
+    RrP = 0.0;
+    RrD = 0.0;
+    RrI = 0.0;
+    */
+
+    //--------------------------------------
+    //---[ End Set all PR gains to zero ]---
+    //--------------------------------------
+
+
+    // buffers
+    //var int L = 20;
+    var int L = 5;
+    //var int L = 100;
+    var array buffLAP = array(L);
+    var array buffLAR = array(L);
+    var array buffRAP = array(L);
+    var array buffRAR = array(L);
+    
+    var float buffSumLAP = 0.0;
+    var float buffSumLAR = 0.0;
+    var float buffSumRAP = 0.0;
+    var float buffSumRAR = 0.0;
+
+
+    // for smoothing
+    var float yn_LAP = 0.0;
+    var float yn1_LAP = 0.0;
+    var float zn_LAP = 0.0;
+    var float xn_LAP = 0.0;
+        
+    var float yn_LAR = 0.0;
+    var float yn1_LAR = 0.0;
+    var float zn_LAR = 0.0;
+    var float xn_LAR = 0.0;
+
+    var float yn_RAP = 0.0;
+    var float yn1_RAP = 0.0;
+    var float zn_RAP = 0.0;
+    var float xn_RAP = 0.0;
+        
+    var float yn_RAR = 0.0;
+    var float yn1_RAR = 0.0;
+    var float zn_RAR = 0.0;
+    var float xn_RAR = 0.0;
+
+
+
+
+
+
+
+
+
+    //var float k1 = 0.80;
+    var float k1 = 0.60;
+    //var float k1 = 0.94;
+    var float k0 = 1.0-k1;
+
+
+    // iterators
+    var int i = 0;
+    var int j = 0;
+
+    var int iLAP = 0;
+    var int iLAR = 0;
+
+    var int iRAP = 0;
+    var int iRAR = 0;
+
+
+    // min and max values (in rad)
+    var float pmax = 3.0*pi/180.0;          // this is the max delta deg in pitch
+    var float pmin = -3.0*pi/180.0;         // min delta deg in pitch
+    var float rmax = 4.0*pi/180.0;          // max delta deg in roll
+    var float rmin = -4.0*pi/180.0;         // min delta deg in roll 
+    
+
+    // temp value for calculating the diritive (one time step back)
+    var float tLp = 0.0;
+    var float tLr = 0.0;
+    var float tLz = 0.0;
+
+    var float tRp = 0.0;
+    var float tRr = 0.0;
+    var float tRz = 0.0;
+
+
+    // Define states
+    var float RHP = 0.0;
+    var float RHR = 0.0;
+    var float RHY = 0.0;
+    var float RKP = 0.0;
+    var float RAP = 0.0;
+    var float RAR = 0.0;
+
+    var float LHP = 0.0;
+    var float LHR = 0.0;
+    var float LHY = 0.0;
+    var float LKP = 0.0;
+    var float LAP = 0.0;
+    var float LAR = 0.0;
+
+    var float RHPf = 0.0;
+    var float RHRf = 0.0;
+    var float RHYf = 0.0;
+    var float RKPf = 0.0;
+    var float RAPf = 0.0;
+    var float RARf = 0.0;
+
+    var float LHPf = 0.0;
+    var float LHRf = 0.0;
+    var float LHYf = 0.0;
+    var float LKPf = 0.0;
+    var float LAPf = 0.0;
+    var float LARf = 0.0;
+
+    var float LMx = 0.0;
+    var float LMy = 0.0;
+    var float LFz = 0.0;
+
+    var float RMx = 0.0;
+    var float RMy = 0.0;
+    var float RFz = 0.0;
+
+    var float LMxM = 0.0;
+    var float LMyM = 0.0;
+    var float LFzM = 0.0;
+
+    var float RMxM = 0.0;
+    var float RMyM = 0.0;
+    var float RFzM = 0.0;
+    
+    // current values
+    var float lp = 0.0;       // left pitch ft
+    var float lr = 0.0;       // left roll ft
+    var float FzR = 0.0;      // right foot Fz scaled
+    var float FzL = 0.0;      // left foot Fz scaled
+    var float rp = 0.0;       // right pitch ft
+    var float rr = 0.0;       // right roll ft
+
+    // Deritives
+    var float dRp = 0.0;        // deritive right pitch
+    var float dRr = 0.0;        // deritive right roll
+
+    var float dLp = 0.0;        // deritive left pitch
+    var float dLr = 0.0;        // deritive left roll
+
+
+    while(true)
+    {
+
+        if(getLine()) then
+        {
+            RHP = checkCtrl("RHP");
+            RHR = checkCtrl("RHR");
+            RHY = checkCtrl("RHY");
+            RKP = checkCtrl("RKP");
+            RAP = checkCtrl("RAP");
+            RAR = checkCtrl("RAR");
+
+            LHP = checkCtrl("LHP");
+            LHR = checkCtrl("LHR");
+            LHY = checkCtrl("LHY");
+            LKP = checkCtrl("LKP");
+            LAP = checkCtrl("LAP");
+            LAR = checkCtrl("LAR");
+        }
+
+        LMx = getSurface("LMx","value");
+        LMy = getSurface("LMy","value");
+        LFz = getSurface("LFz","value");
+
+        RMx = getSurface("RMx","value");
+        RMy = getSurface("RMy","value");
+        RFz = getSurface("RFz","value");
+        
+
+
+//(((((((((((((((((((((((((((((((((((((((((((
+//---------[ Start FT Compensation ]---------
+//(((((((((((((((((((((((((((((((((((((((((((
+    RMxM = -(RF_DC_MAT[0]*RMx +  RF_DC_MAT[1]*RMy + RF_DC_MAT[2]*RFz);
+    RMyM = (RF_DC_MAT[10]*RMx +  RF_DC_MAT[11]*RMy + RF_DC_MAT[12]*RFz);
+    RFzM = ((RF_DC_MAT[20]*RMx +  RF_DC_MAT[21]*RMy + RF_DC_MAT[22]*RFz));
+
+    LMxM = -(LF_DC_MAT[0]*LMx +  LF_DC_MAT[1]*LMy + LF_DC_MAT[2]*LFz);
+    LMyM = (LF_DC_MAT[10]*LMx +  LF_DC_MAT[11]*LMy + LF_DC_MAT[12]*LFz);
+    LFzM = (LF_DC_MAT[20]*LMx +  LF_DC_MAT[21]*LMy + LF_DC_MAT[22]*LFz);
+
+    //----------------
+    //-[start filter]-
+    //----------------
+    fxn[fRMx] = RMxM;
+    fxn[fRMy] = RMyM;
+    fxn[fRFz] = RFzM;
+
+    fxn[fLMx] = LMxM;
+    fxn[fLMy] = LMyM;
+    fxn[fLFz] = LFzM;
+
+    for (i = 0; i < fLength; i = i+1)
+    {
+        fyn[i] = fk1*fyn1[i]+fxn[i];
+        fzn[i] = fk0*fyn[i];
+        fyn1[i] = fyn[i];
+    }
+
+/*
+        fbuffSum[fRMx] = fbuffSum[fRMx] - fbuff0[fLi] + fzn[fRMx];
+        fbuff0[fLi] = fzn[fRMx];
+            
+        fbuffSum[fRMy] = fbuffSum[fRMy] - fbuff1[fLi] + fzn[fRMy];
+        fbuff1[fLi] = fzn[fRMy];
+        
+        fbuffSum[fRFz] = fbuffSum[fRFz] - fbuff2[fLi] + fzn[fRFz];
+        fbuff2[fLi] = fzn[fRFz];
+        
+        fbuffSum[fLMx] = fbuffSum[fLMx] - fbuff3[fLi] + fzn[fLMx];
+        fbuff3[fLi] = fzn[fLMx];
+            
+        fbuffSum[fLMy] = fbuffSum[fLMy] - fbuff4[fLi] + fzn[fLMy];
+        fbuff4[fLi] = fzn[fLMy];
+        
+        fbuffSum[fLFz] = fbuffSum[fLFz] - fbuff5[fLi] + fzn[fLFz];
+        fbuff5[fLi] = fzn[fLFz];
+
+        fLi = fLi + 1;
+        if (fLi >= fL) then
+        {
+            fLi = 0;
+        }
+*/
+/*
+        RMxMf = fbuffSum[fRMx]/fLd;
+        RMyMf = fbuffSum[fRMy]/fLd;
+        RFzMf = fbuffSum[fRFz]/fLd;
+
+        LMxMf = fbuffSum[fLMx]/fLd;
+        LMyMf = fbuffSum[fLMy]/fLd;
+        LFzMf = fbuffSum[fLFz]/fLd;
+*/
+        RMxMf = fzn[fRMx];
+        RMyMf = fzn[fRMy];
+        RFzMf = fzn[fRFz];
+
+        LMxMf = fzn[fLMx];
+        LMyMf = fzn[fLMy];
+        LFzMf = fzn[fLFz];
+    //----------------
+    //--[end filter]--
+    //----------------
+
+
+//(((((((((((((((((((((((((((((((((((((((((((
+//----------[ End FT Compensation ]----------
+//(((((((((((((((((((((((((((((((((((((((((((
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // oppose change
+        lp = LMxMf;       // left pitch ft
+        lr = -LMyMf;       // left roll ft
+        
+        // reverse direction
+        //lp = -LMxM;       // left pitch ft
+        //lr = LMyM;       // left roll ft
+
+        // Oppose change
+        rp = -RMxMf;       // right pitch ft
+        rr = RMyMf;       // right roll ft
+        
+        // reversed direction
+        //rp = RMxM;       // right pitch ft
+        //rr = -RMyM;       // right roll ft
+
+
+        FzR = RFzMf;         // scaled FZ right
+        FzL = LFzMf;         // scaled FZ left
+
+
+
+
+
+//=========================================
+//======[ Start Limit Fz Multiplyer ]======
+//=========================================
+/*
+        if( FzR < 0.0) then
+        {
+            FzR = 0.0;
+        }
+        if( FzR > 1.0) then
+        {
+            FzR = 1.0;
+        }
+        if( FzL < 0.0) then
+        {
+            FzL = 0.0;
+        }
+        if( FzL > 1.0) then
+        {
+            FzL = 1.0;
+        }
+*/
+//=========================================
+//=======[ End Limit Fz Multiplyer ]=======
+//=========================================
+
+        
+
+//=========================================
+//===[ Start Set All to Zero (testing) ]===
+//=========================================
+/*
+        RHP = 0.0;
+        RHR = 0.0;
+        RHY = 0.0;
+        RKP = 0.0;
+        RAP = 0.0;
+        RAR = 0.0;
+        LHP = 0.0;
+        LHR = 0.0;
+        LHY = 0.0;
+        LKP = 0.0;
+        LAR = 0.0;
+        LAP = 0.0;
+*/
+//=========================================
+//====[ End Set All to Zero (testing) ]====
+//=========================================
+
+
+
+
+
+
+//****************************
+//****[ Start Get Dy/Dt ]*****
+//****************************
+
+        dLp = lp - tLp;
+        tLp = lp;
+
+        dRp = rp - tRp;
+        tRp = rp;
+
+        dLr = lr - tLr;
+        tLr = lr;
+
+        dRr = rr - tRr;
+        tRr = rr;
+
+
+
+//****************************
+//*****[ End Get Dy/Dt ]******
+//****************************
+
+
+
+//8888888888888888888888888888888888888888
+//8888888[ Start Do Control Here ]88888888
+//8888888888888888888888888888888888888888
+
+    lp = lp*(LpP + LpD*dLp);
+    rp = rp*(RpP + RpD*dRp);
+
+    lr = lr*(LrP + LrD*dLr);
+    rr = rr*(RrP + RrD*dRr);
+//8888888888888888888888888888888888888888
+//88888888[ End Do Control Here ]888888888
+//8888888888888888888888888888888888888888
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//&&&&&&&[ Start Apply FZ Mult ]&&&&&&&&&&
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+/*
+    lp = FzL*lp;
+    rp = FzR*rp;
+
+    lr = FzL*lr;
+    rr = FzR*rr;
+*/
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//&&&&&&&&[ End Apply FZ Mult ]&&&&&&&&&&&
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+//---------------------------------------
+//------[ Start Set Saturation ]---------
+//---------------------------------------
+        if(lp > pmax) then
+        {
+            lp = pmax;
+        }
+
+        if(lp < pmin) then
+        {
+            lp = pmin;
+        }
+
+        if(rp > pmax) then
+        {
+            rp = pmax;
+        }
+
+        if(rp < pmin) then
+        {
+            rp = pmin;
+        }
+
+
+        if(lr > rmax) then
+        {
+            lr = rmax;
+        }
+
+        if(lr < rmin) then
+        {
+            lr = rmin;
+        }
+
+
+        if(rr > rmax) then
+        {
+            rr = rmax;
+        }
+
+        if(rr < rmin ) then
+        {
+            rr = rmin;
+        }
+
+
+//LAPf = LAP + lp;
+//---------------------------------------
+//-------[ End Set Saturation ]----------
+//---------------------------------------
+
+
+
+
+
+      
+
+ 
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ Start LAR Smoothing ]^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        xn_LAR =  lr*180.0/pi;
+        
+        yn_LAR  = k1 * yn1_LAR + xn_LAR;
+        zn_LAR  = k0 * yn_LAR;
+        yn1_LAR = yn_LAR;
+
+        zn_LAR = xn_LAR;
+
+
+        buffSumLAR = buffSumLAR - buffLAR[iLAR] + zn_LAR;
+        buffLAR[iLAR] = zn_LAR;
+        iLAR = iLAR + 1;
+        if( iLAR >= L ) then
+        {
+            iLAR = 0;
+        }
+
+      LARf =LAR + (buffSumLAR/L)*pi/180.0;
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ Start LAP Smoothing ]^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        xn_LAP = lp*180.0/pi;
+        
+        yn_LAP  = k1 * yn1_LAP + xn_LAP;
+        zn_LAP  = k0 * yn_LAP;
+        yn1_LAP = yn_LAP;
+
+        zn_LAP = xn_LAP;
+
+        buffSumLAP = buffSumLAP - buffLAP[iLAP] + zn_LAP;
+        buffLAP[iLAP] = zn_LAP;
+        iLAP = iLAP + 1;
+        if( iLAP >= L ) then
+        {
+            iLAP = 0;
+        }
+
+      LAPf = LAP + (buffSumLAP/L)*pi/180.0;
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ End LAP Smoothing ]^^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ Start RAR Smoothing ]^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       xn_RAR = rr*180.0/pi;
+        
+        yn_RAR  = k1 * yn1_RAR + xn_RAR;
+        zn_RAR  = k0 * yn_RAR;
+        yn1_RAR = yn_RAR;
+
+        zn_RAR = xn_RAR;
+
+
+        buffSumRAR = buffSumRAR - buffRAR[iRAR] + zn_RAR;
+        buffRAR[iRAR] = zn_RAR;
+        iRAR = iRAR + 1;
+        if( iRAR >= L ) then
+        {
+            iRAR = 0;
+        }
+
+      RARf = RAR + (buffSumRAR/L)*pi/180.0;
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ Start RAP Smoothing ]^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        xn_RAP = rp*180.0/pi;
+        
+        yn_RAP  = k1 * yn1_RAP + xn_RAP;
+        zn_RAP  = k0 * yn_RAP;
+        yn1_RAP = yn_RAP;
+
+        zn_RAP = xn_RAP;
+
+
+
+        buffSumRAP = buffSumRAP - buffRAP[iRAP] + zn_RAP;
+        buffRAP[iRAP] = zn_RAP;
+        iRAP = iRAP + 1;
+        if( iRAP >= L ) then
+        {
+            iRAP = 0;
+        }
+
+      RAPf = RAP + (buffSumRAP/L)*pi/180.0;
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//^^^^^^^[ End RAP Smoothing ]^^^^^^^^^^
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+//((((((((((((((((((((((((((((((((((((((
+//((((([ Start Unchanged Joints ](((((((
+//((((((((((((((((((((((((((((((((((((((
+
+
+        RHPf = RHP;
+        RHRf = RHR;
+        RHYf = RHY;
+        RKPf = RKP;
+       // RAPf = RAP;
+       // RARf = RAR;
+        LHPf = LHP;
+        LHRf = LHR;
+        LHYf = LHY;
+        LKPf = LKP;
+       // LARf = LAR;
+       // LAPf = LAP;
+
+
+
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//&&&&&&&[ End Rate Limiting ]&&&&&&&&&&&
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+        addCtrl("RHP", RHPf);
+        addCtrl("RHR", RHRf);
+        addCtrl("RHY", RHYf);
+        addCtrl("RKP", RKPf);
+        addCtrl("RAP", RAPf);
+        addCtrl("RAR", RARf);
+        addCtrl("LHP", LHPf);
+        addCtrl("LHR", LHRf);
+        addCtrl("LHY", LHYf);
+        addCtrl("LKP", LKPf);
+        addCtrl("LAP", LAPf);
+        addCtrl("LAR", LARf);
+
+        sendCtrl();
+        yield;
+    }
+}

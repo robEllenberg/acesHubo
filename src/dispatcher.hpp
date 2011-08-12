@@ -80,6 +80,7 @@ namespace ACES{
                            std::string args);
             bool addLogger(std::string cfg, std::string type,
                            std::string args);
+            void printWarning(std::string s);
 
             bool startDebug();
             bool stopDebug();

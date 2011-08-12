@@ -43,6 +43,7 @@
 #include "../message.hpp"
 #include "../word.hpp"
 #include "../credentials.hpp"
+//#include "../state/state.hpp"
 
 #include "huboCanDS.hpp"
 #include "can4linux.h"  //Include the can4linux data structures
@@ -50,7 +51,7 @@
 
 //Set to 1 for file I/O mode, and 0 for the actual PCM3680 driver
 #define TESTMODE 1
-#define RAD2DEG (180.0/3.14159)
+#define RAD2DEG (180.0/3.1415926535892)
 
 namespace Hubo{
     const int ctrlSize = 5;
@@ -62,31 +63,24 @@ namespace Hubo{
             void printme();
 
             int getChannels();
-            //float getPPR(int chan);
             float getDirection(int chan);
             unsigned int getEncoderSize(int chan);
-            //int getOffsetPulse(int chan);
-            //int getRevOffset(int chan);
-            //bool getCCW(int chan);
             unsigned int getHarmonic(int chan);
             float getGearRatio(int chan);
             int getZeroTicks(int chan);
             bool getZeroCCW(int chan);
         protected:
-            //bool setPPR(int chan, float proposedPPR);
             bool setDirection(int chan, float dir);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
-            //bool setOffsetPulse(int chan, int offset);
-            //bool setRevOffset(int chan, int offset);
             bool setHarmonic(int chan, int harmonic);
             bool setZero(int chan, int ticks, bool ccw);
-            //bool setCCW(int chan, bool CCW);
+            bool setPositionLimits(int chan, float minP, float maxP);
+            //bool setRateLimits(int chan, float maxV, float maxA);
+
         private:
-            //int boardNum;       //! Identifying number for the motor controller
             bool checkChannel(int chan);
             int channels;       //! Number of channels on the controller (1-3)
-            //float PPR[ctrlSize];       //! Pulses per revolution (one per channel)
             float direction[ctrlSize]; //! +/-1 Direction of motor revolution (1/channel)
             unsigned int driveTeeth[ctrlSize];
             unsigned int drivenTeeth[ctrlSize];
@@ -94,10 +88,15 @@ namespace Hubo{
             unsigned int harmonic[ctrlSize];
             int zeroTicks[ctrlSize];
             bool zeroCCW[ctrlSize];
-            //int offsetPulse[ctrlSize];
-            //int revOffset[ctrlSize];
-            //bool CCW[ctrlSize];
+
+            float minP[ctrlSize];
+            float maxP[ctrlSize];
+            /*
+            float maxV[ctrlSize]; //units/second
+            float maxA[ctrlSize]; //units/second/second
+            */
             //TODO - Do we need to save the 'motor number' for each channel? 
+            //int boardNum;       //! Identifying number for the motor controller
     };
 
     const int senseSize = 4;
@@ -168,9 +167,10 @@ namespace Hubo{
         public: 
             HuboDevice(std::string cfg, std::string args);
             void processUS_NAME_RXDF(ACES::Word<canMsg>* msg);
-            void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
+            virtual void processUS_STAT_RXDF(ACES::Word<canMsg>* msg)=0;
         protected:
             ACES::Word<canMsg>* buildWord(canMsg c, int channel);
+            bool CANStatus;
     };
 
     class MotorDevice : public HuboDevice{
@@ -180,35 +180,40 @@ namespace Hubo{
             virtual ACES::Word<float>* processUS(ACES::Word<canMsg>*);
             void processUS_SENSOR_FT_RXDF(ACES::Word<canMsg>* msg);
             void processUS_AD_RXDF(ACES::Word<canMsg>* msg);
-            //Redfine this function from parent class to avoid clutter
-            void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
             int getChannels();
+            void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
             //User facing (local) Configuration functions
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
             bool setEncoderSize(int chan, int size);
-            //bool setOffsetPulse(int chan, int offset);
-            //bool setRevOffset(int chan, int offset);
-            //bool setCCW(int chan, bool CCW);
             bool setZero(int chan, int ticks, bool ccw);
             bool programZero(int chan);
-            //bool setCalibrate(int channel);
             bool setHIPenable();
             bool setRunCmd();
             bool setHarmonic(int chan, int harmonic);
             //User facing (remote) configuration functions
             bool setGains(std::string type, int channel,
                           int Kp, int Ki, int Kd);
-            bool setSetPoint(int channel, float sp,
-                             bool instantTrigger=false);
+            bool setSetPoint(int channel, float sp, bool instantTrigger=false);
             //Helper functions for processing new set points and config
             //information
             bool applySetPoint(int channel, float sp, bool instantTrigger);
             bool triggersSet();
             void clearTrigger();
+
+            //Status check functions
+           
+            int checkZero(int channel);
+            bool checkSetup();
+
+            //Motion limits
+            bool setPositionLimits(int chan, float minP, float maxP);
+
+            bool checkCAN();
             //Helpers for buildCalibratePulse
             //long calPulse2Chan(int c);
             //long calPulse3Chan(int c);
+            //
             //Functions for generating the different types of configuration
             //packets.
             canMsg buildSetPacket();
@@ -217,7 +222,6 @@ namespace Hubo{
             //canMsg buildCalibratePulse(int c);
             canMsg buildHIPpacket();
             canMsg buildRunCmdPacket();
-            int checkZero(int channel);
         private:
             int zeroFlag[ctrlSize];
             void clearZeroFlag();
@@ -234,11 +238,16 @@ namespace Hubo{
             virtual ACES::Word<canMsg>* processDS(ACES::Word<float>*);
             void processUS_SENSOR_FT_RXDF(ACES::Word<canMsg>* msg);
             void processUS_SENSOR_AD_RXDF(ACES::Word<canMsg>* msg);
+            void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
+
+            bool programZero();
+            canMsg buildZeroPacket(char mode);
 
             canMsg buildRefreshPacket();
             bool setDirection(int chan, float direction);
             bool setScale(int chan, float scale);
     };
+
 };
 
 #endif

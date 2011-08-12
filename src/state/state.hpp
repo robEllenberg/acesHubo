@@ -52,6 +52,8 @@
 #include "../word.hpp"
 #include "matlab.hpp"
 
+#include <boost/circular_buffer.hpp>
+
 namespace ACES {
     //Webots Component Types
     //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
@@ -82,7 +84,7 @@ namespace ACES {
         private:
             bool valid;
             T value;
-            RTT::os::TimeService::ticks t;
+                    RTT::os::TimeService::ticks t;
     };
 
     template <class T>
@@ -98,7 +100,7 @@ namespace ACES {
         private:
             int size;
             int lastValid;
-            std::deque< Sample<T> > hist;
+            boost::circular_buffer< Sample<T> > hist;
     };
 
     template <class T>
@@ -116,20 +118,21 @@ namespace ACES {
             void printme();
             void printHistory();
             virtual void go(T sp);
-            void assign(Word<T>* w);
-            T getVal();
+            virtual void assign(Word<T>* w);
+            virtual T getVal();
             float getInt();
             float getDiff();
 
             bool updateInt(Sample<T> cur, Sample<T> last);
             bool updateDiff(Sample<T> cur, Sample<T> last);
 
-            Word<T>* processDS( std::map<std::string, void*>* p );
+            virtual Word<T>* processDS( std::map<std::string, void*>* p );
 
         protected:
             T value;
             float integral;
             float diff;
+            float kInt;
             History<T> hist;
             RTT::OutputPort< Word<T>* > txDownStream;
             RTT::InputPort< Word<T>* > rxUpStream;
@@ -138,6 +141,83 @@ namespace ACES {
             unsigned int port;
             MatlabIO<T> matio;
             RTT::Activity matActivity;
+    };
+    
+    template <class T>
+    class ProtoFilter
+    {
+        public:
+            ProtoFilter();
+            virtual bool update(T newVal)=0;
+            virtual T getOutput();
+        protected:
+            T value;
+    };
+
+    template <class T>
+    class SmoothingFilter : public ProtoFilter<T>
+    {
+        public:
+            SmoothingFilter(int size=10);
+            bool update(T newVal);
+            bool setDelay(int samples);
+        private:
+            int sanitizeDelay(int samples);
+            void trimBuffer(int count);
+            std::deque<T> xBuffer;
+            std::deque<T> vBuffer;
+            std::deque<T> aBuffer;
+            T oldValue;
+            int size;
+    };
+
+    template <class T>
+    class FastFilter : public ProtoFilter<T>
+    {
+        public:
+            FastFilter(int size=10);
+            bool update(T newVal);
+            bool setDelay(int samples);
+        private:
+            boost::circular_buffer<T> xBuffer;
+            boost::circular_buffer<T> vBuffer;
+            boost::circular_buffer<T> aBuffer;
+            T oldValue;
+            int size;
+    };
+
+    template <class T>
+    class DFFilter : public ProtoFilter<T>
+    {
+        public:
+            /** Constructor to take coefficient vectors */
+            DFFilter(std::vector<T> a,std::vector<T> b);
+            bool update(T newVal);
+        private:
+
+            /**
+             * xHist is a simple input data history
+             * yHist is a history of outputs, used for the feedback portion
+             * a is the coefficients of the denominator, b the numerator
+             */
+            boost::circular_buffer<T> xHist;
+            boost::circular_buffer<T> yHist;
+            std::vector<T> a;
+            std::vector<T> b;
+    };
+    template <class T>
+    class FilteredState : public State<T>
+    {
+        public:
+            FilteredState(std::string config, int nID, bool sampling, unsigned int portnum, int fLength);
+            //TODO: Make fLength unsigned
+
+            void go(T sp);
+            void assign(Word<T>* w);
+            T getVal();
+            void setDelay(int fLength);
+        protected:
+            FastFilter<float> filt;
     };
 }
     

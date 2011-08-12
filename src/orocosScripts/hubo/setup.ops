@@ -1,0 +1,10 @@
+program fullSetup
+{
+    zeroHubo.activate;
+    zeroHubo.start;
+    do nothing until {
+        if (zeroHubo.inFinalState || zeroHubo.isRunning == false) then continue
+    }
+    zeroHubo.stop;
+    zeroHubo.deactivate;
+}
