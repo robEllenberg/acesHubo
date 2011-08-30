@@ -23,10 +23,43 @@
 #include "taskcfg.hpp"
 namespace ACES{
 
+    /*
     taskCfg::taskCfg(){
     name = "";
     priority = 10;
     freq = 1;
+    }
+    */
+
+    ACESTask::ACESTask(std::string cfg)
+      : taskCfg(cfg),
+        RTT::TaskContext(name)
+    {
+        //Create the event driven task activity
+        setActivity( new RTT::Activity( priority) );
+
+        this->ports()->addEventPort("PDP", periodTrigger).doc(
+                               "Periodic Driver Port - Input");
+
+        //Create the helper class to deliever the periodic prompts that drive
+        //the periodic update behavior
+
+        //TODO - Needs to be started/stopped by the same functions that
+        //start/stop the task itself.
+        perDrv = new periodDriver(priority, freq, name);
+        subscribePeriodDriver(perDrv);
+        perDrv->start();
+    }
+
+    void ACESTask::subscribePeriodDriver(periodDriver* p){
+        //Connect to the owner task's period driver port
+        RTT::ConnPolicy policy = RTT::ConnPolicy::data();
+        RTT::base::PortInterface *myPort = NULL, *theirPort=NULL;
+
+        theirPort = (RTT::base::PortInterface*)p->ports()->getPort("PDP");
+        myPort = (RTT::base::PortInterface*)this->ports()->getPort("PDP");
+        bool success = theirPort->connectTo(myPort, policy);
+        assert(success);
     }
 
     taskCfg::taskCfg(std::string cfg){
@@ -38,5 +71,21 @@ namespace ACES{
 
     std::string taskCfg::Name(){
         return name;
+    }
+
+    periodDriver::periodDriver(int pri, float freq, std::string name)
+      :RTT::TaskContext(name + "_PeriodDriver")
+    {
+        priority = pri;
+        frequency = freq;
+        
+        this->ports()->addPort("PDP", periodTrigger).doc(
+                               "Periodic Driver Port - Output");
+
+        setActivity( new RTT::Activity( priority+1, 1.0/frequency ) );
+    }
+
+    void periodDriver::updateHook(){
+        periodTrigger.write(1);
     }
 }

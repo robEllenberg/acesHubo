@@ -46,8 +46,7 @@ namespace ACES {
     //template <class HW, class P>
     //class Protocol;
 
-    class ProtoHardware : protected taskCfg,
-                          public RTT::TaskContext
+    class ProtoHardware : public ACESTask
     {
         public:
             ProtoHardware(std::string cfg, std::string args);

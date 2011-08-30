@@ -24,8 +24,7 @@
 namespace ACES{
 
     Controller::Controller(std::string cfg, std::string args)
-      : taskCfg(cfg),
-        RTT::TaskContext(name),
+      : ACESTask(cfg),
         packetsPerSP(0),
         packetCounter(0)
     {
@@ -59,8 +58,6 @@ namespace ACES{
         this->ports()->addPort("packetReport", packetReporter).doc(
                "Port for Hardware to report reception of setpoints");
 
-        this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name ));
         curMap = NULL;
     }
 
@@ -180,8 +177,7 @@ namespace ACES{
                 //Fall through here is intentional
             case CTRL_RUN:
                 if( getStateVector(true) ){
-                    txDownStream.write(curMap);
-                    curMap = NULL;
+                    sendCtrl();
                 }
                 if(simState == CTRL_STEP){
                     simState = CTRL_HALT;
@@ -203,10 +199,11 @@ namespace ACES{
                 //offset = it+i;
                 float value;
                 lineStream >> value;
-                (*curMap)[ states[i] ] = new float(value);
+                addCtrl( states[i], value);
+                //(*curMap)[ states[i] ] = new float(value);
                 //RTT::Logger::log(RTT::Logger::Debug) << value << ", ";
             }
-            //RTT::Logger::log(RTT::Logger::Debug) << RTT::endlog();
+            RTT::Logger::log(RTT::Logger::Debug) << "SP" << RTT::endlog();
             return true;
         }
         else{

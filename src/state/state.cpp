@@ -23,8 +23,7 @@
 #include "state.hpp"
 namespace ACES {
     ProtoState::ProtoState(std::string cfg, int nID, bool sampling) :
-      taskCfg(cfg),
-      RTT::TaskContext(name),
+      ACESTask(cfg),
       nodeID(nID),
       //Switching this default to false prevents automatic
       //sampling from starting

@@ -133,17 +133,15 @@ namespace ACES{
         this->addAttribute("diff", diff);
         this->addAttribute("portnum", port);
 
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Controller) Reception");
-        this->ports()->addPort("RxUS", rxUpStream).doc(
+        this->ports()->addEventPort("RxUS", rxUpStream).doc(
                                "UpStream (from Device) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Device) Transmission");
 
         RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(25);
         matio.DSmatio.connectTo(&rxDownStream, policy);
-
-        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name) );
     }
 
     template <class T>
@@ -159,15 +157,21 @@ namespace ACES{
 
     template <class T>
     void State<T>::updateHook(){
-        if( samplingAttr ){
-            sample();
-        }
         std::map<std::string, void*>* dsIn = NULL;
         Word<T>* dsOut = NULL;
-        while ( rxDownStream.read(dsIn) == RTT::NewData ){
-            if( (dsOut = processDS(dsIn)) ){
-                txDownStream.write(dsOut);
+
+        if( rxDownStream.read(dsIn) != RTT::NewData ){
+            if( samplingAttr ){
+                sample();
             }
+        }
+        else{
+            do{
+                if( (dsOut = processDS(dsIn)) ){
+                    txDownStream.write(dsOut);
+                }
+            }
+            while ( rxDownStream.read(dsIn) == RTT::NewData );
         }
         
         Word<T>* usIn = NULL;

@@ -36,7 +36,6 @@ namespace ACES {
         this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Protocol) Reception");
 
-        this->setActivity( new RTT::Activity( priority, 1.0/freq, 0, name ) );
     }
 
     template <typename T>

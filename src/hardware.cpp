@@ -23,8 +23,7 @@
 #include "hardware.hpp"
 namespace ACES {
     ProtoHardware::ProtoHardware(std::string cfg, std::string args) :
-      taskCfg(cfg),
-      RTT::TaskContext(name)
+      ACESTask(cfg)
     {
         this->ports()->addPort("packetReport", packetReporter).doc(
                "Port to report transmission of setpoints to controller");

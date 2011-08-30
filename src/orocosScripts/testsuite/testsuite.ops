@@ -1,17 +1,17 @@
 program main {
-    addHardware("tsHW 90 500","TestSuite",""); 
-    addProtocol("tsPro 80 500", "TestSuite", ""); 
+    addHardware("tsHW 10 1000","TestSuite",""); 
+    addProtocol("tsPro 20 1", "TestSuite", ""); 
     linkHP("tsHW", "tsPro"); 
 
     //Create devices, representing physical nodes on the bus
-    addDevice("dX 20 500", "TestSuite", "1"); 
-    addDevice("dY 20 500", "TestSuite", "2"); 
-    addDevice("dZ 20 500", "TestSuite", "3"); 
+    addDevice("dX 30 1", "TestSuite", "1"); 
+    addDevice("dY 32 1", "TestSuite", "2"); 
+    addDevice("dZ 34 1", "TestSuite", "3"); 
 
     //Add states, each represents 1 property of the device
-    addState("X 10 100", "TestSuite", "-1.0 1.0", true, 2827); 
-    addState("Y 10 100", "TestSuite", "3.0 4.0", true, 2828); 
-    addState("Z 10 100", "TestSuite", "5.0 6.0", true, 2829); 
+    addState("X 40 100", "TestSuite", "-1.0 1.0", true, 2827); 
+    addState("Y 42 100", "TestSuite", "3.0 4.0", true, 2828); 
+    addState("Z 44 100", "TestSuite", "5.0 6.0", true, 2829); 
 
     //Tell the states and devices to pay attention to each other
     linkDS("dX", "X"); 
@@ -28,8 +28,8 @@ program main {
     linkLS("log1", "X", "value"); 
     linkLS("log1", "Y", "value"); 
     linkLS("log1", "Z", "value"); 
-    linkLS("log1", "X", "integral"); 
-    linkLS("log1", "X", "diff"); 
+    //linkLS("log1", "X", "integral"); 
+    //linkLS("log1", "X", "diff"); 
     
     // END CONFIG SECTION 
 

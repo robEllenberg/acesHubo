@@ -25,6 +25,9 @@
 
 #include <string>
 #include <sstream>
+#include <rtt/TaskContext.hpp>
+#include <rtt/Activity.hpp>
+#include <ocl/TimerComponent.hpp>
 
 namespace ACES{
 
@@ -34,9 +37,33 @@ namespace ACES{
             double freq;
             int priority;
         public:
-            taskCfg();
+            //taskCfg();
             taskCfg(std::string cfg);
             std::string Name();
     };
+
+    class periodDriver : public RTT::TaskContext
+    {
+        public:
+            periodDriver(int pri, float freq, std::string name);
+            virtual void updateHook();
+        private:
+            int priority;
+            float frequency;
+            RTT::OutputPort<int> periodTrigger;
+    };
+
+    class ACESTask : public taskCfg,
+                     public RTT::TaskContext
+    {
+        public:
+            ACESTask(std::string cfg);
+        private:
+            void subscribePeriodDriver(periodDriver* p);
+
+            periodDriver* perDrv;
+            RTT::InputPort<int> periodTrigger;
+    };
+
 }
 #endif

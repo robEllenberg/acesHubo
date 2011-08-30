@@ -42,44 +42,44 @@ namespace ACES{
         this->events()->addEvent(&txUpStream, "txUpStream", "result",
                                  "Data struct containing processed result");
         */
-        this->ports()->addPort("RxDS", rxDownStream).doc(
+        this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from Device) Reception");
-        this->ports()->addPort("RxUS", rxUpStream).doc(
+        this->ports()->addEventPort("RxUS", rxUpStream).doc(
                                "UpStream (from Hardware) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Hardware) Transmission");
         this->ports()->addPort("TxUS", txUpStream).doc(
                                "UpStream (to Device) Transmission");
-        this->setActivity(
-            new RTT::Activity(this->priority, 1.0/(this->freq), 0,
-                              this->name )
-        );
     }
 
     template <class HW, class PD>    
     void Protocol<HW,PD>::updateHook(){
-        Word<PD>* dsIn = NULL;
-        Message<HW>* dsOut = NULL;
-        while( rxDownStream.read(dsIn) == RTT::NewData ){
-            if( (dsOut = processDS(dsIn)) ){
-                RTT::Logger::log(RTT::Logger::Debug) 
-                                   << "(Protocol: " << name << ") got DS"
-                                   << RTT::endlog();
-                txDownStream.write(dsOut);
-            }
-        }
-        txDSPending();
-
         Word<HW>* usIn = NULL;
         Word<PD>* usOut = NULL;
-        while( rxUpStream.read(usIn) == RTT::NewData ){
-            if( (usOut = processUS(usIn)) ){
-                RTT::Logger::log(RTT::Logger::Debug) 
-                                   << "(Protocol: "
-                                   << name << ") got US" << RTT::endlog();
-                txUpStream.write(usOut);
+        Word<PD>* dsIn = NULL;
+        Message<HW>* dsOut = NULL;
+
+        if(rxUpStream.read(usIn) == RTT::NewData){
+            while( rxUpStream.read(usIn) == RTT::NewData ){
+                if( (usOut = processUS(usIn)) ){
+                    RTT::Logger::log(RTT::Logger::Debug) 
+                                       << "(Protocol: "
+                                       << name << ") got US" << RTT::endlog();
+                    txUpStream.write(usOut);
+                }
             }
+        }else{
+            while( rxDownStream.read(dsIn) == RTT::NewData ){
+                if( (dsOut = processDS(dsIn)) ){
+                    RTT::Logger::log(RTT::Logger::Debug) 
+                                       << "(Protocol: " << name << ") got DS"
+                                       << RTT::endlog();
+                    txDownStream.write(dsOut);
+                }
+            }
+            txDSPending();
         }
+
     }
 
     template <class HW, class PD>    

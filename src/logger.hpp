@@ -49,8 +49,7 @@ namespace ACES{
             std::string attribute;
     };
 
-    class Logger : protected taskCfg,
-                   public    RTT::TaskContext
+    class Logger : public ACESTask
     {
         public:
             Logger(std::string cfg, std::string args);

@@ -48,8 +48,7 @@ namespace ACES {
     //Webots Component Types
     //enum DATA_TYPE { BOOL=1, SHORT, INT, LONG, FLOAT, DOUBLE, VPOINT };
 
-    class ProtoState : public taskCfg,
-                       public RTT::TaskContext
+    class ProtoState : public ACESTask
     {
         public:
             ProtoState(std::string config, int nID, bool sampling) ;

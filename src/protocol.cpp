@@ -24,8 +24,7 @@
 
 namespace ACES {
     ProtoProtocol::ProtoProtocol(std::string cfg, std::string args) :
-      taskCfg(cfg),
-      RTT::TaskContext(name)
+      ACESTask(cfg)
     {}
 
     bool ProtoProtocol::subscribeDevice(RTT::TaskContext* d){

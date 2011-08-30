@@ -33,15 +33,12 @@ namespace ACES{
                            RTT::OwnThread).doc("Print the Credentials");
         this->ports()->addEventPort("RxDS", rxDownStream).doc(
                                "DownStream (from State) Reception");
-        this->ports()->addPort("RxUS", rxUpStream).doc(
+        this->ports()->addEventPort("RxUS", rxUpStream).doc(
                                "UpStream (from Protocol) Reception");
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to Protocol) Transmission");
         this->ports()->addPort("TxUS", txUpStream).doc(
                                "UpStream (to State) Transmission");
-        this->setActivity(
-            new RTT::Activity( priority, 1.0/freq, 0, name )
-        );
     }
 
     template <class S, class PD>

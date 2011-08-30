@@ -24,8 +24,7 @@
 
 namespace ACES{
     ProtoDevice::ProtoDevice(std::string config) :
-      taskCfg(config),
-      RTT::TaskContext(name),
+      ACESTask(config),
       DSlockout(false),  USlockout(false)
         {}
 

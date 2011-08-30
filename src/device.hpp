@@ -36,8 +36,7 @@
 #include "word.hpp"
 
 namespace ACES{
-    class ProtoDevice : protected taskCfg,
-                        public RTT::TaskContext 
+    class ProtoDevice : public ACESTask
     {
         public:
             ProtoDevice(std::string config);

@@ -37,8 +37,7 @@ namespace ACES {
     }
 
     Logger::Logger(std::string cfg, std::string args)
-      : taskCfg(cfg),
-        TaskContext(name)
+      : ACESTask(cfg)
     {
         this->setActivity(
             new RTT::Activity( priority, 1.0/freq, 0, name )
