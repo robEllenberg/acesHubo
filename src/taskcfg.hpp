@@ -25,6 +25,7 @@
 
 #include <string>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
 #include <ocl/TimerComponent.hpp>
@@ -45,12 +46,21 @@ namespace ACES{
     class periodDriver : public RTT::TaskContext
     {
         public:
-            periodDriver(int pri, float freq, std::string name);
+            periodDriver(int pri, float period, std::string name);
             virtual void updateHook();
         private:
             int priority;
             float frequency;
             RTT::OutputPort<int> periodTrigger;
+    };
+
+    class periodDriverMgr
+    {
+        public:
+            periodDriverMgr();
+            periodDriver* getDriver(double period);
+        private:
+            std::map<float, periodDriver*> perDrvMap;
     };
 
     class ACESTask : public taskCfg,
@@ -61,6 +71,7 @@ namespace ACES{
         private:
             void subscribePeriodDriver(periodDriver* p);
 
+            static periodDriverMgr pdm;
             periodDriver* perDrv;
             RTT::InputPort<int> periodTrigger;
     };

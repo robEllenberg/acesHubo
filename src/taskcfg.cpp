@@ -31,6 +31,8 @@ namespace ACES{
     }
     */
 
+    periodDriverMgr ACESTask::pdm; 
+
     ACESTask::ACESTask(std::string cfg)
       : taskCfg(cfg),
         RTT::TaskContext(name)
@@ -46,9 +48,11 @@ namespace ACES{
 
         //TODO - Needs to be started/stopped by the same functions that
         //start/stop the task itself.
-        perDrv = new periodDriver(priority, freq, name);
-        subscribePeriodDriver(perDrv);
-        perDrv->start();
+        //perDrv = new periodDriver(priority, freq, name);
+        if(freq){
+            perDrv = (ACESTask::pdm).getDriver(1.0/freq);
+            subscribePeriodDriver(perDrv);
+        }
     }
 
     void ACESTask::subscribePeriodDriver(periodDriver* p){
@@ -73,19 +77,38 @@ namespace ACES{
         return name;
     }
 
-    periodDriver::periodDriver(int pri, float freq, std::string name)
+    periodDriver::periodDriver(int pri, float period, std::string name)
       :RTT::TaskContext(name + "_PeriodDriver")
     {
         priority = pri;
-        frequency = freq;
         
         this->ports()->addPort("PDP", periodTrigger).doc(
                                "Periodic Driver Port - Output");
 
-        setActivity( new RTT::Activity( priority+1, 1.0/frequency ) );
+        setActivity( new RTT::Activity( priority, period ) );
+        start();
     }
 
     void periodDriver::updateHook(){
         periodTrigger.write(1);
+    }
+    
+    periodDriverMgr::periodDriverMgr(){
+    }
+
+    periodDriver* periodDriverMgr::getDriver(double period){
+        periodDriver *p = NULL;
+        int priority = 99;
+
+        map<float, periodDriver*>::iterator it = perDrvMap.find(period);
+        if(it == perDrvMap.end()){
+            p = new periodDriver(priority, period,
+                        boost::lexical_cast<string>( period ) );
+            perDrvMap[period] = p; 
+        }
+        else{
+            p = it->second;
+        }
+        return p;
     }
 }

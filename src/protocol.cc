@@ -60,14 +60,14 @@ namespace ACES{
         Message<HW>* dsOut = NULL;
 
         if(rxUpStream.read(usIn) == RTT::NewData){
-            while( rxUpStream.read(usIn) == RTT::NewData ){
+            do{
                 if( (usOut = processUS(usIn)) ){
                     RTT::Logger::log(RTT::Logger::Debug) 
                                        << "(Protocol: "
                                        << name << ") got US" << RTT::endlog();
                     txUpStream.write(usOut);
                 }
-            }
+            }while( rxUpStream.read(usIn) == RTT::NewData );
         }else{
             while( rxDownStream.read(dsIn) == RTT::NewData ){
                 if( (dsOut = processDS(dsIn)) ){
