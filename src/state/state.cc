@@ -159,35 +159,34 @@ namespace ACES{
     void State<T>::updateHook(){
         std::map<std::string, void*>* dsIn = NULL;
         Word<T>* dsOut = NULL;
+        Word<T>* usIn = NULL;
 
-        if( rxDownStream.read(dsIn) != RTT::NewData ){
-            if( samplingAttr ){
-                sample();
-            }
-        }
-        else{
+        if( rxDownStream.read(dsIn) == RTT::NewData ){
             do{
+                RTT::Logger::log(RTT::Logger::Debug) << "(state: " 
+                       << name << ") rxDS" << RTT::endlog();
+
                 if( (dsOut = processDS(dsIn)) ){
                     txDownStream.write(dsOut);
                 }
             }
-            while ( rxDownStream.read(dsIn) == RTT::NewData );
+            while(rxDownStream.read(dsIn) == RTT::NewData);
         }
-        
-        Word<T>* usIn = NULL;
-        while( rxUpStream.read(usIn) == RTT::NewData ){
-            RTT::Logger::log(RTT::Logger::Debug) << "(state: " 
-                               << name << ") rxUS"
-                               << RTT::endlog();
-            //  RTT::Logger::log() <<  "r nid =" << rx->nodeID << " my nid="
-            //                     << nodeIDAttr.get() << RTT::endlog();
-            
-            if(usIn->getNodeID() == nodeID){
-                RTT::Logger::log(RTT::Logger::Debug) << "(state: "
-                                   << name << ") assign"
-                                   << RTT::endlog();
-                assign(usIn);
-            }
+        else if(rxUpStream.read(usIn) == RTT::NewData){
+            do{
+                RTT::Logger::log(RTT::Logger::Debug) << "(state: " 
+                       << name << ") rxUS" << RTT::endlog();
+                                   
+                if(usIn->getNodeID() == nodeID){
+                    RTT::Logger::log(RTT::Logger::Debug) << "(state: "
+                                       << name << ") assign"
+                                       << RTT::endlog();
+                    assign(usIn);
+                }
+            }while(rxUpStream.read(usIn) == RTT::NewData);
+        }
+        else if( samplingAttr ){
+            sample();
         }
     }
 
