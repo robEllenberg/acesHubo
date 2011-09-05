@@ -415,6 +415,16 @@ program main{
         LMxMf = fzn[fLMx];
         LMyMf = fzn[fLMy];
         LFzMf = fzn[fLFz];
+/*
+        RMxMf = RMxM;
+        RMyMf = RMyM;
+        RFzMf = RFzM;
+
+        LMxMf = LMxM;
+        LMyMf = LMyM;
+        LFzMf = LFzM;
+*/
+    //----------------
     //----------------
     //--[end filter]--
     //----------------

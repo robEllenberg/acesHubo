@@ -228,6 +228,7 @@ namespace Hubo{
     canmsg_t* canMsg::processREF(canmsg_t* cm){
         cm->length = 6;
         switch((int)subType){
+            case 1:
             case 2:
                 cm->data[0] = bitStrip(r1, 0);
                 cm->data[1] = bitStrip(r1, 1);

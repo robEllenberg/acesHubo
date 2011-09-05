@@ -143,7 +143,6 @@ program internals {
 	dLUpperArm.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dRWrist, node 0
-	/*
 	dRWrist.setDirection(0, 1);
 	dRWrist.setGearRatio(0, 1, 1);
 	dRWrist.setHarmonic(0,100);
@@ -186,6 +185,7 @@ program internals {
 
 	//Defining internal properties for device dNeck, node 0
 
+	/*
 	dNeck.setDirection(0, 1);
 	dNeck.setGearRatio(0, 1, 1);
 	dNeck.setHarmonic(0,100);
@@ -242,36 +242,44 @@ program internals {
     //Position Limits 
     //TODO: Make these actually mean something by measuring the real limits, for now just use +/- pi
 
-	dRHipYR.setPosLimits(0,-180,180);
-	dRHipYR.setPosLimits(1,-180,180);
-	dRHipP.setPosLimits(0,-180,180);
-	dRKnee.setPosLimits(0,-180,180);
-	dRAnklePR.setPosLimits(0,-180,180);
-	dRAnklePR.setPosLimits(1,-180,180);
-	dLHipYR.setPosLimits(0,-180,180);
-	dLHipYR.setPosLimits(1,-180,180);
-	dLHipP.setPosLimits(0,-180,180);
-	dLKnee.setPosLimits(0,-180,180);
-	dLAnklePR.setPosLimits(0,-180,180);
-	dLAnklePR.setPosLimits(1,-180,180);
+	dRHipYR.setPosLimits(0,-1.5,1.5);
+	dRHipYR.setPosLimits(1,-1.5,1.5);
+	dRHipP.setPosLimits(0,-1.5,1.5);
+	dRKnee.setPosLimits(0,-1.5,1.5);
+	dRAnklePR.setPosLimits(0,-1.5,1.5);
+	dRAnklePR.setPosLimits(1,-1.5,1.5);
+	dLHipYR.setPosLimits(0,-1.5,1.5);
+	dLHipYR.setPosLimits(1,-1.5,1.5);
+	dLHipP.setPosLimits(0,-1.5,1.5);
+	dLKnee.setPosLimits(0,-1.5,1.5);
+	dLAnklePR.setPosLimits(0,-1.5,1.5);
+	dLAnklePR.setPosLimits(1,-1.5,1.5);
 	
-    dHip.setPosLimits(0,-180,180);
+    dHip.setPosLimits(0,-1.5,1.5);
 
-	dRShoulderPR.setPosLimits(0,-180,180);
-	dRShoulderPR.setPosLimits(1,-180,180);
-	dRUpperArm.setPosLimits(0,-180,180);
-	dRUpperArm.setPosLimits(1,-180,180);
-	dLShoulderPR.setPosLimits(0,-180,180);
-	dLShoulderPR.setPosLimits(1,-180,180);
-	dLUpperArm.setPosLimits(0,-180,180);
-	dLUpperArm.setPosLimits(1,-180,180);
-	/*
+	dRShoulderPR.setPosLimits(0,-1.5,1.5);
+	dRShoulderPR.setPosLimits(1,-1.5,1.5);
+	dRUpperArm.setPosLimits(0,-1.5,1.5);
+	dRUpperArm.setPosLimits(1,-1.5,1.5);
+	dLShoulderPR.setPosLimits(0,-1.5,1.5);
+	dLShoulderPR.setPosLimits(1,-1.5,1.5);
+	dLUpperArm.setPosLimits(0,-1.5,1.5);
+	dLUpperArm.setPosLimits(1,-1.5,1.5);
+
+	dLWrist.setPosLimits(0,-1,1);
+	dLWrist.setPosLimits(1,-1,1);
+	dLWrist.setPosLimits(2,-1,1);
+	dRWrist.setPosLimits(0,-1,1);
+	dRWrist.setPosLimits(1,-1,1);
+	dRWrist.setPosLimits(2,-1,1);
+
 	dRWrist.setZero(0,-72000,1);
 	dRWrist.setZero(1,0,0);
 	dRWrist.setZero(2,0,0);
 	dLWrist.setZero(0,0,0);
 	dLWrist.setZero(1,0,0);
 	dLWrist.setZero(2,0,0);
+	/*
 	dNeck.setZero(0,0,0);
 	dNeck.setZero(1,0,0);
 	dNeck.setZero(2,0,0);
@@ -308,18 +316,18 @@ program nameinfo {
 	ch1.genPacket(1,8,"0x05010A0A0033000C");
 	ch1.genPacket(1,8,"0x06010A1400E8000B");
 	ch1.genPacket(1,8,"0x07010A0A0AB39560");
-	ch1.genPacket(1,8,"0x08010A0F05D2D85A");
-	ch1.genPacket(1,8,"0x09010A0514A220C4");
-	ch1.genPacket(1,8,"0x0A010A1405CD4943");
-	ch1.genPacket(1,8,"0x0B010A0514291E97");
-	ch1.genPacket(1,7,"0x20010A0A0A0A0000");
-	ch1.genPacket(1,7,"0x21010A0A05050000");
-	ch1.genPacket(1,7,"0x22010A0505050000");
-	ch1.genPacket(1,8,"0x23010A0A009F000A");
-	ch1.genPacket(1,3,"0x24010A0000000000");
-	ch1.genPacket(1,3,"0x25010A0000000000");
-	ch1.genPacket(1,8,"0x35010A0038721200");
-	ch1.genPacket(1,8,"0x36010A0038721200");
+	ch2.genPacket(1,8,"0x08010A0F05D2D85A");
+	ch2.genPacket(1,8,"0x09010A0514A220C4");
+	ch2.genPacket(1,8,"0x0A010A1405CD4943");
+	ch2.genPacket(1,8,"0x0B010A0514291E97");
+	ch2.genPacket(1,7,"0x20010A0A0A0A0000");
+	ch2.genPacket(1,7,"0x21010A0A05050000");
+	ch2.genPacket(1,7,"0x22010A0505050000");
+	ch2.genPacket(1,8,"0x23010A0A009F000A");
+	ch2.genPacket(1,3,"0x24010A0000000000");
+	ch2.genPacket(1,3,"0x25010A0000000000");
+	ch2.genPacket(1,8,"0x35010A0038721200");
+	ch2.genPacket(1,8,"0x36010A0038721200");
 }
 
 program gains {
@@ -347,13 +355,13 @@ program gains {
 	dLShoulderPR.setGains("Position", 1, 200, 0, 500);
 	dLUpperArm.setGains("Position", 0, 200, 0, 500);
 	dLUpperArm.setGains("Position", 1, 200, 0, 500);
-	/*
 	dRWrist.setGains("Position", 0, 15, 0, 15);
 	dRWrist.setGains("Position", 1, 15, 0, 15);
 	dRWrist.setGains("Position", 2, 15, 0, 15);
 	dLWrist.setGains("Position", 0, 15, 0, 15);
 	dLWrist.setGains("Position", 1, 15, 0, 15);
 	dLWrist.setGains("Position", 2, 15, 0, 15);
+	/*
 	dNeck.setGains("Position", 0, 15, 0, 15);
 	dNeck.setGains("Position", 1, 15, 0, 15);
 	dNeck.setGains("Position", 2, 15, 0, 15);
@@ -392,12 +400,12 @@ program enable {
 	dLUpperArm.run();
 	dHip.HIPenable();
 	dHip.run();
-	/*
        //3-motor controllers
 	dRWrist.HIPenable();
 	dRWrist.run();
 	dLWrist.HIPenable();
 	dLWrist.run();
+	/*
 	dNeck.HIPenable();
 	dNeck.run();
 	*/

@@ -31,18 +31,21 @@
 namespace ACES{
 
     template <class T>
-    History<T>::History(int s)
-     :hist(s)
+    History<T>::History(int s) : hist(s)
     {
+        //TODO: eliminate the size field since it can't be changed anyway
         size = s;
+        //this->hist.resize(s);
+        //Added this to initialize the buffer properly
         lastValid = -1;
     }
 
     template <class T>
-    History<T>::History(int s, Sample<T> ic)
-     :hist(s)
+    History<T>::History(int s, Sample<T> ic) : hist(s)
     {
         size = s;
+        //Added this to initialize the buffer properly
+        //this->hist.resize(s);
         hist[0] = ic;
         lastValid = 0;
     }
@@ -52,7 +55,7 @@ namespace ACES{
     {
         Sample<T> s(value, RTT::os::TimeService::Instance()->getTicks());
         hist.push_front(s); 
-        //hist.pop_back(); //This is no longer necessary with a circular buffer
+        hist.pop_back(); //This is no longer necessary with a circular buffer
     }
 
     template <class T>
@@ -332,12 +335,13 @@ namespace ACES{
         RTT::Logger::log(RTT::Logger::Debug) << "(state: "
                            << this->name << ") go: " << (float)sp
                            << RTT::endlog();
-        Word<T>* w = new Word<T>(sp, this->nodeID, 0, SET);
-        this->txDownStream.write(w);
+        //TODO: Move this stuff into the device level ASAP
+        filt.update(sp);
+        Word<T>* w = new Word<T>(filt.getOutput(), this->nodeID, 0, SET);
         if(not this->samplingAttr){
-            filt.update(sp);
             this->value = filt.getOutput();
         }
+        this->txDownStream.write(w);
     }
 
     template <class T>

@@ -830,6 +830,16 @@ StateMachine ZeroAll
        entry
        {
             nameinfo.start;
+            //Do this several times since there seem to have been issues with
+            //it not "clicking" TODO: figure out why (if this is necessary)
+
+            dLFT.programZero;
+            dRFT.programZero;
+            dLFT.programZero;
+            dLFT.programZero;
+            dRFT.programZero;
+            dRFT.programZero;
+            dRWFT.programZero;
        }
 
        transition select setup
@@ -957,8 +967,6 @@ StateMachine ZeroAll
             printWarning("Zeroing of Hubo complete");
             gains.start;
             enable.start;
-            dLFT.programZero;
-            dRFT.programZero;
 
         }
         transition select exit

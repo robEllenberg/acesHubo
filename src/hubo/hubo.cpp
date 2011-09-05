@@ -625,14 +625,14 @@ namespace Hubo{
         }
         else if( offsetRange(SENSOR_FT_RXDF, c->id)){
             idClass = SENSOR_FT_RXDF;
-            equalizer = 0x2F;
+            equalizer = 0x30;
             r1 = assemble2Byte(c->data[0], c->data[1]); //Mx
             r2 = assemble2Byte(c->data[2], c->data[3]); //My
             r3 = assemble2Byte(c->data[4], c->data[5]); //Fz
         }
         else if( offsetRange(SENSOR_AD_RXDF, c->id)){
             idClass = SENSOR_AD_RXDF;
-            equalizer = 0x31;
+            equalizer = 0x40;
             r1 = assemble2Byte(c->data[0], c->data[1]); //Acc1
             r2 = assemble2Byte(c->data[2], c->data[3]); //Acc2
             r3 = assemble2Byte(c->data[4], c->data[5]); //Gyro1
@@ -658,8 +658,9 @@ namespace Hubo{
             //printf(failed to match a packet)
             return pw;
         }
-
-        int id = (c->id) - ((int)idClass) + equalizer;
+        //IMPORTANT: the device offsets are now renumbered slightly to make them consistent.
+        // hte new ids for the force torques are 31,32,36, while the new id's for the IMU data are 41,42,46
+        int id = (c->id) - ((int)idClass) + equalizer ;
         canMsg msg(id, idClass, CMD_NONE, r1, r2, r3, r4, r5);
         msg.printme();
         pw = new ACES::Word<canMsg>(msg, 0, 0, 0, Protocol::credFromPacket(msg));
@@ -1192,6 +1193,7 @@ namespace Hubo{
                     temp[i] = (setPoint[i]*RAD2DEG)*dir*ppr/360.;
                 }
                 break;
+            case 1:
             case 2: //Two Channel Motor Controllers - Limbs
                 for(int i = 0; i < 2; i++){
                     dir = ((MotorCredentials*)credentials)->getDirection(i);
@@ -1400,15 +1402,21 @@ namespace Hubo{
         return msg;
     }
 
+    /**
+     * Build a command packet to set all channels' zero point to current value.
+     * @todo break out the mode byte into channels, should we want to rezero
+     * individually.
+     * 
+     */
     canMsg SensorDevice::buildZeroPacket(char mode){
-        //Null all sensors at once for now
-        //TODO: break out the mode byte into channels
         long r2 = 0, r3 = 0, r4 = 0, r5=0;
-        return canMsg( credentials->getDevID(), CMD_TXDF, NULL_CMD,(long) mode,r2,r3,r4,r5);
+        return canMsg( credentials->getDevID()-1, CMD_TXDF, NULL_CMD,(long) mode,r2,r3,r4,r5);
     }
 
-    /// Zero the sensors (if applicable).
-    /// This should be the same as the FT Null command in the Hubo sofwaree
+    /**
+     * Zero the sensors (if applicable).
+     * This should be the same as the FT Null command in the Hubo sofware.
+     */
     bool SensorDevice::programZero(){
         //SensorCredentials* c = (SensorCredentials*)credentials;
         canMsg msg = buildZeroPacket(0);
@@ -1416,10 +1424,15 @@ namespace Hubo{
         return true;
     }
 
-    /// Check if device has been initialized in the script.
-    /// The device needs internal settings such as drive ratio, 
-    /// encoder size, etc. This function verifies that the scripting 
-    /// has set up the key properties
+    /**
+     * @brief Check if device has been initialized in the script.
+     * The device needs internal settings such as drive ratio, encoder size,
+     * etc. This function verifies that the scripting has set up the key
+     * properties. This process isn't intense, but might add excess
+     * processing time if called on every iteration (and really we only
+     * need to verify this in the beginning).
+     *
+     */
     bool MotorDevice::checkSetup()
     {
         MotorCredentials* cred = (MotorCredentials*)credentials;
@@ -1431,23 +1444,30 @@ namespace Hubo{
         }
         return true;
     }
-
-    bool MotorDevice::setPositionLimits(int chan, float minP, float maxP) {
-        return ((MotorCredentials*)credentials)->setPositionLimits(chan, minP, maxP);
-    }
-    /*
-    bool MotorDevice::setRateLimits(int chan, float maxV, float maxA) {
-        return ((MotorCredentials*)credentials)->setPositionLimits(chan, maxV, maxA);
-    }
-*/
     
-    ///Return CAN status based on nameinfo packet.
-    ///If the nameinfo packet is correctly returned, the CANStatus flag 
-    ///will be set, showing that CAN is connected. This might be useful
-    ///for safety checks down the road
+    /**
+     * Return CAN status based on nameinfo packet.
+     * If the nameinfo packet is correctly returned, the CANStatus flag 
+     * will be set, showing that CAN is connected. This might be useful
+     * for safety checks down the road
+     */
     bool MotorDevice::checkCAN()
     {
         return CANStatus;
     }
 
+    /**
+     * Assign position limits for a given channel.
+     * These limits represent that maximum safe range of a given joint. If the
+     * limits are unknown for a given joint, then simply set them to an
+     * arbitrarily large magnitude. 
+     *
+     * @note The limits are hard, and currently
+     * do NOT have gentle boundaries. The position output will be clipped even
+     * if it means sudden deceleration.
+     * 
+     */
+    bool MotorDevice::setPositionLimits(int chan, float minP, float maxP) {
+        return ((MotorCredentials*)credentials)->setPositionLimits(chan, minP, maxP);
+    }
 }

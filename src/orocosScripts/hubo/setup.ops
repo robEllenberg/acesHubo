@@ -2,9 +2,12 @@ program fullSetup
 {
     zeroHubo.activate;
     zeroHubo.start;
-    do nothing until {
-        if (zeroHubo.inFinalState || zeroHubo.isRunning == false) then continue
+    while (!zeroHubo.inFinalState())
+    {
+        if (zeroHubo.inFinalState || zeroHubo.isRunning == false) then break;
+        nothing;
     }
     zeroHubo.stop;
     zeroHubo.deactivate;
+    printWarning("Full Setup of Hubo complete")
 }

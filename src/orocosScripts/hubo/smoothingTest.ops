@@ -1,6 +1,8 @@
 program main{
 
 var float LKP = 0.0;
+const float pi = 3.141592653589;
+const float d2r = pi/180.0;
 
     while(true)
     {
@@ -10,9 +12,9 @@ var float LKP = 0.0;
             LKP = checkCtrl("LKP");
         }
 
-
-        addCtrl("LKP", LKP);
-        addCtrl("LHP", LKP);
+        addCtrl("RWY", LKP*d2r);
+        addCtrl("RW1", LKP*d2r);
+        addCtrl("RW2", LKP*d2r);
 
         sendCtrl();
         yield;

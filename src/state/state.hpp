@@ -100,7 +100,7 @@ namespace ACES {
         private:
             int size;
             int lastValid;
-            boost::circular_buffer< Sample<T> > hist;
+            std::deque< Sample<T> > hist;
     };
 
     template <class T>
