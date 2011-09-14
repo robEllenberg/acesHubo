@@ -46,6 +46,8 @@
 #include "taskcfg.hpp"
 #include "device.hpp"
 #include "logger.hpp"
+#include "filter.hpp"
+
 #ifdef OMNIBOT
     #include "omnibot/omnibot.hpp"
 #endif

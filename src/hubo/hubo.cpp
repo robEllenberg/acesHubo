@@ -149,6 +149,7 @@ namespace Hubo{
         }
         return false;
     }
+
     //Rob's functions start here
     bool MotorCredentials::checkChannel(int chan){
         if(chan >= 0 && chan < channels){
@@ -161,6 +162,7 @@ namespace Hubo{
         }
         return false; 
     }
+
     bool MotorCredentials::setPositionLimits(int chan,float minPos,float maxPos){
         ///Apply position limits to the given device channel
         if (checkChannel(chan)){
@@ -178,26 +180,7 @@ namespace Hubo{
         }
         return false;
     }
-    /*
-    bool MotorCredentials::setRateLimits(int chan,float maxVel,float maxAcc){
-        ///Apply position limits to the given device channel
-        if (checkChannel(chan)){
-            if (maxVel>0.0 and maxAcc > 0.0){
-                maxV[chan]=maxVel;
-                maxA[chan]=maxAcc;
-                return true;
-            }
-            else{
-            RTT::Logger::log(RTT::Logger::Warning) <<  
-                "Invalid position range: maxVel(" << maxVel 
-                << ") or maxAcc (" << maxAcc << ")." <<
-                "are not greater than zero" 
-                << RTT::endlog();
-            }
-        }
-        return false;
-    }
-    */
+
     void MotorCredentials::printme(){
         ACES::Credentials::printme();
         RTT::Logger::log() << "(HuboDriver) Credentials: \n"
@@ -240,19 +223,6 @@ namespace Hubo{
             RTT::Logger::log() << maxP[i] << ", ";
         }
         RTT::Logger::log() <<  "]" << RTT::endlog();
-/*
-        RTT::Logger::log() << "]\nMaximum Velocity: [";
-        for(int i = 0; i < ctrlSize; i++){
-            RTT::Logger::log() << maxV[i] << ", ";
-        }
-        RTT::Logger::log() <<  "]" << RTT::endlog();
-
-        RTT::Logger::log() << "]\nMaximum Acceleration: [";
-        for(int i = 0; i < ctrlSize; i++){
-            RTT::Logger::log() << maxA[i] << ", ";
-        }
-        RTT::Logger::log() <<  "]" << RTT::endlog();
-  */
     }
 
     SensorCredentials::SensorCredentials(int boardID, int chan)

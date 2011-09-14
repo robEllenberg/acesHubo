@@ -42,7 +42,7 @@ link_directories("/usr/local/webots/lib")
 rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/credentials.cpp src/state/state.cpp
                      src/device.cpp src/protocol.cpp
-                     src/hardware.cpp src/controller.cpp src/logger.cpp)
+                     src/hardware.cpp src/controller.cpp src/logger.cpp src/filter.hpp)
 #rosbuild_add_compile_flags(aces-common -pg)
 #rosbuild_add_link_flags(aces-common -pg)
 

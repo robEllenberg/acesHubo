@@ -43,6 +43,7 @@
 #include "../message.hpp"
 #include "../word.hpp"
 #include "../credentials.hpp"
+#include "../filter.hpp"
 //#include "../state/state.hpp"
 
 #include "huboCanDS.hpp"
@@ -182,6 +183,7 @@ namespace Hubo{
             void processUS_AD_RXDF(ACES::Word<canMsg>* msg);
             int getChannels();
             void processUS_STAT_RXDF(ACES::Word<canMsg>* msg);
+
             //User facing (local) Configuration functions
             bool setDirection(int channel, float direction);
             bool setGearRatio(int chan, int drive, int driven);
@@ -191,10 +193,12 @@ namespace Hubo{
             bool setHIPenable();
             bool setRunCmd();
             bool setHarmonic(int chan, int harmonic);
+
             //User facing (remote) configuration functions
             bool setGains(std::string type, int channel,
                           int Kp, int Ki, int Kd);
             bool setSetPoint(int channel, float sp, bool instantTrigger=false);
+
             //Helper functions for processing new set points and config
             //information
             bool applySetPoint(int channel, float sp, bool instantTrigger);
@@ -202,7 +206,6 @@ namespace Hubo{
             void clearTrigger();
 
             //Status check functions
-           
             int checkZero(int channel);
             bool checkSetup();
 
@@ -222,6 +225,7 @@ namespace Hubo{
             //canMsg buildCalibratePulse(int c);
             canMsg buildHIPpacket();
             canMsg buildRunCmdPacket();
+
         private:
             int zeroFlag[ctrlSize];
             void clearZeroFlag();

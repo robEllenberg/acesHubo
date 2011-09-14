@@ -346,7 +346,7 @@ namespace ACES{
             //manually. Add to config string?
             s = (ProtoState*) new ACES::FilteredState<float>(cfg, id, sampling,
                                                     portnum,filterLength);
-        } 
+        }
         #endif
         #ifdef WEBOTS
         if( type == "Webots") {
