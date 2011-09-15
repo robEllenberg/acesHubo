@@ -36,6 +36,11 @@ namespace ACES{
         packetsPerSP(0),
         packetCounter(0)
     {
+        //Why are all of these operations executed in seperate threads?
+        //It doesn't change the execution, since the operation is blocking, and
+        //most of these shouldn't need a whole other thread to run.
+        //TODO: Try getting rid of these and seeing if it cuts down on
+        //processing load.
         this->ports()->addPort("TxDS", txDownStream).doc(
                                "DownStream (to State) Transmission");
         this->addOperation("addCtrl", &Controller::addCtrl, this,
@@ -61,6 +66,8 @@ namespace ACES{
         this->addOperation("clearCtrl", &Controller::clearCtrl, this,
                            RTT::OwnThread)
                            .doc("Clear the entire set point buffer");
+        //
+        this->addOperation("sin",&Controller::sin,this).doc("Sine function").arg("theta","angle in radians");
 
         this->addAttribute("packetsPerSP", packetsPerSP);
         this->ports()->addPort("packetReport", packetReporter).doc(
@@ -443,4 +450,9 @@ namespace ACES{
         return true;
     }
 */
+
+    //---------------Math--------------------
+    float Controller::sin(float in){
+        return std::sin(in);
+    }
 }

@@ -37,6 +37,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <math.h>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
@@ -68,6 +69,8 @@ namespace ACES{
 
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
             RTT::InputPort<int> packetReporter;
+
+            float sin(float in);
         protected:
             std::map<std::string, void*>* curMap;
         private:
