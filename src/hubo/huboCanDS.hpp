@@ -95,6 +95,7 @@ namespace Hubo{
             unsigned long getR5();
 
             void printme();
+            static unsigned long bitStuff1byte(long bs);
             static unsigned long bitStuff15byte(long bs);
             static unsigned long bitStuff3byte(long bs);
             static unsigned long bitStuffCalibratePacket(long bs);

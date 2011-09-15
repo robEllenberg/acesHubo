@@ -190,6 +190,7 @@ program internals {
 	dNeck.setGearRatio(0, 1, 1);
 	dNeck.setHarmonic(0,100);
 	dNeck.setEncoderSize(0,128);
+	*/
 
 	//Defining internal properties for device dNeck, node 1
 
@@ -204,7 +205,6 @@ program internals {
 	dNeck.setGearRatio(2, 1, 1);
 	dNeck.setHarmonic(2,100);
 	dNeck.setEncoderSize(2,128);
-	*/
 
 	//Defining internal properties for device dHip, node 0
 

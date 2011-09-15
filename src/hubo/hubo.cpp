@@ -1008,6 +1008,7 @@ namespace Hubo{
                     t = SET_TRQ_GAIN_B;
                     break;
                 default:
+                    //TODO: make this error less generic
                     RTT::Logger::log(RTT::Logger::Warning)
                         << "Invalid channel number "
                         << channel << " specified. Must be [0-"
@@ -1072,7 +1073,7 @@ namespace Hubo{
                 mode |= 1;
         }
         switch (cred->getChannels()){
-            case 1: //TODO: Does the hip MC follow 2 or 3?
+            case 1: 
             case 2:  
                 mode |= (1 << (4+c)); //add a flag to indicate the channel number
                 r1 = mode;
@@ -1098,7 +1099,11 @@ namespace Hubo{
                 r3 = 0x3232;
                 break;
             case 5:
-                //TODO Make the hands zero (how?)
+                //KLUDGE: Fingers do not match any other system, so this mess
+                //here duplicates what Hubo lab does in their zero button.
+                r1 = (unsigned char)ticks & 0xFF;
+                r2 = r1 + (r1 << 8);
+                r3 = r2;
                 break;
             default:
                 //Fail - we can't do this for other controller configurations
@@ -1144,14 +1149,15 @@ namespace Hubo{
         unsigned long temp[5];
         switch(numChan){
             float dir, ppr;
-            case 5: //Five Channel Motor Controller - Fingers
-                for(int i=0; i < 5; i++){
+            case 1: //"Single" Channel - Waist
+            case 2: //Two Channel Motor Controllers - Limbs
+                for(int i = 0; i < 2; i++){
                     dir = ((MotorCredentials*)credentials)->getDirection(i);
                     ppr = ((MotorCredentials*)credentials)->getHarmonic(i)
                           *((MotorCredentials*)credentials)->getGearRatio(i)
                           *((MotorCredentials*)credentials)->getEncoderSize(i);
                     temp[i] =
-                        canMsg::bitStuff15byte((long)((setPoint[i]*RAD2DEG)*dir*ppr/360.));
+                       canMsg::bitStuff3byte((long)((setPoint[i]*RAD2DEG)*dir*ppr/360.));
                 }
                 break;
             case 3: //Three Channel Motor Controllers - Wrists & Neck
@@ -1163,15 +1169,10 @@ namespace Hubo{
                     temp[i] = (setPoint[i]*RAD2DEG)*dir*ppr/360.;
                 }
                 break;
-            case 1:
-            case 2: //Two Channel Motor Controllers - Limbs
-                for(int i = 0; i < 2; i++){
-                    dir = ((MotorCredentials*)credentials)->getDirection(i);
-                    ppr = ((MotorCredentials*)credentials)->getHarmonic(i)
-                          *((MotorCredentials*)credentials)->getGearRatio(i)
-                          *((MotorCredentials*)credentials)->getEncoderSize(i);
-                    temp[i] =
-                       canMsg::bitStuff3byte((long)((setPoint[i]*RAD2DEG)*dir*ppr/360.));
+            case 5: //Five Channel Motor Controller - Fingers
+                for(int i=0; i < 5; i++){
+                    //These motor controllers totally defy convention
+                    temp[i]=canMsg::bitStuff1byte((long)(setPoint[i]));
                 }
                 break;
             default:

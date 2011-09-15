@@ -116,6 +116,17 @@ namespace Hubo{
         return (unsigned char)( (src >> (8*byteNum)) & 0x000000FFu );
     }
 
+    
+    /**
+     * Fake Bitstuff algorithm for fingers (Rob).
+     * Use a similar method to hubo lab to cram finger direction and PWM cycle
+     * data into a single byte.
+     */
+    unsigned long canMsg::bitStuff1byte(long bs){
+        if (bs < 0) return( (unsigned long)(((-bs) & 0x0000000F) | (1<<4)) );
+        else	return( (unsigned long)(bs) & 0x0000000F );
+    }
+
     canmsg_t* canMsg::toLineType(){
         canmsg_t* cm = new canmsg_t;
         cm->flags = 0;
@@ -179,16 +190,32 @@ namespace Hubo{
                 cm->length = 2;
                 break;
             case NAME_INFO:
+                //TODO: Test this
+                //! r1 = command frequency (ms), r2-4 = "Limit" ch (0-2) (no idea what units are)
+                cm->data[2] = bitStrip(r1,0);
+                cm->data[3] = bitStrip(r2,0);
+                cm->data[4] = bitStrip(r3,0);
+                if (r5){
+                    cm->data[5] = bitStrip(r4,0);
+                    cm->length = 6;
+                }
+                else cm->length = 5;
+                break;
             case BOARD_STATUS:
-            case SEND_ENC:
-            case SEND_CURR:
-            case SEND_PM:
-            case ENC_ZERO:
-            case GO_HOME:
+                //!Empty Packet
+                cm->length = 2;
+                break;
             case PWM_CMD:
-            case STOP_CMD:
-            case CTRL_MODE:
-                assert(false);
+                //PWM commands are all single bytes, regardless of the number of motors
+                cm->data[2] = (unsigned char)r1;
+                cm->data[3] = (unsigned char)r2;
+                cm->data[4] = (unsigned char)r3;
+                cm->data[5] = (unsigned char)r4;
+                if(r5){
+                    cm->data[5] = (unsigned char)r5;
+                    cm->length = 8;
+                }
+                else cm->length = 7;
                 break;
             case GO_LIMIT_POS:
                 cm->data[2] = (unsigned char)r1; //Copy the mode bits
@@ -205,11 +232,18 @@ namespace Hubo{
                     cm->length = 8;
                 }
                 break;
-            case CURR_LIMIT:
             case NULL_CMD:
                 cm->data[2] = (unsigned char)r1; //Copy the mode bits
                 cm->length = 3;
                 break;
+            case GO_HOME:
+            case CURR_LIMIT:
+            case STOP_CMD:
+            case CTRL_MODE:
+            case SEND_ENC:
+            case SEND_CURR:
+            case SEND_PM:
+            case ENC_ZERO:
             case SET_PERIOD_CMD:
             case SET_SAMPLE_CMD:
             case AD_READ_CMD:

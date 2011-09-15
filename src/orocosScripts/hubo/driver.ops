@@ -1,0 +1,268 @@
+function setupController() {
+    //--------------------------------------------------------------------------
+    //  Define controller for FT feedback
+    //--------------------------------------------------------------------------
+    addController("ctrl 10 100", "User Trajectory","huboCtrlerPID.ops SingleSupport.txt");
+
+    //Controlled states
+    
+    // - Lower Body
+    linkSC("RHY", "ctrl");
+    linkSC("RHR", "ctrl");
+    linkSC("RHP", "ctrl");
+    linkSC("RKP", "ctrl");
+    linkSC("RAP", "ctrl");
+    linkSC("RAR", "ctrl");
+    linkSC("LHY", "ctrl");
+    linkSC("LHR", "ctrl");
+    linkSC("LHP", "ctrl");
+    linkSC("LKP", "ctrl");
+    linkSC("LHR", "ctrl");
+    linkSC("LHP", "ctrl");
+    linkSC("LKP", "ctrl");
+    linkSC("LAP", "ctrl");
+    linkSC("LAR", "ctrl");
+
+    // - Upper Body
+    linkSC("LSP", "ctrl");
+    linkSC("LSY", "ctrl");
+    linkSC("LSR", "ctrl");
+    linkSC("LEB", "ctrl");
+    linkSC("RSP", "ctrl");
+    linkSC("RSY", "ctrl");
+    linkSC("RSR", "ctrl");
+    linkSC("REB", "ctrl");
+    linkSC("WST", "ctrl");
+
+    //Sensor states
+    linkSC("LMx", "ctrl");
+    linkSC("LMy", "ctrl");
+    linkSC("LFz", "ctrl");
+    linkSC("RMx", "ctrl");
+    linkSC("RMy", "ctrl");
+    linkSC("RFz", "ctrl");
+}
+
+function setupLogger() {
+    addLogger("Joints 1 100", "File", "Joints-log.txt");
+    linkLS("Joints", "LKP", "value");
+    linkLS("Joints", "LHP", "value");
+    linkLS("Joints", "RAP", "value");
+    linkLS("Joints", "RAR", "value");
+    linkLS("Joints", "LAP", "value");
+    linkLS("Joints", "LAR", "value");
+}
+
+function setupSensors(bool sampling, int baseport) {
+    //Sensor node     //bus ID#, # of channels (FT=3, IMU/Hand(?)=4)
+    addDevice("dRFT 70 0", "HuboCAN Sensor", "0x31 3");
+    addDevice("dLFT 71 0", "HuboCAN Sensor", "0x32 3");
+    addDevice("dRWFT 45 0", "HuboCAN Sensor", "0x36 3");
+
+    //addDevice("dIMU1 18 0", "HuboCAN Sensor", "0x41 3");
+    //addDevice("dIMU2 19 0", "HuboCAN Sensor", "0x42 3");
+    //addDevice("dIMU3 19 0", "HuboCAN Sensor", "0x46 3");
+
+    linkPD("Pro1", "dRFT");
+    linkPD("Pro1", "dLFT");
+    linkPD("Pro2", "dRWFT");
+
+    // Force Torque state definitions and links 
+    addState("RMx 36 0", "Hubo", "0", sampling, baseport + 30);
+    addState("RMy 37 0", "Hubo", "1", sampling, baseport + 31);
+    addState("RFz 38 0", "Hubo", "2", sampling, baseport + 32);
+
+    linkDS("dRFT", "RMy");
+    linkDS("dRFT", "RMx");
+    linkDS("dRFT", "RFz");
+
+    addState("LMx 36 0", "Hubo", "0", sampling, baseport + 33);
+    addState("LMy 37 0", "Hubo", "1", sampling, baseport + 34);
+    addState("LFz 38 0", "Hubo", "2", sampling, baseport + 35);
+    
+    linkDS("dLFT", "LMx");
+    linkDS("dLFT", "LMy");
+    linkDS("dLFT", "LFz");
+
+    addState("RWMx 10 0", "Hubo", "0", sampling, baseport + 36);
+    addState("RWMy 11 0", "Hubo", "1", sampling, baseport + 37);
+    addState("RWFz 12 0", "Hubo", "2", sampling, baseport + 38);
+
+    linkDS("dRWFT", "RWMx");
+    linkDS("dRWFT", "RWMy");
+    linkDS("dRWFT", "RWFz");
+
+}
+
+function setupLowerBody(bool sampling, int baseport) {
+    //Lower level components
+    addHardware("ch1 95 0", "HuboCAN","/dev/can0 1000");
+    addProtocol("Pro1 90 0", "HuboCAN", "");
+    linkHP("ch1", "Pro1");
+
+	addDevice("dRHipYR 61 0", "HuboCAN Motor", "0x0 2");
+	addDevice("dRHipP 62 0", "HuboCAN Motor", "0x1 2");
+	addDevice("dRKnee 63 0", "HuboCAN Motor", "0x2 2");
+	addDevice("dRAnklePR 60 0", "HuboCAN Motor", "0x3 2");
+
+	addDevice("dLHipYR 61 0", "HuboCAN Motor", "0x4 2");
+	addDevice("dLHipP 62 0", "HuboCAN Motor", "0x5 2");
+	addDevice("dLKnee 63 0", "HuboCAN Motor", "0x6 2");
+	addDevice("dLAnklePR 60 0", "HuboCAN Motor", "0x7 2");
+
+	linkPD("Pro1", "dLAnklePR");
+	linkPD("Pro1", "dLHipYR");
+	linkPD("Pro1", "dLHipP");
+	linkPD("Pro1", "dLKnee");
+	linkPD("Pro1", "dRAnklePR");
+	linkPD("Pro1", "dRHipYR");
+	linkPD("Pro1", "dRHipP");
+	linkPD("Pro1", "dRKnee");
+
+	addState("RHY 30 0", "Hubo", "0", sampling, baseport + 39);
+    addState("RHR 31 0", "Hubo", "1", sampling, baseport + 40);
+    addState("RHP 32 0", "Hubo", "0", sampling, baseport + 41);
+	addState("RKP 33 0", "Hubo", "0", sampling, baseport + 42);
+    addState("RAP 34 0", "Hubo", "0", sampling, baseport + 43);
+    addState("RAR 35 0", "Hubo", "1", sampling, baseport + 44);
+
+    addState("LHY 30 0", "Hubo", "0", sampling, baseport + 45);
+    addState("LHR 31 0", "Hubo", "1", sampling, baseport + 46);
+    addState("LHP 32 0", "Hubo", "0", sampling, baseport + 47);
+    addState("LKP 33 0", "Hubo", "0", sampling, baseport + 48);
+    addState("LAP 34 0", "Hubo", "0", sampling, baseport + 49);
+	addState("LAR 35 0", "Hubo", "1", sampling, baseport + 50);
+	
+    linkDS("dRHipYR", "RHY");
+	linkDS("dRHipYR", "RHR");
+	linkDS("dRHipP", "RHP");
+	linkDS("dRKnee", "RKP");
+	linkDS("dRAnklePR", "RAP");
+	linkDS("dRAnklePR", "RAR");
+	linkDS("dLHipYR", "LHY");
+	linkDS("dLHipYR", "LHR");
+	linkDS("dLHipP", "LHP");
+	linkDS("dLKnee", "LKP");
+	linkDS("dLAnklePR", "LAP");
+	linkDS("dLAnklePR", "LAR");
+}
+
+function setupUpperBody(bool sampling, int baseport) {
+
+    addHardware("ch2 85 0", "HuboCAN","/dev/can1 1000");
+    addProtocol("Pro2 80 0", "HuboCAN", "");
+    linkHP("ch2", "Pro2");
+
+	addDevice("dLShoulderPR 45 0", "HuboCAN Motor", "0xA 2");
+	addDevice("dLUpperArm 44 0", "HuboCAN Motor", "0xB 2");
+	addDevice("dRShoulderPR 45 0", "HuboCAN Motor", "0x8 2");
+	addDevice("dRUpperArm 44 0", "HuboCAN Motor", "0x9 2");
+    addDevice("dHip 50 0", "HuboCAN Motor","0x23 1");
+    addDevice("dRWrist 43 0", "HuboCAN Motor", "0x20 3");
+	addDevice("dLWrist 43 0", "HuboCAN Motor", "0x21 3");
+
+    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 3");
+    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 3");
+    
+    //Link devices to appropriate protocol
+
+    linkPD("Pro2", "dHip");
+	linkPD("Pro2", "dLShoulderPR");
+	linkPD("Pro2", "dLUpperArm");
+	linkPD("Pro2", "dRShoulderPR");
+	linkPD("Pro2", "dRUpperArm");
+
+	linkPD("Pro2", "dLWrist");
+	linkPD("Pro2", "dRWrist");
+
+	linkPD("Pro2", "dLHand");
+	linkPD("Pro2", "dRHand");
+
+	//Right Arm
+    addState("RSP 20 0", "HuboSmoothed", "0 60", sampling, baseport + 20);
+	addState("RSR 21 0", "HuboSmoothed", "1 60", sampling, baseport + 21);
+	addState("RSY 22 0", "HuboSmoothed", "0 60", sampling, baseport + 22);
+	addState("REB 23 0", "HuboSmoothed", "1 60", sampling, baseport + 23);
+
+    //Left Arm
+	addState("LSP 20 0", "HuboSmoothed", "0 60", sampling, baseport + 24);
+	addState("LSR 21 0", "HuboSmoothed", "1 60", sampling, baseport + 25);
+	addState("LSY 22 0", "HuboSmoothed", "0 60", sampling, baseport + 26);
+	addState("LEB 23 0", "HuboSmoothed", "1 60", sampling, baseport + 27);
+    
+	addState("WST 40 0", "HuboSmoothed", "0 60", sampling, baseport + 28);
+
+	addState("RWY 18 0", "Hubo", "0", sampling, baseport + 0);
+	addState("RW1 19 0", "Hubo", "1", sampling, baseport + 1);
+	addState("RW2 20 0", "Hubo", "2", sampling, baseport + 2);
+	addState("LWY 18 0", "Hubo", "0", sampling, baseport + 3);
+	addState("LW1 19 0", "Hubo", "1", sampling, baseport + 4);
+	addState("LW2 20 0", "Hubo", "2", sampling, baseport + 5);
+    
+    addState("RF1 15 0", "Hubo", "4", sampling, baseport + 9);
+	addState("RF2 15 0", "Hubo", "0", sampling, baseport + 10);
+	addState("RF3 15 0", "Hubo", "1", sampling, baseport + 11);
+	addState("RF4 15 0", "Hubo", "2", sampling, baseport + 12);
+	addState("RF5 15 0", "Hubo", "3", sampling, baseport + 13);
+    
+    addState("LF1 15 0", "Hubo", "4", sampling, baseport + 14);
+	addState("LF2 15 0", "Hubo", "0", sampling, baseport + 15);
+	addState("LF3 15 0", "Hubo", "1", sampling, baseport + 16);
+	addState("LF4 15 0", "Hubo", "2", sampling, baseport + 17);
+	addState("LF5 15 0", "Hubo", "3", sampling, baseport + 18);
+
+    //Upper Body
+	linkDS("dRShoulderPR", "RSP");
+	linkDS("dRShoulderPR", "RSR");
+	linkDS("dRUpperArm", "RSY");
+	linkDS("dRUpperArm", "REB");
+	linkDS("dLShoulderPR", "LSP");
+	linkDS("dLShoulderPR", "LSR");
+	linkDS("dLUpperArm", "LSY");
+	linkDS("dLUpperArm", "LEB");
+	linkDS("dHip", "WST");
+
+	linkDS("dRWrist", "RWY");
+	linkDS("dRWrist", "RW1");
+	linkDS("dRWrist", "RW2");
+	linkDS("dLWrist", "LWY");
+	linkDS("dLWrist", "LW1");
+	linkDS("dLWrist", "LW2");
+
+	linkDS("dLHand", "LF1");
+	linkDS("dLHand", "LF2");
+	linkDS("dLHand", "LF3");
+	linkDS("dLHand", "LF4");
+	linkDS("dLHand", "LF5");
+
+	linkDS("dRHand", "RF1");
+	linkDS("dRHand", "RF2");
+	linkDS("dRHand", "RF3");
+	linkDS("dRHand", "RF4");
+	linkDS("dRHand", "RF5");
+}
+
+program main {
+    var bool sampling = false;
+    var int baseport = 2827;
+
+    call setupLowerBody(sampling,baseport);
+    call setupUpperBody(sampling,baseport);
+
+    // Run previously defined components (These may not be necessary depending on the particular test)
+    call setupSensors(sampling,baseport);
+    call setupController();
+    call setupLogger();
+    
+    /** Start various components and services */
+    //startDebug();
+    startHW();
+    startProtocol();
+    startDevice();
+    startState();
+    startController();
+    startLogger();
+    scripting.loadPrograms("config.ops");
+    scripting.loadStateMachines("autoZero.osd");
+    scripting.loadPrograms("setup.ops");
+}
