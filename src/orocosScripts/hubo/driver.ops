@@ -96,9 +96,9 @@ function setupSensors(bool sampling, int baseport) {
 
 function setupLowerBody(bool sampling, int baseport) {
     //Lower level components
-    //addHardware("ch1 95 0", "HuboCAN","/dev/can0 1000");
+    addHardware("ch1 95 0", "HuboCAN","/dev/can0 1000");
     addProtocol("Pro1 90 0", "HuboCAN", "");
-    //linkHP("ch1", "Pro1");
+    linkHP("ch1", "Pro1");
 
 	addDevice("dRHipYR 61 0", "HuboCAN Motor", "0x0 2");
 	addDevice("dRHipP 62 0", "HuboCAN Motor", "0x1 2");
@@ -149,9 +149,9 @@ function setupLowerBody(bool sampling, int baseport) {
 
 function setupUpperBody(bool sampling, int baseport) {
 
-    //addHardware("ch2 85 0", "HuboCAN","/dev/can1 1000");
+    addHardware("ch2 85 0", "HuboCAN","/dev/can1 1000");
     addProtocol("Pro2 80 0", "HuboCAN", "");
-    //linkHP("ch2", "Pro2");
+    linkHP("ch2", "Pro2");
 
 	addDevice("dLShoulderPR 45 0", "HuboCAN Motor", "0xA 2");
 	addDevice("dLUpperArm 44 0", "HuboCAN Motor", "0xB 2");

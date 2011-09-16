@@ -1145,7 +1145,10 @@ namespace Hubo{
     }
 
     canMsg MotorDevice::buildSetPacket(){
+        //Default set command uses REF_TXDF and numchan as subtype
+        huboCanType packetType = REF_TXDF;
         int numChan = getChannels(); 
+        cmdType subcmd = (cmdType)numChan;
         unsigned long temp[5];
         switch(numChan){
             float dir, ppr;
@@ -1174,6 +1177,9 @@ namespace Hubo{
                     //These motor controllers totally defy convention
                     temp[i]=canMsg::bitStuff1byte((long)(setPoint[i]));
                 }
+                //Note that Hands are direct voltage control via PWM_CMD
+                packetType=CMD_TXDF;
+                subcmd = PWM_CMD;
                 break;
             default:
                 //TODO - Failure case
@@ -1181,7 +1187,7 @@ namespace Hubo{
         }
 
         canMsg cm( credentials->getDevID(),
-                REF_TXDF, (cmdType)numChan, temp[0], temp[1], temp[2], temp[3],
+                packetType, subcmd , temp[0], temp[1], temp[2], temp[3],
                 temp[4]);
         return cm;
     }
