@@ -190,7 +190,6 @@ program internals {
 	dNeck.setGearRatio(0, 1, 1);
 	dNeck.setHarmonic(0,100);
 	dNeck.setEncoderSize(0,128);
-	*/
 
 	//Defining internal properties for device dNeck, node 1
 
@@ -205,6 +204,7 @@ program internals {
 	dNeck.setGearRatio(2, 1, 1);
 	dNeck.setHarmonic(2,100);
 	dNeck.setEncoderSize(2,128);
+	*/
 
 	//Defining internal properties for device dHip, node 0
 
@@ -273,18 +273,44 @@ program internals {
 	dRWrist.setPosLimits(1,-1,1);
 	dRWrist.setPosLimits(2,-1,1);
 
+	dLHand.setPosLimits(0,-16,16);
+	dLHand.setPosLimits(1,-16,16);
+	dLHand.setPosLimits(2,-16,16);
+	dLHand.setPosLimits(3,-16,16);
+	dLHand.setPosLimits(4,-16,16);
+
+	dRHand.setPosLimits(0,-16,16);
+	dRHand.setPosLimits(1,-16,16);
+	dRHand.setPosLimits(2,-16,16);
+	dRHand.setPosLimits(3,-16,16);
+	dRHand.setPosLimits(4,-16,16);
+
 	dRWrist.setZero(0,-72000,1);
 	dRWrist.setZero(1,0,0);
 	dRWrist.setZero(2,0,0);
 	dLWrist.setZero(0,0,0);
 	dLWrist.setZero(1,0,0);
 	dLWrist.setZero(2,0,0);
+
+    var int handZeroPower = 4;
+
+    dLHand.setZero(0,handZeroPower,0);
+    dLHand.setZero(1,handZeroPower,0);
+    dLHand.setZero(2,handZeroPower,0);
+    dLHand.setZero(3,handZeroPower,0);
+    dLHand.setZero(4,handZeroPower,0);
+
+    dRHand.setZero(0,handZeroPower,0);
+    dRHand.setZero(1,handZeroPower,0);
+    dRHand.setZero(2,handZeroPower,0);
+    dRHand.setZero(3,handZeroPower,0);
+    dRHand.setZero(4,handZeroPower,0);
+
 	/*
 	dNeck.setZero(0,0,0);
 	dNeck.setZero(1,0,0);
 	dNeck.setZero(2,0,0);
 	*/
-
 
     //Set Instant Trigger options
 
@@ -361,11 +387,11 @@ program gains {
 	dLWrist.setGains("Position", 0, 15, 0, 15);
 	dLWrist.setGains("Position", 1, 15, 0, 15);
 	dLWrist.setGains("Position", 2, 15, 0, 15);
+	dHip.setGains("Position", 0, 200, 0, 500);
 	/*
 	dNeck.setGains("Position", 0, 15, 0, 15);
 	dNeck.setGains("Position", 1, 15, 0, 15);
 	dNeck.setGains("Position", 2, 15, 0, 15);
-	dHip.setGains("Position", 0, 200, 0, 500);
 	*/
 }
 
@@ -409,4 +435,20 @@ program enable {
 	dNeck.HIPenable();
 	dNeck.run();
 	*/
+}
+
+export function leftHandGo(int power){
+    LF1.go(power);
+    LF2.go(power);
+    LF3.go(power);
+    LF4.go(power);
+    LF5.go(power);
+}
+
+export function rightHandGo(int power){
+    RF1.go(power);
+    RF2.go(power);
+    RF3.go(power);
+    RF4.go(power);
+    RF5.go(power);
 }

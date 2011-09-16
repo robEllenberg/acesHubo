@@ -44,7 +44,7 @@ function setupController() {
 }
 
 function setupLogger() {
-    addLogger("Joints 1 100", "File", "Joints-log.txt");
+    addLogger("Joints 5 100", "File", "Joints-log.txt");
     linkLS("Joints", "LKP", "value");
     linkLS("Joints", "LHP", "value");
     linkLS("Joints", "RAP", "value");
@@ -161,8 +161,8 @@ function setupUpperBody(bool sampling, int baseport) {
     addDevice("dRWrist 43 0", "HuboCAN Motor", "0x20 3");
 	addDevice("dLWrist 43 0", "HuboCAN Motor", "0x21 3");
 
-    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 3");
-    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 3");
+    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 5");
+    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 5");
     
     //Link devices to appropriate protocol
 
@@ -261,7 +261,7 @@ program main {
     startDevice();
     startState();
     startController();
-    startLogger();
+    //startLogger();
     scripting.loadPrograms("config.ops");
     scripting.loadStateMachines("autoZero.osd");
     scripting.loadPrograms("setup.ops");

@@ -142,7 +142,7 @@ namespace ACES{
         //this->addOperation("printHist", &State<T>::printHistory, this,
         //                   RTT::OwnThread).doc("Print the history");
 
-        //this->addAttribute("value", value);
+        this->addAttribute("value", value);
         //this->addAttribute("integral", integral);
         //this->addAttribute("diff", diff);
         this->addAttribute("portnum", port);
