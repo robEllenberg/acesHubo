@@ -154,9 +154,9 @@ function setupUpperBody(bool sampling, int baseport) {
     linkHP("ch2", "Pro2");
 
 	addDevice("dLShoulderPR 45 0", "HuboCAN Motor", "0xA 2");
-	addDevice("dLUpperArm 44 0", "HuboCAN Motor", "0xB 2");
+	addDevice("dLShoulderYE 44 0", "HuboCAN Motor", "0xB 2");
 	addDevice("dRShoulderPR 45 0", "HuboCAN Motor", "0x8 2");
-	addDevice("dRUpperArm 44 0", "HuboCAN Motor", "0x9 2");
+	addDevice("dRShoulderYE 44 0", "HuboCAN Motor", "0x9 2");
     addDevice("dHip 50 0", "HuboCAN Motor","0x23 1");
     addDevice("dRWrist 43 0", "HuboCAN Motor", "0x20 3");
 	addDevice("dLWrist 43 0", "HuboCAN Motor", "0x21 3");
@@ -168,9 +168,9 @@ function setupUpperBody(bool sampling, int baseport) {
 
     linkPD("Pro2", "dHip");
 	linkPD("Pro2", "dLShoulderPR");
-	linkPD("Pro2", "dLUpperArm");
+	linkPD("Pro2", "dLShoulderYE");
 	linkPD("Pro2", "dRShoulderPR");
-	linkPD("Pro2", "dRUpperArm");
+	linkPD("Pro2", "dRShoulderYE");
 
 	linkPD("Pro2", "dLWrist");
 	linkPD("Pro2", "dRWrist");
@@ -214,12 +214,12 @@ function setupUpperBody(bool sampling, int baseport) {
     //Upper Body
 	linkDS("dRShoulderPR", "RSP");
 	linkDS("dRShoulderPR", "RSR");
-	linkDS("dRUpperArm", "RSY");
-	linkDS("dRUpperArm", "REB");
+	linkDS("dRShoulderYE", "RSY");
+	linkDS("dRShoulderYE", "REB");
 	linkDS("dLShoulderPR", "LSP");
 	linkDS("dLShoulderPR", "LSR");
-	linkDS("dLUpperArm", "LSY");
-	linkDS("dLUpperArm", "LEB");
+	linkDS("dLShoulderYE", "LSY");
+	linkDS("dLShoulderYE", "LEB");
 	linkDS("dHip", "WST");
 
 	linkDS("dRWrist", "RWY");
@@ -261,7 +261,7 @@ program main {
     startDevice();
     startState();
     startController();
-    //startLogger();
+    startLogger();
     scripting.loadPrograms("config.ops");
     scripting.loadStateMachines("autoZero.osd");
     scripting.loadPrograms("setup.ops");

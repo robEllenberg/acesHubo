@@ -100,19 +100,19 @@ program internals {
 	dRShoulderPR.setHarmonic(1,100);
 	dRShoulderPR.setEncoderSize(1,4000);
 
-	//Defining internal properties for device dRUpperArm, node 0
+	//Defining internal properties for device dRShoulderYE, node 0
 
-	dRUpperArm.setDirection(0, -1);
-	dRUpperArm.setGearRatio(0, 1, 1);
-	dRUpperArm.setHarmonic(0,100);
-	dRUpperArm.setEncoderSize(0,4000);
+	dRShoulderYE.setDirection(0, -1);
+	dRShoulderYE.setGearRatio(0, 1, 1);
+	dRShoulderYE.setHarmonic(0,100);
+	dRShoulderYE.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dRUpperArm, node 1
+	//Defining internal properties for device dRShoulderYE, node 1
 
-	dRUpperArm.setDirection(1, -1);
-	dRUpperArm.setGearRatio(1, 20, 24);
-	dRUpperArm.setHarmonic(1,100);
-	dRUpperArm.setEncoderSize(1,4000);
+	dRShoulderYE.setDirection(1, -1);
+	dRShoulderYE.setGearRatio(1, 20, 24);
+	dRShoulderYE.setHarmonic(1,100);
+	dRShoulderYE.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dLShoulderPR, node 0
 
@@ -128,19 +128,19 @@ program internals {
 	dLShoulderPR.setHarmonic(1,100);
 	dLShoulderPR.setEncoderSize(1,4000);
 
-	//Defining internal properties for device dLUpperArm, node 0
+	//Defining internal properties for device dLShoulderYE, node 0
 
-	dLUpperArm.setDirection(0, 1);
-	dLUpperArm.setGearRatio(0, 1, 1);
-	dLUpperArm.setHarmonic(0,100);
-	dLUpperArm.setEncoderSize(0,4000);
+	dLShoulderYE.setDirection(0, 1);
+	dLShoulderYE.setGearRatio(0, 1, 1);
+	dLShoulderYE.setHarmonic(0,100);
+	dLShoulderYE.setEncoderSize(0,4000);
 
-	//Defining internal properties for device dLUpperArm, node 1
+	//Defining internal properties for device dLShoulderYE, node 1
 
-	dLUpperArm.setDirection(1, 1);
-	dLUpperArm.setGearRatio(1, 20, 24);
-	dLUpperArm.setHarmonic(1,100);
-	dLUpperArm.setEncoderSize(1,4000);
+	dLShoulderYE.setDirection(1, 1);
+	dLShoulderYE.setGearRatio(1, 20, 24);
+	dLShoulderYE.setHarmonic(1,100);
+	dLShoulderYE.setEncoderSize(1,4000);
 
 	//Defining internal properties for device dRWrist, node 0
 	dRWrist.setDirection(0, 1);
@@ -232,12 +232,12 @@ program internals {
 
 	dRShoulderPR.setZero(0,-35000,0);
 	dRShoulderPR.setZero(1,8000,0);
-	dRUpperArm.setZero(0,-30000,0);
-	dRUpperArm.setZero(1,80000,0);
+	dRShoulderYE.setZero(0,-30000,0);
+	dRShoulderYE.setZero(1,80000,0);
 	dLShoulderPR.setZero(0,-10000,1);
 	dLShoulderPR.setZero(1,4000,1);
-	dLUpperArm.setZero(0,12000,1);
-	dLUpperArm.setZero(1,-72000,1);
+	dLShoulderYE.setZero(0,12000,1);
+	dLShoulderYE.setZero(1,-72000,1);
     
     //Position Limits 
     //TODO: Make these actually mean something by measuring the real limits, for now just use +/- pi
@@ -259,12 +259,12 @@ program internals {
 
 	dRShoulderPR.setPosLimits(0,-1.5,1.5);
 	dRShoulderPR.setPosLimits(1,-1.5,1.5);
-	dRUpperArm.setPosLimits(0,-1.5,1.5);
-	dRUpperArm.setPosLimits(1,-1.5,1.5);
+	dRShoulderYE.setPosLimits(0,-1.5,1.5);
+	dRShoulderYE.setPosLimits(1,-1.5,1.5);
 	dLShoulderPR.setPosLimits(0,-1.5,1.5);
 	dLShoulderPR.setPosLimits(1,-1.5,1.5);
-	dLUpperArm.setPosLimits(0,-1.5,1.5);
-	dLUpperArm.setPosLimits(1,-1.5,1.5);
+	dLShoulderYE.setPosLimits(0,-1.5,1.5);
+	dLShoulderYE.setPosLimits(1,-1.5,1.5);
 
 	dLWrist.setPosLimits(0,-1,1);
 	dLWrist.setPosLimits(1,-1,1);
@@ -323,9 +323,9 @@ program internals {
     dRKnee.instantTrigger = true;
     dLKnee.instantTrigger = true;
     //dRShoulderPR.instantTrigger = true;
-    //dRUpperArm.instantTrigger = true;
+    //dRShoulderYE.instantTrigger = true;
     //dLShoulderPR.instantTrigger = true;
-    //dLUpperArm.instantTrigger = true;
+    //dLShoulderYE.instantTrigger = true;
     //dRWrist.instantTrigger = true;
     //dLWrist.instantTrigger = true;
     //dNeck.instantTrigger = true;
@@ -375,12 +375,12 @@ program gains {
 
 	dRShoulderPR.setGains("Position", 0, 200, 0, 500);
 	dRShoulderPR.setGains("Position", 1, 200, 0, 500);
-	dRUpperArm.setGains("Position", 0, 200, 0, 500);
-	dRUpperArm.setGains("Position", 1, 200, 0, 500);
+	dRShoulderYE.setGains("Position", 0, 200, 0, 500);
+	dRShoulderYE.setGains("Position", 1, 200, 0, 500);
 	dLShoulderPR.setGains("Position", 0, 200, 0, 500);
 	dLShoulderPR.setGains("Position", 1, 200, 0, 500);
-	dLUpperArm.setGains("Position", 0, 200, 0, 500);
-	dLUpperArm.setGains("Position", 1, 200, 0, 500);
+	dLShoulderYE.setGains("Position", 0, 200, 0, 500);
+	dLShoulderYE.setGains("Position", 1, 200, 0, 500);
 	dRWrist.setGains("Position", 0, 15, 0, 15);
 	dRWrist.setGains("Position", 1, 15, 0, 15);
 	dRWrist.setGains("Position", 2, 15, 0, 15);
@@ -418,12 +418,12 @@ program enable {
        //Upper body
 	dRShoulderPR.HIPenable();
 	dRShoulderPR.run();
-	dRUpperArm.HIPenable();
-	dRUpperArm.run();
+	dRShoulderYE.HIPenable();
+	dRShoulderYE.run();
 	dLShoulderPR.HIPenable();
 	dLShoulderPR.run();
-	dLUpperArm.HIPenable();
-	dLUpperArm.run();
+	dLShoulderYE.HIPenable();
+	dLShoulderYE.run();
 	dHip.HIPenable();
 	dHip.run();
        //3-motor controllers
