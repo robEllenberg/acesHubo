@@ -1044,7 +1044,7 @@ namespace Hubo{
 
     canMsg MotorDevice::buildZeroPacket(int c, int ticks, bool ccw){
         MotorCredentials* cred = (MotorCredentials*)credentials;
-        long r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5=0;
+        long r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0;
 
         //Check to make sure we're not exceding the value that can be held in
         //hubolab's 19bit + sign bit representation
@@ -1099,9 +1099,10 @@ namespace Hubo{
             case 5:
                 //KLUDGE: Fingers do not match any other system, so this mess
                 //here duplicates what Hubo lab does in their zero button.
-                r1 = (unsigned char)ticks & 0xFF;
+                r1 = ticks & 0xFF;
                 r2 = r1 + (r1 << 8);
                 r3 = r2;
+                r5 = 1;
                 break;
             default:
                 //Fail - we can't do this for other controller configurations
@@ -1171,12 +1172,19 @@ namespace Hubo{
                 }
                 break;
             case 5: //Five Channel Motor Controller - Fingers
-                for(int i=0; i < 5; i++){
+                for(int i = 0; i < 5; i++){
                     //These motor controllers totally defy convention
-                    temp[i]=canMsg::bitStuff1byte((long)(setPoint[i]));
+                    temp[i] = canMsg::bitStuff1byte((long)(setPoint[i]));
                 }
+                //KLUDGE: This mess converts the setpoints to a stuffed set of
+                //bytes that the interpreter for PWM_CMD can digest in a
+                //standard way.
+                temp[1] = (temp[0] + (temp[1] << 8));
+                temp[2] = (temp[2] + (temp[3] << 8) + (temp[3] << 16));
+                temp[4] = 1;
+                temp[0] = 1;
                 //Note that Hands are direct voltage control via PWM_CMD
-                packetType=CMD_TXDF;
+                packetType = CMD_TXDF;
                 subcmd = PWM_CMD;
                 break;
             default:

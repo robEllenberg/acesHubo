@@ -273,17 +273,17 @@ program internals {
 	dRWrist.setPosLimits(2,-2,2);
 	dRWrist.setPosLimits(2,-2,2);
 
-	dLHand.setPosLimits(0,-16,16);
-	dLHand.setPosLimits(1,-16,16);
-	dLHand.setPosLimits(2,-16,16);
-	dLHand.setPosLimits(3,-16,16);
-	dLHand.setPosLimits(4,-16,16);
+	dLHand.setPosLimits(0,-15,15);
+	dLHand.setPosLimits(1,-15,15);
+	dLHand.setPosLimits(2,-15,15);
+	dLHand.setPosLimits(3,-15,15);
+	dLHand.setPosLimits(4,-15,15);
 
-	dRHand.setPosLimits(0,-16,16);
-	dRHand.setPosLimits(1,-16,16);
-	dRHand.setPosLimits(2,-16,16);
-	dRHand.setPosLimits(3,-16,16);
-	dRHand.setPosLimits(4,-16,16);
+	dRHand.setPosLimits(0,-15,15);
+	dRHand.setPosLimits(1,-15,15);
+	dRHand.setPosLimits(2,-15,15);
+	dRHand.setPosLimits(3,-15,15);
+	dRHand.setPosLimits(4,-15,15);
 
 	dRWrist.setZero(0,-72000,1);
 	dRWrist.setZero(1,0,0);
@@ -305,12 +305,6 @@ program internals {
     dRHand.setZero(2,handZeroPower,0);
     dRHand.setZero(3,handZeroPower,0);
     dRHand.setZero(4,handZeroPower,0);
-
-	/*
-	dNeck.setZero(0,0,0);
-	dNeck.setZero(1,0,0);
-	dNeck.setZero(2,0,0);
-	*/
 
     //Set Instant Trigger options
 
@@ -451,4 +445,12 @@ export function rightHandGo(int power){
     RF3.go(power);
     RF4.go(power);
     RF5.go(power);
+}
+//TODO: this is a hack to make the 
+export function rightHandOff(){
+	ch2.genPacket(1,8,"0x240D000000000000");
+}
+
+export function rightHandOff(){
+	ch2.genPacket(1,8,"0x240D000000000000");
 }

@@ -93,7 +93,7 @@ namespace Hubo{
         RTT::Logger::log() << s.str() << RTT::endlog();
     }
 
-    /* The bitStuffing algorithems are pulled directly from the original hubo
+    /* The bitStuffing algorithms are pulled directly from the original hubo
      * code base. They're wrong in that they use a sign bit instead of a two's
      * complement representation, but I'm maintaing them because they're needed
      * to ensure compatibility with the motor controllers */
@@ -115,7 +115,6 @@ namespace Hubo{
     unsigned char canMsg::bitStrip(unsigned long src, int byteNum){
         return (unsigned char)( (src >> (8*byteNum)) & 0x000000FFu );
     }
-
     
     /**
      * Fake Bitstuff algorithm for fingers (Rob).
@@ -123,8 +122,8 @@ namespace Hubo{
      * data into a single byte.
      */
     unsigned long canMsg::bitStuff1byte(long bs){
-        if (bs < 0) return( (unsigned long)(((-bs) & 0x0000000F) | (1<<4)) );
-        else	return( (unsigned long)(bs) & 0x0000000F );
+        if (bs < 0) return (unsigned long)(((-bs) & 0xF) | 0x10 );
+        else	return (unsigned long)((bs) & 0xF );
     }
 
     canmsg_t* canMsg::toLineType(){
@@ -208,12 +207,13 @@ namespace Hubo{
             case PWM_CMD:
                 //PWM commands are all single bytes, regardless of the number of motors
                 cm->data[2] = (unsigned char)r1;
-                cm->data[3] = (unsigned char)r2;
-                cm->data[4] = (unsigned char)r3;
-                cm->data[5] = (unsigned char)r4;
+                cm->data[3] = bitStrip(r2, 0);
+                cm->data[4] = bitStrip(r2, 1);
+                cm->data[5] = bitStrip(r3, 0);
+                cm->data[6] = bitStrip(r3, 1);
                 if(r5){
-                    cm->data[5] = (unsigned char)r5;
                     cm->length = 8;
+                    cm->data[7] = bitStrip(r3, 2);
                 }
                 else cm->length = 7;
                 break;

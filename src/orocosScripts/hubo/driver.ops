@@ -214,8 +214,8 @@ function setupUpperBody(bool sampling, int baseport) {
 
 function setupHands(bool sampling, int baseport){
 
-    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 5");
-    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 5");
+    addDevice("dLHand 40 0", "HuboCAN Motor", "0x25 5");
+    addDevice("dRHand 40 0", "HuboCAN Motor", "0x24 5");
     
 	linkPD("Pro2", "dLHand");
 	linkPD("Pro2", "dRHand");
