@@ -756,22 +756,20 @@ namespace Hubo{
         this->addOperation("checkZero", &MotorDevice::checkZero,this,
             RTT::OwnThread).doc("Check if a given motor channel has been zeroed properly")
                           .arg("channel","Channel number to check");
+
         this->addOperation("checkSetup", &MotorDevice::checkSetup,this,
             RTT::OwnThread).doc("Check if internal properties have been defined for the device");
+
         this->addOperation("checkCAN", &MotorDevice::checkCAN,this,
             RTT::OwnThread).doc("Check if device has received a status packet");
+
         this->addOperation("setPosLimits", &MotorDevice::setPositionLimits, this,
             RTT::OwnThread).doc("Define joint limits for a given channel")
                            .arg("channel", "Channel number to set")
                            .arg("min", "lower limit of joint")
                            .arg("max", "upper limit of joint");
-/*
-        this->addOperation("setRateLimits", &MotorDevice::setRateLimits, this,
-            RTT::OwnThread).doc("Define velocity and acceleration limit on channel")
-                           .arg("channel", "Channel number to set")
-                           .arg("Max Velocity", "Absolute maximum allowed velocity")
-                           .arg("Max Acceleration", "Absolute maximum allowed acceleration");
-                           */
+
+        this->addOperation("getChannels", &MotorDevice::getChannels,this).doc("Return the number of channels for this device");
 
         // Make sure that default status flags are zero
         this->clearZeroFlag();
@@ -925,14 +923,14 @@ namespace Hubo{
                 //Clip lower end, should this be transparent like it is?
 
                 setPoint[channel] = c->minP[channel];
-                RTT::Logger::log(RTT::Logger::Warning)
+                RTT::Logger::log(RTT::Logger::Debug)
                     << "Minimum position limit exceeded on channel " << channel
                     << RTT::endlog();
                 }
             else if (sp > c->maxP[channel]){
                 //Clip upper end
                 setPoint[channel] = c->maxP[channel];
-                RTT::Logger::log(RTT::Logger::Warning)
+                RTT::Logger::log(RTT::Logger::Debug)
                     << "Maximum position limit exceeded on channel " << channel
                     << RTT::endlog();
                 }

@@ -242,36 +242,36 @@ program internals {
     //Position Limits 
     //TODO: Make these actually mean something by measuring the real limits, for now just use +/- pi
 
-	dRHipYR.setPosLimits(0,-1.5,1.5);
-	dRHipYR.setPosLimits(1,-1.5,1.5);
-	dRHipP.setPosLimits(0,-1.5,1.5);
-	dRKnee.setPosLimits(0,-1.5,1.5);
-	dRAnklePR.setPosLimits(0,-1.5,1.5);
-	dRAnklePR.setPosLimits(1,-1.5,1.5);
-	dLHipYR.setPosLimits(0,-1.5,1.5);
-	dLHipYR.setPosLimits(1,-1.5,1.5);
-	dLHipP.setPosLimits(0,-1.5,1.5);
-	dLKnee.setPosLimits(0,-1.5,1.5);
-	dLAnklePR.setPosLimits(0,-1.5,1.5);
-	dLAnklePR.setPosLimits(1,-1.5,1.5);
+	dRHipYR.setPosLimits(0,-1,1);
+	dRHipYR.setPosLimits(1,-1,1);
+	dRHipP.setPosLimits(0,-2,2);
+	dRKnee.setPosLimits(0,-2,2);
+	dRAnklePR.setPosLimits(0,-2,2);
+	dRAnklePR.setPosLimits(1,-1,1);
+	dLHipYR.setPosLimits(0,-1,1);
+	dLHipYR.setPosLimits(1,-1,1);
+	dLHipP.setPosLimits(0,-2,2);
+	dLKnee.setPosLimits(0,-2,2);
+	dLAnklePR.setPosLimits(0,-2,2);
+	dLAnklePR.setPosLimits(1,-1,1);
 	
     dHip.setPosLimits(0,-1.5,1.5);
 
-	dRShoulderPR.setPosLimits(0,-1.5,1.5);
-	dRShoulderPR.setPosLimits(1,-1.5,1.5);
-	dRShoulderYE.setPosLimits(0,-1.5,1.5);
-	dRShoulderYE.setPosLimits(1,-1.5,1.5);
-	dLShoulderPR.setPosLimits(0,-1.5,1.5);
-	dLShoulderPR.setPosLimits(1,-1.5,1.5);
-	dLShoulderYE.setPosLimits(0,-1.5,1.5);
-	dLShoulderYE.setPosLimits(1,-1.5,1.5);
+	dRShoulderPR.setPosLimits(0,-2,2);
+	dRShoulderPR.setPosLimits(1,-2,2);
+	dRShoulderYE.setPosLimits(0,-2,2);
+	dRShoulderYE.setPosLimits(1,-2,2);
+	dLShoulderPR.setPosLimits(0,-2,2);
+	dLShoulderPR.setPosLimits(1,-2,2);
+	dLShoulderYE.setPosLimits(0,-2,2);
+	dLShoulderYE.setPosLimits(1,-2,2);
 
-	dLWrist.setPosLimits(0,-1,1);
-	dLWrist.setPosLimits(1,-1,1);
-	dLWrist.setPosLimits(2,-1,1);
-	dRWrist.setPosLimits(0,-1,1);
-	dRWrist.setPosLimits(1,-1,1);
-	dRWrist.setPosLimits(2,-1,1);
+	dLWrist.setPosLimits(0,-2,2);
+	dLWrist.setPosLimits(2,-2,2);
+	dLWrist.setPosLimits(2,-2,2);
+	dRWrist.setPosLimits(0,-2,2);
+	dRWrist.setPosLimits(2,-2,2);
+	dRWrist.setPosLimits(2,-2,2);
 
 	dLHand.setPosLimits(0,-16,16);
 	dLHand.setPosLimits(1,-16,16);

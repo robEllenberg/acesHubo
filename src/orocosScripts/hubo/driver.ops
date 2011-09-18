@@ -1,11 +1,7 @@
 function setupController() {
-    //--------------------------------------------------------------------------
-    //  Define controller for FT feedback
-    //--------------------------------------------------------------------------
+
     addController("ctrl 10 100", "User Trajectory","huboCtrlerPID.ops SingleSupport.txt");
 
-    //Controlled states
-    
     // - Lower Body
     linkSC("RHY", "ctrl");
     linkSC("RHR", "ctrl");
@@ -23,6 +19,9 @@ function setupController() {
     linkSC("LAP", "ctrl");
     linkSC("LAR", "ctrl");
 
+    //TODO: These should maybe be disabled automatically if these states are
+    //not defined. Alternative, make the function fail gracefully if it can't
+    //find a state (ie don't blow up).
     // - Upper Body
     linkSC("LSP", "ctrl");
     linkSC("LSY", "ctrl");
@@ -161,9 +160,6 @@ function setupUpperBody(bool sampling, int baseport) {
     addDevice("dRWrist 43 0", "HuboCAN Motor", "0x20 3");
 	addDevice("dLWrist 43 0", "HuboCAN Motor", "0x21 3");
 
-    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 5");
-    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 5");
-    
     //Link devices to appropriate protocol
 
     linkPD("Pro2", "dHip");
@@ -174,9 +170,6 @@ function setupUpperBody(bool sampling, int baseport) {
 
 	linkPD("Pro2", "dLWrist");
 	linkPD("Pro2", "dRWrist");
-
-	linkPD("Pro2", "dLHand");
-	linkPD("Pro2", "dRHand");
 
 	//Right Arm
     addState("RSP 20 0", "HuboSmoothed", "0 60", sampling, baseport + 20);
@@ -199,18 +192,6 @@ function setupUpperBody(bool sampling, int baseport) {
 	addState("LW1 19 0", "Hubo", "1", sampling, baseport + 4);
 	addState("LW2 20 0", "Hubo", "2", sampling, baseport + 5);
     
-    addState("RF1 15 0", "Hubo", "4", sampling, baseport + 9);
-	addState("RF2 15 0", "Hubo", "0", sampling, baseport + 10);
-	addState("RF3 15 0", "Hubo", "1", sampling, baseport + 11);
-	addState("RF4 15 0", "Hubo", "2", sampling, baseport + 12);
-	addState("RF5 15 0", "Hubo", "3", sampling, baseport + 13);
-    
-    addState("LF1 15 0", "Hubo", "4", sampling, baseport + 14);
-	addState("LF2 15 0", "Hubo", "0", sampling, baseport + 15);
-	addState("LF3 15 0", "Hubo", "1", sampling, baseport + 16);
-	addState("LF4 15 0", "Hubo", "2", sampling, baseport + 17);
-	addState("LF5 15 0", "Hubo", "3", sampling, baseport + 18);
-
     //Upper Body
 	linkDS("dRShoulderPR", "RSP");
 	linkDS("dRShoulderPR", "RSR");
@@ -229,7 +210,29 @@ function setupUpperBody(bool sampling, int baseport) {
 	linkDS("dLWrist", "LW1");
 	linkDS("dLWrist", "LW2");
 
-	linkDS("dLHand", "LF1");
+}
+
+function setupHands(bool sampling, int baseport){
+
+    addDevice("dLHand 40 0", "HuboCAN Motor", "0x24 5");
+    addDevice("dRHand 40 0", "HuboCAN Motor", "0x25 5");
+    
+	linkPD("Pro2", "dLHand");
+	linkPD("Pro2", "dRHand");
+
+    addState("RF1 15 0", "Hubo", "4", sampling, baseport + 9);
+	addState("RF2 15 0", "Hubo", "0", sampling, baseport + 10);
+	addState("RF3 15 0", "Hubo", "1", sampling, baseport + 11);
+	addState("RF4 15 0", "Hubo", "2", sampling, baseport + 12);
+	addState("RF5 15 0", "Hubo", "3", sampling, baseport + 13);
+    
+    addState("LF1 15 0", "Hubo", "4", sampling, baseport + 14);
+	addState("LF2 15 0", "Hubo", "0", sampling, baseport + 15);
+	addState("LF3 15 0", "Hubo", "1", sampling, baseport + 16);
+	addState("LF4 15 0", "Hubo", "2", sampling, baseport + 17);
+	addState("LF5 15 0", "Hubo", "3", sampling, baseport + 18);
+	
+    linkDS("dLHand", "LF1");
 	linkDS("dLHand", "LF2");
 	linkDS("dLHand", "LF3");
 	linkDS("dLHand", "LF4");
@@ -242,12 +245,18 @@ function setupUpperBody(bool sampling, int baseport) {
 	linkDS("dRHand", "RF5");
 }
 
+/**
+ * Hubo setup program, run with aces-launcher.
+ * Commment out functions here to disable major body parts.
+ * To further customize what is loaded, change the functions above, or make your own!
+ */
 program main {
     var bool sampling = false;
     var int baseport = 2827;
 
     call setupLowerBody(sampling,baseport);
     call setupUpperBody(sampling,baseport);
+    call setupHands(sampling,baseport);
 
     // Run previously defined components (These may not be necessary depending on the particular test)
     call setupSensors(sampling,baseport);

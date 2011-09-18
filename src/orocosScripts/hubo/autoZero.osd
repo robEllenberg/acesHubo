@@ -550,25 +550,25 @@ StateMachine LeftArm
             zeroAttempts=0;
             if (forceZero) then
             {
-                dLUpperArm.programZero(0);
+                dLShoulderYE.programZero(0);
                 zeroAttempts=zeroAttempts+1;
             }
         }
         handle
         { 
-            if(dLUpperArm.checkZero(0)==10) then
+            if(dLShoulderYE.checkZero(0)==10) then
             {
                 //Repeat, since it could simply need to move farther
-                dLUpperArm.programZero(0);
+                dLShoulderYE.programZero(0);
                 zeroAttempts=zeroAttempts+1;
             } 
         }   
 
-        transition if (dLUpperArm.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        transition if (dLShoulderYE.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
         {
 
         } select Failure
-        transition if (dLUpperArm.checkZero(0)==5) then 
+        transition if (dLShoulderYE.checkZero(0)==5) then 
         {
 
         } select LEP
@@ -580,25 +580,25 @@ StateMachine LeftArm
             zeroAttempts=0;
             if (forceZero) then
             {
-                dLUpperArm.programZero(1);
+                dLShoulderYE.programZero(1);
                 zeroAttempts=zeroAttempts+1;
             }
         }
         handle
         { 
-            if(dLUpperArm.checkZero(1)==10) then
+            if(dLShoulderYE.checkZero(1)==10) then
             {
                 //Repeat, since it could simply need to move farther
-                dLUpperArm.programZero(1);
+                dLShoulderYE.programZero(1);
                 zeroAttempts=zeroAttempts+1;
             } 
         }   
 
-        transition if (dLUpperArm.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        transition if (dLShoulderYE.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
         {
 
         } select Failure
-        transition if (dLUpperArm.checkZero(1)==5) then 
+        transition if (dLShoulderYE.checkZero(1)==5) then 
         {
 
         } select exit
@@ -693,25 +693,25 @@ StateMachine RightArm
             zeroAttempts=0;
             if (forceZero) then
             {
-                dRUpperArm.programZero(0);
+                dRShoulderYE.programZero(0);
                 zeroAttempts=zeroAttempts+1;
             }
         }
         handle
         { 
-            if(dRUpperArm.checkZero(0)==10) then
+            if(dRShoulderYE.checkZero(0)==10) then
             {
                 //Repeat, since it could simply need to move farther
-                dRUpperArm.programZero(0);
+                dRShoulderYE.programZero(0);
                 zeroAttempts=zeroAttempts+1;
             } 
         }   
 
-        transition if (dRUpperArm.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
+        transition if (dRShoulderYE.checkZero(0)==10 && zeroAttempts>=retryLimit) then 
         {
 
         } select Failure
-        transition if (dRUpperArm.checkZero(0)==5) then 
+        transition if (dRShoulderYE.checkZero(0)==5) then 
         {
 
         } select REP
@@ -723,24 +723,24 @@ StateMachine RightArm
             zeroAttempts=0;
             if (forceZero) then
             {
-                dRUpperArm.programZero(1);
+                dRShoulderYE.programZero(1);
                 zeroAttempts=zeroAttempts+1;
             }
         }
         handle
         { 
-            if(dRUpperArm.checkZero(1)==10) then
+            if(dRShoulderYE.checkZero(1)==10) then
             {
                 //Repeat, since it could simply need to move farther
-                dRUpperArm.programZero(1);
+                dRShoulderYE.programZero(1);
                 zeroAttempts=zeroAttempts+1;
             } 
         }   
 
-        transition if (dRUpperArm.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
+        transition if (dRShoulderYE.checkZero(1)==10 && zeroAttempts>=retryLimit) then 
         {
         } select Failure
-        transition if (dRUpperArm.checkZero(1)==5) then 
+        transition if (dRShoulderYE.checkZero(1)==5) then 
         {
 
         } select exit
