@@ -451,6 +451,3 @@ export function rightHandOff(){
 	ch2.genPacket(1,8,"0x240D000000000000");
 }
 
-export function rightHandOff(){
-	ch2.genPacket(1,8,"0x240D000000000000");
-}

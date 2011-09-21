@@ -33,8 +33,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_include(rtt_ros_integration GenerateRTTtypekit) 
 
 rosbuild_find_ros_package(rtt )
-find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install )
+find_package(Orocos-RTT REQUIRED rtt-scripting HINTS HINTS ${rtt_PACKAGE_PATH}/install)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT-helpers.cmake)
 
 include_directories("/usr/local/webots/include/controller/c")
 link_directories("/usr/local/webots/lib")
@@ -42,7 +43,7 @@ link_directories("/usr/local/webots/lib")
 rosbuild_add_library(aces-common src/taskcfg.cpp src/word.cpp
                      src/credentials.cpp src/state/state.cpp
                      src/device.cpp src/protocol.cpp
-                     src/hardware.cpp src/controller.cpp src/logger.cpp src/filter.hpp)
+                     src/hardware.cpp src/controller.cpp src/logger.cpp)
 #rosbuild_add_compile_flags(aces-common -pg)
 #rosbuild_add_link_flags(aces-common -pg)
 
@@ -95,6 +96,7 @@ target_link_libraries(aces-launcher aces-hubo)
 #target_link_libraries(aces-launcher aces-robotis)
 #target_link_libraries(aces-launcher minihubo)
 #target_link_libraries(aces-launcher omnibot)
-target_link_libraries(aces-launcher orocos-taskbrowser-gnulinux)
+target_link_libraries(aces-launcher orocos-ocl-taskbrowser-gnulinux)
+target_link_libraries(aces-launcher ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY})
 #rosbuild_add_compile_flags(aces-launcher -pg)
 #rosbuild_add_link_flags(aces-launcher -pg)
