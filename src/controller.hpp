@@ -37,7 +37,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <math.h>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
@@ -46,13 +45,14 @@
 #include <rtt/scripting/Scripting.hpp>
 
 #include "taskcfg.hpp"
+#include "taskmath.hpp"
 
 //TODO - Relocate this definition 
 enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 enum scriptState { CTRL_HALT, CTRL_RUN, CTRL_STEP, CTRL_FAIL, CTRL_END };
 
 namespace ACES{
-    class Controller :  public ACESTask
+    class Controller :  public ACESTask, public TaskMath<float>
     {
         public:
             Controller(std::string cfg, std::string args);
@@ -70,7 +70,6 @@ namespace ACES{
             RTT::OutputPort< std::map<std::string, void*>* > txDownStream;
             RTT::InputPort<int> packetReporter;
 
-            float sin(float in);
         protected:
             std::map<std::string, void*>* curMap;
         private:

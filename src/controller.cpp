@@ -450,9 +450,4 @@ namespace ACES{
         return true;
     }
 */
-
-    //---------------Math--------------------
-    float Controller::sin(float in){
-        return std::sin(in);
-    }
 }
