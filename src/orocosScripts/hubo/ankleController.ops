@@ -15,6 +15,7 @@ program main{
 
     // Constants
     var float pi = 3.14159;
+    const int BYPASS_CONTROLLER = 1;
 
 
 //------------------------------------------
@@ -129,15 +130,14 @@ program main{
 
 
 
-
     // Gains
     // Left foot
-    var float LpP = -0.0003;     // pitch P gain
+    var float LpP = -0.0002; //-0.0003;     // pitch P gain
     var float LpD = -0.00007;     // pitch D gain
     var float LpI = 0.0;     // pitch I gain
 
-    var float LrP = -0.001;     
-    var float LrD = 0.0005;
+    var float LrP = -0.0001; //-0.001;     
+    var float LrD = 0.0001; //0.0005;
     var float LrI = 0.0;
 
     // Right foot
@@ -152,25 +152,27 @@ program main{
     //--------------------------------------
     //--[ Start Set all PR gains to zero ]--
     //--------------------------------------
-    // Left foot
-    /*
-    LpP = 0.0;     // pitch P gain
-    LpD = 0.0;     // pitch D gain
-    LpI = 0.0;     // pitch I gain
+    if (BYPASS_CONTROLLER == 1) then
+    {
+        // Left foot
 
-    LrP = 0.0;
-    LrD = 0.0;
-    LrI = 0.0;
-    
-    // Right foot
-    RpP = 0.0;     // pitch P gain
-    RpD = 0.0;     // pitch D gain
-    RpI = 0.0;     // pitch I gain
-    RrP = 0.0;
-    RrD = 0.0;
-    RrI = 0.0;
-    */
+        LpP = 0.0;     // pitch P gain
+        LpD = 0.0;     // pitch D gain
+        LpI = 0.0;     // pitch I gain
 
+        LrP = 0.0;
+        LrD = 0.0;
+        LrI = 0.0;
+
+        // Right foot
+        RpP = 0.0;     // pitch P gain
+        RpD = 0.0;     // pitch D gain
+        RpI = 0.0;     // pitch I gain
+
+        RrP = 0.0;
+        RrD = 0.0;
+        RrI = 0.0;
+    }
     //--------------------------------------
     //---[ End Set all PR gains to zero ]---
     //--------------------------------------
@@ -261,13 +263,15 @@ program main{
     var float RKP = 0.0;
     var float RAP = 0.0;
     var float RAR = 0.0;
-
+    
     var float LHP = 0.0;
     var float LHR = 0.0;
     var float LHY = 0.0;
     var float LKP = 0.0;
     var float LAP = 0.0;
     var float LAR = 0.0;
+
+    var float STE = 0.0;
 
     var float RHPf = 0.0;
     var float RHRf = 0.0;
@@ -333,6 +337,7 @@ program main{
             LKP = checkCtrl("LKP");
             LAP = checkCtrl("LAP");
             LAR = checkCtrl("LAR");
+            STE = checkCtrl("STATE");
         }
 
         LMx = getSurface("LMx","value");

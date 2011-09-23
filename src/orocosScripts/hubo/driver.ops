@@ -1,6 +1,6 @@
 function setupController() {
 
-    addController("ctrl 10 100", "User Trajectory","huboCtrlerPID.ops SingleSupport.txt");
+    addController("ctrl 10 100", "User Trajectory","ankleController.ops SingleSupport.txt");
 
     // - Lower Body
     linkSC("RHY", "ctrl");
