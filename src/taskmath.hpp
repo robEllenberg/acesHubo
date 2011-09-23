@@ -1,4 +1,5 @@
 #include <math.h>
+
 namespace ACES {
 
     /**
@@ -41,6 +42,10 @@ namespace ACES {
 
     template <class T>
     T TaskMath<T>::sat(T in,T min,T max){
+        //Only valid if max > min, but this fails gracefully.
+        //If min > max, then this function will always return a limit value.
+        //it's up to YOU to make sure that the space between the limit values
+        //makes sense
         if (in>max) return max;
         if (in<min) return min;
         return in;
