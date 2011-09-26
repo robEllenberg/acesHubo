@@ -13,8 +13,9 @@ namespace ACES {
      * @todo Would this work better as a separate component with its own interface? if all operations were executed in the client thread, then multiple threads could be calling the same operations. 
      */
     template <class T>
-    class TaskMath{
+    class TaskMath : public TaskContext{
         public:
+            TaskMath();
             //! Due to Operation restrictions, these functions can't be static!
             //Trigonometry
             T sin(T in){return std::sin(in);};
@@ -48,6 +49,39 @@ namespace ACES {
             
     };
 
+    template <class T>
+    TaskMath<T>::TaskMath(){
+        /** Math operations for scripting, since they don't seem to be present */
+        this->addOperation("sin",&TaskMath::sin,this,RTT::ClientThread);
+
+        this->addOperation("cos",&TaskMath::cos,this,RTT::ClientThread);
+
+        this->addOperation("tan",&TaskMath::tan,this,RTT::ClientThread);
+
+        this->addOperation("asin",&TaskMath::asin,this,RTT::ClientThread);
+
+        this->addOperation("acos",&TaskMath::acos,this,RTT::ClientThread);
+
+        this->addOperation("atan",&TaskMath::atan,this,RTT::ClientThread);
+
+        this->addOperation("sqrt",&TaskMath::sqrt,this,RTT::ClientThread);
+
+        this->addOperation("exp",&TaskMath::exp,this,RTT::ClientThread);
+
+        this->addOperation("log",&TaskMath::log,this,RTT::ClientThread);
+
+        this->addOperation("log10",&TaskMath::log10,this,RTT::ClientThread);
+
+        this->addOperation("ceil",&TaskMath::ceil,this,RTT::ClientThread);
+
+        this->addOperation("floor",&TaskMath::floor,this,RTT::ClientThread);
+
+        this->addOperation("abs",&TaskMath::abs,this,RTT::ClientThread);
+
+        this->addOperation("sat",&TaskMath::sat,this,RTT::ClientThread);
+
+        this->addOperation("fmod",&TaskMath::fmod,this,RTT::ClientThread);
+    }
     /**
      * Simple saturation function.
      * NOTE: Only valid if max > min, but this fails gracefully.

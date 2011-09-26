@@ -45,14 +45,14 @@
 #include <rtt/scripting/Scripting.hpp>
 
 #include "taskcfg.hpp"
-#include "taskmath.hpp"
+//#include "taskmath.hpp"
 
 //TODO - Relocate this definition 
 enum WB_CTRL_STATES { WB_CTRL_HALT, WB_CTRL_RUN, WB_CTRL_STEP };
 enum scriptState { CTRL_HALT, CTRL_RUN, CTRL_STEP, CTRL_FAIL, CTRL_END };
 
 namespace ACES{
-    class Controller :  public ACESTask, public TaskMath<float>
+    class Controller :  public ACESTask//, public TaskMath<float>
     {
         public:
             Controller(std::string cfg, std::string args);

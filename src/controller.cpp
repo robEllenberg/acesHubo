@@ -70,36 +70,6 @@ namespace ACES{
                             "Port for Hardware to report reception of setpoints");
         this->addAttribute("packetsPerSP", packetsPerSP);
 
-        /** Math operations for scripting, since they don't seem to be present */
-        this->addOperation("sin",&Controller::sin,this,RTT::OwnThread);
-
-        this->addOperation("cos",&Controller::cos,this,RTT::OwnThread);
-
-        this->addOperation("tan",&Controller::tan,this,RTT::OwnThread);
-
-        this->addOperation("asin",&Controller::asin,this,RTT::OwnThread);
-            
-        this->addOperation("acos",&Controller::acos,this,RTT::OwnThread);
-
-        this->addOperation("atan",&Controller::atan,this,RTT::OwnThread);
-
-        this->addOperation("sqrt",&Controller::sqrt,this,RTT::OwnThread);
-        
-        this->addOperation("exp",&Controller::exp,this,RTT::OwnThread);
-
-        this->addOperation("log",&Controller::log,this,RTT::OwnThread);
-
-        this->addOperation("log10",&Controller::log10,this,RTT::OwnThread);
-
-        this->addOperation("ceil",&Controller::ceil,this,RTT::OwnThread);
-
-        this->addOperation("floor",&Controller::floor,this,RTT::OwnThread);
-
-        this->addOperation("abs",&Controller::abs,this,RTT::OwnThread);
-
-        this->addOperation("sat",&Controller::sat,this,RTT::OwnThread);
-
-        this->addOperation("fmod",&Controller::fmod,this,RTT::OwnThread);
 
         curMap = NULL;
     }

@@ -36,6 +36,8 @@ namespace ACES{
     {
         //Dispatcher must have an activity of some sort or scripts won't run
         //properly
+        //TODO: Add a function to load a math component and link it to other peers
+        //TODO: Make this happen by defualt during the constructor
         this->setActivity( new RTT::Activity(5, 1.0/10.0, 0, name) );
         this->addOperation("addHardware", &Dispatcher::addHardware, this,
                            RTT::OwnThread).doc("add new hardware")
