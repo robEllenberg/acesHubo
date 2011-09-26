@@ -88,7 +88,7 @@ namespace ACES {
 
     template<class T>
     void Hardware<T>::reportTransmission(Message<T>* m){
-        Word<T>* w = m->peek();
+        //Word<T>* w = m->peek();
         //if(w->getMode() == ACES::SET){
             packetReporter.write(1);
         //}

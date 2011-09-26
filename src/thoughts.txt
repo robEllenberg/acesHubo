@@ -1,0 +1,71 @@
+Current design passes pointers between components, which has a key advantage:
+The Output / Input ports only have to copy 1 pointer's worth of data for each
+write operation.  For simple types, this isn't much of a savings, but with
+large datatypes like images, passing a pointer around is much more efficient.
+
+The other possible method is to avoid dynamic memory allocation entirely and
+pass objects directly to the Orocos ports. While they seem to be designed to do
+this, it raises an important question: What is more costly for a given
+datatype? Copying to an allocated memory location, or allocating new memory
+each time?  The answer probably depends on the amount of memory required.
+
+There is another potential issue with the pointer-passing method (besides the
+obvious memory leaks that are already occuring). At each level, the type of
+data seems to change fundamentally, at least in the general case.  For example,
+the hubo data flow looks something like this:
+
+(State)  ACES::Word<float>   -->
+(Device)  ACES::Word<canMsg> -->
+(Protocol) ACES::Word<canMsg> (copied for some reason) -->
+(Hardware) ACES::Message<canmsg_t*>
+
+EACH of these represents a dynamic allocation executed EVERY time data comes
+through. Orocos warns already that such operations are not (in general)
+realtime.
+
+Solution #1: Eliminate the use of pointers, and pass all data by value between
+components.
+Advantages: Easy to code and grasp mentally, memory management is free
+Disadvantages: Costly for large datatypes, fairly big shakeup of design?
+
+I see this as the "default" answer, because it solves at least 1 of our
+probems, and for small datastypes like floats and can messages, doesn't incur a
+huge penalty.  Images and larger datatypes may present a problem here, but that
+will probably require significant rethought anyway. If we make the restriction
+that this system is design for "small" types, then this could work.
+
+Solution #2: Unify all data for a given system into one class, perhaps named 
+ACES::Downstream, and ACES::Upstream. This class would have to be allocated
+only once at the top level, which might make things more efficient. For
+example, the class could look like:
+
+template <class S, class PD, class HW>
+class ACES::Downstream {
+    S value;    //Abstract value used at controller and state level, could be
+                //changed in sequence by multiple controllers, provided they 
+                //were carefully written.
+    PD intermediateMessage;
+    HW lineMessage;
+}
+
+Thus, by passing around a single pointer, each level could populate the
+appropriate member and pass it on. This would reduce dynamic allocations to a
+single occurance per class. The assumption here is that a single large
+allocation is faster than 3 or 4 smaller ones.
+
+By using shared pointers, this data structure would be recycled after all nodes
+were finished (since the ports would make a new copy of the pointer).  
+NOTE: Verify thread safety and assignment operator behavior here, since orocos
+requires the = operator to be realtime.
+
+What if the state or device needs to send it's own message, without receiving
+an allocated packet? In this case, any level COULD create a new packet, and
+just ignore the upstream data. This would only happen for non-standard
+operations, like 1-off commands to set zero or config data.  In these cases,
+processing would be far less time-sensitive, so we could afford the extra
+allocations.
+
+Solution 3: Write a custom memory manager that would effectively allocate a
+huge array of packets. It's job would be to return a free index when a
+component needed a new packet.  Unfortunately, this seems like a giant
+clusterfuck, and has huge problems with thread safety. 
