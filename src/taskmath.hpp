@@ -1,5 +1,7 @@
 #include <math.h>
-//#include <rtt/TaskContext.hpp>
+#include <rtt/TaskContext.hpp>
+
+
 
 namespace ACES {
 
@@ -10,12 +12,12 @@ namespace ACES {
      * Until they make a math library part of the language, this hack is the
      * next best thing. Inherit from this class to add standard math functions,
      * as well as common methods to a given TaskContext (or child thereof).
-     * @todo Would this work better as a separate component with its own interface? if all operations were executed in the client thread, then multiple threads could be calling the same operations. 
+     * @todo This works as a component, but it should really exist as a service.  Look into how a component offers a service through orocos
      */
     template <class T>
-    class TaskMath : public TaskContext{
+    class TaskMath : public RTT::TaskContext{
         public:
-            TaskMath();
+            TaskMath(std::string name);
             //! Due to Operation restrictions, these functions can't be static!
             //Trigonometry
             T sin(T in){return std::sin(in);};
@@ -50,7 +52,8 @@ namespace ACES {
     };
 
     template <class T>
-    TaskMath<T>::TaskMath(){
+    TaskMath<T>::TaskMath(std::string name) : RTT::TaskContext(name)
+    {
         /** Math operations for scripting, since they don't seem to be present */
         this->addOperation("sin",&TaskMath::sin,this,RTT::ClientThread);
 
@@ -82,6 +85,7 @@ namespace ACES {
 
         this->addOperation("fmod",&TaskMath::fmod,this,RTT::ClientThread);
     }
+
     /**
      * Simple saturation function.
      * NOTE: Only valid if max > min, but this fails gracefully.

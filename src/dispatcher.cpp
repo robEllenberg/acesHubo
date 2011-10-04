@@ -77,6 +77,9 @@ namespace ACES{
                            .arg("type", "_mainType_ _subType_")
                            .arg("args", "arguments specific to the type");
 
+        this->addOperation("addMath", &Dispatcher::addTaskMath, this,
+                           RTT::OwnThread).doc("Include math functions");
+
         this->addOperation("startDebug", &Dispatcher::startDebug, this,
                            RTT::OwnThread).doc("Start debugging statements");
 
@@ -681,4 +684,9 @@ namespace ACES{
             <<  s  << RTT::endlog();
     }
 
+    /** Add a task for math operations */
+    bool Dispatcher::addTaskMath(){
+        TaskMath<float>* math = new TaskMath<float>("math");
+        return connectPeers(math);
+    }
 } 

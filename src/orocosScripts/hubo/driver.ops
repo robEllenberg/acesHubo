@@ -271,6 +271,7 @@ program main {
     startState();
     startController();
     startLogger();
+    addMath;
     scripting.loadPrograms("config.ops");
     scripting.loadStateMachines("autoZero.osd");
     scripting.loadPrograms("setup.ops");

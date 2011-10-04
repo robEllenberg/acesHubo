@@ -48,6 +48,8 @@
 #include "logger.hpp"
 #include "filter.hpp"
 
+#include "taskmath.hpp"
+
 #ifdef OMNIBOT
     #include "omnibot/omnibot.hpp"
 #endif
@@ -83,6 +85,8 @@ namespace ACES{
             bool addLogger(std::string cfg, std::string type,
                            std::string args);
             void printWarning(std::string s);
+
+            bool addTaskMath();
 
             bool startDebug();
             bool stopDebug();
