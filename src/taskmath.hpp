@@ -45,6 +45,7 @@ namespace ACES {
             T floor(T in){return std::floor(in);};
             T abs(T in){return std::abs(in);};
             T fmod(T in, T integrand){return std::fmod(in,integrand);};
+            T rand(T min,T max){return ((T)std::rand()/(T)RAND_MAX*(max-min) + min);};
 
             //Non-linear limiting functions
             T sat(T in, T min, T max);
@@ -84,6 +85,8 @@ namespace ACES {
         this->addOperation("sat",&TaskMath::sat,this,RTT::ClientThread);
 
         this->addOperation("fmod",&TaskMath::fmod,this,RTT::ClientThread);
+
+        this->addOperation("rand",&TaskMath::rand,this,RTT::ClientThread);
     }
 
     /**
@@ -94,7 +97,7 @@ namespace ACES {
      * makes sense.
      */
     template <class T>
-    T TaskMath<T>::sat(T in,T min,T max){
+    inline T TaskMath<T>::sat(T in,T min,T max){
         if (in>max) return max;
         if (in<min) return min;
         return in;
