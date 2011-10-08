@@ -49,6 +49,7 @@ namespace ACES {
 
             //Non-linear limiting functions
             T sat(T in, T min, T max);
+            T quantize(T in, T step, T base);
             
     };
 
@@ -83,6 +84,8 @@ namespace ACES {
         this->addOperation("abs",&TaskMath::abs,this,RTT::ClientThread);
 
         this->addOperation("sat",&TaskMath::sat,this,RTT::ClientThread);
+        
+        this->addOperation("quantize",&TaskMath::quantize,this,RTT::ClientThread);
 
         this->addOperation("fmod",&TaskMath::fmod,this,RTT::ClientThread);
 
@@ -101,5 +104,15 @@ namespace ACES {
         if (in>max) return max;
         if (in<min) return min;
         return in;
+    }
+
+    /**
+     * Quantizer, inspired by simulink.
+     *
+     */
+    template <class T>
+    inline T TaskMath<T>::quantize(T in,T step,T base = 0){
+        T offset = fmod(base,step);
+        return std::floor((in-offset)/step)*step+offset;
     }
 }
