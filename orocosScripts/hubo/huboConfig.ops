@@ -1,0 +1,420 @@
+program internals {
+	//Internal definitions for devices
+
+
+	//Defining internal properties for device dRHipYR, node 0
+
+	dRHipYR.setDirection(0, -1);
+	dRHipYR.setGearRatio(0, 10, 25);
+	dRHipYR.setHarmonic(0,100);
+	dRHipYR.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRHipYR, node 1
+
+	dRHipYR.setDirection(1, 1);
+	dRHipYR.setGearRatio(1, 324, 1024);
+	dRHipYR.setHarmonic(1,160);
+	dRHipYR.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dRUpperLeg, node 0
+
+	dRUpperLeg.setDirection(0, 1);
+	dRUpperLeg.setGearRatio(0, 16, 20);
+	dRUpperLeg.setHarmonic(0,160);
+	dRUpperLeg.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRUpperLeg, node 0
+
+	dRUpperLeg.setDirection(0, 1);
+	dRUpperLeg.setGearRatio(0, 16, 16);
+	dRUpperLeg.setHarmonic(0,160);
+	dRUpperLeg.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRKnee, node 0
+
+	dRKnee.setDirection(0, 1);
+	dRKnee.setGearRatio(0, 16, 16);
+	dRKnee.setHarmonic(0,160);
+	dRKnee.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRAnkle, node 0
+
+	dRAnkle.setDirection(0, -1);
+	dRAnkle.setGearRatio(0, 10, 25);
+	dRAnkle.setHarmonic(0,100);
+	dRAnkle.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRAnkle, node 1
+
+	dRAnkle.setDirection(1, 1);
+	dRAnkle.setGearRatio(1, 324, 1024);
+	dRAnkle.setHarmonic(1,100);
+	dRAnkle.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dLHipYR, node 0
+
+	dLHipYR.setDirection(0, -1);
+	dLHipYR.setGearRatio(0, 10, 25);
+	dLHipYR.setHarmonic(0,100);
+	dLHipYR.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLHipYR, node 1
+
+	dLHipYR.setDirection(1, -1);
+	dLHipYR.setGearRatio(1, 324, 1024);
+	dLHipYR.setHarmonic(1,160);
+	dLHipYR.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dLUpperLeg, node 0
+
+	dLUpperLeg.setDirection(0, 1); 
+	dLUpperLeg.setGearRatio(0, 16, 20);
+	dLUpperLeg.setHarmonic(0,160);
+	dLUpperLeg.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLUpperLeg, node 0
+
+	dLUpperLeg.setDirection(0, -1);
+	dLUpperLeg.setGearRatio(0, 16, 16);
+	dLUpperLeg.setHarmonic(0,160);
+	dLUpperLeg.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLKnee, node 0
+
+	dLKnee.setDirection(0, -1);
+	dLKnee.setGearRatio(0, 16, 16);
+	dLKnee.setHarmonic(0,160);
+	dLKnee.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLAnkle, node 0
+
+	dLAnkle.setDirection(0, 1);
+	dLAnkle.setGearRatio(0, 10, 25);
+	dLAnkle.setHarmonic(0,100);
+	dLAnkle.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLAnkle, node 1
+
+	dLAnkle.setDirection(1, 1);
+	dLAnkle.setGearRatio(1, 324, 1024);
+	dLAnkle.setHarmonic(1,100);
+	dLAnkle.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dRShoulderPR, node 0
+    /*
+	dRShoulderPR.setDirection(0, 1);
+	dRShoulderPR.setGearRatio(0, 11, 16);
+	dRShoulderPR.setHarmonic(0,100);
+	dRShoulderPR.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRShoulderPR, node 1
+
+	dRShoulderPR.setDirection(1, 1);
+	dRShoulderPR.setGearRatio(1, 1, 1);
+	dRShoulderPR.setHarmonic(1,100);
+	dRShoulderPR.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dRUpperArm, node 0
+
+	dRUpperArm.setDirection(0, -1);
+	dRUpperArm.setGearRatio(0, 1, 1);
+	dRUpperArm.setHarmonic(0,100);
+	dRUpperArm.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dRUpperArm, node 1
+
+	dRUpperArm.setDirection(1, -1);
+	dRUpperArm.setGearRatio(1, 20, 24);
+	dRUpperArm.setHarmonic(1,100);
+	dRUpperArm.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dLShoulderPR, node 0
+
+	dLShoulderPR.setDirection(0, -1);
+	dLShoulderPR.setGearRatio(0, 11, 16);
+	dLShoulderPR.setHarmonic(0,100);
+	dLShoulderPR.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLShoulderPR, node 1
+
+	dLShoulderPR.setDirection(1, 1);
+	dLShoulderPR.setGearRatio(1, 1, 1);
+	dLShoulderPR.setHarmonic(1,100);
+	dLShoulderPR.setEncoderSize(1,4000);
+
+	//Defining internal properties for device dLUpperArm, node 0
+
+	dLUpperArm.setDirection(0, 1);
+	dLUpperArm.setGearRatio(0, 1, 1);
+	dLUpperArm.setHarmonic(0,100);
+	dLUpperArm.setEncoderSize(0,4000);
+
+	//Defining internal properties for device dLUpperArm, node 1
+
+	dLUpperArm.setDirection(1, 1);
+	dLUpperArm.setGearRatio(1, 20, 24);
+	dLUpperArm.setHarmonic(1,100);
+	dLUpperArm.setEncoderSize(1,4000);
+    */
+
+	//Defining internal properties for device dRWrist, node 0
+	/*
+	dRWrist.setDirection(0, 1);
+	dRWrist.setGearRatio(0, 1, 1);
+	dRWrist.setHarmonic(0,100);
+	dRWrist.setEncoderSize(0,128);
+
+	//Defining internal properties for device dRWrist, node 1
+
+	dRWrist.setDirection(1, 1);
+	dRWrist.setGearRatio(1, 1, 1);
+	dRWrist.setHarmonic(1,100);
+	dRWrist.setEncoderSize(1,128);
+
+	//Defining internal properties for device dRWrist, node 2
+
+	dRWrist.setDirection(2, 1);
+	dRWrist.setGearRatio(2, 1, 1);
+	dRWrist.setHarmonic(2,100);
+	dRWrist.setEncoderSize(2,128);
+
+	//Defining internal properties for device dLWrist, node 0
+
+	dLWrist.setDirection(0, 1);
+	dLWrist.setGearRatio(0, 1, 1);
+	dLWrist.setHarmonic(0,100);
+	dLWrist.setEncoderSize(0,128);
+
+	//Defining internal properties for device dLWrist, node 1
+
+	dLWrist.setDirection(1, 1);
+	dLWrist.setGearRatio(1, 1, 1);
+	dLWrist.setHarmonic(1,100);
+	dLWrist.setEncoderSize(1,128);
+
+	//Defining internal properties for device dLWrist, node 2
+
+	dLWrist.setDirection(2, 1);
+	dLWrist.setGearRatio(2, 1, 1);
+	dLWrist.setHarmonic(2,100);
+	dLWrist.setEncoderSize(2,128);
+
+	//Defining internal properties for device dNeck, node 0
+
+	dNeck.setDirection(0, 1);
+	dNeck.setGearRatio(0, 1, 1);
+	dNeck.setHarmonic(0,100);
+	dNeck.setEncoderSize(0,128);
+
+	//Defining internal properties for device dNeck, node 1
+
+	dNeck.setDirection(1, 1);
+	dNeck.setGearRatio(1, 1, 1);
+	dNeck.setHarmonic(1,100);
+	dNeck.setEncoderSize(1,128);
+
+	//Defining internal properties for device dNeck, node 2
+
+	dNeck.setDirection(2, 1);
+	dNeck.setGearRatio(2, 1, 1);
+	dNeck.setHarmonic(2,100);
+	dNeck.setEncoderSize(2,128);
+
+	//Defining internal properties for device dHip, node 0
+
+	dHip.setDirection(0, 1);
+	dHip.setGearRatio(0, 10, 25);
+	dHip.setHarmonic(0,100);
+	dHip.setEncoderSize(0,4000);
+	*/
+
+	//Specify Zeros for joints
+
+	dRHipYR.setZero(0,-18100,1);
+	dRHipYR.setZero(1,13000,0);
+	dRUpperLeg.setZero(0,8400,0);
+	dRKnee.setZero(0,-17600,0);
+	dRAnkle.setZero(0,-3000,0);
+	dRAnkle.setZero(1,30800,0);
+	dLHipYR.setZero(0,26100,0);
+	dLHipYR.setZero(1,-32600,1);
+	dLUpperLeg.setZero(0,-17500,1);
+	dLKnee.setZero(0,51900,1);
+	dLAnkle.setZero(0,-1600,1);
+	dLAnkle.setZero(1,-13200,1);
+    /*
+	dRShoulderPR.setZero(0,-35000,0);
+	dRShoulderPR.setZero(1,8000,0);
+	dRUpperArm.setZero(0,-30000,0);
+	dRUpperArm.setZero(1,80000,0);
+	dLShoulderPR.setZero(0,-10000,1);
+	dLShoulderPR.setZero(1,4000,1);
+	dLUpperArm.setZero(0,12000,1);
+	dLUpperArm.setZero(1,-72000,1);
+    */
+	/*
+	dRWrist.setZero(0,-72000,1);
+	dRWrist.setZero(1,0,0);
+	dRWrist.setZero(2,0,0);
+	dLWrist.setZero(0,0,0);
+	dLWrist.setZero(1,0,0);
+	dLWrist.setZero(2,0,0);
+	dNeck.setZero(0,0,0);
+	dNeck.setZero(1,0,0);
+	dNeck.setZero(2,0,0);
+	dHip.setZero(0,8000,1);
+	*/
+}
+
+program instant {
+    //dRHipYR.instantTrigger = true;
+    dRUpperLeg.instantTrigger = true;
+    //dRAnkle.instantTrigger = true;
+    //dLHipYR.instantTrigger = true;
+    dLUpperLeg.instantTrigger = true;
+    //dLAnkle.instantTrigger = true;
+    dRKnee.instantTrigger = true;
+    dLKnee.instantTrigger = true;
+    //dRShoulderPR.instantTrigger = true;
+    //dRUpperArm.instantTrigger = true;
+    //dLShoulderPR.instantTrigger = true;
+    //dLUpperArm.instantTrigger = true;
+    //dRWrist.instantTrigger = true;
+    //dLWrist.instantTrigger = true;
+    //dNeck.instantTrigger = true;
+    //dHip.instantTrigger = true;
+}
+
+program nameinfo {
+	ch1.genPacket(1,8,"0x00010A0A0A8445FD");
+	ch1.genPacket(1,8,"0x01010A0A0001000A");
+	ch1.genPacket(1,8,"0x02010A1400B3000C");
+	ch1.genPacket(1,8,"0x03010A0A0AA6A7DA");
+	ch1.genPacket(1,8,"0x04010A0A0A0576B0");
+	ch1.genPacket(1,8,"0x05010A0A0033000C");
+	ch1.genPacket(1,8,"0x06010A1400E8000B");
+	ch1.genPacket(1,8,"0x07010A0A0AB39560");
+	ch1.genPacket(1,8,"0x08010A0F05D2D85A");
+	ch1.genPacket(1,8,"0x09010A0514A220C4");
+	ch1.genPacket(1,8,"0x0A010A1405CD4943");
+	ch1.genPacket(1,8,"0x0B010A0514291E97");
+	ch1.genPacket(1,7,"0x20010A0A0A0A0000");
+	ch1.genPacket(1,7,"0x21010A0A05050000");
+	ch1.genPacket(1,7,"0x22010A0505050000");
+	ch1.genPacket(1,8,"0x23010A0A009F000A");
+	ch1.genPacket(1,3,"0x24010A0000000000");
+	ch1.genPacket(1,3,"0x25010A0000000000");
+	ch1.genPacket(1,8,"0x35010A0038721200");
+	ch1.genPacket(1,8,"0x36010A0038721200");
+}
+
+program gains {
+	//Specify gains to transmit to motors
+
+	dRHipYR.setGains("Position", 0, 200, 0, 500);
+	dRHipYR.setGains("Position", 1, 200, 0, 500);
+	dRUpperLeg.setGains("Position", 0, 200, 0, 500);
+	dRUpperLeg.setGains("Position", 0, 200, 0, 500);
+	dRAnkle.setGains("Position", 0, 200, 0, 500);
+	dRAnkle.setGains("Position", 1, 200, 0, 500);
+	dLHipYR.setGains("Position", 0, 200, 0, 500);
+	dLHipYR.setGains("Position", 1, 200, 0, 500);
+	dLUpperLeg.setGains("Position", 0, 200, 0, 500);
+	dLUpperLeg.setGains("Position", 0, 200, 0, 500);
+	dLAnkle.setGains("Position", 0, 200, 0, 500);
+	dLAnkle.setGains("Position", 1, 200, 0, 500);
+    /*
+	dRShoulderPR.setGains("Position", 0, 200, 0, 500);
+	dRShoulderPR.setGains("Position", 1, 200, 0, 500);
+	dRUpperArm.setGains("Position", 0, 200, 0, 500);
+	dRUpperArm.setGains("Position", 1, 200, 0, 500);
+	dLShoulderPR.setGains("Position", 0, 200, 0, 500);
+	dLShoulderPR.setGains("Position", 1, 200, 0, 500);
+	dLUpperArm.setGains("Position", 0, 200, 0, 500);
+	dLUpperArm.setGains("Position", 1, 200, 0, 500);
+    */
+	/*
+	dRWrist.setGains("Position", 0, 15, 0, 15);
+	dRWrist.setGains("Position", 1, 15, 0, 15);
+	dRWrist.setGains("Position", 2, 15, 0, 15);
+	dLWrist.setGains("Position", 0, 15, 0, 15);
+	dLWrist.setGains("Position", 1, 15, 0, 15);
+	dLWrist.setGains("Position", 2, 15, 0, 15);
+	dNeck.setGains("Position", 0, 15, 0, 15);
+	dNeck.setGains("Position", 1, 15, 0, 15);
+	dNeck.setGains("Position", 2, 15, 0, 15);
+	dHip.setGains("Position", 0, 200, 0, 500);
+	*/
+}
+
+program zeros {
+}
+
+program enable {
+	//Enable each device
+
+	dRHipYR.HIPenable();
+	dRHipYR.run();
+	dRHipYR.HIPenable();
+	dRHipYR.run();
+	dRUpperLeg.HIPenable();
+	dRUpperLeg.run();
+	dRUpperLeg.HIPenable();
+	dRUpperLeg.run();
+	dRAnkle.HIPenable();
+	dRAnkle.run();
+	dRAnkle.HIPenable();
+	dRAnkle.run();
+	dLHipYR.HIPenable();
+	dLHipYR.run();
+	dLHipYR.HIPenable();
+	dLHipYR.run();
+	dLUpperLeg.HIPenable();
+	dLUpperLeg.run();
+	dLUpperLeg.HIPenable();
+	dLUpperLeg.run();
+	dLAnkle.HIPenable();
+	dLAnkle.run();
+	dLAnkle.HIPenable();
+	dLAnkle.run();
+    /*
+	dRShoulderPR.HIPenable();
+	dRShoulderPR.run();
+	dRShoulderPR.HIPenable();
+	dRShoulderPR.run();
+	dRUpperArm.HIPenable();
+	dRUpperArm.run();
+	dRUpperArm.HIPenable();
+	dRUpperArm.run();
+	dLShoulderPR.HIPenable();
+	dLShoulderPR.run();
+	dLShoulderPR.HIPenable();
+	dLShoulderPR.run();
+	dLUpperArm.HIPenable();
+	dLUpperArm.run();
+	dLUpperArm.HIPenable();
+	dLUpperArm.run();
+    */
+	/*
+	dRWrist.HIPenable();
+	dRWrist.run();
+	dRWrist.HIPenable();
+	dRWrist.run();
+	dRWrist.HIPenable();
+	dRWrist.run();
+	dLWrist.HIPenable();
+	dLWrist.run();
+	dLWrist.HIPenable();
+	dLWrist.run();
+	dLWrist.HIPenable();
+	dLWrist.run();
+	dNeck.HIPenable();
+	dNeck.run();
+	dNeck.HIPenable();
+	dNeck.run();
+	dNeck.HIPenable();
+	dNeck.run();
+	dHip.HIPenable();
+	dHip.run();
+	*/
+}
