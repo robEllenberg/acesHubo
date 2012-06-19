@@ -1,6 +1,6 @@
-#line 2 "/home/bob/thesis/aces/build/aces/src/flexscanner/robotis/robotis.yy.cpp"
+#line 2 "/home/duc/workspace/hubo-proj/aces/build/aces/src/flexscanner/robotis/robotis.yy.cpp"
 
-#line 4 "/home/bob/thesis/aces/build/aces/src/flexscanner/robotis/robotis.yy.cpp"
+#line 4 "/home/duc/workspace/hubo-proj/aces/src-conductor/flexscanner/robotis/robotis.yy.cpp"
 
 #define  YY_INT_ALIGNED short int
 

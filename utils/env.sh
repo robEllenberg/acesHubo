@@ -7,7 +7,7 @@ ROS_DIR=/opt/ros/diamondback
 
 source ${ROS_DIR}/setup.sh
 #RTT_COMPONENT_PATH=/home/bob/thesis/aces/build:/opt/ros/cturtle/stacks/orocos_toolchain_ros/rtt/install/lib/orocos
-export ROS_PACKAGE_PATH=$ACES_ROOT/build:$ROS_PACKAGE_PATH
+export ROS_PACKAGE_PATH=$ACES_ROOT/build:$ACES_ROOT:$ROS_PACKAGE_PATH
 export RTT_COMPONENT_PATH=${ROS_DIR}/stacks/orocos_toolchain_ros/rtt/install/lib/orocos
 export OCL_PATH=${ROS_DIR}/stacks/orocos_toolchain_ros/ocl
 

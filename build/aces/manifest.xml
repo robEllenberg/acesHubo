@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/aces</url>
   <depend package="rtt"/>
   <depend package="ocl"/>
+  <depend package="maestro"/>
 
 </package>
 

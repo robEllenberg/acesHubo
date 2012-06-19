@@ -2,8 +2,9 @@ program main {
     var bool sampling = false;
     var int baseport = 2827;
 
-    addHardware("ch1 90 1000","HuboCAN","/dev/can0 1000");
-    //addHardware("ch1 90 1000","HuboCAN","testfile");
+    //addHardware("ch1 90 1000","HuboCAN","/dev/can0 1000");
+    // testmode
+    addHardware("ch1 90 1000","HuboCAN","testfile"); 
     addProtocol("pro1 80 1000", "HuboCAN", "");
     linkHP("ch1", "pro1");
                                             //board#, #channels
@@ -65,28 +66,6 @@ program main {
     linkDS("dRFT", "RMx");
     linkDS("dRFT", "RMy");
     linkDS("dRFT", "RFz");
-/*
-	addState("RSP 10 200", "Hubo", "0", sampling, baseport + 12);
-	addState("RSR 10 200", "Hubo", "1", sampling, baseport + 13);
-	addState("RSY 10 200", "Hubo", "0", sampling, baseport + 14);
-	addState("REB 10 200", "Hubo", "1", sampling, baseport + 15);
-	addState("LSP 10 200", "Hubo", "0", sampling, baseport + 16);
-	addState("LSR 10 200", "Hubo", "1", sampling, baseport + 17);
-	addState("LSY 10 200", "Hubo", "0", sampling, baseport + 18);
-	addState("LEB 10 200", "Hubo", "1", sampling, baseport + 19);
-*/
-/*
-	addState("RWY 10 200", "Hubo", "0", sampling, baseport + 20);
-	addState("RW1 10 200", "Hubo", "1", sampling, baseport + 21);
-	addState("RW2 10 200", "Hubo", "2", sampling, baseport + 22);
-	addState("LWY 10 200", "Hubo", "0", sampling, baseport + 23);
-	addState("LW1 10 200", "Hubo", "1", sampling, baseport + 24);
-	addState("LW2 10 200", "Hubo", "2", sampling, baseport + 25);
-	addState("NKY 10 200", "Hubo", "0", sampling, baseport + 26);
-	addState("NK1 10 200", "Hubo", "1", sampling, baseport + 27);
-	addState("NK2 10 200", "Hubo", "2", sampling, baseport + 28);
-	addState("WST 10 200", "Hubo", "0", sampling, baseport + 29);
-*/
 	linkDS("dRHipYR","RHY");
 	linkDS("dRHipYR","RHR");
 	linkDS("dRUpperLeg","RHP");
@@ -99,37 +78,6 @@ program main {
 	linkDS("dLKnee","LKP");
 	linkDS("dLAnkle","LAP");
 	linkDS("dLAnkle","LAR");
-/*
-	linkDS("dRShoulderPR","RSP");
-	linkDS("dRShoulderPR","RSR");
-	linkDS("dRUpperArm","RSY");
-	linkDS("dRUpperArm","REB");
-	linkDS("dLShoulderPR","LSP");
-	linkDS("dLShoulderPR","LSR");
-	linkDS("dLUpperArm","LSY");
-	linkDS("dLUpperArm","LEB");
-*/
-/*
-	linkDS("dRWrist","RWY");
-	linkDS("dRWrist","RW1");
-	linkDS("dRWrist","RW2");
-	linkDS("dLWrist","LWY");
-	linkDS("dLWrist","LW1");
-	linkDS("dLWrist","LW2");
-	linkDS("dNeck","NKY");
-	linkDS("dNeck","NK1");
-	linkDS("dNeck","NK2");
-	linkDS("dHip","WST");
-*/
-
-/*
-    addState("RMx 10 50", "Hubo", "0", sampling, baseport+4);
-    addState("RMy 10 50", "Hubo", "1", sampling, baseport+5);
-    addState("RFz 10 50", "Hubo", "2", sampling, baseport+6);
-    linkDS("dRFT", "RMx");
-    linkDS("dRFT", "RMy");
-    linkDS("dRFT", "RFz");
-*/
     //addController("config 10 10", "User Program", "canConfig.ops config");
 
     //Setup Logging
@@ -137,6 +85,9 @@ program main {
     linkLS("log1", "RMx", "value");
     linkLS("log1", "RMy", "value");
     linkLS("log1", "RFz", "value");
+    linkLS("log1", "LHR", "value");
+    linkLS("log1", "LHP", "value");
+    linkLS("log1", "LKP", "value");
     
     /* END CONFIG SECTION */
 

@@ -2,7 +2,7 @@
 <!DOCTYPE properties SYSTEM "cpf.dtd">
 <properties>
     <simple name="Import" type="string"><value>/usr/local/webots/lib/libController.so</value></simple>
-    <simple name="Import" type="string"><value>/home/bob/thesis/aces/build/</value></simple>
+    <simple name="Import" type="string"><value>/home/duc/workspace/hubo-proj/aces/build/</value></simple>
 
     <struct name="Test" type="Webots::ArmCtrl">
         <struct name="Activity" type="PeriodicActivity">
