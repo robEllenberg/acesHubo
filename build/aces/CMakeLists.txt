@@ -99,9 +99,6 @@ target_link_libraries(aces-launcher aces-hubo)
 #target_link_libraries(aces-launcher minihubo)
 #target_link_libraries(aces-launcher omnibot)
 target_link_libraries(aces-launcher orocos-ocl-taskbrowser-gnulinux)
-<<<<<<< HEAD
 target_link_libraries(aces-launcher ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY})
-=======
->>>>>>> changed orocos-taskbrowser-gnulinux to orocos-ocl-taskbrowser-gnulinux because taskbrowser is part of the ocl package
 #rosbuild_add_compile_flags(aces-launcher -pg)
 #rosbuild_add_link_flags(aces-launcher -pg)
