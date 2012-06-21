@@ -53,7 +53,8 @@ add_subdirectory(flexscanner)
                     
 add_definitions(-DTESTSUITE)
 add_definitions(-DHUBO)
-add_definitions(-DHUBO_TESTMODE)
+add_definitions(-DHUBO_TESTMODE) # dnguyen 2012-06-20: added for offline testing
+add_definitions(-DROS_OUTPUT) # dnguyen 2012-06-20: added to output for ROS topic
 #add_definitions(-DROBOTIS)
 #add_definitions(-DWEBOTS)
 #add_definitions(-DOMNIBOT)

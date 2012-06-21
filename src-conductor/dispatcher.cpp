@@ -146,6 +146,11 @@ namespace ACES{
                            .doc("Link Logger to State")
                            .arg("logger", "logger")
                            .arg("state", "state");
+        /* dnguyen 2012-06-19: initialize the ros_node and publish to rostopic set up for sending to openrave
+#ifdef ROS_OUTPUT
+
+#endif
+         */
     }
     
     bool Dispatcher::addHardware(std::string cfg, std::string type,

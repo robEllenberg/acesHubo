@@ -47,6 +47,8 @@
 #include "huboCanDS.hpp"
 #include "can4linux.h"  //Include the can4linux data structures
 
+#include <hubomsg/typekit/HuboCmd.h>
+
 
 //Set to 1 for file I/O mode, and 0 for the actual PCM3680 driver
 #define RAD2DEG (180.0/3.14159)
@@ -148,6 +150,10 @@ namespace Hubo{
                 int channel;    //! File descriptor for the CAN access node
                                 // Used for output in offline mode
             RTT::OutputPort< ACES::Message<canmsg_t*>* > txDSLoop;
+
+#ifdef ROS_OUTPUT
+            RTT::OutputPort<hubomsg::HuboCmd>* outToOpenRave;
+#endif
     };
 
     class Protocol : public ACES::Protocol<canmsg_t*, canMsg> {

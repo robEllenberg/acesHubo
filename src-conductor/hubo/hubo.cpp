@@ -468,7 +468,18 @@ namespace Hubo{
                 //int r = write(channel, &(msg->data), msg->length);
             #else //Normal operation
                 r = write(channel, msg, 1);
-            #endif 
+            #endif
+
+            /* dnguyen 2012-06-19: writing to ROS topic */
+#ifdef ROS_OUTPUT
+			RTT::Logger::log(RTT::Logger::Debug) << "write to channel\n";
+
+			// convert the message into hubomsg format (?)
+
+			// write the message to the ros topic
+			//r = write(ros_topic_out, msg, 1);
+#endif
+			/* */
             if(r == -1){
                 RTT::Logger::log() << RTT::Logger::Info
                 << "CAN Transmission Write Error"
@@ -533,6 +544,7 @@ namespace Hubo{
             ACES::Word<canmsg_t*>* w = new ACES::Word<canmsg_t*>(msg);
             txUpStream.write(w);
 
+            // dnguyen
             if(i == rxSize-1){
                 packet << "$";
                 RTT::Logger::log(RTT::Logger::Debug) << packet.str() << RTT::endlog();
