@@ -43,7 +43,7 @@ program main {
 	linkPD("pro1","dRUpperLeg");
 	linkPD("pro1","dRKnee");
 	//linkPD("pro1","dRWrist");
-    linkPD("pro1", "dRFT");
+   linkPD("pro1", "dRFT");
 
 	addState("RHY 70 3", "Hubo", "0", sampling, baseport + 0);
 	addState("RHR 71 3", "Hubo", "1", sampling, baseport + 1);
@@ -65,28 +65,6 @@ program main {
     linkDS("dRFT", "RMx");
     linkDS("dRFT", "RMy");
     linkDS("dRFT", "RFz");
-/*
-	addState("RSP 10 200", "Hubo", "0", sampling, baseport + 12);
-	addState("RSR 10 200", "Hubo", "1", sampling, baseport + 13);
-	addState("RSY 10 200", "Hubo", "0", sampling, baseport + 14);
-	addState("REB 10 200", "Hubo", "1", sampling, baseport + 15);
-	addState("LSP 10 200", "Hubo", "0", sampling, baseport + 16);
-	addState("LSR 10 200", "Hubo", "1", sampling, baseport + 17);
-	addState("LSY 10 200", "Hubo", "0", sampling, baseport + 18);
-	addState("LEB 10 200", "Hubo", "1", sampling, baseport + 19);
-*/
-/*
-	addState("RWY 10 200", "Hubo", "0", sampling, baseport + 20);
-	addState("RW1 10 200", "Hubo", "1", sampling, baseport + 21);
-	addState("RW2 10 200", "Hubo", "2", sampling, baseport + 22);
-	addState("LWY 10 200", "Hubo", "0", sampling, baseport + 23);
-	addState("LW1 10 200", "Hubo", "1", sampling, baseport + 24);
-	addState("LW2 10 200", "Hubo", "2", sampling, baseport + 25);
-	addState("NKY 10 200", "Hubo", "0", sampling, baseport + 26);
-	addState("NK1 10 200", "Hubo", "1", sampling, baseport + 27);
-	addState("NK2 10 200", "Hubo", "2", sampling, baseport + 28);
-	addState("WST 10 200", "Hubo", "0", sampling, baseport + 29);
-*/
 	linkDS("dRHipYR","RHY");
 	linkDS("dRHipYR","RHR");
 	linkDS("dRUpperLeg","RHP");
@@ -99,37 +77,7 @@ program main {
 	linkDS("dLKnee","LKP");
 	linkDS("dLAnkle","LAP");
 	linkDS("dLAnkle","LAR");
-/*
-	linkDS("dRShoulderPR","RSP");
-	linkDS("dRShoulderPR","RSR");
-	linkDS("dRUpperArm","RSY");
-	linkDS("dRUpperArm","REB");
-	linkDS("dLShoulderPR","LSP");
-	linkDS("dLShoulderPR","LSR");
-	linkDS("dLUpperArm","LSY");
-	linkDS("dLUpperArm","LEB");
-*/
-/*
-	linkDS("dRWrist","RWY");
-	linkDS("dRWrist","RW1");
-	linkDS("dRWrist","RW2");
-	linkDS("dLWrist","LWY");
-	linkDS("dLWrist","LW1");
-	linkDS("dLWrist","LW2");
-	linkDS("dNeck","NKY");
-	linkDS("dNeck","NK1");
-	linkDS("dNeck","NK2");
-	linkDS("dHip","WST");
-*/
 
-/*
-    addState("RMx 10 50", "Hubo", "0", sampling, baseport+4);
-    addState("RMy 10 50", "Hubo", "1", sampling, baseport+5);
-    addState("RFz 10 50", "Hubo", "2", sampling, baseport+6);
-    linkDS("dRFT", "RMx");
-    linkDS("dRFT", "RMy");
-    linkDS("dRFT", "RFz");
-*/
     //addController("config 10 10", "User Program", "canConfig.ops config");
 	addController("ybscript 90 100","Script","100hz.txt");
 
@@ -164,6 +112,7 @@ program main {
     startLogger();
     scripting.loadPrograms("huboConfig.ops");
     scripting.loadPrograms("huboController.ops");
-    scripting.loadPrograms("danscriptHandWaveR1.ops");
+
+    //addController("ybscript 90 100", "Script", "");
 
 }
